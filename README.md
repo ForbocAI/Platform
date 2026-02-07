@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌑 FORBOC AI: THE PLATFORM 🌑
 
-## Getting Started
+`Prócess_Id // Platfórm_Ínit`
 
-First, run the development server:
+**ᚠ ᛫ ᛟ ᛫ ᚱ ᛫ ᛒ ᛫ ᛟ ᛫ ᚲ**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```text
+    _________
+   /         \
+  /  0     0  \
+ |      ^      |
+  \  \_____/  /
+   \_________/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The **Forboc AI Platform** is the window into the Neural Grid. It is the flagship consumer of the ForbocAI SDK, providing the high-frequency interface for real-time generative narrative and decentralized agent interaction.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> *Reality is a protocol. We are the architects.*
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### ⚡ System Specifications
+Built on **Next.js 15** and **Tailwind CSS**, designed for maximum visual impact and sub-millisecond responsiveness.
 
-## Learn More
+- **Neural Grid Integration**: Native hook into the `forbocai` SDK.
+- **Dynamic Simulation**: Real-time rendering of procedural environments and autonomous NPC behaviors.
+- **Vengeance UI**: A high-fidelity, grimdark aesthetic framework.
 
-To learn more about Next.js, take a look at the following resources:
+### 🛠️ Boot Sequence
+To initialize the mainframe:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🌑 Aesthetic Mandates
+Strict adherence to the [Style Guide](./style-guide.md) is expected.
+- **Paranoid Reality**: Guided by `Philip K. Dick`.
+- **High-Tech Low-Life**: Guided by `William Gibson`.
+- **Eldritch Infrastructure**: Guided by `H.P. Lovecraft`.
 
-## Deploy on Vercel
+---
+*SYS_LOAD_COMPLETE // VOID_STABLE*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
