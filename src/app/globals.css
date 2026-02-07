@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "JetBrains Mono", "Courier New", monospace;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+}
+
+:root {
+  --background: #09090b; /* zinc-950 */
+  --foreground: #e4e4e7; /* zinc-200 */
+  --accent-red: #ef4444; /* red-500 */
+  --accent-cyan: #06b6d4; /* cyan-500 */
+  --border-red: #7f1d1d; /* red-900 */
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    height: 100vh;
+    overflow: hidden;
+    font-family: var(--font-sans);
+  }
+
+  /* CRT Scanline Effect */
+  body::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 100;
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+  }
+
+  /* CRT Flicker Overlay */
+  body::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(18, 16, 16, 0.1);
+    opacity: 0;
+    z-index: 101;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+  }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.27861; }
+  5% { opacity: 0.34769; }
+  10% { opacity: 0.23604; }
+  15% { opacity: 0.90626; }
+  20% { opacity: 0.18128; }
+  25% { opacity: 0.83891; }
+  30% { opacity: 0.65583; }
+  35% { opacity: 0.57807; }
+  40% { opacity: 0.26559; }
+  45% { opacity: 0.84693; }
+  50% { opacity: 0.96019; }
+  55% { opacity: 0.08523; }
+  60% { opacity: 0.71313; }
+  65% { opacity: 0.09047; }
+  70% { opacity: 0.47033; }
+  75% { opacity: 0.81093; }
+  80% { opacity: 0.58391; }
+  85% { opacity: 0.65573; }
+  90% { opacity: 0.31925; }
+  95% { opacity: 0.35813; }
+  100% { opacity: 0.32204; }
+}
+
+.vengeance-border {
+  border: 1px solid var(--border-red);
+  box-shadow: 0 0 10px rgba(127, 29, 29, 0.3), inset 0 0 10px rgba(127, 29, 29, 0.2);
+  clip-path: polygon(
+    0 5px, 
+    5px 0, 
+    calc(100% - 5px) 0, 
+    100% 5px, 
+    100% calc(100% - 5px), 
+    calc(100% - 5px) 100%, 
+    5px 100%, 
+    0 calc(100% - 5px)
+  );
+}
+
+.vengeance-button {
+  @apply transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  background: rgba(127, 29, 29, 0.1);
+  border: 1px solid var(--border-red);
+  color: var(--accent-red);
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+.vengeance-button:hover:not(:disabled) {
+  background: rgba(127, 29, 29, 0.3);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+  color: #fff;
+}
+
+.text-cyan {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+}
+
+.text-red {
+  color: var(--accent-red);
+  text-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+}
