@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useGameStore } from "@/store/gameStore";
 import { generateRoom } from "@/lib/quadar/engine";
@@ -36,6 +37,7 @@ export default function GamePage() {
       {/* 1. TOP BAR: Player Stats */}
       <header className="col-span-2 vengeance-border bg-zinc-900/50 flex items-center justify-between px-8">
         <div className="flex items-center gap-8">
+          <Image src="/logo.png" alt="Forboc AI" width={32} height={32} className="object-contain shrink-0" />
           <div className="flex flex-col">
             <span className="text-[10px] text-zinc-500 uppercase tracking-widest">Ident: Ranger</span>
             <span className="text-xl font-bold text-cyan tracking-tighter">LVL {player.level}</span>
