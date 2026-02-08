@@ -4,9 +4,9 @@ import type { GameLogEntry } from "@/lib/quadar/types";
 
 export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; children?: React.ReactNode }) {
   return (
-    <aside className="vengeance-border bg-zinc-950 flex flex-col h-[100px] lg:h-full lg:border-l-0">
+    <aside className="vengeance-border bg-zinc-950 flex flex-col h-25 lg:h-full lg:border-l-0">
       <div className="flex items-center gap-2 p-2 lg:p-3 border-b border-zinc-800 bg-zinc-900/20">
-        <Terminal size={12} className="text-cyan-500 lg:size-[14px]" />
+        <Terminal size={12} className="text-cyan-500 lg:size-3.5" />
         <span className="text-[8px] lg:text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Neural Log</span>
       </div>
       <div className="flex-1 overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">

@@ -23,7 +23,7 @@ export function OracleForm({
           type="submit"
           className="bg-purple-900/20 border border-purple-500/30 text-purple-400 hover:bg-purple-900/40 hover:text-white px-3 flex items-center justify-center transition-colors"
         >
-          <Send size={12} className="lg:w-[14px] lg:h-[14px]" />
+          <Send size={12} className="lg:size-3.5" />
         </button>
       </form>
     </div>

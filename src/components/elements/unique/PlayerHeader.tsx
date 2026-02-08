@@ -30,9 +30,9 @@ export function PlayerHeader({ player }: { player: Player }) {
       </div>
       <div className="flex items-center justify-between w-full lg:w-auto gap-2 lg:gap-8">
         <div className="flex items-center gap-2 lg:gap-6">
-          <StatBox label="STR" value={player.Str} icon={<Shield size={12} className="text-orange-500 lg:size-[14px]" />} />
-          <StatBox label="AGI" value={player.Agi} icon={<Zap size={12} className="text-yellow-500 lg:size-[14px]" />} />
-          <StatBox label="ARC" value={player.Arcane} icon={<Skull size={12} className="text-purple-500 lg:size-[14px]" />} />
+          <StatBox label="STR" value={player.Str} icon={<Shield size={12} className="text-orange-500 lg:size-3.5" />} />
+          <StatBox label="AGI" value={player.Agi} icon={<Zap size={12} className="text-yellow-500 lg:size-3.5" />} />
+          <StatBox label="ARC" value={player.Arcane} icon={<Skull size={12} className="text-purple-500 lg:size-3.5" />} />
         </div>
         <div className="border-l border-zinc-800 pl-2 lg:pl-8 flex flex-col items-end">
           <span className="text-[8px] lg:text-[9px] text-zinc-600 uppercase tracking-widest">Surge</span>

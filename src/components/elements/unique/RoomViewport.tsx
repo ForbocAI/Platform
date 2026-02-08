@@ -18,7 +18,7 @@ export function RoomViewport({ room }: { room: Room }) {
         {room.hazards.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2">
             <div className="p-2 lg:p-4 bg-red-950/30 border border-red-900/50 inline-flex items-center gap-2 animate-pulse">
-              <Activity size={14} className="text-red-500 lg:size-[18px]" />
+              <Activity size={14} className="text-red-500 lg:size-4.5" />
               <span className="text-red-500 font-bold text-[10px] lg:text-sm tracking-widest">HAZARD!</span>
             </div>
           </div>
@@ -28,7 +28,7 @@ export function RoomViewport({ room }: { room: Room }) {
             {room.enemies.map((enemy) => (
               <div key={enemy.id} className="p-3 lg:p-6 bg-zinc-950/80 border border-red-900/30 text-left flex justify-between items-center">
                 <h3 className="text-red-500 font-bold text-sm lg:text-xl uppercase tracking-wider flex items-center gap-2">
-                  <Skull size={14} className="lg:size-[18px]" /> {enemy.name}
+                  <Skull size={14} className="lg:size-4.5" /> {enemy.name}
                 </h3>
                 <span className="text-sm lg:text-xl font-bold text-white">HP {enemy.hp}</span>
               </div>
