@@ -5,7 +5,7 @@ import { RuneSigil } from "./Runes";
 
 export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; children?: React.ReactNode }) {
   return (
-    <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
+    <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0" data-testid="neural-log-panel" aria-label="Neural Log">
       <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border bg-palette-bg-mid/20 shrink-0">
         <Terminal className="app-icon text-palette-accent-cyan shrink-0 animate-ambient-breathe" />
         <span className="font-bold tracking-widest text-palette-muted uppercase leading-tight" data-macro-scramble>Neural Log</span>

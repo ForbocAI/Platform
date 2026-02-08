@@ -29,7 +29,7 @@ All interactive elements in the game UI have:
 | Oracle input / Send | `oracle-input`, `oracle-submit` |
 | Stage (Knowledge / Conflict / Endings) | `stage-to-knowledge`, `stage-to-conflict`, `stage-to-endings` |
 | Fade out scene | `fade-out-scene` |
-| Facts toggle / panel | `facts-toggle`, `facts-panel` |
+| Facts toggle / panel | `facts-toggle`, `facts-panel` (panel is hidden when there are no facts; ask Oracle or COMMUNE first to generate facts) |
 | Thread buttons | `thread-{threadId}` |
 | Vignette theme / Start / Advance / End | `vignette-theme`, `vignette-start`, `vignette-advance-*`, `vignette-end` |
 | Concession modal / Accept (flee, etc.) / Reject | `concession-modal`, `concession-accept-flee`, …, `concession-reject` |
@@ -39,6 +39,15 @@ All interactive elements in the game UI have:
 | Thread list | `thread-list` |
 | Vignette controls | `vignette-controls` |
 | Loading overlay Retry | `loading-retry` |
+| Neural Log panel | `neural-log-panel` |
+
+## Query params (dev / test)
+
+| Param | Effect |
+|-------|--------|
+| `?simulateInitError=1` | Forces init to fail so the Loading overlay shows and **Retry** (`loading-retry`) can be tested. |
+| `?forceEnemy=1` | Adds one random enemy to the starting room so **Combat** and **Concession** flows can be tested without relying on random room generation. |
+| `?lowHp=1` | Sets player HP to 5 at init. Use with `forceEnemy=1` so the first enemy hit that lands triggers the **Concession** modal reliably. |
 
 ## Layout (for snapshot / scrolling)
 

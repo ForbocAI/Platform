@@ -52,7 +52,34 @@ export const initializeGame = createAsyncThunk(
         await new Promise(resolve => setTimeout(resolve, 800));
 
         const player = initializePlayer();
-        const initialRoom = await SDK.Cortex.generateStartRoom();
+        // Dev/test: low HP so one enemy hit triggers concession modal (use with forceEnemy=1)
+        if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('lowHp') === '1') {
+            player.hp = 5;
+        }
+        let initialRoom = await SDK.Cortex.generateStartRoom();
+
+        // Dev/test: force an enemy in the starting room for combat/concession playtest
+        if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('forceEnemy') === '1') {
+            const names = Object.keys(ENEMY_TEMPLATES);
+            const name = names[Math.floor(Math.random() * names.length)];
+            const template = ENEMY_TEMPLATES[name];
+            if (template && (!initialRoom.enemies || initialRoom.enemies.length === 0)) {
+                initialRoom = {
+                    ...initialRoom,
+                    enemies: [
+                        ...(initialRoom.enemies ?? []),
+                        {
+                            id: uniqueLogId(),
+                            name,
+                            ...template,
+                            hp: template.maxHp ?? 30,
+                            maxStress: 100,
+                            stress: 0,
+                        } as Enemy,
+                    ],
+                };
+            }
+        }
 
         const threadId = `thread_${Date.now()}`;
         dispatch(addThread({ id: threadId, name: "Reconnaissance" }));
