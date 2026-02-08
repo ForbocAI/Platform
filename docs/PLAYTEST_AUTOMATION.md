@@ -27,11 +27,11 @@ All interactive elements in the game UI have:
 | Toggle map | `map-toggle` |
 | SCAN / ENGAGE / COMMUNE | `action-scan`, `action-engage`, `action-commune` |
 | Oracle input / Send | `oracle-input`, `oracle-submit` |
-| Stage (Knowledge / Conflict / Endings) | `stage-to-knowledge`, `stage-to-conflict`, `stage-to-endings` |
+| Stage (Knowledge / Conflict / Endings) | `stage-to-knowledge`, `stage-to-conflict`, `stage-to-endings` (in `stage-selector`) |
 | Fade out scene | `fade-out-scene` |
-| Facts toggle / panel | `facts-toggle`, `facts-panel` (panel is hidden when there are no facts; ask Oracle or COMMUNE first to generate facts) |
+| Facts toggle / panel | `facts-toggle`, `facts-panel` (panel content visible when open; panel hidden when there are no facts—ask Oracle or COMMUNE first to generate facts) |
 | Thread buttons | `thread-{threadId}` |
-| Vignette theme / Start / Advance / End | `vignette-theme`, `vignette-start`, `vignette-advance-{stage}`, `vignette-end` (e.g. `vignette-advance-rising-action`, `vignette-advance-climax`, `vignette-advance-epilogue`) |
+| Vignette theme / Start / Advance / End | `vignette-theme`, `vignette-start`, `vignette-advance-{stage}`, `vignette-end` (e.g. `vignette-advance-rising-action`, `vignette-advance-climax`, `vignette-advance-epilogue`; `{stage}` is kebab-case of next stage name) |
 | Concession modal / Accept (flee, etc.) / Reject | `concession-modal`, `concession-accept-flee`, `concession-accept-knocked_away`, `concession-accept-captured`, `concession-accept-other`, `concession-reject` |
 | Volume / Music | `volume-up`, `volume-down`, `music-toggle` |
 | Player header | `player-header` |
@@ -55,9 +55,10 @@ The **Stage selector**, **Fade out scene** button, and **Oracle form** (Ask Orac
 
 ## Auto-play
 
-The header **auto-play** button (Play / Square icon) toggles a mode where the game runs on its own:
+The header **auto-play** button (`auto-play-toggle`, aria-label "Start auto-play" / "Stop auto-play") toggles a mode where the game runs on its own:
 
 - Every ~2.8 s it performs one random valid action: move (if an exit exists), SCAN, ENGAGE (if hostiles present), COMMUNE, or Ask Oracle (random question).
 - If a concession is offered, it randomly Accept or Reject.
+- Auto-play runs via Redux listener middleware (no component `useEffect`).
 
 Use auto-play for soak testing or to quickly generate log/facts state for manual checks.

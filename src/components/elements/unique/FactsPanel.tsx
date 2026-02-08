@@ -2,10 +2,14 @@
 
 import type { Fact } from "@/lib/quadar/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/features/core/store";
+import { selectFactsPanelOpen, toggleFactsPanel } from "@/features/core/ui/slice/uiSlice";
+import { usePlayButtonSound } from "@/features/audio";
 
 export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDisplay?: number }) {
-  const [open, setOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const open = useAppSelector(selectFactsPanelOpen);
+  const playSound = usePlayButtonSound();
   const display = facts.slice(-maxDisplay).reverse();
 
   if (facts.length === 0) return null;
@@ -14,7 +18,10 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
     <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0" data-testid="facts-panel">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          playSound();
+          dispatch(toggleFactsPanel());
+        }}
         className="w-full flex items-center gap-1 p-1.5 text-left text-palette-muted-light hover:text-palette-muted uppercase tracking-wider"
         data-testid="facts-toggle"
         aria-label={open ? "Close Facts" : "Open Facts"}

@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   askOracle,
-  autoPlayTick,
   initializeGame,
   movePlayer,
   engageEnemy,
@@ -30,7 +28,7 @@ import {
   advanceVignetteStage,
   endVignette,
 } from "@/features/narrative/slice/narrativeSlice";
-import { setOracleInput, selectOracleInput, toggleShowMap, selectShowMap, selectStageOfScene, setStageOfScene, selectAutoPlay } from "@/features/core/ui/slice/uiSlice";
+import { setOracleInput, selectOracleInput, toggleShowMap, selectShowMap, selectStageOfScene, setStageOfScene } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound } from "@/features/audio";
 import {
   PlayerHeader,
@@ -63,16 +61,7 @@ export function GameScreen() {
   const vignette = useAppSelector(selectVignette);
   const mainThreadId = useAppSelector(selectMainThreadId);
   const currentSceneId = useAppSelector(selectCurrentSceneId);
-  const autoPlay = useAppSelector(selectAutoPlay);
   const playSound = usePlayButtonSound();
-
-  useEffect(() => {
-    if (!autoPlay) return;
-    const interval = setInterval(() => {
-      dispatch(autoPlayTick());
-    }, 2800);
-    return () => clearInterval(interval);
-  }, [autoPlay, dispatch]);
 
   const handleAskOracle = (e: React.FormEvent) => {
     e.preventDefault();

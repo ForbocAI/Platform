@@ -6,6 +6,8 @@ interface UIState {
     showMap: boolean;
     stageOfScene: StageOfScene;
     autoPlay: boolean;
+    factsPanelOpen: boolean;
+    vignetteThemeInput: string;
 }
 
 const initialState: UIState = {
@@ -13,6 +15,8 @@ const initialState: UIState = {
     showMap: false,
     stageOfScene: "To Knowledge",
     autoPlay: false,
+    factsPanelOpen: false,
+    vignetteThemeInput: "",
 };
 
 export const uiSlice = createSlice({
@@ -34,10 +38,19 @@ export const uiSlice = createSlice({
         toggleAutoPlay: (state) => {
             state.autoPlay = !state.autoPlay;
         },
+        toggleFactsPanel: (state) => {
+            state.factsPanelOpen = !state.factsPanelOpen;
+        },
+        setVignetteThemeInput: (state, action: PayloadAction<string>) => {
+            state.vignetteThemeInput = action.payload;
+        },
+        clearVignetteThemeInput: (state) => {
+            state.vignetteThemeInput = "";
+        },
     }
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -60,6 +73,16 @@ export const selectStageOfScene = createSelector(
 export const selectAutoPlay = createSelector(
   [selectUIState],
   (ui) => ui.autoPlay
+);
+
+export const selectFactsPanelOpen = createSelector(
+  [selectUIState],
+  (ui) => ui.factsPanelOpen
+);
+
+export const selectVignetteThemeInput = createSelector(
+  [selectUIState],
+  (ui) => ui.vignetteThemeInput
 );
 
 export default uiSlice.reducer;

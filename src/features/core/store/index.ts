@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
-import gameReducer, { initializeGame } from '@/features/game/slice/gameSlice';
-import uiReducer from '@/features/core/ui/slice/uiSlice';
-import narrativeReducer from '@/features/narrative/slice/narrativeSlice';
+import gameReducer, { initializeGame, autoPlayTick } from '@/features/game/slice/gameSlice';
+import uiReducer, { toggleAutoPlay, clearVignetteThemeInput } from '@/features/core/ui/slice/uiSlice';
+import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';
 import { baseApi } from '@/features/core/api/baseApi';
 import { registerAudioListeners } from '@/features/audio/audioListeners';
@@ -43,6 +43,27 @@ startAppListening({
     if (!state.game.player) {
       await listenerApi.dispatch(initializeGame());
     }
+  },
+});
+
+startAppListening({
+  predicate: (action) => action.type === toggleAutoPlay.type,
+  effect: async (_, listenerApi) => {
+    const state = listenerApi.getState();
+    if (!state.ui.autoPlay) return;
+    while (true) {
+      await listenerApi.delay(2800);
+      const current = listenerApi.getState();
+      if (!current.ui.autoPlay) break;
+      listenerApi.dispatch(autoPlayTick());
+    }
+  },
+});
+
+startAppListening({
+  predicate: (action) => action.type === endVignette.type,
+  effect: async (_, listenerApi) => {
+    listenerApi.dispatch(clearVignetteThemeInput());
   },
 });
 

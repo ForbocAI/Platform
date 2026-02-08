@@ -1,7 +1,8 @@
 "use client";
 
 import type { VignetteStage } from "@/lib/quadar/types";
-import { useState, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/features/core/store";
+import { selectVignetteThemeInput, setVignetteThemeInput } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound } from "@/features/audio";
 
 const STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax", "Epilogue"];
@@ -19,15 +20,12 @@ export function VignetteControls({
   onAdvance: (stage: VignetteStage) => void;
   onEnd: () => void;
 }) {
-  const [inputTheme, setInputTheme] = useState(theme);
+  const dispatch = useAppDispatch();
+  const inputTheme = useAppSelector(selectVignetteThemeInput);
   const hasActiveVignette = Boolean(theme);
   const currentIndex = STAGES.indexOf(stage);
   const nextStage = STAGES[currentIndex + 1];
   const playSound = usePlayButtonSound();
-
-  useEffect(() => {
-    if (!theme) setInputTheme("");
-  }, [theme]);
 
   return (
     <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5 space-y-1.5" data-testid="vignette-controls">
@@ -36,7 +34,7 @@ export function VignetteControls({
         <input
           type="text"
           value={inputTheme}
-          onChange={(e) => setInputTheme(e.target.value)}
+          onChange={(e) => dispatch(setVignetteThemeInput(e.target.value))}
           placeholder="Theme"
           className="flex-1 min-w-[8rem] px-2 py-0.5 bg-palette-bg-dark border border-palette-border text-palette-muted-light text-sm"
           data-testid="vignette-theme"
