@@ -40,7 +40,8 @@ export const initializeGame = createAsyncThunk(
 
 export const askOracle = createAsyncThunk(
     'game/askOracle',
-    async (question: string, { getState, dispatch }) => {
+    async (question: string, { getState, dispatch, rejectWithValue }) => {
+        if (!question?.trim()) return rejectWithValue('empty');
         const state = getState() as { game: GameState };
         if (!state.game.player) throw new Error("No player");
 

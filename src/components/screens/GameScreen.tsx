@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   askOracle,
   movePlayer,
@@ -27,7 +27,6 @@ export function GameScreen() {
 
   const handleAskOracle = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!oracleInput.trim()) return;
     dispatch(askOracle(oracleInput));
     dispatch(setOracleInput(""));
   };

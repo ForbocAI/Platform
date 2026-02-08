@@ -37,3 +37,7 @@ startAppListening({
     }
   },
 });
+
+if (typeof window !== 'undefined') {
+  queueMicrotask(() => store.dispatch(appBootstrap));
+}
