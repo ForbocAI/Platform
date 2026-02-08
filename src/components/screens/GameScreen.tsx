@@ -108,16 +108,19 @@ export function GameScreen() {
           {showMap ? <MapView room={currentRoom} /> : <RoomViewport room={currentRoom} />}
         </div>
         <div className="min-h-0 overflow-auto w-full flex flex-col">
-          <ThreadList threads={threads} mainThreadId={mainThreadId} onSetMain={(id) => dispatch(setMainThread(id))} />
-          <FactsPanel facts={facts} />
-          <VignetteControls
-            theme={vignette?.theme ?? ""}
-            stage={vignette?.stage}
-            onStart={(theme) => dispatch(startVignette({ theme }))}
-            onAdvance={(stage) => dispatch(advanceVignetteStage({ stage }))}
-            onEnd={() => dispatch(endVignette())}
-          />
-          <NeuralLogPanel logs={logs}>
+          <div className="flex-1 min-h-0 overflow-auto flex flex-col">
+            <ThreadList threads={threads} mainThreadId={mainThreadId} onSetMain={(id) => dispatch(setMainThread(id))} />
+            <FactsPanel facts={facts} />
+            <VignetteControls
+              theme={vignette?.theme ?? ""}
+              stage={vignette?.stage}
+              onStart={(theme) => dispatch(startVignette({ theme }))}
+              onAdvance={(stage) => dispatch(advanceVignetteStage({ stage }))}
+              onEnd={() => dispatch(endVignette())}
+            />
+            <NeuralLogPanel logs={logs} />
+          </div>
+          <div className="shrink-0 flex flex-col border-t border-palette-border bg-palette-bg-mid/10">
             <div className="flex items-center gap-1.5 shrink-0">
               <StageSelector stage={stageOfScene} onStageChange={(s) => dispatch(setStageOfScene(s))} />
               {currentSceneId && (
@@ -140,7 +143,7 @@ export function GameScreen() {
               onChange={(value) => dispatch(setOracleInput(value))}
               onSubmit={handleAskOracle}
             />
-          </NeuralLogPanel>
+          </div>
         </div>
         <div className="min-h-0 overflow-hidden w-full">
           <ActionDeck

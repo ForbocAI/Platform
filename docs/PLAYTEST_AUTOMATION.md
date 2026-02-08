@@ -40,6 +40,10 @@ All interactive elements in the game UI have:
 | Vignette controls | `vignette-controls` |
 | Loading overlay Retry | `loading-retry` |
 
+## Layout (for snapshot / scrolling)
+
+The **Stage selector**, **Fade out scene** button, and **Oracle form** (Ask Oracle input + Send) live in a fixed footer strip below the scrollable middle column (Threads, Facts, Vignette, Neural Log). They are always visible without scrolling, so automation can target them by `data-testid` or `aria-label` without scrolling the log into view first.
+
 ## Auto-play
 
 The header **auto-play** button (Play / Square icon) toggles a mode where the game runs on its own:
