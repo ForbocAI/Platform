@@ -19,13 +19,17 @@ export function registerAudioListeners(
   startListening({
     predicate: (action) => action.type === "app/bootstrap",
     effect: (_action, listenerApi) => {
+      const state = listenerApi.getState();
       setMusicStateGetter(() => {
-        const state = listenerApi.getState();
+        const s = listenerApi.getState();
         return {
-          musicVolume: selectMusicVolume(state),
-          musicPlaying: selectMusicPlaying(state),
+          musicVolume: selectMusicVolume(s),
+          musicPlaying: selectMusicPlaying(s),
         };
       });
+      if (selectMusicPlaying(state)) {
+        startMusicLoop();
+      }
     },
   });
 

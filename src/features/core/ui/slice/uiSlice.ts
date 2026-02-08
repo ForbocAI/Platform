@@ -6,6 +6,7 @@ interface UIState {
     showMap: boolean;
     stageOfScene: StageOfScene;
     autoPlay: boolean;
+    textToSpeech: boolean;
     factsPanelOpen: boolean;
     vignetteThemeInput: string;
 }
@@ -15,6 +16,7 @@ const initialState: UIState = {
     showMap: false,
     stageOfScene: "To Knowledge",
     autoPlay: false,
+    textToSpeech: true,
     factsPanelOpen: false,
     vignetteThemeInput: "",
 };
@@ -38,6 +40,9 @@ export const uiSlice = createSlice({
         toggleAutoPlay: (state) => {
             state.autoPlay = !state.autoPlay;
         },
+        toggleTextToSpeech: (state) => {
+            state.textToSpeech = !state.textToSpeech;
+        },
         toggleFactsPanel: (state) => {
             state.factsPanelOpen = !state.factsPanelOpen;
         },
@@ -50,7 +55,7 @@ export const uiSlice = createSlice({
     }
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -73,6 +78,11 @@ export const selectStageOfScene = createSelector(
 export const selectAutoPlay = createSelector(
   [selectUIState],
   (ui) => ui.autoPlay
+);
+
+export const selectTextToSpeech = createSelector(
+  [selectUIState],
+  (ui) => ui.textToSpeech
 );
 
 export const selectFactsPanelOpen = createSelector(

@@ -1,15 +1,17 @@
 import Image from "next/image";
-import { Shield, Zap, Skull, Play, Square } from "lucide-react";
+import { Shield, Zap, Skull, Play, Square, Speech, Music } from "lucide-react";
 import { StatBox } from "../generic";
 import { VolumeControls } from "./VolumeControls";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
-import { selectAutoPlay, toggleAutoPlay } from "@/features/core/ui/slice/uiSlice";
-import { usePlayButtonSound } from "@/features/audio";
+import { selectAutoPlay, toggleAutoPlay, selectTextToSpeech, toggleTextToSpeech } from "@/features/core/ui/slice/uiSlice";
+import { usePlayButtonSound, startMusic, stopMusic, selectMusicPlaying } from "@/features/audio";
 import type { Player } from "@/lib/quadar/types";
 
 export function PlayerHeader({ player }: { player: Player }) {
   const dispatch = useAppDispatch();
   const autoPlay = useAppSelector(selectAutoPlay);
+  const textToSpeech = useAppSelector(selectTextToSpeech);
+  const musicPlaying = useAppSelector(selectMusicPlaying);
   const playSound = usePlayButtonSound();
 
   return (
@@ -43,6 +45,9 @@ export function PlayerHeader({ player }: { player: Player }) {
       </div>
       <div className="flex items-center justify-between w-full lg:w-auto gap-1.5 sm:gap-2 lg:gap-4 shrink-0">
         <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
+          <StatBox label="STR" value={player.Str} icon={<Shield className="app-icon text-palette-accent-warm" />} />
+          <StatBox label="AGI" value={player.Agi} icon={<Zap className="app-icon text-palette-accent-gold" />} />
+          <StatBox label="ARC" value={player.Arcane} icon={<Skull className="app-icon text-palette-accent-magic" />} />
           <button
             type="button"
             onClick={() => {
@@ -59,9 +64,38 @@ export function PlayerHeader({ player }: { player: Player }) {
           >
             {autoPlay ? <Square className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           </button>
-          <StatBox label="STR" value={player.Str} icon={<Shield className="app-icon text-palette-accent-warm" />} />
-          <StatBox label="AGI" value={player.Agi} icon={<Zap className="app-icon text-palette-accent-gold" />} />
-          <StatBox label="ARC" value={player.Arcane} icon={<Skull className="app-icon text-palette-accent-magic" />} />
+          <button
+            type="button"
+            onClick={() => {
+              playSound();
+              dispatch(toggleTextToSpeech());
+            }}
+            className={textToSpeech
+              ? "p-1 sm:p-1.5 rounded border border-palette-accent-cyan/50 bg-palette-accent-cyan/20 text-palette-accent-cyan hover:bg-palette-accent-cyan/30 transition-colors"
+              : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-cyan text-palette-muted hover:text-palette-accent-cyan transition-colors"
+            }
+            data-testid="text-to-speech-toggle"
+            aria-label={textToSpeech ? "Turn off text-to-speech" : "Turn on text-to-speech"}
+            title={textToSpeech ? "Turn off text-to-speech" : "Turn on text-to-speech"}
+          >
+            <Speech className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              playSound();
+              dispatch(musicPlaying ? stopMusic() : startMusic());
+            }}
+            className={musicPlaying
+              ? "p-1 sm:p-1.5 rounded border border-palette-accent-cyan/50 bg-palette-accent-cyan/20 text-palette-accent-cyan hover:bg-palette-accent-cyan/30 transition-colors"
+              : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-cyan text-palette-muted hover:text-palette-accent-cyan transition-colors"
+            }
+            data-testid="music-toggle"
+            aria-label={musicPlaying ? "Pause music" : "Play music"}
+            title={musicPlaying ? "Pause music" : "Play music"}
+          >
+            <Music className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${musicPlaying ? "" : "opacity-70"}`} />
+          </button>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
           <VolumeControls />

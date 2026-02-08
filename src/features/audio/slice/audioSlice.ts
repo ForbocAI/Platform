@@ -13,9 +13,9 @@ export interface AudioSliceState {
 }
 
 const initialState: AudioSliceState = {
-  masterVolume: 0.3,
-  musicVolume: 0.3 * 0.6, // masterVolume * 0.6
-  musicPlaying: false,
+  masterVolume: 1,
+  musicVolume: 1 * 0.6, // masterVolume * 0.6
+  musicPlaying: true,
 };
 
 export const audioSlice = createSlice({

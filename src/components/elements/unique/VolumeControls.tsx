@@ -3,20 +3,16 @@
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   setMasterVolume,
-  startMusic,
-  stopMusic,
   selectMasterVolume,
-  selectMusicPlaying,
   usePlayButtonSound,
 } from "@/features/audio";
-import { Volume2, VolumeX, Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 
 const VOLUME_STEP = 0.15;
 
 export function VolumeControls() {
   const dispatch = useAppDispatch();
   const masterVolume = useAppSelector(selectMasterVolume);
-  const musicPlaying = useAppSelector(selectMusicPlaying);
   const isMuted = masterVolume <= 0;
   const playSound = usePlayButtonSound();
 
@@ -30,27 +26,8 @@ export function VolumeControls() {
     dispatch(setMasterVolume(Math.max(0, masterVolume - VOLUME_STEP)));
   };
 
-  const handleToggleMusic = () => {
-    playSound();
-    dispatch(musicPlaying ? stopMusic() : startMusic());
-  };
-
   return (
     <div className="flex items-center gap-0.5 sm:gap-1 border border-palette-border rounded bg-palette-bg-mid/80 p-0.5">
-      <button
-        type="button"
-        onClick={handleToggleMusic}
-        className="p-0.5 sm:p-1 rounded border border-transparent hover:border-palette-muted hover:bg-palette-panel/80 text-palette-muted-light hover:text-palette-accent-cyan transition-colors"
-        title={musicPlaying ? "Pause music" : "Play music"}
-        aria-label={musicPlaying ? "Pause music" : "Play music"}
-        data-testid="music-toggle"
-      >
-        {musicPlaying ? (
-          <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-        ) : (
-          <VolumeX className="w-3 h-3 sm:w-3.5 sm:h-3.5 opacity-70" />
-        )}
-      </button>
       <div className="flex flex-col gap-px items-center">
         <button
           type="button"

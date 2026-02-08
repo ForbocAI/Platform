@@ -29,7 +29,7 @@ import {
   endVignette,
 } from "@/features/narrative/slice/narrativeSlice";
 import { setOracleInput, selectOracleInput, toggleShowMap, selectShowMap, selectStageOfScene, setStageOfScene } from "@/features/core/ui/slice/uiSlice";
-import { usePlayButtonSound } from "@/features/audio";
+import { usePlayButtonSound, useSpeechOnNewLog } from "@/features/audio";
 import {
   PlayerHeader,
   RoomViewport,
@@ -62,6 +62,7 @@ export function GameScreen() {
   const mainThreadId = useAppSelector(selectMainThreadId);
   const currentSceneId = useAppSelector(selectCurrentSceneId);
   const playSound = usePlayButtonSound();
+  useSpeechOnNewLog();
 
   const handleAskOracle = (e: React.FormEvent) => {
     e.preventDefault();
