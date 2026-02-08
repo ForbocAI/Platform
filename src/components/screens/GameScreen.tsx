@@ -40,7 +40,7 @@ export function GameScreen() {
   }
 
   return (
-    <main className="h-screen w-screen flex flex-col lg:grid lg:grid-cols-[1fr_400px] lg:grid-rows-[80px_1fr_250px] gap-2 p-2 bg-zinc-950 font-mono text-zinc-300 overflow-hidden">
+    <main className="h-screen w-screen flex flex-col lg:grid lg:grid-cols-[1fr_400px] lg:grid-rows-[80px_1fr_250px] gap-1 lg:gap-2 p-2 bg-zinc-950 font-mono text-zinc-300 overflow-hidden">
       <PlayerHeader player={player} />
       <RoomViewport room={currentRoom} />
       <NeuralLogPanel logs={logs}>

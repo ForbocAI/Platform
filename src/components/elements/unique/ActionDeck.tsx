@@ -18,9 +18,9 @@ export function ActionDeck({
   onCommune: () => void;
 }) {
   return (
-    <footer className="flex-shrink-0 vengeance-border lg:col-span-2 bg-zinc-900/80 p-3 lg:p-6 flex flex-col lg:flex-row gap-4 lg:gap-8 items-center justify-between">
-      <div className="flex w-full lg:w-auto gap-4 justify-between lg:justify-start">
-        <div className="grid grid-cols-3 gap-1 w-24 h-24 lg:w-32 lg:h-24 flex-shrink-0">
+    <footer className="shrink-0 vengeance-border lg:col-span-2 bg-zinc-900/80 p-2 lg:p-6 flex flex-col lg:flex-row gap-2 lg:gap-8 items-center justify-between">
+      <div className="flex w-full lg:w-auto gap-2 lg:gap-4 justify-between lg:justify-start">
+        <div className="grid grid-cols-3 gap-1 w-24 h-24 lg:w-32 lg:h-24 shrink-0">
           <div />
           <NavButton dir="N" onClick={() => onMove("North")} active={!!currentRoom.exits.North} />
           <div />
@@ -33,7 +33,7 @@ export function ActionDeck({
           <NavButton dir="S" onClick={() => onMove("South")} active={!!currentRoom.exits.South} />
           <div />
         </div>
-        <div className="grid grid-cols-1 lg:flex gap-2 lg:gap-4 flex-1">
+        <div className="grid grid-cols-3 lg:flex gap-2 lg:gap-4 flex-1">
           <GameButton onClick={onScan} icon={<Crosshair size={14} className="lg:w-[16px] lg:h-[16px]" />}>
             SCAN
           </GameButton>
