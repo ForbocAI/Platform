@@ -26,7 +26,7 @@ export function ActionDeck({
           <div />
           <NavButton dir="W" onClick={() => onMove("West")} active={!!currentRoom.exits.West} />
           <div className="bg-zinc-800/50 flex items-center justify-center rounded">
-            <MapIcon size={12} className="text-zinc-500 lg:w-[16px] lg:h-[16px]" />
+            <MapIcon size={12} className="text-zinc-500 lg:size-4" />
           </div>
           <NavButton dir="E" onClick={() => onMove("East")} active={!!currentRoom.exits.East} />
           <div />
@@ -34,13 +34,13 @@ export function ActionDeck({
           <div />
         </div>
         <div className="grid grid-cols-3 lg:flex gap-2 lg:gap-4 flex-1">
-          <GameButton onClick={onScan} icon={<Crosshair size={14} className="lg:w-[16px] lg:h-[16px]" />}>
+          <GameButton onClick={onScan} icon={<Crosshair size={14} className="lg:size-4" />}>
             SCAN
           </GameButton>
-          <GameButton onClick={onEngage} variant="danger" icon={<Skull size={14} className="lg:w-[16px] lg:h-[16px]" />}>
+          <GameButton onClick={onEngage} variant="danger" icon={<Skull size={14} className="lg:size-4" />}>
             ENGAGE
           </GameButton>
-          <GameButton onClick={onCommune} variant="magic" icon={<Activity size={14} className="lg:w-[16px] lg:h-[16px]" />}>
+          <GameButton onClick={onCommune} variant="magic" icon={<Activity size={14} className="lg:size-4" />}>
             COMMUNE
           </GameButton>
         </div>
