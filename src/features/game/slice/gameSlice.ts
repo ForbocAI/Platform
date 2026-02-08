@@ -12,6 +12,9 @@ import {
     addThread,
     applySetChange,
     setSuggestNextStage,
+    startVignette,
+    advanceVignetteStage,
+    endVignette,
 } from '@/features/narrative/slice/narrativeSlice';
 
 interface GameState {
@@ -401,8 +404,41 @@ export const gameSlice = createSlice({
         },
         rejectConcession: (state) => {
             if (state.player && state.pendingConcessionDamage > 0) {
-                state.player.hp = Math.max(0, state.player.hp - state.pendingConcessionDamage);
-                state.player.stress = Math.min(state.player.maxStress, state.player.stress + 5);
+                const damage = state.pendingConcessionDamage;
+                const newHp = Math.max(0, state.player.hp - damage);
+
+                if (newHp <= 0) {
+                    // Death Logic
+                    state.player.hp = state.player.maxHp;
+                    state.player.stress = 0;
+
+                    state.logs.push({
+                        id: uniqueLogId(),
+                        timestamp: Date.now(),
+                        message: "You have succumbed to your wounds. DEATH.",
+                        type: "combat"
+                    });
+                    state.logs.push({
+                        id: uniqueLogId(),
+                        timestamp: Date.now(),
+                        message: "SYSTEM: Vital signs critical. Initiating emergency cloning protocol... Respawned at current location.",
+                        type: "system"
+                    });
+
+                    // Clear enemies in current room to provide safety
+                    if (state.currentRoom) {
+                        state.currentRoom.enemies = [];
+                        state.logs.push({
+                            id: uniqueLogId(),
+                            timestamp: Date.now(),
+                            message: "Hostiles cleared from sector during reconstruction.",
+                            type: "system"
+                        });
+                    }
+                } else {
+                    state.player.hp = newHp;
+                    state.player.stress = Math.min(state.player.maxStress, state.player.stress + 5);
+                }
             }
             state.concessionOffered = null;
             state.pendingConcessionDamage = 0;
@@ -521,6 +557,31 @@ export const gameSlice = createSlice({
                 timestamp: Date.now(),
                 message: `The Void: ${result.description} (Roll: ${result.roll}, Surge: ${newSurge})`,
                 type: "loom"
+            });
+        });
+        // Vignette Logging
+        builder.addCase(startVignette, (state, action) => {
+            state.logs.push({
+                id: uniqueLogId(),
+                timestamp: Date.now(),
+                message: `Vignette Started: "${action.payload.theme}"`,
+                type: "narrative"
+            });
+        });
+        builder.addCase(advanceVignetteStage, (state, action) => {
+            state.logs.push({
+                id: uniqueLogId(),
+                timestamp: Date.now(),
+                message: `Vignette Advanced: ${action.payload.stage}`,
+                type: "narrative"
+            });
+        });
+        builder.addCase(endVignette, (state) => {
+            state.logs.push({
+                id: uniqueLogId(),
+                timestamp: Date.now(),
+                message: "Vignette Ended.",
+                type: "narrative"
             });
         });
     }

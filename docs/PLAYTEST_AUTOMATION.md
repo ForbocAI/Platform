@@ -82,10 +82,10 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 | **Oracle** | Type question in "Ask Oracle", click Send (or Enter) | ✅ Log "Your Question: …", then "Oracle: … (Roll: …, Surge: …)"; Facts panel gets entry |
 | **Facts panel** | After Oracle or COMMUNE, click "Open Facts" (aria-label when closed) | ✅ Panel shows fact list; button becomes "Close Facts" |
 | **Stage selector** | Click "Stage: Knowledge" / "Stage: Conflict" / "Stage: Endings" | ✅ Stage updates (Oracle/COMMUNE use current stage) |
-| **Vignette** | Enter theme in "Vignette theme", click "Start vignette" | ✅ "Theme: … · Stage: Exposition"; "Advance to Rising Action" / "Advance to Climax" / "End vignette" work |
+| **Vignette** | Enter theme in "Vignette theme", click "Start vignette" | ✅ **Logged:** Start/Advance/End actions now appear in Neural Log. |
 | **Fade out scene** | With a current scene, click "Fade out" in footer | ✅ (Scene id present when room + thread established) |
 | **Loading / Retry** | Load `?simulateInitError=1` | ✅ "Simulated init failure." + "Retry initialization" (aria-label); Retry re-runs init (fails again while param set) |
-| **Concession** | `?lowHp=1&forceEnemy=1`, ENGAGE until enemy hit would take player out | ⚠️ Code path verified (ConcessionModal, accept/reject); RNG often has enemy miss or die first. Repeat ENGAGE or use auto-play to increase chance. |
+| **Concession** | `?lowHp=1&forceEnemy=1`, ENGAGE until enemy hit would take player out | ✅ **Death implemented:** Rejecting concession at 0 HP logs death, clears room enemies, and respawns player (full HP). |
 
 ### Reproduction steps (cursor-ide-browser)
 
@@ -95,7 +95,6 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 
 ### Known issues / notes
 
-- **Concession (single-player):** Modal and accept/reject are implemented; triggering it depends on combat RNG (enemy must land a hit that would reduce player HP to 0). With `lowHp=1` + `forceEnemy=1`, the enemy may be killed before landing a hit. For deterministic concession testing, consider many ENGAGE rounds or a future dev-only option.
 - **Auto-play:** Not exercised in this pass; doc and `autoPlayTick` list valid actions and concession handling.
 
 ---
@@ -117,6 +116,40 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 1. Systematic playthrough of all single-player gameplay.
 2. Concrete improvements (bugs, UX, balance, or alignment with quadar / quadar_ familiar).
 3. `docs/PLAYTEST_AUTOMATION.md` kept current with test coverage and reproduction steps.
+
+---
+
+I need you to act as an expert Game Developer and QA Engineer to perform a systematic playthrough and improvement cycle for the single-player gameplay of the "Qua'dar" game.
+
+**Target Application:**
+- **Codebase:** `/Users/seandinwiddie/GitHub/Forboc.AI/Platform`
+- **Running Locally:** `http://localhost:3000`
+
+**Core Objectives:**
+1.  **Systematic Playtest:** Test all *remaining* single-player gameplay mechanics that haven't been fully verified yet (e.g., Level Generation variety, Hazards, specific NPC interactions, Wares/Trading, Quests, and Session completion/Scoring).
+2.  **Implement Improvements:** Fix any bugs, visual glitches, or gameplay logic that deviates from the design notes.
+3.  **Update Documentation:** Keep `docs/PLAYTEST_AUTOMATION.md` strictly up-to-date with your findings, new test coverage, and reproduction steps.
+
+**Reference Material (Read these first):**
+-   **Game Rules:** `@/Users/seandinwiddie/GitHub/Forboc/notes/quadar_familiar.md` (Mechanics, Dice, Progression)
+-   **Game World:** `@/Users/seandinwiddie/GitHub/Forboc/notes/quadar.md` (Lore, Factions, Spells)
+-   **Current Status:** `@/Users/seandinwiddie/GitHub/Forboc.AI/Platform/docs/PLAYTEST_AUTOMATION.md` (Review this to see what was just tested/fixed, specifically Vignette logging and Death/Respawn logic).
+
+**Technical Constraints & Standards:**
+-   **Architecture:** Follow `@/Users/seandinwiddie/GitHub/Forboc/notes/ref/standards/technology-maintenance/condensed.md` strictly for Frontend Architecture (FP/Redux, presentational components).
+-   **Exclusions:**
+    -   Do **NOT** implement Multiplayer.
+    -   Do **NOT** implement automated tests (Jest/Cypress), logging infrastructure, backend, database, or Expo/mobile specific code yet.
+    -   Focus strictly on the web client gameplay experience.
+
+**Immediate Next Steps:**
+1.  Read the referenced files to understand the game state and recent fixes (Death/Respawn).
+2.  Launch a browser subagent to explore the game, specifically looking for:
+    -   Different biome/room generations.
+    -   Hazard interactions (e.g., "Threat Imminent").
+    -   NPCs other than the default enemy (e.g., "Fellow Ranger").
+3.  Report logical discrepancies between the game behavior and the `quadar_familiar.md` design.
+4.  Implement fixes or enhancements directly.
 
 ---
 
