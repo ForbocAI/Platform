@@ -1,0 +1,75 @@
+"use client";
+
+import { useAppDispatch, useAppSelector } from "@/features/core/store";
+import {
+  setMasterVolume,
+  startMusic,
+  stopMusic,
+  selectMasterVolume,
+  selectMusicPlaying,
+} from "@/features/audio";
+import { Volume2, VolumeX, Minus, Plus } from "lucide-react";
+
+const VOLUME_STEP = 0.15;
+
+export function VolumeControls() {
+  const dispatch = useAppDispatch();
+  const masterVolume = useAppSelector(selectMasterVolume);
+  const musicPlaying = useAppSelector(selectMusicPlaying);
+  const isMuted = masterVolume <= 0;
+
+  const handleVolumeUp = () => {
+    dispatch(setMasterVolume(Math.min(1, masterVolume + VOLUME_STEP)));
+  };
+
+  const handleVolumeDown = () => {
+    dispatch(setMasterVolume(Math.max(0, masterVolume - VOLUME_STEP)));
+  };
+
+  const handleToggleMusic = () => {
+    dispatch(musicPlaying ? stopMusic() : startMusic());
+  };
+
+  return (
+    <div className="flex items-center gap-0.5 sm:gap-1 border border-palette-border rounded bg-palette-bg-mid/80 p-0.5">
+      <button
+        type="button"
+        onClick={handleToggleMusic}
+        className="p-0.5 sm:p-1 rounded border border-transparent hover:border-palette-muted hover:bg-palette-panel/80 text-palette-muted-light hover:text-palette-accent-cyan transition-colors"
+        title={musicPlaying ? "Pause music" : "Play music"}
+        aria-label={musicPlaying ? "Pause music" : "Play music"}
+      >
+        {musicPlaying ? (
+          <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+        ) : (
+          <VolumeX className="w-3 h-3 sm:w-3.5 sm:h-3.5 opacity-70" />
+        )}
+      </button>
+      <div className="flex flex-col gap-px items-center">
+        <button
+          type="button"
+          onClick={handleVolumeUp}
+          className="p-0.5 rounded border border-transparent hover:border-palette-muted hover:bg-palette-panel/80 text-palette-muted-light hover:text-palette-foreground disabled:opacity-40 disabled:pointer-events-none"
+          title="Volume up"
+          aria-label="Volume up"
+          disabled={masterVolume >= 1}
+        >
+          <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+        </button>
+        <span className="text-[10px] leading-tight text-palette-muted uppercase tracking-wider">
+          Vol
+        </span>
+        <button
+          type="button"
+          onClick={handleVolumeDown}
+          className="p-0.5 rounded border border-transparent hover:border-palette-muted hover:bg-palette-panel/80 text-palette-muted-light hover:text-palette-foreground disabled:opacity-40 disabled:pointer-events-none"
+          title="Volume down"
+          aria-label="Volume down"
+          disabled={isMuted}
+        >
+          <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+        </button>
+      </div>
+    </div>
+  );
+}

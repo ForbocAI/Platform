@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Shield, Zap, Skull } from "lucide-react";
 import { StatBox } from "../generic";
+import { VolumeControls } from "./VolumeControls";
 import type { Player } from "@/lib/quadar/types";
 
 export function PlayerHeader({ player }: { player: Player }) {
@@ -10,7 +11,10 @@ export function PlayerHeader({ player }: { player: Player }) {
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
           <Image src="/logo.png" alt="Forboc AI" width={48} height={48} className="logo-theme object-contain w-8 h-8 sm:w-10 sm:h-10" />
           <div className="flex flex-col min-w-[2.5rem] gap-px min-w-0">
-            <span className="text-palette-muted uppercase tracking-widest leading-tight">Ident: {player.characterClass}</span>
+            <span className="text-palette-muted uppercase tracking-widest leading-tight flex items-center gap-1.5">
+              Ident: {player.characterClass}
+              <span className="status-led" aria-hidden />
+            </span>
             <span className="font-bold text-palette-accent-cyan tracking-tight leading-tight flex items-baseline gap-1 min-w-0">
               <span className="truncate min-w-0">{player.name}</span>
               <span className="text-palette-muted-light shrink-0">LVL {player.level}</span>
@@ -36,9 +40,12 @@ export function PlayerHeader({ player }: { player: Player }) {
           <StatBox label="AGI" value={player.Agi} icon={<Zap className="app-icon text-palette-accent-gold" />} />
           <StatBox label="ARC" value={player.Arcane} icon={<Skull className="app-icon text-palette-accent-magic" />} />
         </div>
-        <div className="border-l border-palette-border pl-1.5 sm:pl-2 flex flex-col items-end gap-px">
-          <span className="text-palette-muted-light uppercase tracking-widest leading-tight">Surge</span>
-          <span className="font-black text-palette-white leading-tight">{player.surgeCount}</span>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <VolumeControls />
+          <div className="border-l border-palette-border pl-1.5 sm:pl-2 flex flex-col items-end gap-px">
+            <span className="text-palette-muted-light uppercase tracking-widest leading-tight">Surge</span>
+            <span className="font-black text-palette-white leading-tight">{player.surgeCount}</span>
+          </div>
         </div>
       </div>
     </header>

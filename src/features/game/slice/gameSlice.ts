@@ -1,9 +1,18 @@
 
 import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit';
-import { Player, Room, GameLogEntry, Enemy } from '@/lib/quadar/types';
-import { initializePlayer } from '@/lib/quadar/engine'; // Temporary: Initialization still uses direct engine for now
+import { Player, Room, GameLogEntry, Enemy, Thread, Npc } from '@/lib/quadar/types';
+import { initializePlayer, ENEMY_TEMPLATES } from '@/lib/quadar/engine';
 import { SDK } from '@/lib/sdk-placeholder';
 import { resolveDuel, resolveEnemyAttack } from '@/lib/quadar/combat';
+import { generateFollowUpFacts, resolveUnexpectedlyEffect, classifyQuestion } from '@/lib/quadar/narrativeHelpers';
+import {
+    addFact,
+    addFollowUpFacts,
+    fadeInScene,
+    addThread,
+    applySetChange,
+    setSuggestNextStage,
+} from '@/features/narrative/slice/narrativeSlice';
 
 interface GameState {
     player: Player | null;
@@ -12,6 +21,9 @@ interface GameState {
     isInitialized: boolean;
     isLoading: boolean;
     error: string | null;
+    concessionOffered: import('@/lib/quadar/types').Concession | null;
+    /** Damage that would be dealt if player rejects concession. */
+    pendingConcessionDamage: number;
 }
 
 const initialState: GameState = {
@@ -21,6 +33,8 @@ const initialState: GameState = {
     isInitialized: false,
     isLoading: false,
     error: null,
+    concessionOffered: null,
+    pendingConcessionDamage: 0,
 };
 
 function uniqueLogId(): string {
@@ -31,17 +45,23 @@ function uniqueLogId(): string {
 export const initializeGame = createAsyncThunk(
     'game/initialize',
     async (_, { dispatch }) => {
-        // Dev/test: ?simulateInitError=1 to exercise error/retry UI
         if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('simulateInitError') === '1') {
             throw new Error('Simulated init failure.');
         }
-        // Simulate initial connection sequence
         dispatch(addLog({ message: "SYSTEM: Establishing Neural Link...", type: "system" }));
         await new Promise(resolve => setTimeout(resolve, 800));
 
-        // In a real scenario, SDK.Memory.load() would happen here
         const player = initializePlayer();
         const initialRoom = await SDK.Cortex.generateStartRoom();
+
+        const threadId = `thread_${Date.now()}`;
+        dispatch(addThread({ id: threadId, name: "Reconnaissance" }));
+        dispatch(fadeInScene({
+            roomId: initialRoom.id,
+            mainThreadId: threadId,
+            stageOfScene: "To Knowledge",
+            participantIds: [player.id],
+        }));
 
         return { player, initialRoom };
     }
@@ -51,13 +71,37 @@ export const askOracle = createAsyncThunk(
     'game/askOracle',
     async (question: string, { getState, dispatch, rejectWithValue }) => {
         if (!question?.trim()) return rejectWithValue('empty');
-        const state = getState() as { game: GameState; ui: { stageOfScene: import('@/lib/quadar/types').StageOfScene } };
+        const state = getState() as {
+            game: GameState;
+            ui: { stageOfScene: import('@/lib/quadar/types').StageOfScene };
+            narrative: { currentSceneId: string | null; threads: { id: string }[] };
+        };
         if (!state.game.player) throw new Error("No player");
 
         dispatch(addLog({ message: `Your Question: "${question}"`, type: "system" }));
 
         const stage = state.ui?.stageOfScene ?? "To Knowledge";
         const result = await SDK.Cortex.consultOracle(question, state.game.player.surgeCount, stage);
+
+        dispatch(addFact({
+            sourceQuestion: question,
+            sourceAnswer: result.description,
+            text: `${question} → ${result.description}`,
+            isFollowUp: false,
+            questionKind: classifyQuestion(question),
+        }));
+        const followUps = generateFollowUpFacts(question, result);
+        if (followUps.length) dispatch(addFollowUpFacts({ facts: followUps }));
+
+        if (result.qualifier === "unexpectedly" && result.unexpectedEventIndex != null && result.unexpectedEventLabel) {
+            const effect = resolveUnexpectedlyEffect(result.unexpectedEventIndex, result.unexpectedEventLabel);
+            if (effect.applySetChange) dispatch(applySetChange());
+            if (effect.suggestNextStage) dispatch(setSuggestNextStage(effect.suggestNextStage));
+            if (effect.applyEnteringRed && state.game.currentRoom) {
+                dispatch(addHazardOrEnemyToCurrentRoom());
+            }
+        }
+
         return result;
     }
 );
@@ -65,7 +109,10 @@ export const askOracle = createAsyncThunk(
 export const movePlayer = createAsyncThunk(
     'game/movePlayer',
     async (direction: string, { getState, dispatch }) => {
-        const state = getState() as { game: GameState };
+        const state = getState() as {
+            game: GameState;
+            narrative: { currentSceneId: string | null; threads: Thread[]; mainThreadId: string | null };
+        };
         if (!state.game.currentRoom) throw new Error("No room");
 
         const isValid = await SDK.Bridge.validateMove(state.game.currentRoom, direction);
@@ -76,6 +123,17 @@ export const movePlayer = createAsyncThunk(
 
         const newRoom = await SDK.Cortex.generateRoom();
         dispatch(addLog({ message: `Moved ${direction}.`, type: "exploration" }));
+
+        const { currentSceneId, threads, mainThreadId } = state.narrative;
+        if (!currentSceneId && threads.length > 0 && newRoom) {
+            const threadId = mainThreadId ?? threads[0].id;
+            dispatch(fadeInScene({
+                roomId: newRoom.id,
+                mainThreadId: threadId,
+                stageOfScene: "To Knowledge",
+                participantIds: state.game.player ? [state.game.player.id] : [],
+            }));
+        }
 
         return newRoom;
     }
@@ -90,7 +148,7 @@ export const engageEnemy = createAsyncThunk(
 
         if (!currentRoom.enemies?.length) {
             dispatch(addLog({ message: "No hostiles in range.", type: "combat" }));
-            return { updatedRoom: null };
+            return { updatedRoom: null, playerDamage: 0 };
         }
 
         const target = currentRoom.enemies[0];
@@ -115,12 +173,19 @@ export const engageEnemy = createAsyncThunk(
             if (counterResult.hit) playerDamage = counterResult.damage;
         }
 
+        const wouldBeTakenOut = player && playerDamage > 0 && player.hp - playerDamage <= 0;
+        const concession = wouldBeTakenOut
+            ? { offered: true as const, outcome: undefined as import('@/lib/quadar/types').ConcessionOutcome | undefined, narrative: undefined as string | undefined }
+            : null;
+
         return {
             updatedRoom: {
                 ...currentRoom,
                 enemies: updatedEnemies,
             },
-            playerDamage,
+            playerDamage: concession ? 0 : playerDamage,
+            concessionOffered: concession,
+            pendingConcessionDamage: concession ? playerDamage : 0,
         };
     }
 );
@@ -159,16 +224,48 @@ const COMMUNE_QUESTION = "What does the void reveal?";
 export const communeWithVoid = createAsyncThunk(
     'game/communeWithVoid',
     async (_, { getState, dispatch }) => {
-        const state = getState() as { game: GameState; ui: { stageOfScene: import('@/lib/quadar/types').StageOfScene } };
+        const state = getState() as {
+            game: GameState;
+            ui: { stageOfScene: import('@/lib/quadar/types').StageOfScene };
+            narrative: { currentSceneId: string | null };
+        };
         if (!state.game.player) throw new Error("No player");
 
         dispatch(addLog({ message: "You attempt to commune with the void...", type: "loom" }));
 
         const stage = state.ui?.stageOfScene ?? "To Knowledge";
         const result = await SDK.Cortex.consultOracle(COMMUNE_QUESTION, state.game.player.surgeCount, stage);
+
+        dispatch(addFact({
+            sourceQuestion: COMMUNE_QUESTION,
+            sourceAnswer: result.description,
+            text: `${COMMUNE_QUESTION} → ${result.description}`,
+            isFollowUp: false,
+        }));
+        const followUps = generateFollowUpFacts(COMMUNE_QUESTION, result);
+        if (followUps.length) dispatch(addFollowUpFacts({ facts: followUps }));
+
+        if (result.qualifier === "unexpectedly" && result.unexpectedEventIndex != null && result.unexpectedEventLabel) {
+            const effect = resolveUnexpectedlyEffect(result.unexpectedEventIndex, result.unexpectedEventLabel);
+            if (effect.applySetChange) dispatch(applySetChange());
+            if (effect.suggestNextStage) dispatch(setSuggestNextStage(effect.suggestNextStage));
+            if (effect.applyEnteringRed && state.game.currentRoom) {
+                dispatch(addHazardOrEnemyToCurrentRoom());
+            }
+            if (effect.applyEnterStageLeft && state.game.currentRoom) {
+                dispatch(addAllyToCurrentRoom());
+            }
+        }
+
         return result;
     }
 );
+
+const FELLOW_RANGER: Npc = {
+    id: "fellow_ranger",
+    name: "Fellow Ranger",
+    description: "A fresh recruit. Reconnaissance objective.",
+};
 
 export const gameSlice = createSlice({
     name: 'game',
@@ -181,7 +278,61 @@ export const gameSlice = createSlice({
                 message: action.payload.message,
                 type: action.payload.type
             });
-        }
+        },
+        /** Entering the Red: add hazard or enemy to current room. */
+        addHazardOrEnemyToCurrentRoom: (state) => {
+            if (!state.currentRoom) return;
+            const roll = Math.random();
+            if (roll < 0.5 && !state.currentRoom.enemies.length) {
+                const names = Object.keys(ENEMY_TEMPLATES);
+                const name = names[Math.floor(Math.random() * names.length)];
+                const template = ENEMY_TEMPLATES[name];
+                if (template) {
+                    state.currentRoom.enemies.push({
+                        id: uniqueLogId(),
+                        name,
+                        ...template,
+                        hp: template.maxHp ?? 30,
+                        maxStress: 100,
+                        stress: 0,
+                    } as Enemy);
+                }
+            } else {
+                if (!state.currentRoom.hazards.includes("Threat Imminent")) {
+                    state.currentRoom.hazards = [...state.currentRoom.hazards, "Threat Imminent"];
+                }
+            }
+        },
+        acceptConcession: (state, action: PayloadAction<{ outcome: import('@/lib/quadar/types').ConcessionOutcome; narrative?: string }>) => {
+            state.concessionOffered = null;
+            state.pendingConcessionDamage = 0;
+            if (action.payload.narrative) {
+                state.logs.push({
+                    id: uniqueLogId(),
+                    timestamp: Date.now(),
+                    message: action.payload.narrative,
+                    type: "combat"
+                });
+            }
+        },
+        rejectConcession: (state) => {
+            if (state.player && state.pendingConcessionDamage > 0) {
+                state.player.hp = Math.max(0, state.player.hp - state.pendingConcessionDamage);
+                state.player.stress = Math.min(state.player.maxStress, state.player.stress + 5);
+            }
+            state.concessionOffered = null;
+            state.pendingConcessionDamage = 0;
+        },
+        /** Enter Stage Left: add Fellow Ranger (or similar) to current room. */
+        addAllyToCurrentRoom: (state) => {
+            if (!state.currentRoom) return;
+            const allies = state.currentRoom.allies ?? [];
+            if (allies.some((a) => a.name === FELLOW_RANGER.name)) return;
+            state.currentRoom.allies = [
+                ...allies,
+                { ...FELLOW_RANGER, id: `ranger_${uniqueLogId()}` },
+            ];
+        },
     },
     extraReducers: (builder) => {
         // Initialize
@@ -255,9 +406,11 @@ export const gameSlice = createSlice({
             if (action.payload.updatedRoom) {
                 state.currentRoom = action.payload.updatedRoom;
             }
-            if (state.player && action.payload.playerDamage && action.payload.playerDamage > 0) {
+            if (action.payload.concessionOffered) {
+                state.concessionOffered = action.payload.concessionOffered;
+                state.pendingConcessionDamage = action.payload.pendingConcessionDamage ?? 0;
+            } else if (state.player && action.payload.playerDamage && action.payload.playerDamage > 0) {
                 state.player.hp = Math.max(0, state.player.hp - action.payload.playerDamage);
-                // Stress: +5 when taking combat damage
                 state.player.stress = Math.min(state.player.maxStress, state.player.stress + 5);
             }
         });
@@ -289,7 +442,13 @@ export const gameSlice = createSlice({
     }
 });
 
-export const { addLog } = gameSlice.actions;
+export const {
+    addLog,
+    addHazardOrEnemyToCurrentRoom,
+    acceptConcession,
+    rejectConcession,
+    addAllyToCurrentRoom,
+} = gameSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectGameState = (state: { game: GameState }) => state.game;
@@ -322,6 +481,11 @@ export const selectIsLoading = createSelector(
 export const selectError = createSelector(
     [selectGameState],
     (game) => game.error
+);
+
+export const selectConcessionOffered = createSelector(
+    [selectGameState],
+    (game) => game.concessionOffered
 );
 
 export default gameSlice.reducer;

@@ -7,15 +7,30 @@ export interface CombatResult {
     message: string;
 }
 
+/** Group Score modifier for crowd/ally support (Familiar: "special abilities affecting a crowd contribute to Group Score"). */
+export interface GroupScoreModifier {
+    attackerBonus?: number;
+    defenderBonus?: number;
+}
+
 /** Shadows of Fate: d20 + Str + Agi + Arcane + optional spell modifier. Higher total wins. */
 function rollCombatTotal(stats: Stats, spellModifier = 0): number {
     const d20 = Math.floor(Math.random() * 20) + 1;
     return d20 + stats.Str + stats.Agi + stats.Arcane + spellModifier;
 }
 
-export function resolveDuel(attacker: Stats, defender: Enemy, spellModifier = 0): CombatResult {
-    const attackerTotal = rollCombatTotal(attacker, spellModifier);
-    const defenderTotal = rollCombatTotal(defender);
+export function resolveDuel(
+    attacker: Stats,
+    defender: Enemy,
+    spellModifier = 0,
+    groupScore?: GroupScoreModifier
+): CombatResult {
+    let attackerTotal = rollCombatTotal(attacker, spellModifier);
+    let defenderTotal = rollCombatTotal(defender);
+    if (groupScore) {
+        attackerTotal += groupScore.attackerBonus ?? 0;
+        defenderTotal += groupScore.defenderBonus ?? 0;
+    }
 
     const isHit = attackerTotal > defenderTotal;
     let damage = 0;
@@ -38,9 +53,17 @@ export function resolveDuel(attacker: Stats, defender: Enemy, spellModifier = 0)
 }
 
 /** Enemy attacks the player. Shadows of Fate: both roll d20 + Str + Agi + Arcane, higher wins. */
-export function resolveEnemyAttack(attacker: Enemy, defender: Player): CombatResult {
-    const attackerTotal = rollCombatTotal(attacker);
-    const defenderTotal = rollCombatTotal(defender);
+export function resolveEnemyAttack(
+    attacker: Enemy,
+    defender: Player,
+    groupScore?: GroupScoreModifier
+): CombatResult {
+    let attackerTotal = rollCombatTotal(attacker);
+    let defenderTotal = rollCombatTotal(defender);
+    if (groupScore) {
+        attackerTotal += groupScore.attackerBonus ?? 0;
+        defenderTotal += groupScore.defenderBonus ?? 0;
+    }
 
     const isHit = attackerTotal > defenderTotal;
     let damage = 0;

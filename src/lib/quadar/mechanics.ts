@@ -1,5 +1,5 @@
 
-import { CharacterClass, Spell } from "./types";
+import { CharacterClass, Spell, Stats } from "./types";
 
 export const SPELLS: Record<string, Spell> = {
     // --- Ashwalker (Ranger/Rogue) Spells ---
@@ -56,6 +56,21 @@ export const SPELLS: Record<string, Spell> = {
         description: "Encase in diamond shell, invulnerable.",
         effect: () => "Invulnerability"
     },
+    "dark_crystal_shielding": {
+        id: "dark_crystal_shielding",
+        name: "Dark Crystal Shielding",
+        class: "Obsidian Warden",
+        description: "Form protective abyssal crystal shields.",
+        effect: (_a: Stats, _d: Stats) => "Reduce incoming damage"
+    },
+    "death_shard_strike": {
+        id: "death_shard_strike",
+        name: "Death Shard Strike",
+        class: "Obsidian Warden",
+        description: "Rapid flurry of crystalline poison shards.",
+        damage: "2d6",
+        effect: (_a: Stats, _d: Stats) => "Piercing"
+    },
 
     // --- Doomguard Spells ---
     "hellfire_explosion": {
@@ -73,6 +88,38 @@ export const SPELLS: Record<string, Spell> = {
         description: "Bludgeoning charge closing gap.",
         damage: "1d10 + STR",
         effect: () => "Charge Damage"
+    },
+    "explosive_barrage": {
+        id: "explosive_barrage",
+        name: "Explosive Barrage",
+        class: "Doomguard",
+        description: "Barrage of ranged death attacks.",
+        damage: "2d6 AoE",
+        effect: (_a: Stats, _d: Stats) => "AoE"
+    },
+    "ripping_blade_slash": {
+        id: "ripping_blade_slash",
+        name: "Ripping Blade Slash",
+        class: "Doomguard",
+        description: "Searing jagged blade slash.",
+        damage: "1d8 + STR",
+        effect: (_a: Stats, _d: Stats) => "Fire/melee"
+    },
+
+    // --- Ashwalker (more from quadar.md) ---
+    "eternal_flame": {
+        id: "eternal_flame",
+        name: "Eternal Flame",
+        class: "Ashwalker",
+        description: "Absorb residual life after killing, empower attacks.",
+        effect: (_a: Stats, _d: Stats) => "Buff on kill"
+    },
+    "blazing_trail": {
+        id: "blazing_trail",
+        name: "Blazing Trail",
+        class: "Ashwalker",
+        description: "Leave magikal flames in wake.",
+        effect: (_a: Stats, _d: Stats) => "Burning trail"
     }
 };
 
@@ -86,11 +133,11 @@ export const CLASS_TEMPLATES: Record<CharacterClass, {
     },
     "Obsidian Warden": {
         baseStats: { Str: 18, Agi: 8, Arcane: 10, maxHp: 200, maxStress: 80 },
-        startingSpells: ["obsidian_surge", "petrified_diamond_embrace"]
+        startingSpells: ["obsidian_surge", "petrified_diamond_embrace", "dark_crystal_shielding"]
     },
     "Doomguard": {
         baseStats: { Str: 16, Agi: 10, Arcane: 12, maxHp: 180, maxStress: 90 },
-        startingSpells: ["hellfire_explosion", "dreadful_charge"]
+        startingSpells: ["hellfire_explosion", "dreadful_charge", "explosive_barrage"]
     },
     // Defaults for others to prevent crashes, implement full list later
     "Iron Armored Guardian": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },

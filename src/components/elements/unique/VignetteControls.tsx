@@ -1,0 +1,63 @@
+"use client";
+
+import type { VignetteStage } from "@/lib/quadar/types";
+import { useState } from "react";
+
+const STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax", "Epilogue"];
+
+export function VignetteControls({
+  theme = "",
+  stage = "Exposition",
+  onStart,
+  onAdvance,
+  onEnd,
+}: {
+  theme?: string;
+  stage?: VignetteStage;
+  onStart: (theme: string) => void;
+  onAdvance: (stage: VignetteStage) => void;
+  onEnd: () => void;
+}) {
+  const [inputTheme, setInputTheme] = useState(theme);
+  const currentIndex = STAGES.indexOf(stage);
+  const nextStage = STAGES[currentIndex + 1];
+
+  return (
+    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5 space-y-1.5">
+      <span className="text-palette-muted uppercase tracking-wider text-xs block">Vignette</span>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <input
+          type="text"
+          value={inputTheme}
+          onChange={(e) => setInputTheme(e.target.value)}
+          placeholder="Theme"
+          className="flex-1 min-w-[8rem] px-2 py-0.5 bg-palette-bg-dark border border-palette-border text-palette-muted-light text-sm"
+        />
+        <button
+          type="button"
+          onClick={() => onStart(inputTheme)}
+          className="px-2 py-0.5 border border-palette-border text-palette-muted hover:border-palette-accent-cyan hover:text-palette-accent-cyan text-xs uppercase"
+        >
+          Start
+        </button>
+        {nextStage && (
+          <button
+            type="button"
+            onClick={() => onAdvance(nextStage)}
+            className="px-2 py-0.5 border border-palette-accent-magic/50 text-palette-accent-magic text-xs uppercase"
+          >
+            → {nextStage}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onEnd}
+          className="px-2 py-0.5 border border-palette-border text-palette-muted hover:text-palette-accent-red text-xs uppercase"
+        >
+          End
+        </button>
+      </div>
+      {theme ? <p className="text-xs text-palette-muted">Theme: {theme} · Stage: {stage}</p> : null}
+    </div>
+  );
+}

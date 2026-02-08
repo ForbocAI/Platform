@@ -1,4 +1,4 @@
-import { Room, Biome, Enemy, Player, LoomResult, StageOfScene } from "./types";
+import { Room, Biome, Enemy, Player, LoomResult, StageOfScene, Npc } from "./types";
 import { UNEXPECTEDLY_TABLE, CLASS_TEMPLATES } from "./mechanics";
 
 const BIOMES: Biome[] = ["Ethereal Marshlands", "Toxic Wastes", "Haunted Chapel", "Obsidian Spire"];
@@ -19,7 +19,7 @@ const LOOM_RANGES: Record<StageOfScene, { min: number; max: number }[]> = {
   ],
 };
 
-const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
+export const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
     "Obsidian Warden": {
         characterClass: "Obsidian Warden",
         ac: 15,
@@ -68,9 +68,20 @@ export function initializePlayer(): Player {
     };
 }
 
+/** Fellow rangers / fresh recruits (Familiar: "Occasionally fresh recruits get sent here. Fellow rangers spawn."). */
+const FELLOW_RANGER: Npc = {
+  id: "fellow_ranger",
+  name: "Fellow Ranger",
+  description: "A fresh recruit drawn to the Tower. Reconnaissance objective.",
+};
+
 /** Generates the initial Quadar Tower merchandise store room per Familiar rules. */
 export function generateStartRoom(): Room {
-  return generateRoom("start_room", "Quadar Tower", { title: "Store Room", description: "In the cryptic recesses of Quadar Tower, you preside over an emporium, brokering eldritch artifacts amid its shadowed corridors. A merchandise store room you manage and trade wares from." });
+  const room = generateRoom("start_room", "Quadar Tower", { title: "Store Room", description: "In the cryptic recesses of Quadar Tower, you preside over an emporium, brokering eldritch artifacts amid its shadowed corridors. A merchandise store room you manage and trade wares from." });
+  if (Math.random() < 0.4) {
+    room.allies = [{ ...FELLOW_RANGER, id: `ranger_${Date.now()}` }];
+  }
+  return room;
 }
 
 interface GenerateRoomOverrides {
@@ -119,6 +130,7 @@ export function generateRoom(id?: string, biomeOverride?: Biome, overrides?: Gen
             West: Math.random() > 0.3 ? "new-room" : null,
         },
         enemies,
+        allies: [],
     };
 }
 
@@ -172,10 +184,13 @@ export function consultLoom(question: string, currentSurgeCount: number, stage: 
 
     const newSurge = result.qualifier ? -1 : 2;
 
+    let unexpectedEventIndex: number | undefined;
+    let unexpectedEventLabel: string | undefined;
     if (result.qualifier === "unexpectedly") {
         const d20 = Math.floor(Math.random() * 20) + 1;
-        const unexpectedEvent = UNEXPECTEDLY_TABLE[d20 - 1] || "Re-roll";
-        description += ` [EVENT: ${unexpectedEvent}]`;
+        unexpectedEventIndex = d20;
+        unexpectedEventLabel = UNEXPECTEDLY_TABLE[d20 - 1] || "Re-roll";
+        description += ` [EVENT: ${unexpectedEventLabel}]`;
     }
 
     return {
@@ -183,6 +198,8 @@ export function consultLoom(question: string, currentSurgeCount: number, stage: 
         qualifier: result.qualifier,
         description,
         roll: modifiedRoll,
-        surgeUpdate: newSurge
+        surgeUpdate: newSurge,
+        unexpectedEventIndex,
+        unexpectedEventLabel,
     };
 }

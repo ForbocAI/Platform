@@ -2,7 +2,10 @@ import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
 import gameReducer, { initializeGame } from '@/features/game/slice/gameSlice';
 import uiReducer from '@/features/core/ui/slice/uiSlice';
+import narrativeReducer from '@/features/narrative/slice/narrativeSlice';
+import audioReducer from '@/features/audio/slice/audioSlice';
 import { baseApi } from '@/features/core/api/baseApi';
+import { registerAudioListeners } from '@/features/audio/audioListeners';
 import '@/features/core/api/gameApi';
 
 export const appBootstrap = { type: 'app/bootstrap' as const };
@@ -13,6 +16,8 @@ export const store = configureStore({
   reducer: {
     game: gameReducer,
     ui: uiReducer,
+    narrative: narrativeReducer,
+    audio: audioReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -28,6 +33,8 @@ export type AppDispatch = typeof store.dispatch;
 export { useAppDispatch, useAppSelector } from './hooks';
 
 const startAppListening = listenerMiddleware.startListening as TypedStartListening<RootState, AppDispatch>;
+
+registerAudioListeners(startAppListening);
 
 startAppListening({
   predicate: (action) => action.type === 'app/bootstrap',

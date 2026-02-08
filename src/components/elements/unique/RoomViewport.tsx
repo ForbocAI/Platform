@@ -9,8 +9,8 @@ export function RoomViewport({ room }: { room: Room }) {
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-palette-bg-dark/80 pointer-events-none" />
       <div className="w-full max-w-2xl text-center z-10 relative overflow-y-auto max-h-full scrollbar-hide">
         <RuneSigil className="block mb-1.5 sm:mb-2" />
-        <span className="text-palette-accent-red/50 tracking-[0.2em] uppercase mb-1 block leading-tight">{room.biome}</span>
-        <h2 className="font-black text-palette-white mb-1.5 sm:mb-2 tracking-widest uppercase contrast-125 drop-shadow-md leading-tight">
+        <span className="text-palette-accent-red/50 tracking-[0.2em] uppercase mb-1 block leading-tight animate-holo-flicker">{room.biome}</span>
+        <h2 className="font-black text-palette-white mb-1.5 sm:mb-2 tracking-widest uppercase contrast-125 drop-shadow-md leading-tight glitch-text" data-text={room.title}>
           {room.title}
         </h2>
         <div className="w-8 sm:w-12 h-px bg-palette-border-red mx-auto mb-1.5 sm:mb-2" />
@@ -23,6 +23,18 @@ export function RoomViewport({ room }: { room: Room }) {
               <Activity className="app-icon text-palette-accent-red" />
               <span className="text-palette-accent-red font-bold tracking-widest">HAZARD!</span>
             </div>
+          </div>
+        )}
+        {room.allies && room.allies.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap justify-center gap-1">
+            {room.allies.map((ally) => (
+              <span
+                key={ally.id}
+                className="px-2 py-0.5 bg-palette-accent-cyan/20 border border-palette-accent-cyan/50 text-palette-accent-cyan text-xs uppercase"
+              >
+                {ally.name}
+              </span>
+            ))}
           </div>
         )}
         {room.enemies.length > 0 && (

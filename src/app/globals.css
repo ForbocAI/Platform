@@ -218,13 +218,13 @@
 
 /* Status LED — monochrome pulse (use animation: ambient-breathe) */
 .status-led {
-  width: 8px;
-  height: 8px;
-  min-width: 8px;
-  min-height: 8px;
+  width: 5px;
+  height: 5px;
+  min-width: 5px;
+  min-height: 5px;
   background: var(--accent-cyan);
   border-radius: 50%;
-  box-shadow: 0 0 6px var(--accent-cyan), 0 0 12px var(--accent-cyan);
+  box-shadow: 0 0 6px var(--accent-cyan), 0 0 8px var(--accent-cyan);
   margin-left: 0.5rem;
   position: relative;
   opacity: 0.9;

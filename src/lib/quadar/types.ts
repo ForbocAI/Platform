@@ -53,6 +53,13 @@ export interface Item {
     type: "weapon" | "armor" | "consumable" | "relic";
 }
 
+/** Friendly or neutral NPC (e.g. Fellow Ranger). */
+export interface Npc {
+    id: string;
+    name: string;
+    description: string;
+}
+
 export interface Room {
     id: string;
     title: string;
@@ -61,6 +68,8 @@ export interface Room {
     hazards: string[];
     exits: Record<Direction, string | null>; // Maps direction to room ID
     enemies: Enemy[];
+    /** Fellow rangers, recruits, or other non-hostile NPCs (Familiar). */
+    allies?: Npc[];
 }
 
 export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower";
@@ -90,4 +99,100 @@ export interface LoomResult {
     description: string;
     roll: number;
     surgeUpdate: number; // How much to add/reset to surge count
+    /** When qualifier is "unexpectedly", the d20 result 1–20 for Table 2. */
+    unexpectedEventIndex?: number;
+    unexpectedEventLabel?: string;
+}
+
+// --- Speculum Threads (quadar_ familiar) ---
+
+export type ThreadStage = "To Knowledge" | "To Conflict" | "To Endings";
+
+export interface Thread {
+    id: string;
+    name: string;
+    stage?: ThreadStage;
+    visitedSceneIds: string[];
+    relatedNpcIds: string[];
+    facts: string[];
+    createdAt: number;
+}
+
+export interface SceneRecord {
+    id: string;
+    locationRoomId: string;
+    mainThreadId: string;
+    stageOfScene: StageOfScene;
+    participantIds: string[];
+    status: "active" | "faded";
+    openedAt: number;
+    closedAt?: number;
+}
+
+export interface Fact {
+    id: string;
+    sourceQuestion?: string;
+    sourceAnswer?: string;
+    text: string;
+    isFollowUp: boolean;
+    /** Chipping (incremental) vs cutting (direct) question. */
+    questionKind?: QuestionKind;
+    timestamp: number;
+}
+
+export type VignetteStage = "Exposition" | "Rising Action" | "Climax" | "Epilogue";
+
+export interface Vignette {
+    id: string;
+    theme: string;
+    stage: VignetteStage;
+    threadIds: string[];
+    createdAt: number;
+}
+
+// --- Combat concessions (Familiar) ---
+
+export type ConcessionOutcome = "flee" | "knocked_away" | "captured" | "other";
+
+export interface Concession {
+    offered: boolean;
+    outcome?: ConcessionOutcome;
+    narrative?: string;
+}
+
+// --- Question heuristics (Chipping vs Cutting) ---
+
+export type QuestionKind = "chipping" | "cutting";
+
+// --- Unexpectedly effect (Table 2 mechanical result) ---
+
+export type UnexpectedlyEffectType =
+    | "foreshadowing"
+    | "tying_off"
+    | "to_conflict"
+    | "costume_change"
+    | "key_grip"
+    | "to_knowledge"
+    | "framing"
+    | "set_change"
+    | "upstaged"
+    | "pattern_change"
+    | "limelit"
+    | "entering_the_red"
+    | "to_endings"
+    | "montage"
+    | "enter_stage_left"
+    | "cross_stitch"
+    | "six_degrees"
+    | "reroll_reserved";
+
+export interface UnexpectedlyEffect {
+    type: UnexpectedlyEffectType;
+    label: string;
+    applySetChange?: boolean;
+    applyEnteringRed?: boolean;
+    /** Enter Stage Left: add PC/NPC to scene (e.g. Fellow Ranger). */
+    applyEnterStageLeft?: boolean;
+    suggestNewMainThreadId?: string;
+    suggestNextStage?: StageOfScene;
 }

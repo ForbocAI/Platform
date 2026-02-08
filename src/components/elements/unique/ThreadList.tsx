@@ -1,0 +1,39 @@
+"use client";
+
+import type { Thread } from "@/lib/quadar/types";
+import { cn } from "@/lib/utils";
+
+export function ThreadList({
+  threads,
+  mainThreadId,
+  onSetMain,
+}: {
+  threads: Thread[];
+  mainThreadId: string | null;
+  onSetMain: (id: string) => void;
+}) {
+  if (threads.length === 0) return null;
+
+  return (
+    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5">
+      <span className="text-palette-muted uppercase tracking-wider text-xs block mb-1">Threads</span>
+      <div className="flex flex-wrap gap-1">
+        {threads.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => onSetMain(t.id)}
+            className={cn(
+              "px-2 py-0.5 text-xs font-bold uppercase tracking-wider border transition-colors",
+              mainThreadId === t.id
+                ? "bg-palette-accent-magic/50 border-palette-accent-cyan/50 text-palette-accent-cyan"
+                : "border-palette-border text-palette-muted hover:text-palette-muted-light"
+            )}
+          >
+            {t.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
