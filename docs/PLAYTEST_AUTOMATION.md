@@ -97,3 +97,35 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 
 - **Concession (single-player):** Modal and accept/reject are implemented; triggering it depends on combat RNG (enemy must land a hit that would reduce player HP to 0). With `lowHp=1` + `forceEnemy=1`, the enemy may be killed before landing a hit. For deterministic concession testing, consider many ENGAGE rounds or a future dev-only option.
 - **Auto-play:** Not exercised in this pass; doc and `autoPlayTick` list valid actions and concession handling.
+
+---
+
+**Task:** Fully test all single-player gameplay for the Qua'dar game and make improvements. Keep the automation doc up to date.
+
+**What we're testing:** `/Users/seandinwiddie/GitHub/Forboc.AI/Platform` — the game runs at **http://localhost:3000** (port 3000).
+
+**References (source of truth):**
+- **Game design / Familiar system:** `@Forboc/notes/quadar_ familiar.md` — initialization, guidance, questioning, d100/d20 tables, modifiers (And/But/And Unexpectedly), Speculum, etc.
+- **Game world / rules:** `@Forboc/notes/quadar.md` — Qua'dar setting, characters (Obsidian Wardens, Doomguards, etc.), classes, spells, Umbralyn, Quadar Tower.
+- **Code standards (architecture only):** `@Forboc/notes/ref/standards/technology-maintenance/condensed.md` — follow FP/Redux patterns, presentational components, reducer-first logic, directory structure. **Do NOT implement:** tests, logging, backend, db, or Expo. Use it only for frontend architecture and style.
+
+**Scope:**
+- Test and improve **all** single-player gameplay (movement, combat, level generation, hazards, NPCs, wares, quests, session/scoring, etc.). **Exclude multiplayer.**
+- After each playtest or change, **update `PLAYTEST_AUTOMATION.md`** in the Platform repo (under `docs/`). Document what was tested, how to reproduce it, any automation steps (e.g. browser/Playwright), and current known issues or improvements.
+
+**Deliverables:**
+1. Systematic playthrough of all single-player gameplay.
+2. Concrete improvements (bugs, UX, balance, or alignment with quadar / quadar_ familiar).
+3. `docs/PLAYTEST_AUTOMATION.md` kept current with test coverage and reproduction steps.
+
+---
+
+please give me a prompt for a new chat to fully test all of the game play and make improvements
+
+note that what we are testing is /Users/seandinwiddie/GitHub/Forboc.AI/Platform
+
+please note to reference @Forboc/notes/quadar_ familiar.md @Forboc/notes/quadar.md and test/implement such futher, except multiplayer, and to reference @Forboc/notes/ref/standards/technology-maintenance/condensed.md except not to implement any tests, logging, backend, db, or expo yet
+
+and that it is running on port 3000 now
+
+and to keep PLAYTEST_AUTOMATION.md up to date.
