@@ -90,7 +90,7 @@ export interface GameLogEntry {
     id: string;
     timestamp: number;
     message: string;
-    type: "combat" | "exploration" | "system" | "loom";
+    type: "combat" | "exploration" | "system" | "loom" | "narrative";
 }
 
 export interface LoomResult {
