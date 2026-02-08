@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import StoreProvider from "./StoreProvider";
+import BootstrapGate from "./BootstrapGate";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -86,13 +88,9 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-D999WBQEXY');`}
       </Script>
-      import StoreProvider from "./StoreProvider";
-
-      // ... existing code ...
-
       <body className={`${jetbrainsMono.variable} font-mono antialiased overflow-hidden bg-zinc-950`}>
         <StoreProvider>
-          {children}
+          <BootstrapGate>{children}</BootstrapGate>
         </StoreProvider>
       </body>
     </html>
