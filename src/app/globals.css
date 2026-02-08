@@ -59,6 +59,12 @@
   --icon-size: 1.4em;
 }
 
+@media (max-width: 640px) {
+  :root {
+    --font-size-base: 0.4rem;
+  }
+}
+
 @layer base {
   body {
     background-color: var(--background);
@@ -83,8 +89,8 @@
     flex-shrink: 0;
   }
 
-  /* CRT Scanline Effect — palette: #000000, #ff0000, #172317, #0000ff */
-  body::before {
+  /* SAVE FOR LATER: CRT Scanline Effect — palette: #000000, #ff0000, #172317, #0000ff */
+  /* body::before {
     content: " ";
     display: block;
     position: absolute;
@@ -97,7 +103,7 @@
     z-index: 100;
     background-size: 100% 4px, 3px 100%;
     pointer-events: none;
-  }
+  } */
 
   /* CRT Flicker Overlay — palette #0f0f0f */
   body::after {
