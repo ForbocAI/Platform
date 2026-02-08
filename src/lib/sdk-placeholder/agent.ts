@@ -4,7 +4,7 @@ import { Player, Room } from '@/lib/quadar/types';
 // Agent: Controls NPCs and Entities ("The Shadows")
 export const Agent = {
     // Decides enemy actions for a turn
-    decideEnemyActions: async (room: Room, player: Player): Promise<string[]> => {
+    decideEnemyActions: async (room: Room, _player: Player): Promise<string[]> => {
         await new Promise(resolve => setTimeout(resolve, 200));
 
         if (!room.enemies || room.enemies.length === 0) return [];

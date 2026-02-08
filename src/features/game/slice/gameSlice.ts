@@ -1,6 +1,6 @@
 
 import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit';
-import { Player, Room, GameLogEntry, LoomResult } from '@/lib/quadar/types';
+import { Player, Room, GameLogEntry } from '@/lib/quadar/types';
 import { initializePlayer } from '@/lib/quadar/engine'; // Temporary: Initialization still uses direct engine for now
 import { SDK } from '@/lib/sdk-placeholder';
 
@@ -139,28 +139,28 @@ export const { addLog } = gameSlice.actions;
 const selectGameState = (state: { game: GameState }) => state.game;
 
 export const selectPlayer = createSelector(
-  [selectGameState],
-  (game) => game.player
+    [selectGameState],
+    (game) => game.player
 );
 
 export const selectCurrentRoom = createSelector(
-  [selectGameState],
-  (game) => game.currentRoom
+    [selectGameState],
+    (game) => game.currentRoom
 );
 
 export const selectLogs = createSelector(
-  [selectGameState],
-  (game) => game.logs
+    [selectGameState],
+    (game) => game.logs
 );
 
 export const selectIsInitialized = createSelector(
-  [selectGameState],
-  (game) => game.isInitialized
+    [selectGameState],
+    (game) => game.isInitialized
 );
 
 export const selectIsLoading = createSelector(
-  [selectGameState],
-  (game) => game.isLoading
+    [selectGameState],
+    (game) => game.isLoading
 );
 
 export default gameSlice.reducer;

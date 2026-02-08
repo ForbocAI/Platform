@@ -1,5 +1,5 @@
 
-import { Room, Biome, Enemy, Player, LoomResult, CharacterClass } from "./types";
+import { Room, Biome, Enemy, Player, LoomResult } from "./types";
 import { UNEXPECTEDLY_TABLE, CLASS_TEMPLATES } from "./mechanics";
 
 const BIOMES: Biome[] = ["Ethereal Marshlands", "Toxic Wastes", "Haunted Chapel", "Obsidian Spire"];

@@ -1,11 +1,11 @@
 
-import { Room, LoomResult } from '@/lib/quadar/types';
+import { Room, LoomResult, Biome } from '@/lib/quadar/types';
 import { generateRoom, consultLoom } from '@/lib/quadar/engine';
 
 // Cortex: Emits narrative and simulation data ("The Mind")
 export const Cortex = {
     // Simulates AI generation of a room description/state
-    generateRoom: async (id?: string, biomeOverride?: any): Promise<Room> => {
+    generateRoom: async (id?: string, biomeOverride?: Biome): Promise<Room> => {
         // Simulate network latency
         await new Promise(resolve => setTimeout(resolve, 300));
         return generateRoom(id, biomeOverride);

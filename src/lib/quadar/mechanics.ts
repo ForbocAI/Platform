@@ -9,7 +9,7 @@ export const SPELLS: Record<string, Spell> = {
         class: "Ashwalker",
         description: "Powerful melee strike with ancient relic.",
         damage: "1d8 + STR",
-        effect: (attacker, defender) => `${attacker.Str} damage`
+        effect: (attacker, _defender) => `${attacker.Str} damage`
     },
     "ember_dash": {
         id: "ember_dash",
@@ -47,7 +47,7 @@ export const SPELLS: Record<string, Spell> = {
         name: "Obsidian Surge",
         class: "Obsidian Warden",
         description: "Channel latent power for strength/speed.",
-        effect: (attacker) => "Buff stats"
+        effect: (_attacker) => "Buff stats"
     },
     "petrified_diamond_embrace": {
         id: "petrified_diamond_embrace",
