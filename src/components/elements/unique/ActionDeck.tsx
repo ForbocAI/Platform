@@ -20,9 +20,9 @@ export function ActionDeck({
   onCommune: () => void;
 }) {
   return (
-    <footer className="shrink-0 vengeance-border bg-zinc-900/80 p-1.5 sm:p-2 lg:p-6 flex flex-col lg:flex-row gap-1.5 sm:gap-2 lg:gap-8 items-center justify-between h-full min-h-0">
-      <div className="flex w-full lg:w-auto gap-1.5 sm:gap-2 lg:gap-4 justify-between lg:justify-start items-center min-w-0">
-        <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-24 shrink-0">
+    <footer className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-col lg:flex-row gap-1.5 sm:gap-2 items-center justify-between h-full min-h-0">
+      <div className="flex w-full lg:w-auto gap-1 sm:gap-1.5 justify-between lg:justify-start items-center min-w-0">
+        <div className="grid grid-cols-3 gap-px sm:gap-0.5 w-14 h-14 sm:w-16 sm:h-16 shrink-0">
           <div />
           <NavButton dir="N" onClick={() => onMove("North")} active={!!currentRoom.exits.North} data-testid="move-north" />
           <div />
@@ -30,54 +30,54 @@ export function ActionDeck({
           <button
             type="button"
             onClick={onMapClick}
-            className="w-full h-full border border-cyan-900/50 bg-cyan-950/20 text-cyan-500 flex items-center justify-center rounded-sm hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-colors touch-manipulation"
+            className="w-full h-full border border-palette-accent-cyan/50 bg-palette-bg-dark/20 text-palette-accent-cyan flex items-center justify-center rounded-sm hover:bg-palette-accent-cyan/20 hover:border-palette-accent-cyan/50 transition-colors touch-manipulation"
             title="Toggle map"
             data-testid="map-toggle"
           >
-            <MapIcon size={10} className="sm:size-3 lg:size-4" />
+            <MapIcon className="app-icon" />
           </button>
           <NavButton dir="E" onClick={() => onMove("East")} active={!!currentRoom.exits.East} data-testid="move-east" />
           <div />
           <NavButton dir="S" onClick={() => onMove("South")} active={!!currentRoom.exits.South} data-testid="move-south" />
           <div />
         </div>
-        <div className="grid grid-cols-3 lg:flex gap-1 sm:gap-2 lg:gap-4 flex-1 min-w-0">
-          <GameButton onClick={onScan} icon={<Crosshair size={12} className="sm:size-3.5 lg:size-4" />} data-testid="action-scan">
+        <div className="grid grid-cols-3 lg:flex gap-1 flex-1 min-w-0">
+          <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan">
             SCAN
           </GameButton>
-          <GameButton onClick={onEngage} variant="danger" icon={<Skull size={12} className="sm:size-3.5 lg:size-4" />} data-testid="action-engage">
+          <GameButton onClick={onEngage} variant="danger" icon={<Skull className="app-icon" />} data-testid="action-engage">
             ENGAGE
           </GameButton>
-          <GameButton onClick={onCommune} variant="magic" icon={<Activity size={12} className="sm:size-3.5 lg:size-4" />} data-testid="action-commune">
+          <GameButton onClick={onCommune} variant="magic" icon={<Activity className="app-icon" />} data-testid="action-commune">
             COMMUNE
           </GameButton>
         </div>
       </div>
-      <div className="hidden lg:flex gap-4 border-l border-zinc-800 pl-8">
-        <div className="flex flex-col gap-2">
-          <span className="text-[9px] text-zinc-500 uppercase tracking-widest">Known Spells</span>
-          <div className="flex gap-1">
+      <div className="hidden lg:flex gap-2 border-l border-palette-border pl-2">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-palette-muted uppercase tracking-widest leading-tight">Known Spells</span>
+          <div className="flex gap-px">
             {player.spells.map((spell) => (
               <div
                 key={spell}
-                className="w-8 h-8 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 hover:border-cyan-500 hover:text-cyan-500 cursor-pointer transition-colors"
+                className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted hover:border-palette-accent-cyan hover:text-palette-accent-cyan cursor-pointer transition-colors"
                 title={spell}
               >
-                <Zap size={14} />
+                <Zap className="app-icon" />
               </div>
             ))}
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <span className="text-[9px] text-zinc-500 uppercase tracking-widest">Inventory</span>
-          <div className="flex gap-1">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-palette-muted uppercase tracking-widest leading-tight">Inventory</span>
+          <div className="flex gap-px">
             {player.inventory.map((item) => (
               <div
                 key={item.id}
-                className="w-8 h-8 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 hover:border-yellow-500 hover:text-yellow-500 cursor-pointer transition-colors"
+                className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted hover:border-palette-accent-gold hover:text-palette-accent-gold cursor-pointer transition-colors"
                 title={item.name}
               >
-                <Shield size={14} />
+                <Shield className="app-icon" />
               </div>
             ))}
           </div>

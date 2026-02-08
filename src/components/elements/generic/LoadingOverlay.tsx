@@ -1,3 +1,5 @@
+import { TopRunes } from "@/components/elements/unique/Runes";
+
 export function LoadingOverlay({
   message = "INITIALIZING...",
   onRetry,
@@ -6,13 +8,14 @@ export function LoadingOverlay({
   onRetry?: () => void;
 }) {
   return (
-    <div className="h-screen w-screen bg-black text-red-500 font-mono flex flex-col items-center justify-center gap-4 text-xs lg:text-base">
+    <div className="h-screen w-screen bg-palette-bg-dark text-palette-accent-red flex flex-col items-center justify-center gap-2 leading-relaxed">
+      <TopRunes />
       <span className={onRetry ? "" : "animate-pulse"}>{message}</span>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
-          className="px-4 py-2 border border-red-900/50 bg-red-950/20 text-red-500 hover:bg-red-900/40 transition-colors uppercase tracking-wider font-bold"
+          className="px-2 py-1 border border-palette-border-red/50 bg-palette-border-red/20 text-palette-accent-red hover:bg-palette-border-red/40 transition-colors uppercase tracking-wider font-bold leading-tight"
         >
           Retry
         </button>

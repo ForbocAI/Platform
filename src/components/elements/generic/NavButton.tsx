@@ -17,10 +17,10 @@ export function NavButton({
       onClick={onClick}
       {...rest}
       className={cn(
-        "w-full h-full border transition-all duration-300 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded-sm touch-manipulation",
+        "w-full h-full border transition-all duration-300 flex items-center justify-center font-bold rounded-sm touch-manipulation leading-tight",
         active
-          ? "border-cyan-900/50 bg-cyan-950/20 text-cyan-500 active:bg-cyan-500 active:text-zinc-950 lg:hover:bg-cyan-500 lg:hover:text-zinc-950 lg:hover:shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-          : "border-zinc-900/50 bg-zinc-950/50 text-zinc-800 cursor-not-allowed"
+          ? "border-palette-accent-cyan/50 bg-palette-bg-dark/20 text-palette-accent-cyan active:bg-palette-accent-cyan active:text-palette-bg-dark lg:hover:bg-palette-accent-cyan lg:hover:text-palette-bg-dark lg:hover:shadow-[0_0_10px_rgba(127,191,255,0.5)]"
+          : "border-palette-border/50 bg-palette-bg-dark/50 text-palette-border cursor-not-allowed"
       )}
     >
       {dir}

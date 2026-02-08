@@ -52,7 +52,7 @@ export function GameScreen() {
   }
 
   return (
-    <main className="h-screen w-screen flex flex-col px-1 sm:px-2 pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] bg-zinc-950 font-mono text-zinc-300 overflow-hidden">
+    <main className="h-screen w-screen flex flex-col px-1 pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] bg-palette-bg-dark text-palette-muted-light overflow-hidden">
       <div className="flex-1 min-h-0 grid grid-cols-1 grid-rows-[9fr_15fr_15fr_11fr] gap-y-2 py-2 overflow-hidden">
         <div className="min-h-0 overflow-hidden w-full">
           <PlayerHeader player={player} />

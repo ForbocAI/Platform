@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import BootstrapGate from "./BootstrapGate";
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://platform.forboc.ai"),
@@ -88,7 +82,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-D999WBQEXY');`}
       </Script>
-      <body className={`${jetbrainsMono.variable} font-mono antialiased overflow-hidden bg-zinc-950`}>
+      <body className="font-sans antialiased overflow-hidden bg-palette-bg-dark">
         <StoreProvider>
           <BootstrapGate>{children}</BootstrapGate>
         </StoreProvider>

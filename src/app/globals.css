@@ -1,16 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
 @import "tailwindcss";
 
+/* Michroma — grimdark cyberpunk UI. Single font for consistency. */
 @theme {
-  --font-sans: "JetBrains Mono", "Courier New", monospace;
-  --font-mono: "JetBrains Mono", "Courier New", monospace;
+  --font-sans: "Michroma", sans-serif;
+  --font-mono: "Michroma", monospace;
+  --font-display: "Michroma", sans-serif;
+  --font-runic: "Michroma", sans-serif;
+  /* Palette from forbocai.github.io/design_ref/palette.md */
+  --color-palette-bg: #0f0f0f;
+  --color-palette-bg-dark: #000000;
+  --color-palette-bg-mid: #1f1f1f;
+  --color-palette-panel: #2f2f2f;
+  --color-palette-muted: #4b4b4b;
+  --color-palette-muted-light: #5b5b5b;
+  --color-palette-border: #2f2f2f;
+  --color-palette-accent-red: #ff0000;
+  --color-palette-accent-cyan: #7fbfff;
+  --color-palette-border-red: #7f0000;
+  --color-palette-accent-magic: #7fbfff;
+  --color-palette-accent-warm: #e3974f;
+  --color-palette-accent-gold: #efcb1f;
+  --color-palette-white: #ffffff;
+  --color-palette-foreground: #ebebeb;
 }
 
+/* Runes — Michroma. Style-guide: ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ */
+.font-runic {
+  font-family: var(--font-runic);
+}
+
+/* Display font — headings / titles */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Palette colors from forbocai.github.io/design_ref/palette.md — ONLY these hex values allowed */
 :root {
-  --background: #09090b; /* zinc-950 */
-  --foreground: #e4e4e7; /* zinc-200 */
-  --accent-red: #ef4444; /* red-500 */
-  --accent-cyan: #06b6d4; /* cyan-500 */
-  --border-red: #7f1d1d; /* red-900 */
+  --background: #0f0f0f;
+  --foreground: #ebebeb;
+  --accent-red: #ff0000;
+  --accent-cyan: #7fbfff;
+  --border-red: #7f0000;
+  --palette-bg-dark: #000000;
+  --palette-bg-mid: #1f1f1f;
+  --palette-bg-panel: #2f2f2f;
+  --palette-muted: #4b4b4b;
+  --palette-muted-light: #5b5b5b;
+  --palette-border: #2f2f2f;
+  --palette-border-light: #4b4b4b;
+  --palette-accent-magic: #7fbfff;
+  --palette-accent-warm: #e3974f;
+  --palette-accent-gold: #efcb1f;
+  --palette-white: #ffffff;
+  --color-rune-ink: #4b4b4b;
+  /* Single font and icon size — all text and icons use these globally */
+  --font-size-base: 0.6rem;
+  --icon-size: 1.4em;
 }
 
 @layer base {
@@ -20,9 +66,24 @@
     height: 100vh;
     overflow: hidden;
     font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: 1.4;
+    letter-spacing: 0.02em;
   }
 
-  /* CRT Scanline Effect */
+  /* All text inherits same size; components must not set font-size */
+  * {
+    font-size: inherit;
+  }
+
+  /* All icons same size — use .app-icon on Lucide (or any) icons */
+  .app-icon {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    flex-shrink: 0;
+  }
+
+  /* CRT Scanline Effect — palette: #000000, #ff0000, #172317, #0000ff */
   body::before {
     content: " ";
     display: block;
@@ -31,14 +92,14 @@
     left: 0;
     bottom: 0;
     right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background: linear-gradient(rgba(15, 15, 15, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(23, 35, 23, 0.02), rgba(0, 0, 255, 0.06));
     z-index: 100;
     background-size: 100% 4px, 3px 100%;
     pointer-events: none;
   }
 
-  /* CRT Flicker Overlay */
+  /* CRT Flicker Overlay — palette #0f0f0f */
   body::after {
     content: " ";
     display: block;
@@ -47,7 +108,7 @@
     left: 0;
     bottom: 0;
     right: 0;
-    background: rgba(18, 16, 16, 0.1);
+    background: rgba(15, 15, 15, 0.1);
     opacity: 0;
     z-index: 101;
     pointer-events: none;
@@ -81,7 +142,7 @@
 
 .vengeance-border {
   border: 1px solid var(--border-red);
-  box-shadow: 0 0 10px rgba(127, 29, 29, 0.3), inset 0 0 10px rgba(127, 29, 29, 0.2);
+  box-shadow: 0 0 10px rgba(127, 0, 0, 0.3), inset 0 0 10px rgba(127, 0, 0, 0.2);
   clip-path: polygon(
     0 5px, 
     5px 0, 
@@ -96,7 +157,7 @@
 
 .vengeance-button {
   @apply transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
-  background: rgba(127, 29, 29, 0.1);
+  background: rgba(127, 0, 0, 0.1);
   border: 1px solid var(--border-red);
   color: var(--accent-red);
   text-transform: uppercase;
@@ -105,42 +166,74 @@
 }
 
 .vengeance-button:hover:not(:disabled) {
-  background: rgba(127, 29, 29, 0.3);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-  color: #fff;
+  background: rgba(127, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+  color: var(--palette-white);
 }
 
 .text-cyan {
   color: var(--accent-cyan);
-  text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+  text-shadow: 0 0 5px rgba(127, 191, 255, 0.5);
 }
 
 .text-red {
   color: var(--accent-red);
-  text-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
 }
 
-/* Logo tinted to match theme accent (red) with a subtle glow and pulse */
+/* Logo tinted to match theme accent (red) — palette #ff0000 */
 .logo-theme {
   filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(98%) contrast(93%) 
-          drop-shadow(0 0 5px rgba(239, 68, 68, 0.4));
+          drop-shadow(0 0 5px rgba(255, 0, 0, 0.4));
   transition: all 0.3s ease;
   animation: logo-pulse 4s ease-in-out infinite;
 }
 
 .logo-theme:hover {
   filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(110%) contrast(100%) 
-          drop-shadow(0 0 12px rgba(239, 68, 68, 0.8));
+          drop-shadow(0 0 12px rgba(255, 0, 0, 0.8));
   transform: scale(1.05);
 }
 
 @keyframes logo-pulse {
   0%, 100% {
     filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(98%) contrast(93%) 
-            drop-shadow(0 0 5px rgba(239, 68, 68, 0.4));
+            drop-shadow(0 0 5px rgba(255, 0, 0, 0.4));
   }
   50% {
     filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(115%) contrast(100%) 
-            drop-shadow(0 0 10px rgba(239, 68, 68, 0.7));
+            drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
   }
+}
+
+/* ─── SCROLLBARS: grimdark cyberpunk ─────────────────────────────────────────
+ * Track: void. Thumb: muted with red outline. Matches vengeance-border palette.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--palette-muted) var(--palette-bg-dark);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--palette-bg-dark);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--palette-muted);
+  border: 1px solid var(--border-red);
+  border-radius: 0;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--palette-muted-light);
+  box-shadow: 0 0 6px rgba(127, 0, 0, 0.25);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--palette-bg-dark);
 }
