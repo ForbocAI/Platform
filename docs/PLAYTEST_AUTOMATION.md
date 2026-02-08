@@ -31,8 +31,8 @@ All interactive elements in the game UI have:
 | Fade out scene | `fade-out-scene` |
 | Facts toggle / panel | `facts-toggle`, `facts-panel` (panel is hidden when there are no facts; ask Oracle or COMMUNE first to generate facts) |
 | Thread buttons | `thread-{threadId}` |
-| Vignette theme / Start / Advance / End | `vignette-theme`, `vignette-start`, `vignette-advance-*`, `vignette-end` |
-| Concession modal / Accept (flee, etc.) / Reject | `concession-modal`, `concession-accept-flee`, …, `concession-reject` |
+| Vignette theme / Start / Advance / End | `vignette-theme`, `vignette-start`, `vignette-advance-{stage}`, `vignette-end` (e.g. `vignette-advance-rising-action`, `vignette-advance-climax`, `vignette-advance-epilogue`) |
+| Concession modal / Accept (flee, etc.) / Reject | `concession-modal`, `concession-accept-flee`, `concession-accept-knocked_away`, `concession-accept-captured`, `concession-accept-other`, `concession-reject` |
 | Volume / Music | `volume-up`, `volume-down`, `music-toggle` |
 | Player header | `player-header` |
 | Stage selector | `stage-selector` |
@@ -47,7 +47,7 @@ All interactive elements in the game UI have:
 |-------|--------|
 | `?simulateInitError=1` | Forces init to fail so the Loading overlay shows and **Retry** (`loading-retry`) can be tested. |
 | `?forceEnemy=1` | Adds one random enemy to the starting room so **Combat** and **Concession** flows can be tested without relying on random room generation. |
-| `?lowHp=1` | Sets player HP to 5 at init. Use with `forceEnemy=1` so the first enemy hit that lands triggers the **Concession** modal reliably. |
+| `?lowHp=1` | Sets player HP to 5 at init. Use with `forceEnemy=1` so an enemy hit that would take you out triggers the **Concession** modal (RNG: enemy must land a hit; may need several ENGAGEs). |
 
 ## Layout (for snapshot / scrolling)
 
