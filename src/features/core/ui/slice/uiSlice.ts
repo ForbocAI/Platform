@@ -1,5 +1,5 @@
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 
 interface UIState {
     oracleInput: string;
@@ -24,7 +24,12 @@ export const uiSlice = createSlice({
 
 export const { setOracleInput, clearOracleInput } = uiSlice.actions;
 
-// Selectors
-export const selectOracleInput = (state: { ui: UIState }) => state.ui.oracleInput;
+// Selectors (memoized for stable references)
+const selectUIState = (state: { ui: UIState }) => state.ui;
+
+export const selectOracleInput = createSelector(
+  [selectUIState],
+  (ui) => ui.oracleInput
+);
 
 export default uiSlice.reducer;

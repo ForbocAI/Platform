@@ -3,6 +3,7 @@ import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/too
 import gameReducer, { initializeGame } from '@/features/game/slice/gameSlice';
 import uiReducer from '@/features/core/ui/slice/uiSlice';
 import { baseApi } from '@/features/core/api/baseApi';
+import '@/features/core/api/gameApi';
 
 export const appBootstrap = { type: 'app/bootstrap' as const };
 

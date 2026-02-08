@@ -13,6 +13,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: [],
+  tagTypes: ['Game', 'Player', 'Room', 'Oracle'],
   endpoints: () => ({}),
 });
