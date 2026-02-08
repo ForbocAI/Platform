@@ -42,6 +42,7 @@ export function initializePlayer(): Player {
         ...template.baseStats,
         hp: template.baseStats.maxHp,
         stress: 0,
+        ac: 14, // Light armor (Scout Garb)
         inventory: [
             { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword." },
             { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor." },

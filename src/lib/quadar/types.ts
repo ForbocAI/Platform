@@ -31,6 +31,7 @@ export interface Player extends Stats {
     name: string;
     level: number;
     characterClass: CharacterClass;
+    ac: number; // Armor class for enemy attacks
     inventory: Item[];
     spells: string[]; // IDs of learned spells
     surgeCount: number; // For Loom of Fate

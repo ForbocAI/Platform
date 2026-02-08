@@ -6,6 +6,7 @@ export function ActionDeck({
   player,
   currentRoom,
   onMove,
+  onMapClick,
   onScan,
   onEngage,
   onCommune,
@@ -13,6 +14,7 @@ export function ActionDeck({
   player: Player;
   currentRoom: Room;
   onMove: (direction: string) => void;
+  onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;
   onCommune: () => void;
@@ -22,25 +24,31 @@ export function ActionDeck({
       <div className="flex w-full lg:w-auto gap-1.5 sm:gap-2 lg:gap-4 justify-between lg:justify-start items-center min-w-0">
         <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-24 shrink-0">
           <div />
-          <NavButton dir="N" onClick={() => onMove("North")} active={!!currentRoom.exits.North} />
+          <NavButton dir="N" onClick={() => onMove("North")} active={!!currentRoom.exits.North} data-testid="move-north" />
           <div />
-          <NavButton dir="W" onClick={() => onMove("West")} active={!!currentRoom.exits.West} />
-          <div className="bg-zinc-800/50 flex items-center justify-center rounded-sm">
-            <MapIcon size={10} className="text-zinc-500 sm:size-3 lg:size-4" />
-          </div>
-          <NavButton dir="E" onClick={() => onMove("East")} active={!!currentRoom.exits.East} />
+          <NavButton dir="W" onClick={() => onMove("West")} active={!!currentRoom.exits.West} data-testid="move-west" />
+          <button
+            type="button"
+            onClick={onMapClick}
+            className="w-full h-full border border-cyan-900/50 bg-cyan-950/20 text-cyan-500 flex items-center justify-center rounded-sm hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-colors touch-manipulation"
+            title="Toggle map"
+            data-testid="map-toggle"
+          >
+            <MapIcon size={10} className="sm:size-3 lg:size-4" />
+          </button>
+          <NavButton dir="E" onClick={() => onMove("East")} active={!!currentRoom.exits.East} data-testid="move-east" />
           <div />
-          <NavButton dir="S" onClick={() => onMove("South")} active={!!currentRoom.exits.South} />
+          <NavButton dir="S" onClick={() => onMove("South")} active={!!currentRoom.exits.South} data-testid="move-south" />
           <div />
         </div>
         <div className="grid grid-cols-3 lg:flex gap-1 sm:gap-2 lg:gap-4 flex-1 min-w-0">
-          <GameButton onClick={onScan} icon={<Crosshair size={12} className="sm:size-3.5 lg:size-4" />}>
+          <GameButton onClick={onScan} icon={<Crosshair size={12} className="sm:size-3.5 lg:size-4" />} data-testid="action-scan">
             SCAN
           </GameButton>
-          <GameButton onClick={onEngage} variant="danger" icon={<Skull size={12} className="sm:size-3.5 lg:size-4" />}>
+          <GameButton onClick={onEngage} variant="danger" icon={<Skull size={12} className="sm:size-3.5 lg:size-4" />} data-testid="action-engage">
             ENGAGE
           </GameButton>
-          <GameButton onClick={onCommune} variant="magic" icon={<Activity size={12} className="sm:size-3.5 lg:size-4" />}>
+          <GameButton onClick={onCommune} variant="magic" icon={<Activity size={12} className="sm:size-3.5 lg:size-4" />} data-testid="action-commune">
             COMMUNE
           </GameButton>
         </div>

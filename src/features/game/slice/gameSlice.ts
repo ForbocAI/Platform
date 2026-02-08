@@ -1,8 +1,9 @@
 
 import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit';
-import { Player, Room, GameLogEntry } from '@/lib/quadar/types';
+import { Player, Room, GameLogEntry, Enemy } from '@/lib/quadar/types';
 import { initializePlayer } from '@/lib/quadar/engine'; // Temporary: Initialization still uses direct engine for now
 import { SDK } from '@/lib/sdk-placeholder';
+import { resolveDuel, resolveEnemyAttack } from '@/lib/quadar/combat';
 
 interface GameState {
     player: Player | null;
@@ -21,6 +22,10 @@ const initialState: GameState = {
     isLoading: false,
     error: null,
 };
+
+function uniqueLogId(): string {
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
 
 // Async Thunks
 export const initializeGame = createAsyncThunk(
@@ -71,13 +76,101 @@ export const movePlayer = createAsyncThunk(
     }
 );
 
+export const engageEnemy = createAsyncThunk(
+    'game/engageEnemy',
+    async (_, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { player, currentRoom } = state.game;
+        if (!player || !currentRoom) throw new Error("No player or room");
+
+        if (!currentRoom.enemies?.length) {
+            dispatch(addLog({ message: "No hostiles in range.", type: "combat" }));
+            return { updatedRoom: null };
+        }
+
+        const target = currentRoom.enemies[0];
+        const result = resolveDuel(player, target);
+        dispatch(addLog({ message: result.message, type: "combat" }));
+
+        const newHp = result.hit ? Math.max(0, target.hp - result.damage) : target.hp;
+        const updatedEnemies: Enemy[] = currentRoom.enemies
+            .map((e, i) =>
+                i === 0 ? { ...e, hp: newHp } : e
+            )
+            .filter((e) => e.hp > 0);
+
+        if (newHp <= 0) {
+            dispatch(addLog({ message: `${target.name} has fallen.`, type: "combat" }));
+        }
+
+        let playerDamage = 0;
+        if (newHp > 0) {
+            const counterResult = resolveEnemyAttack(target, player);
+            dispatch(addLog({ message: counterResult.message, type: "combat" }));
+            if (counterResult.hit) playerDamage = counterResult.damage;
+        }
+
+        return {
+            updatedRoom: {
+                ...currentRoom,
+                enemies: updatedEnemies,
+            },
+            playerDamage,
+        };
+    }
+);
+
+function buildScanReadout(room: Room): string {
+    const hazards = room.hazards?.length ? room.hazards.join(", ") : "None";
+    const exitDirs = (["North", "South", "East", "West"] as const)
+        .filter((d) => room.exits[d])
+        .map((d) => d.charAt(0))
+        .join(", ");
+    const exits = exitDirs || "None";
+    if (!room.enemies?.length) {
+        return `Scan complete. Biome: ${room.biome}. Hazards: ${hazards}. Hostiles: 0. Exits: ${exits}.`;
+    }
+    const hostiles = room.enemies
+        .map((e) => `${e.name} (HP ${e.hp}/${e.maxHp})`)
+        .join("; ");
+    return `Scan complete. Biome: ${room.biome}. Hazards: ${hazards}. Hostiles: ${room.enemies.length} — ${hostiles}. Exits: ${exits}.`;
+}
+
+export const scanSector = createAsyncThunk(
+    'game/scanSector',
+    async (_, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        if (!state.game.currentRoom) throw new Error("No room");
+
+        dispatch(addLog({ message: "Scanning current sector...", type: "exploration" }));
+
+        const readout = buildScanReadout(state.game.currentRoom);
+        dispatch(addLog({ message: readout, type: "exploration" }));
+    }
+);
+
+const COMMUNE_QUESTION = "What does the void reveal?";
+
+export const communeWithVoid = createAsyncThunk(
+    'game/communeWithVoid',
+    async (_, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        if (!state.game.player) throw new Error("No player");
+
+        dispatch(addLog({ message: "You attempt to commune with the void...", type: "loom" }));
+
+        const result = await SDK.Cortex.consultOracle(COMMUNE_QUESTION, state.game.player.surgeCount);
+        return result;
+    }
+);
+
 export const gameSlice = createSlice({
     name: 'game',
     initialState,
     reducers: {
         addLog: (state, action: PayloadAction<{ message: string; type: GameLogEntry['type'] }>) => {
             state.logs.push({
-                id: Date.now().toString(),
+                id: uniqueLogId(),
                 timestamp: Date.now(),
                 message: action.payload.message,
                 type: action.payload.type
@@ -95,7 +188,7 @@ export const gameSlice = createSlice({
             state.player = action.payload.player;
             state.currentRoom = action.payload.initialRoom;
             state.logs.push({
-                id: Date.now().toString(),
+                id: uniqueLogId(),
                 timestamp: Date.now(),
                 message: "SYSTEM: Connection Stable. Welcome to Quadar Tower, Ranger.",
                 type: "system"
@@ -119,7 +212,7 @@ export const gameSlice = createSlice({
             player.surgeCount = newSurge;
 
             state.logs.push({
-                id: Date.now().toString(),
+                id: uniqueLogId(),
                 timestamp: Date.now(),
                 message: `Oracle: ${result.description} (Roll: ${result.roll}, Surge: ${newSurge})`,
                 type: "loom"
@@ -129,6 +222,35 @@ export const gameSlice = createSlice({
         // Move
         builder.addCase(movePlayer.fulfilled, (state, action) => {
             state.currentRoom = action.payload;
+        });
+
+        // Engage (combat)
+        builder.addCase(engageEnemy.fulfilled, (state, action) => {
+            if (action.payload.updatedRoom) {
+                state.currentRoom = action.payload.updatedRoom;
+            }
+            if (state.player && action.payload.playerDamage && action.payload.playerDamage > 0) {
+                state.player.hp = Math.max(0, state.player.hp - action.payload.playerDamage);
+            }
+        });
+
+        // Commune (Loom of Fate – void)
+        builder.addCase(communeWithVoid.fulfilled, (state, action) => {
+            if (!state.player) return;
+            const result = action.payload;
+            let newSurge = state.player.surgeCount;
+            if (result.surgeUpdate === -1) {
+                newSurge = 0;
+            } else {
+                newSurge += result.surgeUpdate;
+            }
+            state.player.surgeCount = newSurge;
+            state.logs.push({
+                id: uniqueLogId(),
+                timestamp: Date.now(),
+                message: `The Void: ${result.description} (Roll: ${result.roll}, Surge: ${newSurge})`,
+                type: "loom"
+            });
         });
     }
 });

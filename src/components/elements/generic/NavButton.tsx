@@ -4,16 +4,18 @@ export function NavButton({
   dir,
   onClick,
   active,
+  ...rest
 }: {
   dir: string;
   onClick: () => void;
   active: boolean;
-}) {
+} & React.ComponentPropsWithoutRef<"button">) {
   return (
     <button
       type="button"
       disabled={!active}
       onClick={onClick}
+      {...rest}
       className={cn(
         "w-full h-full border transition-all duration-300 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded-sm touch-manipulation",
         active

@@ -5,16 +5,18 @@ export function GameButton({
   onClick,
   variant = "default",
   icon,
+  ...rest
 }: {
   children: React.ReactNode;
   onClick: () => void;
   variant?: "default" | "danger" | "magic";
   icon?: React.ReactNode;
-}) {
+} & React.ComponentPropsWithoutRef<"button">) {
   return (
     <button
       onClick={onClick}
       type="button"
+      {...rest}
       className={cn(
         "h-8 sm:h-10 lg:h-12 px-1 sm:px-2 lg:px-6 border transition-all duration-300 flex items-center justify-center gap-1 lg:gap-3 text-[9px] sm:text-[10px] lg:text-xs font-bold tracking-wider uppercase group w-full lg:w-auto touch-manipulation",
         variant === "default" && "border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:border-zinc-500",

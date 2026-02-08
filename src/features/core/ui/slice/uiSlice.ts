@@ -3,10 +3,12 @@ import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 
 interface UIState {
     oracleInput: string;
+    showMap: boolean;
 }
 
 const initialState: UIState = {
     oracleInput: "",
+    showMap: false,
 };
 
 export const uiSlice = createSlice({
@@ -18,11 +20,14 @@ export const uiSlice = createSlice({
         },
         clearOracleInput: (state) => {
             state.oracleInput = "";
-        }
+        },
+        toggleShowMap: (state) => {
+            state.showMap = !state.showMap;
+        },
     }
 });
 
-export const { setOracleInput, clearOracleInput } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -30,6 +35,11 @@ const selectUIState = (state: { ui: UIState }) => state.ui;
 export const selectOracleInput = createSelector(
   [selectUIState],
   (ui) => ui.oracleInput
+);
+
+export const selectShowMap = createSelector(
+  [selectUIState],
+  (ui) => ui.showMap
 );
 
 export default uiSlice.reducer;
