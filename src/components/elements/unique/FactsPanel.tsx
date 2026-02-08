@@ -11,11 +11,13 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
   if (facts.length === 0) return null;
 
   return (
-    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0">
+    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0" data-testid="facts-panel">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center gap-1 p-1.5 text-left text-palette-muted-light hover:text-palette-muted uppercase tracking-wider"
+        data-testid="facts-toggle"
+        aria-label={open ? "Close Facts" : "Open Facts"}
       >
         {open ? <ChevronDown className="app-icon" /> : <ChevronRight className="app-icon" />}
         <span>Facts ({facts.length})</span>

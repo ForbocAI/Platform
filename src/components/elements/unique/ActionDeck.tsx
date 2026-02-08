@@ -28,9 +28,9 @@ export function ActionDeck({
       <div className="flex w-full lg:w-auto gap-1 sm:gap-1.5 justify-between lg:justify-start items-center min-w-0">
         <div className="grid grid-cols-3 gap-px sm:gap-0.5 w-14 h-14 sm:w-16 sm:h-16 shrink-0">
           <div />
-          <NavButton dir="N" onClick={() => onMove("North")} active={!!currentRoom.exits.North} data-testid="move-north" />
+          <NavButton dir="N" onClick={() => onMove("North")} active={!!currentRoom.exits.North} data-testid="move-north" aria-label="Move North" />
           <div />
-          <NavButton dir="W" onClick={() => onMove("West")} active={!!currentRoom.exits.West} data-testid="move-west" />
+          <NavButton dir="W" onClick={() => onMove("West")} active={!!currentRoom.exits.West} data-testid="move-west" aria-label="Move West" />
           <button
             type="button"
             onClick={() => {
@@ -40,22 +40,23 @@ export function ActionDeck({
             className="w-full h-full border border-palette-accent-cyan/50 bg-palette-bg-dark/20 text-palette-accent-cyan flex items-center justify-center rounded-sm hover:bg-palette-accent-cyan/20 hover:border-palette-accent-cyan/50 transition-colors touch-manipulation"
             title="Toggle map"
             data-testid="map-toggle"
+            aria-label="Toggle map"
           >
             <MapIcon className="app-icon" />
           </button>
-          <NavButton dir="E" onClick={() => onMove("East")} active={!!currentRoom.exits.East} data-testid="move-east" />
+          <NavButton dir="E" onClick={() => onMove("East")} active={!!currentRoom.exits.East} data-testid="move-east" aria-label="Move East" />
           <div />
-          <NavButton dir="S" onClick={() => onMove("South")} active={!!currentRoom.exits.South} data-testid="move-south" />
+          <NavButton dir="S" onClick={() => onMove("South")} active={!!currentRoom.exits.South} data-testid="move-south" aria-label="Move South" />
           <div />
         </div>
         <div className="grid grid-cols-3 lg:flex gap-1 flex-1 min-w-0">
-          <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan">
+          <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan" aria-label="Scan sector">
             SCAN
           </GameButton>
-          <GameButton onClick={onEngage} variant="danger" icon={<Skull className="app-icon" />} data-testid="action-engage">
+          <GameButton onClick={onEngage} variant="danger" icon={<Skull className="app-icon" />} data-testid="action-engage" aria-label="Engage enemy">
             ENGAGE
           </GameButton>
-          <GameButton onClick={onCommune} variant="magic" icon={<Activity className="app-icon" />} data-testid="action-commune">
+          <GameButton onClick={onCommune} variant="magic" icon={<Activity className="app-icon" />} data-testid="action-commune" aria-label="Commune with void">
             COMMUNE
           </GameButton>
         </div>

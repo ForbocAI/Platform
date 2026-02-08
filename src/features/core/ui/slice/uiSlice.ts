@@ -5,12 +5,14 @@ interface UIState {
     oracleInput: string;
     showMap: boolean;
     stageOfScene: StageOfScene;
+    autoPlay: boolean;
 }
 
 const initialState: UIState = {
     oracleInput: "",
     showMap: false,
     stageOfScene: "To Knowledge",
+    autoPlay: false,
 };
 
 export const uiSlice = createSlice({
@@ -29,10 +31,13 @@ export const uiSlice = createSlice({
         setStageOfScene: (state, action: PayloadAction<StageOfScene>) => {
             state.stageOfScene = action.payload;
         },
+        toggleAutoPlay: (state) => {
+            state.autoPlay = !state.autoPlay;
+        },
     }
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -50,6 +55,11 @@ export const selectShowMap = createSelector(
 export const selectStageOfScene = createSelector(
   [selectUIState],
   (ui) => ui.stageOfScene
+);
+
+export const selectAutoPlay = createSelector(
+  [selectUIState],
+  (ui) => ui.autoPlay
 );
 
 export default uiSlice.reducer;

@@ -267,6 +267,63 @@ const FELLOW_RANGER: Npc = {
     description: "A fresh recruit. Reconnaissance objective.",
 };
 
+const AUTO_PLAY_ORACLE_QUESTIONS = [
+    "What lurks ahead?",
+    "Is the path safe?",
+    "What does the void reveal?",
+    "Any signs of hostiles?",
+    "What is the room's secret?",
+];
+
+/** Dispatched on an interval when auto-play is on. Picks one random valid action and runs it. */
+export const autoPlayTick = createAsyncThunk(
+    'game/autoPlayTick',
+    async (_, { getState, dispatch }) => {
+        const state = getState() as {
+            game: GameState;
+            ui: { autoPlay?: boolean };
+        };
+        if (!state.ui?.autoPlay) return;
+        if (!state.game.player || !state.game.currentRoom) return;
+
+        const { currentRoom, concessionOffered } = state.game;
+
+        if (concessionOffered?.offered) {
+            const accept = Math.random() < 0.5;
+            if (accept) {
+                const outcomes: Array<import('@/lib/quadar/types').ConcessionOutcome> = ['flee', 'knocked_away', 'captured', 'other'];
+                const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+                const narratives: Record<string, string> = {
+                    flee: "You break away and flee the fray.",
+                    knocked_away: "You are knocked from the fight but survive.",
+                    captured: "You are taken captive instead of slain.",
+                    other: "You concede on your own terms.",
+                };
+                dispatch(acceptConcession({ outcome, narrative: narratives[outcome] ?? "" }));
+            } else {
+                dispatch(rejectConcession());
+            }
+            return;
+        }
+
+        type Action = () => void;
+        const actions: Action[] = [];
+
+        if (currentRoom.exits?.North) actions.push(() => dispatch(movePlayer("North")));
+        if (currentRoom.exits?.South) actions.push(() => dispatch(movePlayer("South")));
+        if (currentRoom.exits?.East) actions.push(() => dispatch(movePlayer("East")));
+        if (currentRoom.exits?.West) actions.push(() => dispatch(movePlayer("West")));
+        actions.push(() => dispatch(scanSector()));
+        if (currentRoom.enemies?.length) actions.push(() => dispatch(engageEnemy()));
+        actions.push(() => dispatch(communeWithVoid()));
+        const oracleQ = AUTO_PLAY_ORACLE_QUESTIONS[Math.floor(Math.random() * AUTO_PLAY_ORACLE_QUESTIONS.length)];
+        actions.push(() => dispatch(askOracle(oracleQ)));
+
+        const pick = actions[Math.floor(Math.random() * actions.length)];
+        pick();
+    }
+);
+
 export const gameSlice = createSlice({
     name: 'game',
     initialState,

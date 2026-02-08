@@ -17,7 +17,7 @@ export function ThreadList({
   if (threads.length === 0) return null;
 
   return (
-    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5">
+    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5" data-testid="thread-list">
       <span className="text-palette-muted uppercase tracking-wider text-xs block mb-1">Threads</span>
       <div className="flex flex-wrap gap-1">
         {threads.map((t) => (
@@ -28,6 +28,8 @@ export function ThreadList({
               playSound();
               onSetMain(t.id);
             }}
+            data-testid={`thread-${t.id}`}
+            aria-label={mainThreadId === t.id ? `Main thread: ${t.name}` : `Set main thread: ${t.name}`}
             className={cn(
               "px-2 py-0.5 text-xs font-bold uppercase tracking-wider border transition-colors",
               mainThreadId === t.id

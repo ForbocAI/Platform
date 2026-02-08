@@ -43,6 +43,7 @@ export function VolumeControls() {
         className="p-0.5 sm:p-1 rounded border border-transparent hover:border-palette-muted hover:bg-palette-panel/80 text-palette-muted-light hover:text-palette-accent-cyan transition-colors"
         title={musicPlaying ? "Pause music" : "Play music"}
         aria-label={musicPlaying ? "Pause music" : "Play music"}
+        data-testid="music-toggle"
       >
         {musicPlaying ? (
           <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -58,6 +59,7 @@ export function VolumeControls() {
           title="Volume up"
           aria-label="Volume up"
           disabled={masterVolume >= 1}
+          data-testid="volume-up"
         >
           <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
         </button>
@@ -71,6 +73,7 @@ export function VolumeControls() {
           title="Volume down"
           aria-label="Volume down"
           disabled={isMuted}
+          data-testid="volume-down"
         >
           <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
         </button>

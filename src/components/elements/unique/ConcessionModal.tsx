@@ -19,7 +19,7 @@ export function ConcessionModal({
 }) {
   const playSound = usePlayButtonSound();
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-palette-bg-dark/90">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-palette-bg-dark/90" data-testid="concession-modal">
       <div className="vengeance-border bg-palette-bg-mid border-2 border-palette-accent-red/50 p-4 sm:p-6 max-w-md w-full">
         <h3 className="font-black text-palette-accent-red uppercase tracking-widest mb-2">
           Concession offered
@@ -36,6 +36,8 @@ export function ConcessionModal({
                 playSound();
                 onAccept(value, narrative);
               }}
+              data-testid={`concession-accept-${value}`}
+              aria-label={`Accept: ${label}`}
               className="w-full px-3 py-2 bg-palette-bg-dark border border-palette-border text-palette-muted-light hover:border-palette-accent-cyan hover:text-palette-accent-cyan transition-colors text-left"
             >
               <span className="font-bold">{label}</span>
@@ -49,6 +51,8 @@ export function ConcessionModal({
             playSound();
             onReject();
           }}
+          data-testid="concession-reject"
+          aria-label="Reject — take the blow"
           className="w-full px-3 py-2 bg-palette-accent-red/20 border border-palette-accent-red text-palette-accent-red hover:bg-palette-accent-red/30 transition-colors font-bold uppercase tracking-wider"
         >
           Reject — take the blow

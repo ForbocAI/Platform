@@ -20,7 +20,7 @@ export function StageSelector({
 }) {
   const playSound = usePlayButtonSound();
   return (
-    <div className="flex items-center gap-1 p-1 sm:p-1.5 border-b border-palette-border bg-palette-bg-mid/10 shrink-0">
+    <div className="flex items-center gap-1 p-1 sm:p-1.5 border-b border-palette-border bg-palette-bg-mid/10 shrink-0" data-testid="stage-selector">
       <RuneSigil className="shrink-0" />
       <span className="text-palette-muted-light uppercase tracking-wider mr-0.5 shrink-0 leading-tight">Stage:</span>
       {STAGES.map(({ value, label }) => (
@@ -31,6 +31,8 @@ export function StageSelector({
             playSound();
             onStageChange(value);
           }}
+          data-testid={`stage-${value.replace(/\s+/g, "-").toLowerCase()}`}
+          aria-label={`Stage: ${label}`}
           className={cn(
             "px-1.5 sm:px-2 py-0.5 font-bold uppercase tracking-wider transition-colors touch-manipulation leading-tight",
             stage === value
