@@ -39,10 +39,10 @@ This log tracks the engineering requirements for the flagship Forboc AI consumer
 ## 5. Qua'dar System Implementation (The Law of the Spire) ᛒ
 *Objective: Instantiate the grimdark TTRPG rules within the digital engine.*
 
-- [ ] **Class & Spell Mechanics**: Port the attributes and unique spell architectures (e.g., *Obsidian Surge*, *Hellfire Explosion*) from `quadar.md`.
-- [ ] **Starting Initiation**: Implement the Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `quadar_familiar.md`.
-- [ ] **Loom of Fate Logic**: Integrate the `Surge Count` and narrative modifier tables for determining world-event consequences.
-- [ ] **Narrative Momentum**: Implement the "Chipping vs. Cutting" questioning heuristics in the SDK's directive synthesis to maintain genre consistency.
+- [x] **Class & Spell Mechanics**: Port the attributes and unique spell architectures (e.g., *Obsidian Surge*, *Hellfire Explosion*) from `quadar.md`.
+- [x] **Starting Initiation**: Implement the Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `quadar_familiar.md`.
+- [x] **Loom of Fate Logic**: Integrate the `Surge Count` and narrative modifier tables for determining world-event consequences.
+- [x] **Narrative Momentum**: Implement the "Chipping vs. Cutting" questioning heuristics in the SDK's directive synthesis to maintain genre consistency.
 
 ---
 

@@ -86,8 +86,14 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-D999WBQEXY');`}
       </Script>
+      import StoreProvider from "./StoreProvider";
+
+      // ... existing code ...
+
       <body className={`${jetbrainsMono.variable} font-mono antialiased overflow-hidden bg-zinc-950`}>
-        {children}
+        <StoreProvider>
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );
