@@ -7,7 +7,7 @@
   --font-mono: "Michroma", monospace;
   --font-display: "Michroma", sans-serif;
   --font-runic: "Michroma", sans-serif;
-  /* Palette from forbocai.github.io/design_ref/palette.md */
+  /* Monochrome palette — grayscale only */
   --color-palette-bg: #0f0f0f;
   --color-palette-bg-dark: #000000;
   --color-palette-bg-mid: #1f1f1f;
@@ -15,12 +15,12 @@
   --color-palette-muted: #4b4b4b;
   --color-palette-muted-light: #5b5b5b;
   --color-palette-border: #2f2f2f;
-  --color-palette-accent-red: #ff0000;
-  --color-palette-accent-cyan: #7fbfff;
-  --color-palette-border-red: #7f0000;
-  --color-palette-accent-magic: #7fbfff;
-  --color-palette-accent-warm: #e3974f;
-  --color-palette-accent-gold: #efcb1f;
+  --color-palette-accent-red: #b0b0b0;
+  --color-palette-accent-cyan: #b0b0b0;
+  --color-palette-border-red: #4b4b4b;
+  --color-palette-accent-magic: #a0a0a0;
+  --color-palette-accent-warm: #909090;
+  --color-palette-accent-gold: #c0c0c0;
   --color-palette-white: #ffffff;
   --color-palette-foreground: #ebebeb;
 }
@@ -35,13 +35,13 @@
   font-family: var(--font-display);
 }
 
-/* Palette colors from forbocai.github.io/design_ref/palette.md — ONLY these hex values allowed */
+/* Monochrome palette — grayscale only */
 :root {
   --background: #0f0f0f;
   --foreground: #ebebeb;
-  --accent-red: #ff0000;
-  --accent-cyan: #7fbfff;
-  --border-red: #7f0000;
+  --accent-red: #b0b0b0;
+  --accent-cyan: #b0b0b0;
+  --border-red: #4b4b4b;
   --palette-bg-dark: #000000;
   --palette-bg-mid: #1f1f1f;
   --palette-bg-panel: #2f2f2f;
@@ -49,9 +49,9 @@
   --palette-muted-light: #5b5b5b;
   --palette-border: #2f2f2f;
   --palette-border-light: #4b4b4b;
-  --palette-accent-magic: #7fbfff;
-  --palette-accent-warm: #e3974f;
-  --palette-accent-gold: #efcb1f;
+  --palette-accent-magic: #a0a0a0;
+  --palette-accent-warm: #909090;
+  --palette-accent-gold: #c0c0c0;
   --palette-white: #ffffff;
   --color-rune-ink: #4b4b4b;
   /* Single font and icon size — all text and icons use these globally */
@@ -146,9 +146,158 @@
   100% { opacity: 0.32204; }
 }
 
+/* ─── ANIMATIONS: forbocai.github.io legacy ──────────────────────────────────── */
+
+/* Status LED / ambient breathe — pulsing opacity */
+@keyframes ambient-breathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Holographic flicker — subtle opacity drop */
+@keyframes holo-flicker {
+  0%, 100% { opacity: 1; }
+  93% { opacity: 0.85; }
+  94% { opacity: 1; }
+}
+
+/* Cursor blink — terminal underscore */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* Glitch text — clip + skew distortion (use with data-text attr) */
+@keyframes glitch-anim {
+  0% { clip: rect(31px, 9999px, 94px, 0); transform: skew(0.85deg); }
+  5% { clip: rect(70px, 9999px, 11px, 0); transform: skew(0.24deg); }
+  10% { clip: rect(6px, 9999px, 83px, 0); transform: skew(0.73deg); }
+  15% { clip: rect(25px, 9999px, 93px, 0); transform: skew(0.18deg); }
+  20% { clip: rect(2px, 9999px, 3px, 0); transform: skew(0.19deg); }
+  25% { clip: rect(98px, 9999px, 50px, 0); transform: skew(0.35deg); }
+  30% { clip: rect(80px, 9999px, 59px, 0); transform: skew(0.95deg); }
+  35% { clip: rect(50px, 9999px, 78px, 0); transform: skew(0.67deg); }
+  40% { clip: rect(37px, 9999px, 59px, 0); transform: skew(0.97deg); }
+  45% { clip: rect(10px, 9999px, 63px, 0); transform: skew(0.04deg); }
+  50% { clip: rect(44px, 9999px, 98px, 0); transform: skew(0.53deg); }
+  55% { clip: rect(81px, 9999px, 63px, 0); transform: skew(0.5deg); }
+  60% { clip: rect(76px, 9999px, 12px, 0); transform: skew(0.39deg); }
+  65% { clip: rect(85px, 9999px, 35px, 0); transform: skew(0.34deg); }
+  70% { clip: rect(2px, 9999px, 33px, 0); transform: skew(0.97deg); }
+  75% { clip: rect(52px, 9999px, 83px, 0); transform: skew(0.48deg); }
+  80% { clip: rect(49px, 9999px, 75px, 0); transform: skew(0.18deg); }
+  85% { clip: rect(100px, 9999px, 6px, 0); transform: skew(0.94deg); }
+  90% { clip: rect(35px, 9999px, 16px, 0); transform: skew(0.03deg); }
+  95% { clip: rect(66px, 9999px, 67px, 0); transform: skew(0.24deg); }
+  100% { clip: rect(19px, 9999px, 64px, 0); transform: skew(0.93deg); }
+}
+
+@keyframes glitch-anim2 {
+  0% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.85deg); }
+  5% { clip: rect(52px, 9999px, 74px, 0); transform: skew(0.24deg); }
+  10% { clip: rect(79px, 9999px, 85px, 0); transform: skew(0.73deg); }
+  15% { clip: rect(75px, 9999px, 5px, 0); transform: skew(0.18deg); }
+  20% { clip: rect(67px, 9999px, 91px, 0); transform: skew(0.19deg); }
+  25% { clip: rect(14px, 9999px, 51px, 0); transform: skew(0.35deg); }
+  30% { clip: rect(18px, 9999px, 75px, 0); transform: skew(0.95deg); }
+  35% { clip: rect(86px, 9999px, 90px, 0); transform: skew(0.67deg); }
+  40% { clip: rect(64px, 9999px, 6px, 0); transform: skew(0.97deg); }
+  45% { clip: rect(62px, 9999px, 49px, 0); transform: skew(0.04deg); }
+  50% { clip: rect(10px, 9999px, 9px, 0); transform: skew(0.53deg); }
+  55% { clip: rect(3px, 9999px, 5px, 0); transform: skew(0.5deg); }
+  60% { clip: rect(5px, 9999px, 81px, 0); transform: skew(0.39deg); }
+  65% { clip: rect(52px, 9999px, 18px, 0); transform: skew(0.34deg); }
+  70% { clip: rect(67px, 9999px, 6px, 0); transform: skew(0.97deg); }
+  75% { clip: rect(21px, 9999px, 58px, 0); transform: skew(0.48deg); }
+  80% { clip: rect(98px, 9999px, 14px, 0); transform: skew(0.18deg); }
+  85% { clip: rect(16px, 9999px, 57px, 0); transform: skew(0.94deg); }
+  90% { clip: rect(8px, 9999px, 69px, 0); transform: skew(0.03deg); }
+  95% { clip: rect(22px, 9999px, 47px, 0); transform: skew(0.24deg); }
+  100% { clip: rect(4px, 9999px, 9px, 0); transform: skew(0.93deg); }
+}
+
+/* Status LED — monochrome pulse (use animation: ambient-breathe) */
+.status-led {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  min-height: 8px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent-cyan), 0 0 12px var(--accent-cyan);
+  margin-left: 0.5rem;
+  position: relative;
+  opacity: 0.9;
+  animation: ambient-breathe 2s ease-in-out infinite;
+}
+
+/* Glitch text — requires data-text="Your Text" */
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+  pointer-events: none;
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -1px 0 var(--palette-muted-light), 1px 0 var(--palette-muted-light);
+  clip: rect(0, 9999px, 0.5em, 0);
+  animation: glitch-anim 3s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: -1px 0 var(--palette-muted);
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+/* Macro scramble / terminal cursor — blinking underscore */
+[data-macro-scramble] {
+  font-family: var(--font-mono);
+  color: var(--foreground);
+  text-shadow: 0 0 5px rgba(176, 176, 176, 0.4);
+  position: relative;
+  display: inline-block;
+}
+
+[data-macro-scramble]::after {
+  content: "_";
+  opacity: 0;
+  animation: cursor-blink 0.8s step-end infinite;
+  margin-left: 2px;
+  color: var(--accent-cyan);
+}
+
+/* Encrypted text — JS hook for Sneakers decrypt effect */
+.encrypted-text {
+  display: inline-block;
+}
+
+/* Holo-flicker — apply to elements for subtle flicker */
+.animate-holo-flicker {
+  animation: holo-flicker 3s ease-in-out infinite;
+}
+
+/* Ambient breathe — apply for pulsing opacity */
+.animate-ambient-breathe {
+  animation: ambient-breathe 2.5s ease-in-out infinite;
+}
+
 .vengeance-border {
   border: 1px solid var(--border-red);
-  box-shadow: 0 0 10px rgba(127, 0, 0, 0.3), inset 0 0 10px rgba(127, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(75, 75, 75, 0.3), inset 0 0 10px rgba(75, 75, 75, 0.2);
   clip-path: polygon(
     0 5px, 
     5px 0, 
@@ -163,7 +312,7 @@
 
 .vengeance-button {
   @apply transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
-  background: rgba(127, 0, 0, 0.1);
+  background: rgba(75, 75, 75, 0.2);
   border: 1px solid var(--border-red);
   color: var(--accent-red);
   text-transform: uppercase;
@@ -172,48 +321,48 @@
 }
 
 .vengeance-button:hover:not(:disabled) {
-  background: rgba(127, 0, 0, 0.3);
-  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+  background: rgba(75, 75, 75, 0.4);
+  box-shadow: 0 0 15px rgba(176, 176, 176, 0.3);
   color: var(--palette-white);
 }
 
 .text-cyan {
   color: var(--accent-cyan);
-  text-shadow: 0 0 5px rgba(127, 191, 255, 0.5);
+  text-shadow: 0 0 5px rgba(176, 176, 176, 0.5);
 }
 
 .text-red {
   color: var(--accent-red);
-  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  text-shadow: 0 0 5px rgba(176, 176, 176, 0.5);
 }
 
-/* Logo tinted to match theme accent (red) — palette #ff0000 */
+/* Logo — monochrome (grayscale) */
 .logo-theme {
-  filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(98%) contrast(93%) 
-          drop-shadow(0 0 5px rgba(255, 0, 0, 0.4));
+  filter: grayscale(1) brightness(0.9) contrast(1.1)
+          drop-shadow(0 0 5px rgba(176, 176, 176, 0.4));
   transition: all 0.3s ease;
   animation: logo-pulse 4s ease-in-out infinite;
 }
 
 .logo-theme:hover {
-  filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(110%) contrast(100%) 
-          drop-shadow(0 0 12px rgba(255, 0, 0, 0.8));
+  filter: grayscale(1) brightness(1.05) contrast(1.1)
+          drop-shadow(0 0 12px rgba(176, 176, 176, 0.5));
   transform: scale(1.05);
 }
 
 @keyframes logo-pulse {
   0%, 100% {
-    filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(98%) contrast(93%) 
-            drop-shadow(0 0 5px rgba(255, 0, 0, 0.4));
+    filter: grayscale(1) brightness(0.9) contrast(1.1)
+            drop-shadow(0 0 5px rgba(176, 176, 176, 0.4));
   }
   50% {
-    filter: invert(39%) sepia(85%) saturate(5412%) hue-rotate(345deg) brightness(115%) contrast(100%) 
-            drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
+    filter: grayscale(1) brightness(1) contrast(1.1)
+            drop-shadow(0 0 10px rgba(176, 176, 176, 0.5));
   }
 }
 
-/* ─── SCROLLBARS: grimdark cyberpunk ─────────────────────────────────────────
- * Track: void. Thumb: muted with red outline. Matches vengeance-border palette.
+/* ─── SCROLLBARS: grimdark monochrome ───────────────────────────────────────
+ * Track: void. Thumb: muted with gray outline. Matches vengeance-border palette.
  */
 * {
   scrollbar-width: thin;
@@ -237,7 +386,7 @@
 
 *::-webkit-scrollbar-thumb:hover {
   background: var(--palette-muted-light);
-  box-shadow: 0 0 6px rgba(127, 0, 0, 0.25);
+  box-shadow: 0 0 6px rgba(75, 75, 75, 0.4);
 }
 
 *::-webkit-scrollbar-corner {
