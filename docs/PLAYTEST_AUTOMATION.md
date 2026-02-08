@@ -38,6 +38,7 @@ All interactive elements in the game UI have:
 | Stage selector | `stage-selector` |
 | Thread list | `thread-list` |
 | Vignette controls | `vignette-controls` |
+| Loading overlay Retry | `loading-retry` |
 
 ## Auto-play
 

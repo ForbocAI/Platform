@@ -16,6 +16,8 @@ export function LoadingOverlay({
           type="button"
           onClick={onRetry}
           className="px-2 py-1 border border-palette-border-red/50 bg-palette-border-red/20 text-palette-accent-red hover:bg-palette-border-red/40 transition-colors uppercase tracking-wider font-bold leading-tight"
+          data-testid="loading-retry"
+          aria-label="Retry initialization"
         >
           Retry
         </button>
