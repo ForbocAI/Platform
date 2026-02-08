@@ -160,6 +160,11 @@ export const narrativeSlice = createSlice({
     crossStitchThread: (state, action: PayloadAction<string>) => {
       state.mainThreadId = action.payload;
     },
+    /** Sync thread's related NPCs from current room (allies + merchants). */
+    setThreadRelatedNpcs: (state, action: PayloadAction<{ threadId: string; npcIds: string[] }>) => {
+      const thread = state.threads.find((t) => t.id === action.payload.threadId);
+      if (thread) thread.relatedNpcIds = action.payload.npcIds;
+    },
     resetNarrative: () => initialState,
   },
 });
@@ -178,6 +183,7 @@ export const {
   applyEnteringRed,
   setSuggestNextStage,
   crossStitchThread,
+  setThreadRelatedNpcs,
   resetNarrative,
 } = narrativeSlice.actions;
 

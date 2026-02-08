@@ -13,8 +13,15 @@ import {
   selectLogs,
   selectError,
   selectConcessionOffered,
+  selectTradePanelMerchantId,
+  selectExploredRooms,
+  selectRoomCoordinates,
   acceptConcession,
   rejectConcession,
+  openTradePanel,
+  closeTradePanel,
+  buyFromMerchant,
+  sellToMerchant,
 } from "@/features/game/slice/gameSlice";
 import {
   selectThreads,
@@ -42,6 +49,7 @@ import {
   FactsPanel,
   ThreadList,
   VignetteControls,
+  TradePanel,
 } from "@/components/elements/unique";
 import { LoadingOverlay } from "@/components/elements/generic";
 import type { ConcessionOutcome } from "@/lib/quadar/types";
@@ -56,6 +64,9 @@ export function GameScreen() {
   const stageOfScene = useAppSelector(selectStageOfScene);
   const error = useAppSelector(selectError);
   const concessionOffered = useAppSelector(selectConcessionOffered);
+  const tradePanelMerchantId = useAppSelector(selectTradePanelMerchantId);
+  const exploredRooms = useAppSelector(selectExploredRooms);
+  const roomCoordinates = useAppSelector(selectRoomCoordinates);
   const threads = useAppSelector(selectThreads);
   const facts = useAppSelector(selectFacts);
   const vignette = useAppSelector(selectVignette);
@@ -90,12 +101,35 @@ export function GameScreen() {
           onReject={() => dispatch(rejectConcession())}
         />
       )}
+      {tradePanelMerchantId &&
+        currentRoom?.merchants &&
+        player &&
+        (() => {
+          const merchant = currentRoom.merchants.find((m) => m.id === tradePanelMerchantId);
+          return merchant ? (
+            <TradePanel
+              merchant={merchant}
+              playerInventory={player.inventory}
+              onBuy={(itemId) => dispatch(buyFromMerchant({ merchantId: tradePanelMerchantId, itemId }))}
+              onSell={(itemId) => dispatch(sellToMerchant({ merchantId: tradePanelMerchantId, itemId }))}
+              onClose={() => dispatch(closeTradePanel())}
+            />
+          ) : null;
+        })()}
       <div className="flex-1 min-h-0 grid grid-cols-1 grid-rows-[9fr_15fr_15fr_11fr] gap-y-2 py-2 overflow-hidden">
         <div className="min-h-0 overflow-hidden w-full">
           <PlayerHeader player={player} />
         </div>
         <div className="min-h-0 overflow-auto w-full vengeance-border border-b-2 border-[var(--border-red)] rounded-none">
-          {showMap ? <MapView room={currentRoom} /> : <RoomViewport room={currentRoom} />}
+          {showMap ? (
+            <MapView
+              exploredRooms={exploredRooms}
+              roomCoordinates={roomCoordinates}
+              currentRoomId={currentRoom?.id ?? null}
+            />
+          ) : (
+            <RoomViewport room={currentRoom} onTradeMerchant={(id) => dispatch(openTradePanel({ merchantId: id }))} />
+          )}
         </div>
         <div className="min-h-0 overflow-auto w-full flex flex-col">
           <div className="flex-1 min-h-0 overflow-auto flex flex-col">
@@ -104,7 +138,16 @@ export function GameScreen() {
             <VignetteControls
               theme={vignette?.theme ?? ""}
               stage={vignette?.stage}
-              onStart={(theme) => dispatch(startVignette({ theme }))}
+              threadIds={vignette?.threadIds}
+              threads={threads}
+              onStart={(theme) =>
+                dispatch(
+                  startVignette({
+                    theme,
+                    threadIds: mainThreadId ? [mainThreadId] : threads.map((t) => t.id),
+                  })
+                )
+              }
               onAdvance={(stage) => dispatch(advanceVignetteStage({ stage }))}
               onEnd={() => dispatch(endVignette())}
             />

@@ -13,9 +13,15 @@ export function VignetteControls({
   onStart,
   onAdvance,
   onEnd,
+  threadIds,
+  threads = [],
 }: {
   theme?: string;
   stage?: VignetteStage;
+  /** Thread ids tied to this vignette (narrative–spatial wiring). */
+  threadIds?: string[];
+  /** Thread list to resolve names for display. */
+  threads?: { id: string; name: string }[];
   onStart: (theme: string) => void;
   onAdvance: (stage: VignetteStage) => void;
   onEnd: () => void;
@@ -81,7 +87,14 @@ export function VignetteControls({
           </button>
         )}
       </div>
-      {theme ? <p className="text-xs text-palette-muted">Theme: {theme} · Stage: {stage}</p> : null}
+      {theme ? (
+        <p className="text-xs text-palette-muted">
+          Theme: {theme} · Stage: {stage}
+          {threadIds?.length && threads.length
+            ? ` · Threads: ${threadIds.map((id) => threads.find((t) => t.id === id)?.name ?? id).join(", ")}`
+            : null}
+        </p>
+      ) : null}
     </div>
   );
 }

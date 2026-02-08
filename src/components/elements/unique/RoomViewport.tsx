@@ -1,8 +1,14 @@
-import { Activity, Skull } from "lucide-react";
+import { Activity, Skull, ShoppingBag } from "lucide-react";
 import type { Room } from "@/lib/quadar/types";
 import { RuneSigil } from "./Runes";
 
-export function RoomViewport({ room }: { room: Room }) {
+export function RoomViewport({
+  room,
+  onTradeMerchant,
+}: {
+  room: Room;
+  onTradeMerchant?: (merchantId: string) => void;
+}) {
   return (
     <section className="flex-1 min-h-0 vengeance-border bg-palette-bg-mid/10 flex flex-col items-center justify-center p-1.5 sm:p-3 relative overflow-hidden group">
       <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#ff0000_1px,transparent_1px)] bg-size-[20px_20px]" />
@@ -34,6 +40,22 @@ export function RoomViewport({ room }: { room: Room }) {
               >
                 {ally.name}
               </span>
+            ))}
+          </div>
+        )}
+        {room.merchants && room.merchants.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap justify-center gap-1">
+            {room.merchants.map((merchant) => (
+              <button
+                key={merchant.id}
+                type="button"
+                onClick={() => onTradeMerchant?.(merchant.id)}
+                data-testid={`trade-merchant-${merchant.id}`}
+                aria-label={`Trade with ${merchant.name}`}
+                className="px-2 py-0.5 bg-palette-accent-gold/20 border border-palette-accent-gold/50 text-palette-accent-gold text-xs uppercase hover:bg-palette-accent-gold/30 flex items-center gap-1"
+              >
+                <ShoppingBag className="app-icon" /> {merchant.name} — Trade
+              </button>
             ))}
           </div>
         )}

@@ -60,6 +60,12 @@ export interface Npc {
     description: string;
 }
 
+/** Nomadic trader (quadar.md: Rangers and Merchants). Can barter wares. */
+export interface Merchant extends Npc {
+    /** Items the merchant offers for trade. */
+    wares: Item[];
+}
+
 export interface Room {
     id: string;
     title: string;
@@ -70,6 +76,8 @@ export interface Room {
     enemies: Enemy[];
     /** Fellow rangers, recruits, or other non-hostile NPCs (Familiar). */
     allies?: Npc[];
+    /** Nomadic traders who barter wares (quadar.md: Rangers and Merchants). */
+    merchants?: Merchant[];
 }
 
 export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower";

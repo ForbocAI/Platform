@@ -1,4 +1,4 @@
-import { Room, Biome, Enemy, Player, LoomResult, StageOfScene, Npc } from "./types";
+import { Room, Biome, Enemy, Player, LoomResult, StageOfScene, Npc, Merchant, Item } from "./types";
 import { UNEXPECTEDLY_TABLE, CLASS_TEMPLATES } from "./mechanics";
 
 const BIOMES: Biome[] = ["Ethereal Marshlands", "Toxic Wastes", "Haunted Chapel", "Obsidian Spire"];
@@ -46,25 +46,39 @@ export const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
     }
 };
 
-export function initializePlayer(): Player {
-    // Defines the "Starting Initiation" - Level 12 Ranger/Rogue (Ashwalker)
+/** Level-1 max HP for deterministic playtest (ranger, basic equip). */
+const LEVEL_1_MAX_HP = 24;
+
+export interface InitializePlayerOptions {
+    /** When true: ranger (Ashwalker), level 1, full health, basic equip, no progress flags — for reliable playtest automation. */
+    deterministic?: boolean;
+}
+
+export function initializePlayer(opts?: InitializePlayerOptions): Player {
+    const deterministic = opts?.deterministic ?? false;
     const template = CLASS_TEMPLATES["Ashwalker"];
+    const maxHp = deterministic ? LEVEL_1_MAX_HP : template.baseStats.maxHp;
+    const level = deterministic ? 1 : 12;
     return {
         id: "player_1",
-        name: "Kamenal", // The chronicler mentioned in docs
-        level: 12,
+        name: "Kamenal",
+        level,
         characterClass: "Ashwalker",
-        ...template.baseStats,
-        hp: template.baseStats.maxHp,
+        Str: template.baseStats.Str,
+        Agi: template.baseStats.Agi,
+        Arcane: template.baseStats.Arcane,
+        maxHp,
+        hp: maxHp,
+        maxStress: template.baseStats.maxStress,
         stress: 0,
-        ac: 14, // Light armor (Scout Garb)
+        ac: 14,
         inventory: [
             { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword." },
             { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor." },
             { id: "relic_shard", name: "Relic Shard", type: "relic", description: "A buzzing shard of old tech." }
         ],
         spells: template.startingSpells,
-        surgeCount: 0 // Initial Surge Count
+        surgeCount: 0
     };
 }
 
@@ -75,11 +89,59 @@ const FELLOW_RANGER: Npc = {
   description: "A fresh recruit drawn to the Tower. Reconnaissance objective.",
 };
 
+/** Wares that merchants can offer (quadar.md: nomadic traders, arcane, lost craftsmanship). */
+const WARE_POOL: Omit<Item, "id">[] = [
+  { name: "Void Shard", description: "A crystallized fragment of the abyss.", type: "relic" },
+  { name: "Ember Salve", description: "Ashwalker remedy for burns and stress.", type: "consumable" },
+  { name: "Obsidian Blade", description: "Shard-edged dagger from the Spire.", type: "weapon" },
+  { name: "Chthonic Warding", description: "Amulet that deflects dark energies.", type: "relic" },
+  { name: "Scout's Cloak", description: "Light cloak for stealth.", type: "armor" },
+  { name: "Marsh Tonic", description: "Brew from Ethereal Marshlands herbs.", type: "consumable" },
+  { name: "Rusted Key", description: "Ancient key, unknown lock.", type: "relic" },
+  { name: "Doomsteel Gauntlet", description: "Heavy gauntlet from a fallen knight.", type: "armor" },
+  { name: "Ghost Resin", description: "Sticky ethereal substance.", type: "consumable" },
+  { name: "Spire Pick", description: "Climbing tool from Obsidian Spire.", type: "weapon" },
+];
+
+const MERCHANT_NAMES = ["Gloamstrider", "Twilightrider", "Emberogue"];
+
+function uniqueId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
+function pickRandomWares(count: number): Item[] {
+  const shuffled = [...WARE_POOL].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length)).map((w) => ({ ...w, id: uniqueId() }));
+}
+
+/** Creates a nomadic merchant with random wares (quadar.md: Rangers and Merchants). */
+export function createMerchant(): Merchant {
+  const name = MERCHANT_NAMES[Math.floor(Math.random() * MERCHANT_NAMES.length)];
+  const wares = pickRandomWares(2 + Math.floor(Math.random() * 2));
+  return {
+    id: `merchant_${uniqueId()}`,
+    name,
+    description: "A nomadic trader with an eye for the arcane and lost craftsmanship.",
+    wares,
+  };
+}
+
+export interface GenerateStartRoomOptions {
+    /** When true: no random allies or merchants — for reliable playtest automation. */
+    deterministic?: boolean;
+}
+
 /** Generates the initial Quadar Tower merchandise store room per Familiar rules. */
-export function generateStartRoom(): Room {
+export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
+  const deterministic = opts?.deterministic ?? false;
   const room = generateRoom("start_room", "Quadar Tower", { title: "Store Room", description: "In the cryptic recesses of Quadar Tower, you preside over an emporium, brokering eldritch artifacts amid its shadowed corridors. A merchandise store room you manage and trade wares from." });
-  if (Math.random() < 0.4) {
-    room.allies = [{ ...FELLOW_RANGER, id: `ranger_${Date.now()}` }];
+  if (!deterministic) {
+    if (Math.random() < 0.4) {
+      room.allies = [{ ...FELLOW_RANGER, id: `ranger_${uniqueId()}` }];
+    }
+    if (Math.random() < 0.6) {
+      room.merchants = [createMerchant()];
+    }
   }
   return room;
 }
@@ -131,6 +193,7 @@ export function generateRoom(id?: string, biomeOverride?: Biome, overrides?: Gen
         },
         enemies,
         allies: [],
+        merchants: Math.random() < 0.15 ? [createMerchant()] : [],
     };
 }
 

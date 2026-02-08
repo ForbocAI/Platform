@@ -1,7 +1,7 @@
 
 import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit';
-import { Player, Room, GameLogEntry, Enemy, Thread, Npc } from '@/lib/quadar/types';
-import { initializePlayer, ENEMY_TEMPLATES } from '@/lib/quadar/engine';
+import { Player, Room, GameLogEntry, Enemy, Thread, Npc, Direction } from '@/lib/quadar/types';
+import { initializePlayer, ENEMY_TEMPLATES, createMerchant } from '@/lib/quadar/engine';
 import { SDK } from '@/lib/sdk-placeholder';
 import { resolveDuel, resolveEnemyAttack } from '@/lib/quadar/combat';
 import { generateFollowUpFacts, resolveUnexpectedlyEffect, classifyQuestion } from '@/lib/quadar/narrativeHelpers';
@@ -12,10 +12,17 @@ import {
     addThread,
     applySetChange,
     setSuggestNextStage,
+    setThreadRelatedNpcs,
     startVignette,
     advanceVignetteStage,
     endVignette,
 } from '@/features/narrative/slice/narrativeSlice';
+
+/** Grid position for explored map (grows through play). */
+export interface RoomCoordinates {
+    x: number;
+    y: number;
+}
 
 interface GameState {
     player: Player | null;
@@ -25,8 +32,13 @@ interface GameState {
     isLoading: boolean;
     error: string | null;
     concessionOffered: import('@/lib/quadar/types').Concession | null;
-    /** Damage that would be dealt if player rejects concession. */
     pendingConcessionDamage: number;
+    /** Merchant ID when trade panel is open; null when closed. */
+    tradePanelMerchantId: string | null;
+    /** All rooms visited this session (id -> room); map grows as player explores. */
+    exploredRooms: Record<string, Room>;
+    /** Grid position per room for map display (start room at 0,0). */
+    roomCoordinates: Record<string, RoomCoordinates>;
 }
 
 const initialState: GameState = {
@@ -38,10 +50,20 @@ const initialState: GameState = {
     error: null,
     concessionOffered: null,
     pendingConcessionDamage: 0,
+    tradePanelMerchantId: null,
+    exploredRooms: {},
+    roomCoordinates: {},
 };
 
 function uniqueLogId(): string {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
+/** NPC ids in room (allies + merchants) for thread relatedNpcIds sync. */
+function npcIdsFromRoom(room: Room): string[] {
+    const allies = (room.allies ?? []).map((a) => a.id);
+    const merchants = (room.merchants ?? []).map((m) => m.id);
+    return [...allies, ...merchants];
 }
 
 // Async Thunks
@@ -54,13 +76,20 @@ export const initializeGame = createAsyncThunk(
         dispatch(addLog({ message: "SYSTEM: Establishing Neural Link...", type: "system" }));
         await new Promise(resolve => setTimeout(resolve, 800));
 
-        const player = initializePlayer();
+        const deterministic = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('deterministic') === '1';
+        const player = initializePlayer({ deterministic });
         // Dev/test: low HP so one enemy hit triggers concession modal (use with forceEnemy=1)
         if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('lowHp') === '1') {
             player.hp = 5;
         }
-        let initialRoom = await SDK.Cortex.generateStartRoom();
+        let initialRoom = await SDK.Cortex.generateStartRoom({ deterministic });
 
+        // Dev/test: force a merchant in the starting room for trading playtest
+        if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('forceMerchant') === '1') {
+            if (!initialRoom.merchants || initialRoom.merchants.length === 0) {
+                initialRoom = { ...initialRoom, merchants: [createMerchant()] };
+            }
+        }
         // Dev/test: force an enemy in the starting room for combat/concession playtest
         if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('forceEnemy') === '1') {
             const names = Object.keys(ENEMY_TEMPLATES);
@@ -92,6 +121,7 @@ export const initializeGame = createAsyncThunk(
             stageOfScene: "To Knowledge",
             participantIds: [player.id],
         }));
+        dispatch(setThreadRelatedNpcs({ threadId, npcIds: npcIdsFromRoom(initialRoom) }));
 
         return { player, initialRoom };
     }
@@ -131,6 +161,10 @@ export const askOracle = createAsyncThunk(
                 dispatch(addHazardOrEnemyToCurrentRoom());
             }
         }
+        const stateAfter = getState() as { game: GameState; narrative: { mainThreadId: string | null } };
+        if (stateAfter.game.currentRoom && stateAfter.narrative.mainThreadId) {
+            dispatch(setThreadRelatedNpcs({ threadId: stateAfter.narrative.mainThreadId, npcIds: npcIdsFromRoom(stateAfter.game.currentRoom) }));
+        }
 
         return result;
     }
@@ -155,8 +189,8 @@ export const movePlayer = createAsyncThunk(
         dispatch(addLog({ message: `Moved ${direction}.`, type: "exploration" }));
 
         const { currentSceneId, threads, mainThreadId } = state.narrative;
-        if (!currentSceneId && threads.length > 0 && newRoom) {
-            const threadId = mainThreadId ?? threads[0].id;
+        const threadId = mainThreadId ?? threads[0]?.id;
+        if (!currentSceneId && threads.length > 0 && newRoom && threadId) {
             dispatch(fadeInScene({
                 roomId: newRoom.id,
                 mainThreadId: threadId,
@@ -164,8 +198,9 @@ export const movePlayer = createAsyncThunk(
                 participantIds: state.game.player ? [state.game.player.id] : [],
             }));
         }
+        if (threadId) dispatch(setThreadRelatedNpcs({ threadId, npcIds: npcIdsFromRoom(newRoom) }));
 
-        return newRoom;
+        return { newRoom, previousRoomId: state.game.currentRoom.id, direction: direction as Direction };
     }
 );
 
@@ -227,13 +262,12 @@ function buildScanReadout(room: Room): string {
         .map((d) => d.charAt(0))
         .join(", ");
     const exits = exitDirs || "None";
-    if (!room.enemies?.length) {
-        return `Scan complete. Biome: ${room.biome}. Hazards: ${hazards}. Hostiles: 0. Exits: ${exits}.`;
-    }
-    const hostiles = room.enemies
-        .map((e) => `${e.name} (HP ${e.hp}/${e.maxHp})`)
-        .join("; ");
-    return `Scan complete. Biome: ${room.biome}. Hazards: ${hazards}. Hostiles: ${room.enemies.length} — ${hostiles}. Exits: ${exits}.`;
+    const allies = room.allies?.length ? room.allies.map((a) => a.name).join(", ") : "None";
+    const merchants = room.merchants?.length ? room.merchants.map((m) => m.name).join(", ") : "None";
+    const hostilesPart = !room.enemies?.length
+        ? "Hostiles: 0."
+        : `Hostiles: ${room.enemies.length} — ${room.enemies.map((e) => `${e.name} (HP ${e.hp}/${e.maxHp})`).join("; ")}.`;
+    return `Scan complete. Biome: ${room.biome}. Hazards: ${hazards}. Allies: ${allies}. Merchants: ${merchants}. ${hostilesPart} Exits: ${exits}.`;
 }
 
 export const scanSector = createAsyncThunk(
@@ -283,8 +317,12 @@ export const communeWithVoid = createAsyncThunk(
                 dispatch(addHazardOrEnemyToCurrentRoom());
             }
             if (effect.applyEnterStageLeft && state.game.currentRoom) {
-                dispatch(addAllyToCurrentRoom());
+                dispatch(addAllyOrMerchantToCurrentRoom());
             }
+        }
+        const stateAfter = getState() as { game: GameState; narrative: { mainThreadId: string | null } };
+        if (stateAfter.game.currentRoom && stateAfter.narrative.mainThreadId) {
+            dispatch(setThreadRelatedNpcs({ threadId: stateAfter.narrative.mainThreadId, npcIds: npcIdsFromRoom(stateAfter.game.currentRoom) }));
         }
 
         return result;
@@ -443,15 +481,44 @@ export const gameSlice = createSlice({
             state.concessionOffered = null;
             state.pendingConcessionDamage = 0;
         },
-        /** Enter Stage Left: add Fellow Ranger (or similar) to current room. */
-        addAllyToCurrentRoom: (state) => {
+        /** Enter Stage Left: add Fellow Ranger or Merchant to current room. */
+        addAllyOrMerchantToCurrentRoom: (state) => {
             if (!state.currentRoom) return;
-            const allies = state.currentRoom.allies ?? [];
-            if (allies.some((a) => a.name === FELLOW_RANGER.name)) return;
-            state.currentRoom.allies = [
-                ...allies,
-                { ...FELLOW_RANGER, id: `ranger_${uniqueLogId()}` },
-            ];
+            const hasRanger = (state.currentRoom.allies ?? []).some((a) => a.name === FELLOW_RANGER.name);
+            const hasMerchant = (state.currentRoom.merchants ?? []).length > 0;
+            if (Math.random() < 0.5 && !hasRanger) {
+                state.currentRoom.allies = [...(state.currentRoom.allies ?? []), { ...FELLOW_RANGER, id: `ranger_${uniqueLogId()}` }];
+            } else if (!hasMerchant) {
+                state.currentRoom.merchants = [...(state.currentRoom.merchants ?? []), createMerchant()];
+            }
+        },
+        openTradePanel: (state, action: PayloadAction<{ merchantId: string }>) => {
+            state.tradePanelMerchantId = action.payload.merchantId;
+        },
+        closeTradePanel: (state) => {
+            state.tradePanelMerchantId = null;
+        },
+        buyFromMerchant: (state, action: PayloadAction<{ merchantId: string; itemId: string }>) => {
+            const { merchantId, itemId } = action.payload;
+            if (!state.player || !state.currentRoom?.merchants) return;
+            const merchant = state.currentRoom.merchants.find((m) => m.id === merchantId);
+            if (!merchant) return;
+            const idx = merchant.wares.findIndex((w) => w.id === itemId);
+            if (idx < 0) return;
+            const [item] = merchant.wares.splice(idx, 1);
+            state.player.inventory.push(item);
+            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Bought ${item.name} from ${merchant.name}.`, type: "exploration" });
+        },
+        sellToMerchant: (state, action: PayloadAction<{ merchantId: string; itemId: string }>) => {
+            const { merchantId, itemId } = action.payload;
+            if (!state.player || !state.currentRoom?.merchants) return;
+            const merchant = state.currentRoom.merchants.find((m) => m.id === merchantId);
+            if (!merchant) return;
+            const idx = state.player.inventory.findIndex((i) => i.id === itemId);
+            if (idx < 0) return;
+            const [item] = state.player.inventory.splice(idx, 1);
+            merchant.wares.push(item);
+            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Sold ${item.name} to ${merchant.name}.`, type: "exploration" });
         },
     },
     extraReducers: (builder) => {
@@ -469,6 +536,9 @@ export const gameSlice = createSlice({
             state.isInitialized = true;
             state.player = action.payload.player;
             state.currentRoom = action.payload.initialRoom;
+            const room = action.payload.initialRoom;
+            state.exploredRooms[room.id] = room;
+            state.roomCoordinates[room.id] = { x: 0, y: 0 };
             state.logs.push({
                 id: uniqueLogId(),
                 timestamp: Date.now(),
@@ -516,9 +586,19 @@ export const gameSlice = createSlice({
             }
         });
 
-        // Move
+        // Move — record explored room and link from previous room
         builder.addCase(movePlayer.fulfilled, (state, action) => {
-            state.currentRoom = action.payload;
+            const { newRoom, previousRoomId, direction } = action.payload;
+            state.currentRoom = newRoom;
+            state.tradePanelMerchantId = null;
+            state.exploredRooms[newRoom.id] = newRoom;
+            const prevCoord = state.roomCoordinates[previousRoomId];
+            const delta = { North: { x: 0, y: -1 }, South: { x: 0, y: 1 }, East: { x: 1, y: 0 }, West: { x: -1, y: 0 } }[direction];
+            state.roomCoordinates[newRoom.id] = prevCoord ? { x: prevCoord.x + delta.x, y: prevCoord.y + delta.y } : { x: delta.x, y: delta.y };
+            const prevRoom = state.exploredRooms[previousRoomId];
+            if (prevRoom) {
+                state.exploredRooms[previousRoomId] = { ...prevRoom, exits: { ...prevRoom.exits, [direction]: newRoom.id } };
+            }
         });
 
         // Engage (combat)
@@ -592,7 +672,11 @@ export const {
     addHazardOrEnemyToCurrentRoom,
     acceptConcession,
     rejectConcession,
-    addAllyToCurrentRoom,
+    addAllyOrMerchantToCurrentRoom,
+    openTradePanel,
+    closeTradePanel,
+    buyFromMerchant,
+    sellToMerchant,
 } = gameSlice.actions;
 
 // Selectors (memoized for stable references)
@@ -631,6 +715,21 @@ export const selectError = createSelector(
 export const selectConcessionOffered = createSelector(
     [selectGameState],
     (game) => game.concessionOffered
+);
+
+export const selectTradePanelMerchantId = createSelector(
+    [selectGameState],
+    (game) => game.tradePanelMerchantId
+);
+
+export const selectExploredRooms = createSelector(
+    [selectGameState],
+    (game) => game.exploredRooms
+);
+
+export const selectRoomCoordinates = createSelector(
+    [selectGameState],
+    (game) => game.roomCoordinates
 );
 
 export default gameSlice.reducer;

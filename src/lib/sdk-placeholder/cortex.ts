@@ -1,11 +1,11 @@
 import { Room, LoomResult, Biome, StageOfScene } from '@/lib/quadar/types';
-import { generateRoom, generateStartRoom, consultLoom } from '@/lib/quadar/engine';
+import { generateRoom, generateStartRoom, consultLoom, GenerateStartRoomOptions } from '@/lib/quadar/engine';
 
 // Cortex: Emits narrative and simulation data ("The Mind")
 export const Cortex = {
-    generateStartRoom: async (): Promise<Room> => {
+    generateStartRoom: async (opts?: GenerateStartRoomOptions): Promise<Room> => {
         await new Promise(resolve => setTimeout(resolve, 300));
-        return generateStartRoom();
+        return generateStartRoom(opts);
     },
 
     // Simulates AI generation of a room description/state
