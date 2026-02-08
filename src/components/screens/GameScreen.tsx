@@ -29,6 +29,7 @@ import {
   endVignette,
 } from "@/features/narrative/slice/narrativeSlice";
 import { setOracleInput, selectOracleInput, toggleShowMap, selectShowMap, selectStageOfScene, setStageOfScene } from "@/features/core/ui/slice/uiSlice";
+import { usePlayButtonSound } from "@/features/audio";
 import {
   PlayerHeader,
   RoomViewport,
@@ -60,6 +61,7 @@ export function GameScreen() {
   const vignette = useAppSelector(selectVignette);
   const mainThreadId = useAppSelector(selectMainThreadId);
   const currentSceneId = useAppSelector(selectCurrentSceneId);
+  const playSound = usePlayButtonSound();
 
   const handleAskOracle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +112,10 @@ export function GameScreen() {
               {currentSceneId && (
                 <button
                   type="button"
-                  onClick={() => dispatch(fadeOutScene({ sceneId: currentSceneId }))}
+                  onClick={() => {
+                    playSound();
+                    dispatch(fadeOutScene({ sceneId: currentSceneId }));
+                  }}
                   className="px-2 py-0.5 border border-palette-border text-palette-muted hover:text-palette-accent-cyan text-xs uppercase"
                 >
                   Fade out

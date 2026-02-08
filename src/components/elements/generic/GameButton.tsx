@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { usePlayButtonSound } from "@/features/audio";
 
 export function GameButton({
   children,
@@ -12,9 +15,13 @@ export function GameButton({
   variant?: "default" | "danger" | "magic";
   icon?: React.ReactNode;
 } & React.ComponentPropsWithoutRef<"button">) {
+  const playSound = usePlayButtonSound();
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        playSound();
+        onClick();
+      }}
       type="button"
       {...rest}
       className={cn(

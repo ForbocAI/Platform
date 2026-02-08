@@ -1,4 +1,7 @@
+"use client";
+
 import { Send } from "lucide-react";
+import { usePlayButtonSound } from "@/features/audio";
 
 export function OracleForm({
   value,
@@ -9,9 +12,15 @@ export function OracleForm({
   onChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
+  const playSound = usePlayButtonSound();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    playSound();
+    onSubmit(e);
+  };
   return (
     <div className="p-1.5 sm:p-2 border-t border-palette-border bg-palette-bg-mid/30 shrink-0">
-      <form onSubmit={onSubmit} className="flex gap-1.5">
+      <form onSubmit={handleSubmit} className="flex gap-1.5">
         <input
           type="text"
           value={value}

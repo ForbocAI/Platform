@@ -7,6 +7,7 @@ import {
   stopMusic,
   selectMasterVolume,
   selectMusicPlaying,
+  usePlayButtonSound,
 } from "@/features/audio";
 import { Volume2, VolumeX, Minus, Plus } from "lucide-react";
 
@@ -17,16 +18,20 @@ export function VolumeControls() {
   const masterVolume = useAppSelector(selectMasterVolume);
   const musicPlaying = useAppSelector(selectMusicPlaying);
   const isMuted = masterVolume <= 0;
+  const playSound = usePlayButtonSound();
 
   const handleVolumeUp = () => {
+    playSound();
     dispatch(setMasterVolume(Math.min(1, masterVolume + VOLUME_STEP)));
   };
 
   const handleVolumeDown = () => {
+    playSound();
     dispatch(setMasterVolume(Math.max(0, masterVolume - VOLUME_STEP)));
   };
 
   const handleToggleMusic = () => {
+    playSound();
     dispatch(musicPlaying ? stopMusic() : startMusic());
   };
 

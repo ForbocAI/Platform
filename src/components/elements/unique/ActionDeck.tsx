@@ -1,5 +1,8 @@
+"use client";
+
 import { Shield, Zap, Skull, Map as MapIcon, Activity, Crosshair } from "lucide-react";
 import { GameButton, NavButton } from "../generic";
+import { usePlayButtonSound } from "@/features/audio";
 import type { Player, Room } from "@/lib/quadar/types";
 
 export function ActionDeck({
@@ -19,6 +22,7 @@ export function ActionDeck({
   onEngage: () => void;
   onCommune: () => void;
 }) {
+  const playSound = usePlayButtonSound();
   return (
     <footer className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-col lg:flex-row gap-1.5 sm:gap-2 items-center justify-between h-full min-h-0">
       <div className="flex w-full lg:w-auto gap-1 sm:gap-1.5 justify-between lg:justify-start items-center min-w-0">
@@ -29,7 +33,10 @@ export function ActionDeck({
           <NavButton dir="W" onClick={() => onMove("West")} active={!!currentRoom.exits.West} data-testid="move-west" />
           <button
             type="button"
-            onClick={onMapClick}
+            onClick={() => {
+              playSound();
+              onMapClick();
+            }}
             className="w-full h-full border border-palette-accent-cyan/50 bg-palette-bg-dark/20 text-palette-accent-cyan flex items-center justify-center rounded-sm hover:bg-palette-accent-cyan/20 hover:border-palette-accent-cyan/50 transition-colors touch-manipulation"
             title="Toggle map"
             data-testid="map-toggle"

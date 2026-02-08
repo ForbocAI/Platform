@@ -2,6 +2,7 @@
 
 import type { VignetteStage } from "@/lib/quadar/types";
 import { useState } from "react";
+import { usePlayButtonSound } from "@/features/audio";
 
 const STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax", "Epilogue"];
 
@@ -21,6 +22,7 @@ export function VignetteControls({
   const [inputTheme, setInputTheme] = useState(theme);
   const currentIndex = STAGES.indexOf(stage);
   const nextStage = STAGES[currentIndex + 1];
+  const playSound = usePlayButtonSound();
 
   return (
     <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5 space-y-1.5">
@@ -35,7 +37,10 @@ export function VignetteControls({
         />
         <button
           type="button"
-          onClick={() => onStart(inputTheme)}
+          onClick={() => {
+            playSound();
+            onStart(inputTheme);
+          }}
           className="px-2 py-0.5 border border-palette-border text-palette-muted hover:border-palette-accent-cyan hover:text-palette-accent-cyan text-xs uppercase"
         >
           Start
@@ -43,7 +48,10 @@ export function VignetteControls({
         {nextStage && (
           <button
             type="button"
-            onClick={() => onAdvance(nextStage)}
+            onClick={() => {
+              playSound();
+              onAdvance(nextStage);
+            }}
             className="px-2 py-0.5 border border-palette-accent-magic/50 text-palette-accent-magic text-xs uppercase"
           >
             → {nextStage}
@@ -51,7 +59,10 @@ export function VignetteControls({
         )}
         <button
           type="button"
-          onClick={onEnd}
+          onClick={() => {
+            playSound();
+            onEnd();
+          }}
           className="px-2 py-0.5 border border-palette-border text-palette-muted hover:text-palette-accent-red text-xs uppercase"
         >
           End

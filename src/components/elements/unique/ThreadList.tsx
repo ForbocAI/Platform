@@ -2,6 +2,7 @@
 
 import type { Thread } from "@/lib/quadar/types";
 import { cn } from "@/lib/utils";
+import { usePlayButtonSound } from "@/features/audio";
 
 export function ThreadList({
   threads,
@@ -12,6 +13,7 @@ export function ThreadList({
   mainThreadId: string | null;
   onSetMain: (id: string) => void;
 }) {
+  const playSound = usePlayButtonSound();
   if (threads.length === 0) return null;
 
   return (
@@ -22,7 +24,10 @@ export function ThreadList({
           <button
             key={t.id}
             type="button"
-            onClick={() => onSetMain(t.id)}
+            onClick={() => {
+              playSound();
+              onSetMain(t.id);
+            }}
             className={cn(
               "px-2 py-0.5 text-xs font-bold uppercase tracking-wider border transition-colors",
               mainThreadId === t.id

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ConcessionOutcome } from "@/lib/quadar/types";
+import { usePlayButtonSound } from "@/features/audio";
 
 const OUTCOMES: { value: ConcessionOutcome; label: string; narrative: string }[] = [
   { value: "flee", label: "Flee", narrative: "You break away and flee the fray." },
@@ -16,6 +17,7 @@ export function ConcessionModal({
   onAccept: (outcome: ConcessionOutcome, narrative: string) => void;
   onReject: () => void;
 }) {
+  const playSound = usePlayButtonSound();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-palette-bg-dark/90">
       <div className="vengeance-border bg-palette-bg-mid border-2 border-palette-accent-red/50 p-4 sm:p-6 max-w-md w-full">
@@ -30,7 +32,10 @@ export function ConcessionModal({
             <button
               key={value}
               type="button"
-              onClick={() => onAccept(value, narrative)}
+              onClick={() => {
+                playSound();
+                onAccept(value, narrative);
+              }}
               className="w-full px-3 py-2 bg-palette-bg-dark border border-palette-border text-palette-muted-light hover:border-palette-accent-cyan hover:text-palette-accent-cyan transition-colors text-left"
             >
               <span className="font-bold">{label}</span>
@@ -40,7 +45,10 @@ export function ConcessionModal({
         </div>
         <button
           type="button"
-          onClick={onReject}
+          onClick={() => {
+            playSound();
+            onReject();
+          }}
           className="w-full px-3 py-2 bg-palette-accent-red/20 border border-palette-accent-red text-palette-accent-red hover:bg-palette-accent-red/30 transition-colors font-bold uppercase tracking-wider"
         >
           Reject — take the blow

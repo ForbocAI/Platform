@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { usePlayButtonSound } from "@/features/audio";
 
 export function NavButton({
   dir,
@@ -10,11 +13,17 @@ export function NavButton({
   onClick: () => void;
   active: boolean;
 } & React.ComponentPropsWithoutRef<"button">) {
+  const playSound = usePlayButtonSound();
   return (
     <button
       type="button"
       disabled={!active}
-      onClick={onClick}
+      onClick={() => {
+        if (active) {
+          playSound();
+          onClick();
+        }
+      }}
       {...rest}
       className={cn(
         "w-full h-full border transition-all duration-300 flex items-center justify-center font-bold rounded-sm touch-manipulation leading-tight",

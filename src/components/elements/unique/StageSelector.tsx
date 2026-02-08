@@ -1,5 +1,8 @@
+"use client";
+
 import type { StageOfScene } from "@/lib/quadar/types";
 import { cn } from "@/lib/utils";
+import { usePlayButtonSound } from "@/features/audio";
 import { RuneSigil } from "./Runes";
 
 const STAGES: { value: StageOfScene; label: string }[] = [
@@ -15,6 +18,7 @@ export function StageSelector({
   stage: StageOfScene;
   onStageChange: (s: StageOfScene) => void;
 }) {
+  const playSound = usePlayButtonSound();
   return (
     <div className="flex items-center gap-1 p-1 sm:p-1.5 border-b border-palette-border bg-palette-bg-mid/10 shrink-0">
       <RuneSigil className="shrink-0" />
@@ -23,7 +27,10 @@ export function StageSelector({
         <button
           key={value}
           type="button"
-          onClick={() => onStageChange(value)}
+          onClick={() => {
+            playSound();
+            onStageChange(value);
+          }}
           className={cn(
             "px-1.5 sm:px-2 py-0.5 font-bold uppercase tracking-wider transition-colors touch-manipulation leading-tight",
             stage === value
