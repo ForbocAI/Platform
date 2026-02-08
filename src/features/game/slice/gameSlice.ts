@@ -31,13 +31,17 @@ function uniqueLogId(): string {
 export const initializeGame = createAsyncThunk(
     'game/initialize',
     async (_, { dispatch }) => {
+        // Dev/test: ?simulateInitError=1 to exercise error/retry UI
+        if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('simulateInitError') === '1') {
+            throw new Error('Simulated init failure.');
+        }
         // Simulate initial connection sequence
         dispatch(addLog({ message: "SYSTEM: Establishing Neural Link...", type: "system" }));
         await new Promise(resolve => setTimeout(resolve, 800));
 
         // In a real scenario, SDK.Memory.load() would happen here
         const player = initializePlayer();
-        const initialRoom = await SDK.Cortex.generateRoom("start_room", "Quadar Tower");
+        const initialRoom = await SDK.Cortex.generateStartRoom();
 
         return { player, initialRoom };
     }
@@ -47,12 +51,13 @@ export const askOracle = createAsyncThunk(
     'game/askOracle',
     async (question: string, { getState, dispatch, rejectWithValue }) => {
         if (!question?.trim()) return rejectWithValue('empty');
-        const state = getState() as { game: GameState };
+        const state = getState() as { game: GameState; ui: { stageOfScene: import('@/lib/quadar/types').StageOfScene } };
         if (!state.game.player) throw new Error("No player");
 
         dispatch(addLog({ message: `Your Question: "${question}"`, type: "system" }));
 
-        const result = await SDK.Cortex.consultOracle(question, state.game.player.surgeCount);
+        const stage = state.ui?.stageOfScene ?? "To Knowledge";
+        const result = await SDK.Cortex.consultOracle(question, state.game.player.surgeCount, stage);
         return result;
     }
 );
@@ -154,12 +159,13 @@ const COMMUNE_QUESTION = "What does the void reveal?";
 export const communeWithVoid = createAsyncThunk(
     'game/communeWithVoid',
     async (_, { getState, dispatch }) => {
-        const state = getState() as { game: GameState };
+        const state = getState() as { game: GameState; ui: { stageOfScene: import('@/lib/quadar/types').StageOfScene } };
         if (!state.game.player) throw new Error("No player");
 
         dispatch(addLog({ message: "You attempt to commune with the void...", type: "loom" }));
 
-        const result = await SDK.Cortex.consultOracle(COMMUNE_QUESTION, state.game.player.surgeCount);
+        const stage = state.ui?.stageOfScene ?? "To Knowledge";
+        const result = await SDK.Cortex.consultOracle(COMMUNE_QUESTION, state.game.player.surgeCount, stage);
         return result;
     }
 );
@@ -181,6 +187,11 @@ export const gameSlice = createSlice({
         // Initialize
         builder.addCase(initializeGame.pending, (state) => {
             state.isLoading = true;
+            state.error = null;
+        });
+        builder.addCase(initializeGame.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = (action.error?.message as string) ?? "Failed to initialize.";
         });
         builder.addCase(initializeGame.fulfilled, (state, action) => {
             state.isLoading = false;
@@ -201,7 +212,7 @@ export const gameSlice = createSlice({
             const result = action.payload;
 
             // Update Surge
-            const player = state.player; // Ensure type safety
+            const player = state.player;
             let newSurge = player.surgeCount;
 
             if (result.surgeUpdate === -1) {
@@ -211,12 +222,27 @@ export const gameSlice = createSlice({
             }
             player.surgeCount = newSurge;
 
+            // Stress: +10 on "and unexpectedly" (narrative strain)
+            if (result.qualifier === "unexpectedly") {
+                player.stress = Math.min(player.maxStress, player.stress + 10);
+            }
+
             state.logs.push({
                 id: uniqueLogId(),
                 timestamp: Date.now(),
                 message: `Oracle: ${result.description} (Roll: ${result.roll}, Surge: ${newSurge})`,
                 type: "loom"
             });
+        });
+        builder.addCase(askOracle.rejected, (state, action) => {
+            if (action.payload === "empty") {
+                state.logs.push({
+                    id: uniqueLogId(),
+                    timestamp: Date.now(),
+                    message: "Question cannot be empty.",
+                    type: "system"
+                });
+            }
         });
 
         // Move
@@ -231,6 +257,8 @@ export const gameSlice = createSlice({
             }
             if (state.player && action.payload.playerDamage && action.payload.playerDamage > 0) {
                 state.player.hp = Math.max(0, state.player.hp - action.payload.playerDamage);
+                // Stress: +5 when taking combat damage
+                state.player.stress = Math.min(state.player.maxStress, state.player.stress + 5);
             }
         });
 
@@ -245,6 +273,12 @@ export const gameSlice = createSlice({
                 newSurge += result.surgeUpdate;
             }
             state.player.surgeCount = newSurge;
+
+            // Stress: +10 on "and unexpectedly"
+            if (result.qualifier === "unexpectedly") {
+                state.player.stress = Math.min(state.player.maxStress, state.player.stress + 10);
+            }
+
             state.logs.push({
                 id: uniqueLogId(),
                 timestamp: Date.now(),
@@ -283,6 +317,11 @@ export const selectIsInitialized = createSelector(
 export const selectIsLoading = createSelector(
     [selectGameState],
     (game) => game.isLoading
+);
+
+export const selectError = createSelector(
+    [selectGameState],
+    (game) => game.error
 );
 
 export default gameSlice.reducer;

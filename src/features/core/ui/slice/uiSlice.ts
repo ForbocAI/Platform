@@ -1,14 +1,16 @@
-
+import type { StageOfScene } from '@/lib/quadar/types';
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 
 interface UIState {
     oracleInput: string;
     showMap: boolean;
+    stageOfScene: StageOfScene;
 }
 
 const initialState: UIState = {
     oracleInput: "",
     showMap: false,
+    stageOfScene: "To Knowledge",
 };
 
 export const uiSlice = createSlice({
@@ -24,10 +26,13 @@ export const uiSlice = createSlice({
         toggleShowMap: (state) => {
             state.showMap = !state.showMap;
         },
+        setStageOfScene: (state, action: PayloadAction<StageOfScene>) => {
+            state.stageOfScene = action.payload;
+        },
     }
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -40,6 +45,11 @@ export const selectOracleInput = createSelector(
 export const selectShowMap = createSelector(
   [selectUIState],
   (ui) => ui.showMap
+);
+
+export const selectStageOfScene = createSelector(
+  [selectUIState],
+  (ui) => ui.stageOfScene
 );
 
 export default uiSlice.reducer;

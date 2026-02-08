@@ -7,43 +7,48 @@ export interface CombatResult {
     message: string;
 }
 
-export function resolveDuel(attacker: Stats, defender: Enemy): CombatResult {
+/** Shadows of Fate: d20 + Str + Agi + Arcane + optional spell modifier. Higher total wins. */
+function rollCombatTotal(stats: Stats, spellModifier = 0): number {
     const d20 = Math.floor(Math.random() * 20) + 1;
-    const attackBonus = Math.floor((attacker.Str + attacker.Agi + attacker.Arcane) / 10);
-    const totalAttack = d20 + attackBonus;
+    return d20 + stats.Str + stats.Agi + stats.Arcane + spellModifier;
+}
 
-    const isHit = totalAttack >= defender.ac;
+export function resolveDuel(attacker: Stats, defender: Enemy, spellModifier = 0): CombatResult {
+    const attackerTotal = rollCombatTotal(attacker, spellModifier);
+    const defenderTotal = rollCombatTotal(defender);
+
+    const isHit = attackerTotal > defenderTotal;
     let damage = 0;
     let message = "";
 
     if (isHit) {
-        // Damage logic: Base + random factor
-        damage = Math.floor(Math.random() * 10) + attackBonus + 1;
-        message = `Critical hit! You land a heavy blow on ${defender.name} for ${damage} damage.`;
+        const diff = attackerTotal - defenderTotal;
+        damage = Math.max(1, Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1);
+        message = `You land a heavy blow on ${defender.name} for ${damage} damage. (${attackerTotal} vs ${defenderTotal})`;
     } else {
-        message = `You swing at ${defender.name} but the Shadows guide their movement. Miss!`;
+        message = `You swing at ${defender.name} but the Shadows guide their movement. Miss! (${attackerTotal} vs ${defenderTotal})`;
     }
 
     return {
         hit: isHit,
         damage,
-        roll: totalAttack,
+        roll: attackerTotal,
         message,
     };
 }
 
-/** Enemy attacks the player; defender must have ac and name. */
+/** Enemy attacks the player. Shadows of Fate: both roll d20 + Str + Agi + Arcane, higher wins. */
 export function resolveEnemyAttack(attacker: Enemy, defender: Player): CombatResult {
-    const d20 = Math.floor(Math.random() * 20) + 1;
-    const attackBonus = Math.floor((attacker.Str + attacker.Agi + attacker.Arcane) / 10);
-    const totalAttack = d20 + attackBonus;
+    const attackerTotal = rollCombatTotal(attacker);
+    const defenderTotal = rollCombatTotal(defender);
 
-    const isHit = totalAttack >= defender.ac;
+    const isHit = attackerTotal > defenderTotal;
     let damage = 0;
     let message = "";
 
     if (isHit) {
-        damage = Math.floor(Math.random() * 10) + attackBonus + 1;
+        const diff = attackerTotal - defenderTotal;
+        damage = Math.max(1, Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1);
         message = `${attacker.name} strikes you for ${damage} damage!`;
     } else {
         message = `${attacker.name} attacks but you evade. Miss!`;
@@ -52,7 +57,7 @@ export function resolveEnemyAttack(attacker: Enemy, defender: Player): CombatRes
     return {
         hit: isHit,
         damage,
-        roll: totalAttack,
+        roll: attackerTotal,
         message,
     };
 }

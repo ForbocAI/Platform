@@ -1,3 +1,4 @@
+export { StageSelector } from "./StageSelector";
 export { PlayerHeader } from "./PlayerHeader";
 export { RoomViewport } from "./RoomViewport";
 export { MapView } from "./MapView";

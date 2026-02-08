@@ -20,7 +20,7 @@ export function ActionDeck({
   onCommune: () => void;
 }) {
   return (
-    <footer className="shrink-0 vengeance-border lg:col-span-2 bg-zinc-900/80 p-1.5 sm:p-2 lg:p-6 flex flex-col lg:flex-row gap-1.5 sm:gap-2 lg:gap-8 items-center justify-between">
+    <footer className="shrink-0 vengeance-border bg-zinc-900/80 p-1.5 sm:p-2 lg:p-6 flex flex-col lg:flex-row gap-1.5 sm:gap-2 lg:gap-8 items-center justify-between h-full min-h-0">
       <div className="flex w-full lg:w-auto gap-1.5 sm:gap-2 lg:gap-4 justify-between lg:justify-start items-center min-w-0">
         <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-24 shrink-0">
           <div />

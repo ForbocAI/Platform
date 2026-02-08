@@ -64,6 +64,8 @@ export interface Room {
 }
 
 export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower";
+
+export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";
 export type Direction = "North" | "South" | "East" | "West";
 
 export interface Spell {

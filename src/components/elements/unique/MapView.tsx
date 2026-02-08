@@ -1,13 +1,9 @@
 import { Map as MapIcon, Compass } from "lucide-react";
 import type { Room } from "@/lib/quadar/types";
+import { getRoomExitsDisplay } from "@/lib/quadar/roomDisplay";
 
 export function MapView({ room }: { room: Room }) {
-  const exits = [
-    { dir: "N", label: "North", open: !!room.exits.North },
-    { dir: "S", label: "South", open: !!room.exits.South },
-    { dir: "E", label: "East", open: !!room.exits.East },
-    { dir: "W", label: "West", open: !!room.exits.West },
-  ];
+  const exits = getRoomExitsDisplay(room);
 
   return (
     <section className="flex-1 min-h-0 vengeance-border bg-zinc-900/10 flex flex-col relative overflow-hidden">

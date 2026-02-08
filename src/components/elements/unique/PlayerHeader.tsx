@@ -5,7 +5,7 @@ import type { Player } from "@/lib/quadar/types";
 
 export function PlayerHeader({ player }: { player: Player }) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-20 shrink-0 min-h-[2.75rem] pt-[env(safe-area-inset-top,0px)] lg:pt-0 lg:static lg:col-span-2 vengeance-border bg-zinc-950 lg:bg-zinc-900/50 flex flex-col lg:flex-row items-start lg:items-center justify-between p-1.5 sm:p-2 lg:px-8 gap-1.5 sm:gap-2">
+    <header className="shrink-0 min-h-0 vengeance-border bg-zinc-900/50 flex flex-col lg:flex-row items-start lg:items-center justify-between p-1.5 sm:p-2 lg:px-8 gap-1.5 sm:gap-2 h-full">
       <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-8 w-full lg:w-auto min-w-0">
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
           <Image src="/logo.png" alt="Forboc AI" width={24} height={24} className="logo-theme object-contain w-5 h-5 sm:w-6 sm:h-6 lg:size-8" />

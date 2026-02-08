@@ -1,8 +1,23 @@
-
-import { Room, Biome, Enemy, Player, LoomResult } from "./types";
+import { Room, Biome, Enemy, Player, LoomResult, StageOfScene } from "./types";
 import { UNEXPECTEDLY_TABLE, CLASS_TEMPLATES } from "./mechanics";
 
 const BIOMES: Biome[] = ["Ethereal Marshlands", "Toxic Wastes", "Haunted Chapel", "Obsidian Spire"];
+
+// Table 1 ranges by Stage of Scene (Loom of Fate)
+const LOOM_RANGES: Record<StageOfScene, { min: number; max: number }[]> = {
+  "To Knowledge": [
+    { min: 96, max: 100 }, { min: 86, max: 95 }, { min: 81, max: 85 }, { min: 51, max: 80 },
+    { min: 21, max: 50 }, { min: 16, max: 20 }, { min: 6, max: 15 }, { min: 1, max: 5 },
+  ],
+  "To Conflict": [
+    { min: 99, max: 100 }, { min: 95, max: 98 }, { min: 85, max: 94 }, { min: 51, max: 84 },
+    { min: 17, max: 50 }, { min: 7, max: 16 }, { min: 3, max: 6 }, { min: 1, max: 2 },
+  ],
+  "To Endings": [
+    { min: 100, max: 100 }, { min: 99, max: 99 }, { min: 81, max: 98 }, { min: 51, max: 80 },
+    { min: 21, max: 50 }, { min: 3, max: 20 }, { min: 2, max: 2 }, { min: 1, max: 1 },
+  ],
+};
 
 const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
     "Obsidian Warden": {
@@ -53,7 +68,17 @@ export function initializePlayer(): Player {
     };
 }
 
-export function generateRoom(id?: string, biomeOverride?: Biome): Room {
+/** Generates the initial Quadar Tower merchandise store room per Familiar rules. */
+export function generateStartRoom(): Room {
+  return generateRoom("start_room", "Quadar Tower", { title: "Store Room", description: "In the cryptic recesses of Quadar Tower, you preside over an emporium, brokering eldritch artifacts amid its shadowed corridors. A merchandise store room you manage and trade wares from." });
+}
+
+interface GenerateRoomOverrides {
+  title?: string;
+  description?: string;
+}
+
+export function generateRoom(id?: string, biomeOverride?: Biome, overrides?: GenerateRoomOverrides): Room {
     const biome = biomeOverride || BIOMES[Math.floor(Math.random() * BIOMES.length)];
     const nameParts = {
         "Ethereal Marshlands": ["Ghost", "Mist", "Dread", "Swamp", "Veil"],
@@ -83,8 +108,8 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
 
     return {
         id: id || Math.random().toString(36).substring(7),
-        title: `${p1} ${p2}`,
-        description: `You stand within the ${biome}. The air is heavy with ${biome === "Toxic Wastes" ? "metallic stench" : "whispers of the dead"}.`,
+        title: overrides?.title ?? `${p1} ${p2}`,
+        description: overrides?.description ?? `You stand within the ${biome}. The air is heavy with ${biome === "Toxic Wastes" ? "metallic stench" : "whispers of the dead"}.`,
         biome,
         hazards: roll < 20 ? ["Toxic Air"] : [],
         exits: {
@@ -99,94 +124,63 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
 
 // --- Loom of Fate Logic ---
 
-export function consultLoom(question: string, currentSurgeCount: number): LoomResult {
+type Table1Result = { answer: "Yes" | "No"; qualifier?: "and" | "but" | "unexpectedly"; resultString: string };
+
+function resolveTable1(modifiedRoll: number, stage: StageOfScene): Table1Result {
+  const ranges = LOOM_RANGES[stage];
+  // Order: Yes+unexp, Yes+but, Yes+and, Yes, No, No+and, No+but, No+unexp
+  const results: Table1Result[] = [
+    { answer: "Yes", qualifier: "unexpectedly", resultString: "Yes, and unexpectedly..." },
+    { answer: "Yes", qualifier: "but", resultString: "Yes, but..." },
+    { answer: "Yes", qualifier: "and", resultString: "Yes, and..." },
+    { answer: "Yes", resultString: "Yes." },
+    { answer: "No", resultString: "No." },
+    { answer: "No", qualifier: "and", resultString: "No, and..." },
+    { answer: "No", qualifier: "but", resultString: "No, but..." },
+    { answer: "No", qualifier: "unexpectedly", resultString: "No, and unexpectedly..." },
+  ];
+  for (let i = 0; i < ranges.length; i++) {
+    if (modifiedRoll >= ranges[i].min && modifiedRoll <= ranges[i].max) {
+      return results[i];
+    }
+  }
+  return results[0]; // fallback
+}
+
+export function consultLoom(question: string, currentSurgeCount: number, stage: StageOfScene = "To Knowledge"): LoomResult {
     const d100 = Math.floor(Math.random() * 100) + 1;
     let modifiedRoll = d100;
 
-    // Surge Logic: 
-    // If d100 > 50, ADD surge.
-    // If d100 <= 50, SUBTRACT surge.
+    // Surge Logic: If d100 > 50, ADD surge. If d100 <= 50, SUBTRACT surge.
     if (d100 > 50) {
         modifiedRoll += currentSurgeCount;
     } else {
         modifiedRoll -= currentSurgeCount;
     }
 
-    // Clamp roll
-    if (modifiedRoll < 1) modifiedRoll = 1;
-    if (modifiedRoll > 100) modifiedRoll = 100;
-
-    let resultString = "";
-    let answer: "Yes" | "No";
-    let qualifier: "and" | "but" | "unexpectedly" | undefined;
-    let newSurge = 0; // The amount to UPDATE the current with or reset (if 0, implies reset? No, rules say "Add 2" or "Reset")
-
-    // Table 1 Logic
-    // Yes, and unexpectedly: 96-100+
-    // Yes, but: 86-95
-    // Yes, and: 81-85
-    // Yes: 51-80
-    // No: 21-50
-    // No, and: 16-20
-    // No, but: 6-15
-    // No, and unexpectedly: 1-5 (and < 1)
-
-    if (modifiedRoll >= 96) {
-        answer = "Yes";
-        qualifier = "unexpectedly";
-        resultString = "Yes, and unexpectedly...";
-    } else if (modifiedRoll >= 86) {
-        answer = "Yes";
-        qualifier = "but";
-        resultString = "Yes, but...";
-    } else if (modifiedRoll >= 81) {
-        answer = "Yes";
-        qualifier = "and";
-        resultString = "Yes, and...";
-    } else if (modifiedRoll >= 51) {
-        answer = "Yes";
-        resultString = "Yes.";
-    } else if (modifiedRoll >= 21) {
-        answer = "No";
-        resultString = "No.";
-    } else if (modifiedRoll >= 16) {
-        answer = "No";
-        qualifier = "and";
-        resultString = "No, and...";
-    } else if (modifiedRoll >= 6) {
-        answer = "No";
-        qualifier = "but";
-        resultString = "No, but...";
+    // Out-of-range: "Any result outside the range of the table is automatically treated as corresponding 'and unexpectedly' result."
+    let result: Table1Result;
+    if (modifiedRoll < 1) {
+        result = { answer: "No", qualifier: "unexpectedly", resultString: "No, and unexpectedly..." };
+    } else if (modifiedRoll > 100) {
+        result = { answer: "Yes", qualifier: "unexpectedly", resultString: "Yes, and unexpectedly..." };
     } else {
-        answer = "No";
-        qualifier = "unexpectedly";
-        resultString = "No, and unexpectedly...";
+        result = resolveTable1(modifiedRoll, stage);
     }
 
-    let description = resultString;
+    let description = result.resultString;
 
-    // Surge Update Rule:
-    // "If the answer is anything other than plain 'yes' or 'no', reset the Surge Count."
-    // "If the answer is just 'yes' or 'no', add another two (2) to the Surge Count."
+    const newSurge = result.qualifier ? -1 : 2;
 
-    if (!qualifier) {
-        // Plain Yes/No
-        newSurge = 2; // Helper will need to handle this as "add 2"
-    } else {
-        // Qualifier exists (and, but, unexpectedly)
-        newSurge = -1; // Helper will need to handle this as "reset to 0"
-    }
-
-    // Handle Unexpectedly Table
-    if (qualifier === "unexpectedly") {
+    if (result.qualifier === "unexpectedly") {
         const d20 = Math.floor(Math.random() * 20) + 1;
         const unexpectedEvent = UNEXPECTEDLY_TABLE[d20 - 1] || "Re-roll";
         description += ` [EVENT: ${unexpectedEvent}]`;
     }
 
     return {
-        answer,
-        qualifier,
+        answer: result.answer,
+        qualifier: result.qualifier,
         description,
         roll: modifiedRoll,
         surgeUpdate: newSurge
