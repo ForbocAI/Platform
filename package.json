@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@iconify-icons/pixelarticons": "^1.2.5",
+    "@iconify-json/game-icons": "^1.2.3",
     "@iconify/react": "^6.0.2",
     "@reduxjs/toolkit": "^2.11.2",
     "clsx": "^2.1.1",
