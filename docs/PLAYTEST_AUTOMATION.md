@@ -38,7 +38,7 @@ All interactive elements in the game UI have:
 | Stage selector | `stage-selector` |
 | Thread list | `thread-list` |
 | Vignette controls | `vignette-controls` |
-| Loading overlay Retry | `loading-retry` |
+| Loading overlay Retry | `loading-retry` (aria-label: "Retry initialization") |
 | Neural Log panel | `neural-log-panel` |
 
 ## Query params (dev / test)
@@ -62,3 +62,38 @@ The header **auto-play** button (`auto-play-toggle`, aria-label "Start auto-play
 - Auto-play runs via Redux listener middleware (no component `useEffect`).
 
 Use auto-play for soak testing or to quickly generate log/facts state for manual checks.
+
+---
+
+## Test coverage (single-player)
+
+**Last playtest:** 2026-02-08. App: Forboc.AI/Platform at `http://localhost:3000`.
+
+### What was tested
+
+| Flow | How to reproduce | Status |
+|------|------------------|--------|
+| **Init** | Load `http://localhost:3000` → wait for "Connection Stable" | ✅ Store Room, Reconnaissance thread, Neural Log entries |
+| **Movement** | Click Move East/South/North/West (enabled per room exits) | ✅ Room title/description and log update (e.g. "Moved East." → Acid Pit) |
+| **Map toggle** | Click "Toggle map" | ✅ View switches; movement still works after toggle |
+| **SCAN** | Click "Scan sector" | ✅ Log: biome, hazards, hostiles (name, HP), exits |
+| **ENGAGE** | With hostiles in room (or `?forceEnemy=1`), click "Engage enemy" | ✅ Duel message + enemy counter-attack; enemy HP decreases or "has fallen" |
+| **COMMUNE** | Click "Commune with void" | ✅ Log "You attempt to commune with the void..."; Oracle answer and facts added |
+| **Oracle** | Type question in "Ask Oracle", click Send (or Enter) | ✅ Log "Your Question: …", then "Oracle: … (Roll: …, Surge: …)"; Facts panel gets entry |
+| **Facts panel** | After Oracle or COMMUNE, click "Open Facts" (aria-label when closed) | ✅ Panel shows fact list; button becomes "Close Facts" |
+| **Stage selector** | Click "Stage: Knowledge" / "Stage: Conflict" / "Stage: Endings" | ✅ Stage updates (Oracle/COMMUNE use current stage) |
+| **Vignette** | Enter theme in "Vignette theme", click "Start vignette" | ✅ "Theme: … · Stage: Exposition"; "Advance to Rising Action" / "Advance to Climax" / "End vignette" work |
+| **Fade out scene** | With a current scene, click "Fade out" in footer | ✅ (Scene id present when room + thread established) |
+| **Loading / Retry** | Load `?simulateInitError=1` | ✅ "Simulated init failure." + "Retry initialization" (aria-label); Retry re-runs init (fails again while param set) |
+| **Concession** | `?lowHp=1&forceEnemy=1`, ENGAGE until enemy hit would take player out | ⚠️ Code path verified (ConcessionModal, accept/reject); RNG often has enemy miss or die first. Repeat ENGAGE or use auto-play to increase chance. |
+
+### Reproduction steps (cursor-ide-browser)
+
+1. **Stale refs:** Snapshot → find ref → single action (click/type) → snapshot again before next action.
+2. **Facts:** Ask Oracle or COMMUNE first so facts exist; then target "Open Facts" (or "Close Facts" when open).
+3. **Concession:** Navigate to `http://localhost:3000/?lowHp=1&forceEnemy=1`, then repeatedly click "Engage enemy" until either the Concession modal appears (enemy lands a killing hit) or the enemy is defeated.
+
+### Known issues / notes
+
+- **Concession (single-player):** Modal and accept/reject are implemented; triggering it depends on combat RNG (enemy must land a hit that would reduce player HP to 0). With `lowHp=1` + `forceEnemy=1`, the enemy may be killed before landing a hit. For deterministic concession testing, consider many ENGAGE rounds or a future dev-only option.
+- **Auto-play:** Not exercised in this pass; doc and `autoPlayTick` list valid actions and concession handling.
