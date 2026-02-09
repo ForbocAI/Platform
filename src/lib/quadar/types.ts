@@ -9,6 +9,15 @@ export interface Stats {
     hp: number;
     maxStress: number;
     stress: number;
+    ac: number;
+}
+
+export type EquipmentSlot = "mainHand" | "armor" | "relic";
+
+export interface Equipment {
+    mainHand?: Item;
+    armor?: Item;
+    relic?: Item;
 }
 
 export type CharacterClass =
@@ -33,8 +42,13 @@ export interface Player extends Stats {
     characterClass: CharacterClass;
     ac: number; // Armor class for enemy attacks
     inventory: Item[];
+    equipment: Equipment;
     spells: string[]; // IDs of learned spells
     surgeCount: number; // For Loom of Fate
+    /** Currency (qvht/forboc): "what we spend spirit on. Currency becomes." Primary trade medium. */
+    spirit: number;
+    /** Price of revelation (qvht: "price paid in blood and sacrifice"). Ritual / high-tier cost. */
+    blood: number;
 }
 
 export interface Enemy extends Stats {
@@ -51,6 +65,13 @@ export interface Item {
     name: string;
     description: string;
     type: "weapon" | "armor" | "consumable" | "relic";
+    bonus?: Partial<Stats>;
+    /** For consumables: e.g. "heal_10", "stress_-5" */
+    effect?: string;
+    /** Spirit cost to buy (qvht: spirit as currency). Sell grants spirit. */
+    value?: number;
+    /** Optional blood price for ritual / revelation wares (qvht: "price paid in blood"). */
+    bloodPrice?: number;
 }
 
 /** Friendly or neutral NPC (e.g. Fellow Ranger). */
@@ -124,6 +145,7 @@ export interface Thread {
     relatedNpcIds: string[];
     facts: string[];
     createdAt: number;
+    updatedAt?: number;
 }
 
 export interface SceneRecord {

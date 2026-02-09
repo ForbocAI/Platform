@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Zap, Skull, Map as MapIcon, Activity, Crosshair } from "lucide-react";
+import { Shield, Zap, Skull, Map as MapIcon, Activity, Crosshair, Package } from "lucide-react";
 import { GameButton, NavButton } from "../generic";
 import { usePlayButtonSound } from "@/features/audio";
 import type { Player, Room } from "@/lib/quadar/types";
@@ -13,6 +13,9 @@ export function ActionDeck({
   onScan,
   onEngage,
   onCommune,
+  onCast,
+  inventoryOpen,
+  onToggleInventory,
 }: {
   player: Player;
   currentRoom: Room;
@@ -21,6 +24,9 @@ export function ActionDeck({
   onScan: () => void;
   onEngage: () => void;
   onCommune: () => void;
+  onCast: (spellId: string) => void;
+  inventoryOpen: boolean;
+  onToggleInventory: () => void;
 }) {
   const playSound = usePlayButtonSound();
   return (
@@ -49,7 +55,7 @@ export function ActionDeck({
           <NavButton dir="S" onClick={() => onMove("South")} active={!!currentRoom.exits.South} data-testid="move-south" aria-label="Move South" />
           <div />
         </div>
-        <div className="grid grid-cols-3 lg:flex gap-1 flex-1 min-w-0">
+        <div className="grid grid-cols-4 lg:flex gap-1 flex-1 min-w-0">
           <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan" aria-label="Scan sector">
             SCAN
           </GameButton>
@@ -58,6 +64,15 @@ export function ActionDeck({
           </GameButton>
           <GameButton onClick={onCommune} variant="magic" icon={<Activity className="app-icon" />} data-testid="action-commune" aria-label="Commune with void">
             COMMUNE
+          </GameButton>
+          <GameButton
+            onClick={onToggleInventory}
+            icon={<Package className="app-icon" />}
+            data-testid="inventory-toggle"
+            aria-label={inventoryOpen ? "Close Inventory" : "Open Inventory"}
+            className={inventoryOpen ? "!border-palette-accent-gold !text-palette-accent-gold !bg-palette-accent-gold/20" : ""}
+          >
+            ITEMS
           </GameButton>
         </div>
       </div>
@@ -68,8 +83,13 @@ export function ActionDeck({
             {player.spells.map((spell) => (
               <div
                 key={spell}
+                onClick={() => {
+                  playSound();
+                  onCast(spell);
+                }}
                 className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted hover:border-palette-accent-cyan hover:text-palette-accent-cyan cursor-pointer transition-colors"
                 title={spell}
+                data-testid={`cast-spell-${spell}`}
               >
                 <Zap className="app-icon" />
               </div>

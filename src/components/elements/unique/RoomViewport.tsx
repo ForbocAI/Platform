@@ -1,6 +1,8 @@
-import { Activity, Skull, ShoppingBag } from "lucide-react";
+import { Activity, Skull, ShoppingBag, Clapperboard, Hash } from "lucide-react";
 import type { Room } from "@/lib/quadar/types";
 import { RuneSigil } from "./Runes";
+import { useAppSelector } from "@/features/core/store";
+import { selectVignette, selectMainThread, selectCurrentScene } from "@/features/narrative/slice/narrativeSlice";
 
 export function RoomViewport({
   room,
@@ -9,6 +11,12 @@ export function RoomViewport({
   room: Room;
   onTradeMerchant?: (merchantId: string) => void;
 }) {
+  const vignette = useAppSelector(selectVignette);
+  const mainThread = useAppSelector(selectMainThread);
+  const currentScene = useAppSelector(selectCurrentScene);
+
+  const isSceneHere = currentScene?.locationRoomId === room.id;
+
   return (
     <section className="flex-1 min-h-0 vengeance-border bg-palette-bg-mid/10 flex flex-col items-center justify-center p-1.5 sm:p-3 relative overflow-hidden group">
       <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#ff0000_1px,transparent_1px)] bg-size-[20px_20px]" />
@@ -23,6 +31,24 @@ export function RoomViewport({
         <p className="leading-relaxed text-palette-muted-light italic mb-2 sm:mb-3 max-w-xl mx-auto px-2">
           &quot;{room.description}&quot;
         </p>
+
+        {/* Narrative Overlays */}
+        {vignette && (
+          <div className="mb-2 p-1.5 border border-palette-accent-magic/50 bg-palette-accent-magic/10 flex items-center justify-center gap-2 animate-pulse">
+            <Clapperboard className="w-4 h-4 text-palette-accent-magic" />
+            <span className="text-palette-accent-magic font-bold text-xs uppercase tracking-widest">
+              Vignette: {vignette.theme} ({vignette.stage})
+            </span>
+          </div>
+        )}
+        {!vignette && isSceneHere && mainThread && (
+          <div className="mb-2 p-1.5 border border-palette-accent-cyan/50 bg-palette-accent-cyan/10 flex items-center justify-center gap-2">
+            <Hash className="w-4 h-4 text-palette-accent-cyan" />
+            <span className="text-palette-accent-cyan font-bold text-xs uppercase tracking-widest">
+              Thread: {mainThread.name} ({currentScene.stageOfScene})
+            </span>
+          </div>
+        )}
         {room.hazards.length > 0 && (
           <div className="flex flex-wrap justify-center gap-1 mt-1.5">
             <div className="p-1 sm:p-1.5 bg-palette-border-red/30 border border-palette-border-red/50 inline-flex items-center gap-1 animate-pulse">

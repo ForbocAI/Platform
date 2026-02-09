@@ -5,7 +5,7 @@ import uiReducer, { toggleAutoPlay, clearVignetteThemeInput } from '@/features/c
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';
 import { baseApi } from '@/features/core/api/baseApi';
-import { registerAudioListeners } from '@/features/audio/audioListeners';
+import { registerAudioListeners, flushTtsQueue } from '@/features/audio/audioListeners';
 import '@/features/core/api/gameApi';
 
 export const appBootstrap = { type: 'app/bootstrap' as const };
@@ -35,6 +35,17 @@ export { useAppDispatch, useAppSelector } from './hooks';
 const startAppListening = listenerMiddleware.startListening as TypedStartListening<RootState, AppDispatch>;
 
 registerAudioListeners(startAppListening);
+
+// Flush TTS queue on user click so speechSynthesis.speak() runs with a user gesture (Chrome requirement).
+startAppListening({
+  predicate: (action) => action.type === 'app/bootstrap',
+  effect: (_, listenerApi) => {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', () => flushTtsQueue(), true);
+    }
+    listenerApi.cancel();
+  },
+});
 
 startAppListening({
   predicate: (action) => action.type === 'app/bootstrap',

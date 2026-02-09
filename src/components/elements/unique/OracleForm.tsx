@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef } from "react";
 import { Send } from "lucide-react";
 import { usePlayButtonSound } from "@/features/audio";
 
@@ -16,10 +16,6 @@ export function OracleForm({
   const formContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const playSound = usePlayButtonSound();
-
-  const scrollFormIntoView = useCallback(() => {
-    formContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +40,7 @@ export function OracleForm({
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onFocus={scrollFormIntoView}
+          onFocus={() => formContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
           onKeyDown={handleKeyDown}
           placeholder="Ask Oracle… (Enter to send)"
           className="w-full bg-palette-bg-dark border border-palette-border text-palette-accent-magic px-1.5 sm:px-2 py-1 sm:py-1.5 leading-relaxed focus:outline-none focus:border-palette-accent-cyan/50 placeholder:text-palette-muted min-w-0"

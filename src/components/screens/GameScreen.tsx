@@ -22,6 +22,11 @@ import {
   closeTradePanel,
   buyFromMerchant,
   sellToMerchant,
+  sacrificeItem,
+  equipItem,
+  unequipItem,
+  useConsumableItem,
+  castSpell,
 } from "@/features/game/slice/gameSlice";
 import {
   selectThreads,
@@ -35,7 +40,7 @@ import {
   advanceVignetteStage,
   endVignette,
 } from "@/features/narrative/slice/narrativeSlice";
-import { setOracleInput, selectOracleInput, toggleShowMap, selectShowMap, selectStageOfScene, setStageOfScene } from "@/features/core/ui/slice/uiSlice";
+import { setOracleInput, selectOracleInput, toggleShowMap, selectShowMap, selectStageOfScene, setStageOfScene, selectInventoryOpen, toggleInventory } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound } from "@/features/audio";
 import {
   PlayerHeader,
@@ -50,6 +55,7 @@ import {
   ThreadList,
   VignetteControls,
   TradePanel,
+  InventoryPanel,
 } from "@/components/elements/unique";
 import { LoadingOverlay } from "@/components/elements/generic";
 import type { ConcessionOutcome } from "@/lib/quadar/types";
@@ -61,6 +67,7 @@ export function GameScreen() {
   const logs = useAppSelector(selectLogs);
   const oracleInput = useAppSelector(selectOracleInput);
   const showMap = useAppSelector(selectShowMap);
+  const inventoryOpen = useAppSelector(selectInventoryOpen);
   const stageOfScene = useAppSelector(selectStageOfScene);
   const error = useAppSelector(selectError);
   const concessionOffered = useAppSelector(selectConcessionOffered);
@@ -76,7 +83,6 @@ export function GameScreen() {
 
   const handleAskOracle = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!oracleInput.trim()) return;
     dispatch(askOracle(oracleInput));
     dispatch(setOracleInput(""));
   };
@@ -109,17 +115,29 @@ export function GameScreen() {
             <TradePanel
               merchant={merchant}
               playerInventory={player.inventory}
+              playerSpirit={player.spirit ?? 0}
+              playerBlood={player.blood ?? 0}
               onBuy={(itemId) => dispatch(buyFromMerchant({ merchantId: tradePanelMerchantId, itemId }))}
               onSell={(itemId) => dispatch(sellToMerchant({ merchantId: tradePanelMerchantId, itemId }))}
               onClose={() => dispatch(closeTradePanel())}
             />
           ) : null;
         })()}
+      {inventoryOpen && player && (
+        <InventoryPanel
+          player={player}
+          onClose={() => dispatch(toggleInventory())}
+          onEquip={(itemId, slot) => dispatch(equipItem({ itemId, slot }))}
+          onUnequip={(slot) => dispatch(unequipItem({ slot }))}
+          onUse={(itemId) => dispatch(useConsumableItem({ itemId }))}
+          onSacrifice={(itemId) => dispatch(sacrificeItem({ itemId }))}
+        />
+      )}
       <div className="flex-1 min-h-0 grid grid-cols-1 grid-rows-[9fr_15fr_15fr_11fr] gap-y-2 py-2 overflow-hidden">
         <div className="min-h-0 overflow-hidden w-full">
           <PlayerHeader player={player} />
         </div>
-        <div className="min-h-0 overflow-auto w-full vengeance-border border-b-2 border-[var(--border-red)] rounded-none">
+        <div className="min-h-0 overflow-auto w-full vengeance-border border-b-2 border-(--border-red) rounded-none">
           {showMap ? (
             <MapView
               exploredRooms={exploredRooms}
@@ -186,6 +204,9 @@ export function GameScreen() {
             onScan={() => dispatch(scanSector())}
             onEngage={() => dispatch(engageEnemy())}
             onCommune={() => dispatch(communeWithVoid())}
+            onCast={(spellId) => dispatch(castSpell({ spellId }))}
+            inventoryOpen={inventoryOpen}
+            onToggleInventory={() => dispatch(toggleInventory())}
           />
         </div>
       </div>

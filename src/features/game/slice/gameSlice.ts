@@ -3,7 +3,9 @@ import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@r
 import { Player, Room, GameLogEntry, Enemy, Thread, Npc, Direction } from '@/lib/quadar/types';
 import { initializePlayer, ENEMY_TEMPLATES, createMerchant } from '@/lib/quadar/engine';
 import { gameApi } from '@/features/core/api/gameApi';
-import { resolveDuel, resolveEnemyAttack } from '@/lib/quadar/combat';
+import { resolveDuel, resolveEnemyAttack, resolveSpellDuel } from '@/lib/quadar/combat';
+import { useConsumable } from '@/lib/quadar/items';
+import { SPELLS } from '@/lib/quadar/mechanics';
 import { generateFollowUpFacts, resolveUnexpectedlyEffect, classifyQuestion } from '@/lib/quadar/narrativeHelpers';
 import {
     addFact,
@@ -233,6 +235,13 @@ export const engageEnemy = createAsyncThunk(
 
         if (newHp <= 0) {
             dispatch(addLog({ message: `${target.name} has fallen.`, type: "combat" }));
+            dispatch(addFact({
+                sourceQuestion: "Combat Resolution",
+                sourceAnswer: `Defeated ${target.name}.`,
+                text: `Victoriously defeated ${target.name} in ${currentRoom.title}.`,
+                isFollowUp: false,
+                questionKind: "Resolution"
+            }));
         }
 
         let playerDamage = 0;
@@ -255,7 +264,126 @@ export const engageEnemy = createAsyncThunk(
             playerDamage: concession ? 0 : playerDamage,
             concessionOffered: concession,
             pendingConcessionDamage: concession ? playerDamage : 0,
+            enemyDefeated: newHp <= 0,
         };
+    }
+);
+
+export const castSpell = createAsyncThunk(
+    'game/castSpell',
+    async (payload: { spellId: string }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { player, currentRoom } = state.game;
+        const { spellId } = payload;
+
+        if (!player || !currentRoom) throw new Error("No player or room");
+        if (!currentRoom.enemies?.length) {
+            dispatch(addLog({ message: "No target for spell.", type: "combat" }));
+            return { updatedRoom: null, playerDamage: 0 };
+        }
+
+        const spell = SPELLS[spellId];
+        if (!spell) {
+            dispatch(addLog({ message: "Unknown spell.", type: "system" }));
+            return { updatedRoom: null, playerDamage: 0 };
+        }
+
+        // Logic check: does player have spell?
+        if (!player.spells?.includes(spellId)) {
+            dispatch(addLog({ message: "You don't know that spell.", type: "system" }));
+            return { updatedRoom: null, playerDamage: 0 };
+        }
+
+        const target = currentRoom.enemies[0];
+        const result = resolveSpellDuel(player, target, spell);
+        dispatch(addLog({ message: result.message, type: "combat" }));
+
+        const newHp = result.hit ? Math.max(0, target.hp - result.damage) : target.hp;
+        const updatedEnemies: import('@/lib/quadar/types').Enemy[] = currentRoom.enemies
+            .map((e, i) =>
+                i === 0 ? { ...e, hp: newHp } : e
+            )
+            .filter((e) => e.hp > 0);
+
+        if (newHp <= 0) {
+            dispatch(addLog({ message: `${target.name} has be obliterated by arcane force.`, type: "combat" }));
+            dispatch(addFact({
+                sourceQuestion: "Combat Resolution",
+                sourceAnswer: `Defeated ${target.name} with ${spell.name}.`,
+                text: `Victoriously defeated ${target.name} in ${currentRoom.title} using ${spell.name}.`,
+                isFollowUp: false,
+                questionKind: "Resolution"
+            }));
+        }
+
+        let playerDamage = 0;
+        if (newHp > 0) {
+            // Enemy hits back if not dead
+            const counterResult = resolveEnemyAttack(target, player);
+            dispatch(addLog({ message: counterResult.message, type: "combat" }));
+            if (counterResult.hit) playerDamage = counterResult.damage;
+        }
+
+        const wouldBeTakenOut = player && playerDamage > 0 && player.hp - playerDamage <= 0;
+        const concession = wouldBeTakenOut
+            ? { offered: true as const, outcome: undefined as import('@/lib/quadar/types').ConcessionOutcome | undefined, narrative: undefined as string | undefined }
+            : null;
+
+        return {
+            updatedRoom: {
+                ...currentRoom,
+                enemies: updatedEnemies,
+            },
+            playerDamage: concession ? 0 : playerDamage,
+            concessionOffered: concession,
+            pendingConcessionDamage: concession ? playerDamage : 0,
+            enemyDefeated: newHp <= 0,
+        };
+    }
+);
+
+export const buyFromMerchant = createAsyncThunk(
+    'game/buyFromMerchant',
+    async (payload: { merchantId: string; itemId: string }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { merchantId, itemId } = payload;
+        const merchant = state.game.currentRoom?.merchants?.find((m) => m.id === merchantId);
+        const item = merchant?.wares.find((w) => w.id === itemId);
+        const player = state.game.player;
+
+        if (!merchant || !item || !player) return;
+        const spiritCost = item.value ?? 0;
+        const bloodCost = item.bloodPrice ?? 0;
+const spirit = player.spirit ?? 0;
+            const blood = player.blood ?? 0;
+            const canAfford = spirit >= spiritCost && blood >= bloodCost;
+            if (!canAfford) {
+                dispatch(addLog({ message: `Not enough spirit (${spirit}/${spiritCost}) or blood (${blood}/${bloodCost}) to buy ${item.name}.`, type: "exploration" }));
+            return;
+        }
+        dispatch(gameSlice.actions.buyFromMerchantInternal(payload));
+        dispatch(addFact({
+            text: `Purchased ${item.name} from ${merchant.name} in ${state.game.currentRoom?.title}. Paid in spirit${bloodCost ? " and blood" : ""}.`,
+            isFollowUp: false
+        }));
+    }
+);
+
+export const sellToMerchant = createAsyncThunk(
+    'game/sellToMerchant',
+    async (payload: { merchantId: string; itemId: string }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { merchantId, itemId } = payload;
+        const merchant = state.game.currentRoom?.merchants?.find((m) => m.id === merchantId);
+        const item = state.game.player?.inventory.find((i) => i.id === itemId);
+
+        if (merchant && item) {
+            dispatch(gameSlice.actions.sellToMerchantInternal(payload));
+            dispatch(addFact({
+                text: `Sold ${item.name} to ${merchant.name} in ${state.game.currentRoom?.title}.`,
+                isFollowUp: false
+            }));
+        }
     }
 );
 
@@ -507,7 +635,22 @@ export const gameSlice = createSlice({
         closeTradePanel: (state) => {
             state.tradePanelMerchantId = null;
         },
-        buyFromMerchant: (state, action: PayloadAction<{ merchantId: string; itemId: string }>) => {
+        addSpirit: (state, action: PayloadAction<number>) => {
+            if (state.player) state.player.spirit = (state.player.spirit ?? 0) + action.payload;
+        },
+        addBlood: (state, action: PayloadAction<number>) => {
+            if (state.player) state.player.blood = (state.player.blood ?? 0) + action.payload;
+        },
+        sacrificeItem: (state, action: PayloadAction<{ itemId: string }>) => {
+            if (!state.player) return;
+            const idx = state.player.inventory.findIndex((i) => i.id === action.payload.itemId);
+            if (idx < 0) return;
+            const [item] = state.player.inventory.splice(idx, 1);
+            const spiritGain = Math.max(1, Math.floor((item.value ?? 0) / 2));
+            state.player.spirit = (state.player.spirit ?? 0) + spiritGain;
+            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Sacrificed ${item.name} for ${spiritGain} spirit.`, type: "exploration" });
+        },
+        buyFromMerchantInternal: (state, action: PayloadAction<{ merchantId: string; itemId: string }>) => {
             const { merchantId, itemId } = action.payload;
             if (!state.player || !state.currentRoom?.merchants) return;
             const merchant = state.currentRoom.merchants.find((m) => m.id === merchantId);
@@ -515,10 +658,14 @@ export const gameSlice = createSlice({
             const idx = merchant.wares.findIndex((w) => w.id === itemId);
             if (idx < 0) return;
             const [item] = merchant.wares.splice(idx, 1);
+            const spiritCost = item.value ?? 0;
+            const bloodCost = item.bloodPrice ?? 0;
+            state.player.spirit = (state.player.spirit ?? 0) - spiritCost;
+            state.player.blood = (state.player.blood ?? 0) - bloodCost;
             state.player.inventory.push(item);
-            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Bought ${item.name} from ${merchant.name}.`, type: "exploration" });
+            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Bought ${item.name} from ${merchant.name}. Paid ${spiritCost} spirit${bloodCost ? ` and ${bloodCost} blood` : ""}.`, type: "exploration" });
         },
-        sellToMerchant: (state, action: PayloadAction<{ merchantId: string; itemId: string }>) => {
+        sellToMerchantInternal: (state, action: PayloadAction<{ merchantId: string; itemId: string }>) => {
             const { merchantId, itemId } = action.payload;
             if (!state.player || !state.currentRoom?.merchants) return;
             const merchant = state.currentRoom.merchants.find((m) => m.id === merchantId);
@@ -526,8 +673,60 @@ export const gameSlice = createSlice({
             const idx = state.player.inventory.findIndex((i) => i.id === itemId);
             if (idx < 0) return;
             const [item] = state.player.inventory.splice(idx, 1);
+            const spiritGain = Math.floor((item.value ?? 0) / 2);
+            state.player.spirit = (state.player.spirit ?? 0) + spiritGain;
             merchant.wares.push(item);
-            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Sold ${item.name} to ${merchant.name}.`, type: "exploration" });
+            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Sold ${item.name} to ${merchant.name}. Gained ${spiritGain} spirit.`, type: "exploration" });
+        },
+        equipItem: (state, action: PayloadAction<{ itemId: string; slot: import('@/lib/quadar/types').EquipmentSlot }>) => {
+            if (!state.player) return;
+            const { itemId, slot } = action.payload;
+            const inventoryIndex = state.player.inventory.findIndex(i => i.id === itemId);
+            if (inventoryIndex === -1) return;
+
+            const itemToEquip = state.player.inventory[inventoryIndex];
+
+            // Check if slot is occupied (and move occupied to inventory)
+            const currentEquipped = state.player.equipment[slot];
+            if (currentEquipped) {
+                state.player.inventory.push(currentEquipped);
+            }
+
+            state.player.equipment[slot] = itemToEquip;
+            state.player.inventory.splice(inventoryIndex, 1);
+
+            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Equipped ${itemToEquip.name}.`, type: "system" });
+        },
+        unequipItem: (state, action: PayloadAction<{ slot: import('@/lib/quadar/types').EquipmentSlot }>) => {
+            if (!state.player) return;
+            const { slot } = action.payload;
+            const item = state.player.equipment[slot];
+            if (!item) return;
+
+            state.player.inventory.push(item);
+            state.player.equipment[slot] = undefined;
+            state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Unequipped ${item.name}.`, type: "system" });
+        },
+        useConsumableItem: (state, action: PayloadAction<{ itemId: string }>) => {
+            if (!state.player) return;
+            const { itemId } = action.payload;
+            const idx = state.player.inventory.findIndex(i => i.id === itemId);
+            if (idx === -1) return;
+
+            const item = state.player.inventory[idx];
+
+            const result = useConsumable(state.player, item);
+            if (result) {
+                state.player.hp = result.updatedPlayer.hp;
+                state.player.stress = result.updatedPlayer.stress;
+                // If other fields change, copy them too. For now only hp/stress expected.
+
+                state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: result.message, type: "system" });
+                // Consume item
+                state.player.inventory.splice(idx, 1);
+            } else {
+                state.logs.push({ id: uniqueLogId(), timestamp: Date.now(), message: `Cannot use ${item.name}.`, type: "system" });
+            }
         },
     },
     extraReducers: (builder) => {
@@ -560,6 +759,7 @@ export const gameSlice = createSlice({
         builder.addCase(askOracle.fulfilled, (state, action) => {
             if (!state.player) return;
             const result = action.payload;
+            state.player.spirit = (state.player.spirit ?? 0) + 1;
 
             // Update Surge
             const player = state.player;
@@ -615,6 +815,28 @@ export const gameSlice = createSlice({
             if (action.payload.updatedRoom) {
                 state.currentRoom = action.payload.updatedRoom;
             }
+            if (state.player && action.payload.enemyDefeated) {
+                state.player.spirit = (state.player.spirit ?? 0) + 5;
+                state.player.blood = (state.player.blood ?? 0) + 2;
+            }
+            if (action.payload.concessionOffered) {
+                state.concessionOffered = action.payload.concessionOffered;
+                state.pendingConcessionDamage = action.payload.pendingConcessionDamage ?? 0;
+            } else if (state.player && action.payload.playerDamage && action.payload.playerDamage > 0) {
+                state.player.hp = Math.max(0, state.player.hp - action.payload.playerDamage);
+                state.player.stress = Math.min(state.player.maxStress, state.player.stress + 5);
+            }
+        });
+
+        // Cast Spell (combat)
+        builder.addCase(castSpell.fulfilled, (state, action) => {
+            if (action.payload.updatedRoom) {
+                state.currentRoom = action.payload.updatedRoom;
+            }
+            if (state.player && action.payload.enemyDefeated) {
+                state.player.spirit = (state.player.spirit ?? 0) + 5;
+                state.player.blood = (state.player.blood ?? 0) + 2;
+            }
             if (action.payload.concessionOffered) {
                 state.concessionOffered = action.payload.concessionOffered;
                 state.pendingConcessionDamage = action.payload.pendingConcessionDamage ?? 0;
@@ -628,6 +850,7 @@ export const gameSlice = createSlice({
         builder.addCase(communeWithVoid.fulfilled, (state, action) => {
             if (!state.player) return;
             const result = action.payload;
+            state.player.spirit = (state.player.spirit ?? 0) + 1;
             let newSurge = state.player.surgeCount;
             if (result.surgeUpdate === -1) {
                 newSurge = 0;
@@ -684,8 +907,14 @@ export const {
     addAllyOrMerchantToCurrentRoom,
     openTradePanel,
     closeTradePanel,
-    buyFromMerchant,
-    sellToMerchant,
+    addSpirit,
+    addBlood,
+    sacrificeItem,
+    buyFromMerchantInternal,
+    sellToMerchantInternal,
+    equipItem,
+    unequipItem,
+    useConsumableItem,
 } = gameSlice.actions;
 
 // Selectors (memoized for stable references)

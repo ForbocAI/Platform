@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Shield, Zap, Skull, Play, Square, Speech, Music } from "lucide-react";
+import { Shield, Zap, Skull, Play, Square, Speech, Music, Package } from "lucide-react";
 import { StatBox } from "../generic";
 import { VolumeControls } from "./VolumeControls";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
@@ -11,6 +11,7 @@ export function PlayerHeader({ player }: { player: Player }) {
   const dispatch = useAppDispatch();
   const autoPlay = useAppSelector(selectAutoPlay);
   const textToSpeech = useAppSelector(selectTextToSpeech);
+
   const musicPlaying = useAppSelector(selectMusicPlaying);
   const playSound = usePlayButtonSound();
 
@@ -19,7 +20,7 @@ export function PlayerHeader({ player }: { player: Player }) {
       <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-4 w-full lg:w-auto min-w-0">
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
           <Image src="/logo.png" alt="Forboc AI" width={48} height={48} className="logo-theme object-contain w-8 h-8 sm:w-10 sm:h-10" />
-          <div className="flex flex-col min-w-[2.5rem] gap-px min-w-0">
+          <div className="flex flex-col min-w-10 gap-px">
             <span className="text-palette-muted uppercase tracking-widest leading-tight flex items-center gap-1.5">
               Ident: {player.characterClass}
               <span className="status-led" aria-hidden />
@@ -64,6 +65,7 @@ export function PlayerHeader({ player }: { player: Player }) {
           >
             {autoPlay ? <Square className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           </button>
+
           <button
             type="button"
             onClick={() => {
@@ -99,6 +101,14 @@ export function PlayerHeader({ player }: { player: Player }) {
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
           <VolumeControls />
+          <div className="border-l border-palette-border pl-1.5 sm:pl-2 flex flex-col items-end gap-px">
+            <span className="text-palette-muted-light uppercase tracking-widest leading-tight">Spirit</span>
+            <span className="font-black text-palette-accent-cyan leading-tight">{player.spirit ?? 0}</span>
+          </div>
+          <div className="flex flex-col items-end gap-px">
+            <span className="text-palette-muted-light uppercase tracking-widest leading-tight">Blood</span>
+            <span className="font-black text-palette-accent-red leading-tight">{player.blood ?? 0}</span>
+          </div>
           <div className="border-l border-palette-border pl-1.5 sm:pl-2 flex flex-col items-end gap-px">
             <span className="text-palette-muted-light uppercase tracking-widest leading-tight">Surge</span>
             <span className="font-black text-palette-white leading-tight">{player.surgeCount}</span>

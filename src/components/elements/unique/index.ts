@@ -12,3 +12,4 @@ export { ThreadList } from "./ThreadList";
 export { VignetteControls } from "./VignetteControls";
 export { VolumeControls } from "./VolumeControls";
 export { TradePanel } from "./TradePanel";
+export { InventoryPanel } from "./InventoryPanel";
