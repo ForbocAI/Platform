@@ -1,7 +1,5 @@
-// useEffect, useState — used only for localhost-only Speech test (commented out)
 import Image from "next/image";
-import Link from "next/link";
-import { Shield, Zap, Skull, Play, Square, Speech, Music, TestTube2 } from "lucide-react";
+import { Shield, Zap, Skull, Play, Square, Speech, Music } from "lucide-react";
 import { StatBox } from "../generic";
 import { VolumeControls } from "./VolumeControls";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
@@ -15,11 +13,6 @@ export function PlayerHeader({ player }: { player: Player }) {
   const textToSpeech = useAppSelector(selectTextToSpeech);
   const musicPlaying = useAppSelector(selectMusicPlaying);
   const playSound = usePlayButtonSound();
-  // Only show Speech test on localhost — commented out so we can deploy and test on phone
-  // const [isLocalhost, setIsLocalhost] = useState(false);
-  // useEffect(() => {
-  //   setIsLocalhost(typeof window !== "undefined" && window.location.hostname === "localhost");
-  // }, []);
 
   return (
     <header className="shrink-0 min-h-0 vengeance-border bg-palette-bg-mid/50 flex flex-col lg:flex-row items-start lg:items-center justify-between p-1.5 sm:p-2 gap-1.5 sm:gap-2 h-full" data-testid="player-header">
@@ -71,17 +64,6 @@ export function PlayerHeader({ player }: { player: Player }) {
           >
             {autoPlay ? <Square className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           </button>
-          {/* Speech test: was {isLocalhost && (...)} — always show so we can test on phone */}
-          <Link
-            href="/speech-test"
-            onClick={() => playSound()}
-            className="p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-cyan text-palette-muted hover:text-palette-accent-cyan transition-colors"
-            data-testid="speech-test-link"
-            aria-label="Speech test"
-            title="Speech test"
-          >
-            <TestTube2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </Link>
           <button
             type="button"
             onClick={() => {
