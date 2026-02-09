@@ -1,10 +1,12 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Player, Room, GameLogEntry, LoomResult, Enemy } from '@/lib/quadar/types';
-import { initializePlayer } from '@/lib/quadar/engine';
+import { initializePlayer, generateRandomEnemy, generateRandomMerchant } from '@/lib/quadar/engine';
 import { SDK } from '@/lib/sdk-placeholder';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
-import { resolveDuel, resolveEnemyAttack } from '@/lib/quadar/combat';
+import { resolveDuel, resolveEnemyAttack, resolveSpellDuel } from '@/lib/quadar/combat';
+import { SPELLS } from '@/lib/quadar/mechanics';
+import { resolveUnexpectedlyEffect } from '@/lib/quadar/narrativeHelpers';
 
 export interface RoomCoordinates {
     x: number;
@@ -23,6 +25,7 @@ interface GameState {
     isInitialized: boolean;
     isLoading: boolean;
     error: string | null;
+    selectedSpellId: string | null;
 }
 
 const initialState: GameState = {
@@ -34,6 +37,7 @@ const initialState: GameState = {
     isInitialized: false,
     isLoading: false,
     error: null,
+    selectedSpellId: null,
 };
 
 // Async Thunks
@@ -144,13 +148,77 @@ export const communeWithVoid = createAsyncThunk(
     }
 );
 
-export const engageHostiles = createAsyncThunk(
-    'game/engageHostiles',
-    async (_, { getState, dispatch }) => {
+export const castSpell = createAsyncThunk(
+    'game/castSpell',
+    async ({ spellId }: { spellId: string }, { getState, dispatch }) => {
         const state = getState() as { game: GameState };
         const { player, currentRoom } = state.game;
 
         if (!player || !currentRoom) return;
+
+        if (currentRoom.enemies.length === 0) {
+            dispatch(addLog({ message: "No target for spell.", type: "system" }));
+            return null;
+        }
+
+        const spell = SPELLS[spellId];
+        if (!spell) {
+            dispatch(addLog({ message: "Unknown spell.", type: "system" }));
+            return null;
+        }
+
+        const enemy = currentRoom.enemies[0]; // Target first enemy
+
+        // Player casts spell
+        const duelResult = resolveSpellDuel(player, enemy, spell);
+        dispatch(addLog({ message: duelResult.message, type: "combat" }));
+
+        let enemyDamage = 0;
+        let enemyDefeated = false;
+
+        if (duelResult.hit) {
+            enemyDamage = duelResult.damage;
+            if (enemy.hp - enemyDamage <= 0) {
+                enemyDefeated = true;
+                dispatch(addLog({ message: `${enemy.name} has been eradicated by arcane force!`, type: "combat" }));
+                dispatch(addFact({ text: `Vanquished ${enemy.name} with ${spell.name}.`, questionKind: "combat", isFollowUp: false }));
+            }
+        }
+
+        let playerDamage = 0;
+        // Enemy counter-attack if still alive
+        if (!enemyDefeated) {
+            const enemyAttack = resolveEnemyAttack(enemy, player);
+            dispatch(addLog({ message: enemyAttack.message, type: "combat" }));
+            if (enemyAttack.hit) {
+                playerDamage = enemyAttack.damage;
+            }
+        }
+
+        return {
+            enemyId: enemy.id,
+            enemyDamage,
+            enemyDefeated,
+            playerDamage
+        };
+    }
+);
+
+export const engageHostiles = createAsyncThunk(
+    'game/engageHostiles',
+    async (_, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { player, currentRoom, selectedSpellId } = state.game;
+
+        if (!player || !currentRoom) return;
+
+        // If spell selected, delegate to castSpell
+        if (selectedSpellId) {
+            await dispatch(castSpell({ spellId: selectedSpellId }));
+            // Use action creator from slice (will be defined by runtime execution time)
+            dispatch(gameSlice.actions.selectSpell(null));
+            return null;
+        }
 
         if (currentRoom.enemies.length === 0) {
             dispatch(addLog({ message: "No hostiles to engage.", type: "combat" }));
@@ -159,7 +227,7 @@ export const engageHostiles = createAsyncThunk(
 
         const enemy = currentRoom.enemies[0]; // Target first enemy
 
-        // Player attacks
+        // Player attacks (Basic Attack)
         const duelResult = resolveDuel(player, enemy);
         dispatch(addLog({ message: duelResult.message, type: "combat" }));
 
@@ -326,6 +394,8 @@ export const runAutoplayTick = createAsyncThunk(
     }
 );
 
+
+
 export const gameSlice = createSlice({
     name: 'game',
     initialState,
@@ -337,6 +407,9 @@ export const gameSlice = createSlice({
                 message: action.payload.message,
                 type: action.payload.type
             });
+        },
+        selectSpell: (state, action: PayloadAction<string | null>) => {
+            state.selectedSpellId = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -365,11 +438,31 @@ export const gameSlice = createSlice({
             if (!state.player) return;
             const result = action.payload;
             const player = state.player;
+
+            // Surge Update
             let newSurge = player.surgeCount;
             if (result.surgeUpdate === -1) { newSurge = 0; } else { newSurge += result.surgeUpdate; }
             player.surgeCount = newSurge;
 
-            // Log is handled in thunk
+            // Handle Unexpectedly Event
+            if (result.unexpectedRoll) {
+                const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
+                if (effect.applyEnteringRed && state.currentRoom) {
+                    // Add random enemy
+                    state.currentRoom.enemies.push(generateRandomEnemy());
+                    state.currentRoom.hazards.push("Threat Imminent");
+                }
+                if (effect.applyEnterStageLeft && state.currentRoom) {
+                    // Add merchant and ally
+                    if (!state.currentRoom.merchants) state.currentRoom.merchants = [];
+                    state.currentRoom.merchants.push(generateRandomMerchant());
+
+                    if (!state.currentRoom.allies) state.currentRoom.allies = [];
+                    state.currentRoom.allies.push({ id: Date.now().toString(), name: "Fellow Ranger" });
+                }
+            }
+
+            // Log is handled in thunk but we add the Oracle result here too for persistent log state
             state.logs.push({
                 id: Date.now().toString(),
                 timestamp: Date.now(),
@@ -382,9 +475,27 @@ export const gameSlice = createSlice({
             if (!state.player || !action.payload) return;
             const result = action.payload;
             const player = state.player;
+
+            // Surge Update
             let newSurge = player.surgeCount;
             if (result.surgeUpdate === -1) { newSurge = 0; } else { newSurge += result.surgeUpdate; }
             player.surgeCount = newSurge;
+
+            // Handle Unexpectedly Event
+            if (result.unexpectedRoll) {
+                const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
+                if (effect.applyEnteringRed && state.currentRoom) {
+                    state.currentRoom.enemies.push(generateRandomEnemy());
+                    state.currentRoom.hazards.push("Threat Imminent");
+                }
+                if (effect.applyEnterStageLeft && state.currentRoom) {
+                    if (!state.currentRoom.merchants) state.currentRoom.merchants = [];
+                    state.currentRoom.merchants.push(generateRandomMerchant());
+
+                    if (!state.currentRoom.allies) state.currentRoom.allies = [];
+                    state.currentRoom.allies.push({ id: Date.now().toString(), name: "Fellow Ranger" });
+                }
+            }
         });
 
         // Move
@@ -402,6 +513,35 @@ export const gameSlice = createSlice({
 
         // Combat
         builder.addCase(engageHostiles.fulfilled, (state, action) => {
+            if (!action.payload || !state.player || !state.currentRoom) return;
+            const { enemyId, enemyDamage, enemyDefeated, playerDamage } = action.payload;
+
+            // Update Player
+            state.player.hp -= playerDamage;
+            if (state.player.hp < 0) state.player.hp = 0;
+            state.player.stress += 1;
+
+            // Update Enemy
+            const enemies = state.currentRoom.enemies.map(e => {
+                if (e.id === enemyId) {
+                    return { ...e, hp: e.hp - enemyDamage };
+                }
+                return e;
+            });
+
+            if (enemyDefeated) {
+                // Remove defeated enemy
+                state.currentRoom.enemies = enemies.filter(e => e.id !== enemyId);
+                // Rewards
+                state.player.spirit = (state.player.spirit || 0) + 5;
+                state.player.blood = (state.player.blood || 0) + 2;
+            } else {
+                state.currentRoom.enemies = enemies;
+            }
+        });
+
+        // Cast Spell
+        builder.addCase(castSpell.fulfilled, (state, action) => {
             if (!action.payload || !state.player || !state.currentRoom) return;
             const { enemyId, enemyDamage, enemyDefeated, playerDamage } = action.payload;
 
@@ -465,7 +605,7 @@ export const gameSlice = createSlice({
     }
 });
 
-export const { addLog } = gameSlice.actions;
+export const { addLog, selectSpell } = gameSlice.actions;
 
 // Selectors
 export const selectPlayer = (state: { game: GameState }) => state.game.player;
@@ -475,5 +615,6 @@ export const selectRoomCoordinates = (state: { game: GameState }) => state.game.
 export const selectLogs = (state: { game: GameState }) => state.game.logs;
 export const selectIsInitialized = (state: { game: GameState }) => state.game.isInitialized;
 export const selectIsLoading = (state: { game: GameState }) => state.game.isLoading;
+export const selectSelectedSpellId = (state: { game: GameState }) => state.game.selectedSpellId;
 
 export default gameSlice.reducer;

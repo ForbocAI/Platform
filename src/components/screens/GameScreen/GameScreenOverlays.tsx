@@ -13,6 +13,7 @@ export function GameScreenOverlays({
   onRejectConcession,
   activeMerchant,
   onCloseTrade,
+  onSelectSpell,
 }: {
   inventoryOpen: boolean;
   spellsPanelOpen: boolean;
@@ -23,6 +24,7 @@ export function GameScreenOverlays({
   onRejectConcession?: () => void;
   activeMerchant?: import("@/lib/quadar/types").Merchant | null;
   onCloseTrade?: () => void;
+  onSelectSpell?: (spellId: string) => void;
 }) {
   return (
     <>
@@ -39,6 +41,7 @@ export function GameScreenOverlays({
         <SpellsPanel
           player={player}
           onClose={onCloseSpells}
+          onSelectSpell={onSelectSpell}
         />
       )}
       <ConcessionModal

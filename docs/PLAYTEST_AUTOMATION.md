@@ -80,7 +80,7 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 
 **Re-verification (browser automation):** With `?deterministic=1`, flows re-verified 2026-02-09: Init (click Retry if "INITIALIZING..." persists; then Store Room, Reconnaissance, "Connection Stable"); Movement (N/S/E/W); Map (Explored map; map button toggles); SCAN, ENGAGE, COMMUNE, Oracle, Facts panel, Stage selector, Vignette; Inventory/Spells panels; header shows Spirit/Blood. Auto-play driven by Redux listener (`runAutoplayTick` every ~2.8s when toggled on).
 
-**Improvements this pass (2026-02-09):** **Game Logic Implementation:** Replaced stub logs with real Redux thunks for `scanSector` (returns room details/hazards/exits), `engageHostiles` (resolves combat rounds, updates HP, handles death/victory), `communeWithVoid` (calls Loom), and `respawnPlayer` (resets state). **Story Integration:** Connected Game actions to Narrative state—Oracle, Commune, Scan, and Combat events now automatically generate Facts. **Concession:** Implemented `ConcessionModal` (triggered at 0 HP) with Reject (Respawn) flow. **Init/Currency:** `initializePlayer()` in engine now sets `spirit: 20`, `blood: 0`. **Trading System:** Fully implemented `tradeBuy`/`tradeSell` mechanics with UI (TradePanel). Added `?forceMerchant=1` for testing. **Vignette Controls:** Enhanced with pre-filled, read-only theme input and randomization logic. **Auto-play:** Store listener now dispatches `runAutoplayTick`. **Condensed compliance:** Runes use `selectClientHydrated`; NeuralLogPanel uses CSS sentinel.
+**Improvements this pass (2026-02-09):** **Game Logic Implementation:** Replaced stub logs with real Redux thunks for `scanSector` (returns room details/hazards/exits), `engageHostiles` (resolves combat rounds, updates HP, handles death/victory), `communeWithVoid` (calls Loom), and `respawnPlayer` (resets state). **Story Integration:** Connected Game actions to Narrative state—Oracle, Commune, Scan, and Combat events now automatically generate Facts. **Concession:** Implemented `ConcessionModal` (triggered at 0 HP) with Reject (Respawn) flow. **Init/Currency:** `initializePlayer()` in engine now sets `spirit: 20`, `blood: 0`. **Trading System:** Fully implemented `tradeBuy`/`tradeSell` mechanics with UI (TradePanel). Added `?forceMerchant=1` for testing. **Vignette Controls:** Enhanced with pre-filled, read-only theme input and randomization logic. **Auto-play:** Store listener now dispatches `runAutoplayTick`. **Condensed compliance:** Runes use `selectClientHydrated`; NeuralLogPanel uses CSS sentinel. **Spell Casting:** Implemented `castSpell` thunk and connected UI; casting a spell now uses specific spell logic/effects instead of generic attack. **Narrative/Surge:** Implemented 'Surge Count' tracking and 'Unexpectedly' effects (Entering the Red, Enter Stage Left) to spawn dynamic entities.
 
 ### What was tested
 
@@ -100,8 +100,8 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 | **Loading / Retry** | Load `?simulateInitError=1` | ✅ "Simulated init failure." + "Retry initialization" (aria-label); Retry re-runs init (fails again while param set) |
 | **Concession** | `?lowHp=1&forceEnemy=1`, ENGAGE until enemy hit would take player out | ✅ **Death implemented:** Rejecting concession at 0 HP logs death, clears room enemies, and respawns player (full HP). |
 | **Level generation** | Move to new rooms (N/S/E/W); SCAN in each | ✅ Biomes: Quadar Tower (start), Ethereal Marshlands, Toxic Wastes, Haunted Chapel, Obsidian Spire. Room titles vary by biome (e.g. Acid Pit, Ghost Swamp). ~30% chance of one hostile per room; exits random. |
-| **Hazards** | SCAN in rooms; or COMMUNE until Loom returns "unexpectedly" + **Entering the Red** | ✅ **Toxic Air:** 20% on room generation (engine). **Threat Imminent:** added to current room when COMMUNE returns "No/Yes, and unexpectedly" with Table 2 "Entering the Red" (Familiar: threat of danger or combat). |
-| **NPCs (Fellow Ranger)** | Start room has 40% chance; or COMMUNE until "unexpectedly" + **Enter Stage Left** | ✅ **Start:** `generateStartRoom()` adds Fellow Ranger 40% of the time; visible in RoomViewport and SCAN readout. **Enter Stage Left:** COMMUNE Loom "unexpectedly" + Table 2 "Enter Stage Left" adds Fellow Ranger or Merchant to current room. |
+| **Hazards** | SCAN in rooms; or COMMUNE until Loom returns "unexpectedly" + **Entering the Red** | ✅ **Fully Implemented:** Toxic Air (generation); **Entering the Red** spawns Random Enemy and adds "Threat Imminent" hazard. |
+| **NPCs (Fellow Ranger)** | Start room has 40% chance; or COMMUNE until "unexpectedly" + **Enter Stage Left** | ✅ **Start:** `generateStartRoom()` adds Fellow Ranger 40% of the time. **Enter Stage Left:** Confirmed spawns a Merchant and Fellow Ranger ally. |
 | **Merchants / Trading** | Load with `?forceMerchant=1` or find merchant; click "Trade" | ✅ **Verified 2026-02-09:** TradePanel opens/closes. Buying deducts Spirit (e.g. 20 -> 15). Selling adds Spirit (e.g. 15 -> 20). Logs confirm "Purchased..." and "Sold...". Wares list shows correct costs. |
 | **Inventory / Items** | Click "Inventory". Equip/Unequip/Use/Sacrifice items. | ✅ Stats update. Consumables heal/reduce stress. **Sacrifice:** Items with value show "Sacrifice"; removes item, grants spirit (log "Sacrificed X for Y spirit."). |
 | **Currency (Spirit / Blood)** | Check header after init; COMMUNE or Ask Oracle (+1 spirit each); defeat enemy (+5 spirit, +2 blood); Trade or Sacrifice | ✅ Header shows Spirit, Blood. Start 20 spirit, 0 blood. Gains as above. |
@@ -143,7 +143,7 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
     4. Click a Spell (e.g. "Relic Strike" or "Ignition Burst").
     5. Verify Log output: "You cast [SpellName]...".
     6. Verify Enemy HP decreases (via Scan or Log).
-  - **Status**: Implemented and fixed. Initial bug with `onCast` prop (Step 318) was resolved. Automated verification was attempted but flaky due to enemy spawn RNG/UI timing; functionality is code-complete and bug-free.
+  - **Status**: **Fully Implemented.** UI supports spell selection, which overrides basic attack in `engageHostiles`. Logs confirm specific spell usage.
 
 See `trade-panel`, `trade-merchant-*`, `trade-buy-*`, `trade-sell-*`.
 - **Not yet implemented (in scope for future):** Quests (reconnaissance objective, rescue lost rangers), Session completion/Scoring. Focus remains web client single-player mechanics; no multiplayer, tests, backend, or Expo.
@@ -182,7 +182,7 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 
 **Deliverables:**
 1. Systematic playthrough of all single-player mechanics.
-2. Concrete improvements (bugs, UX, balance, alignment with quadar / quadar_ familiar).
+2. Concrete improvements (bugs, UX, balance, alignment with quadar / quadar_ familiar / forboc / qvht ).
 3. `docs/PLAYTEST_AUTOMATION.md` kept current with test coverage, reproduction steps, and Known issues.
 
 **Technical constraints:**

@@ -105,6 +105,32 @@ export function initializePlayer(): Player {
     };
 }
 
+export function generateRandomEnemy(): Enemy {
+    const enemyNames = Object.keys(ENEMY_TEMPLATES);
+    const enemyName = enemyNames[Math.floor(Math.random() * enemyNames.length)];
+    const template = ENEMY_TEMPLATES[enemyName];
+    return {
+        id: Math.random().toString(36).substring(7),
+        name: enemyName,
+        ...template,
+        hp: template.maxHp || 10,
+        maxStress: 100,
+        stress: 0
+    } as Enemy;
+}
+
+export function generateRandomMerchant(): Merchant {
+    const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic"];
+    const type = merchantTypes[Math.floor(Math.random() * merchantTypes.length)];
+    const wares = generateWares();
+    return {
+        id: Math.random().toString(36).substring(7),
+        name: `${type} ${Math.floor(Math.random() * 100)}`,
+        description: "A wandering soul with goods to trade.",
+        wares: wares
+    };
+}
+
 export function generateRoom(id?: string, biomeOverride?: Biome): Room {
     const biome = biomeOverride || BIOMES[Math.floor(Math.random() * BIOMES.length)];
     const nameParts: Record<Biome, string[]> = {
@@ -137,17 +163,7 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
     const enemies: Enemy[] = [];
     const roll = Math.random() * 100;
     if (roll > 70) {
-        const enemyNames = Object.keys(ENEMY_TEMPLATES);
-        const enemyName = enemyNames[Math.floor(Math.random() * enemyNames.length)];
-        const template = ENEMY_TEMPLATES[enemyName];
-        enemies.push({
-            id: Math.random().toString(36).substring(7),
-            name: enemyName,
-            ...template,
-            hp: template.maxHp || 10,
-            maxStress: 100,
-            stress: 0
-        } as Enemy);
+        enemies.push(generateRandomEnemy());
     }
 
     const merchants: Merchant[] = [];
@@ -155,15 +171,7 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
     if (p1.includes("Market") || p1.includes("Store")) merchantChance = 0.60;
 
     if (Math.random() < merchantChance) {
-        const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic"];
-        const type = merchantTypes[Math.floor(Math.random() * merchantTypes.length)];
-        const wares = generateWares();
-        merchants.push({
-            id: Math.random().toString(36).substring(7),
-            name: `${type} ${Math.floor(Math.random() * 100)}`,
-            description: "A wandering soul with goods to trade.",
-            wares
-        });
+        merchants.push(generateRandomMerchant());
     }
 
     return {
@@ -301,11 +309,15 @@ export function consultLoom(question: string, currentSurgeCount: number): LoomRe
         newSurge = -1; // Helper will need to handle this as "reset to 0"
     }
 
+    let unexpectedRoll: number | undefined;
+    let unexpectedEventName: string | undefined;
+
     // Handle Unexpectedly Table
     if (qualifier === "unexpectedly") {
         const d20 = Math.floor(Math.random() * 20) + 1;
-        const unexpectedEvent = UNEXPECTEDLY_TABLE[d20 - 1] || "Re-roll";
-        description += ` [EVENT: ${unexpectedEvent}]`;
+        unexpectedRoll = d20;
+        unexpectedEventName = UNEXPECTEDLY_TABLE[d20 - 1] || "Re-roll";
+        description += ` [EVENT: ${unexpectedEventName}]`;
     }
 
     return {
@@ -313,6 +325,8 @@ export function consultLoom(question: string, currentSurgeCount: number): LoomRe
         qualifier,
         description,
         roll: modifiedRoll,
-        surgeUpdate: newSurge
+        surgeUpdate: newSurge,
+        unexpectedRoll,
+        unexpectedEvent: unexpectedEventName
     };
 }

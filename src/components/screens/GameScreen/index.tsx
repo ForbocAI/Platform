@@ -19,6 +19,7 @@ import {
   communeWithVoid,
   engageHostiles,
   respawnPlayer,
+  selectSpell,
 } from "@/features/game/slice/gameSlice";
 import {
   selectOracleInput,
@@ -164,6 +165,7 @@ export function GameScreen() {
         onAcceptConcession={(type) => dispatch(addLog({ message: `You accepted concession: ${type}`, type: "system" }))}
         activeMerchant={activeMerchant}
         onCloseTrade={() => dispatch(closeTrade())}
+        onSelectSpell={(id) => dispatch(selectSpell(id))}
       />
     </div>
   );

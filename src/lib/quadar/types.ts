@@ -111,6 +111,8 @@ export interface LoomResult {
     description: string;
     roll: number;
     surgeUpdate: number; // How much to add/reset to surge count
+    unexpectedRoll?: number; // The d20 roll if 'unexpectedly' occurred
+    unexpectedEvent?: string; // The text description of the unexpected event
 }
 
 export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";

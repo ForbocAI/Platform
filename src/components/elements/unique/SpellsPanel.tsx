@@ -6,9 +6,10 @@ import type { Player } from "@/lib/quadar/types";
 interface SpellsPanelProps {
   player: Player;
   onClose: () => void;
+  onSelectSpell?: (spellId: string) => void;
 }
 
-export function SpellsPanel({ player, onClose }: SpellsPanelProps) {
+export function SpellsPanel({ player, onClose, onSelectSpell }: SpellsPanelProps) {
   return (
     <div
       className="absolute inset-0 z-50 bg-palette-bg-dark/95 backdrop-blur-sm p-4 flex flex-col items-center justify-center"
@@ -38,10 +39,19 @@ export function SpellsPanel({ player, onClose }: SpellsPanelProps) {
               {player.spells.map((spell) => (
                 <li
                   key={spell}
-                  className="flex items-center gap-2 p-2 bg-palette-bg-mid/30 border border-palette-border rounded text-palette-white"
                 >
-                  <Wand2 className="w-4 h-4 text-palette-accent-cyan shrink-0" />
-                  <span className="font-medium">{spell}</span>
+                  <button
+                    onClick={() => {
+                      onSelectSpell?.(spell);
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-2 p-3 bg-palette-bg-mid/30 border border-palette-border rounded text-palette-white hover:bg-palette-accent-cyan/20 hover:border-palette-accent-cyan transition-all text-left"
+                    aria-label={`Select spell ${spell}`}
+                  >
+                    <Wand2 className="w-4 h-4 text-palette-accent-cyan shrink-0" />
+                    <span className="font-medium flex-1">{spell}</span>
+                    <span className="text-xs text-palette-muted uppercase tracking-wider">Select</span>
+                  </button>
                 </li>
               ))}
             </ul>
