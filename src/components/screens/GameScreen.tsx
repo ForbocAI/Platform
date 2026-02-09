@@ -36,7 +36,7 @@ import {
   endVignette,
 } from "@/features/narrative/slice/narrativeSlice";
 import { setOracleInput, selectOracleInput, toggleShowMap, selectShowMap, selectStageOfScene, setStageOfScene } from "@/features/core/ui/slice/uiSlice";
-import { usePlayButtonSound, useSpeechOnNewLog } from "@/features/audio";
+import { usePlayButtonSound } from "@/features/audio";
 import {
   PlayerHeader,
   RoomViewport,
