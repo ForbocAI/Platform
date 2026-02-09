@@ -77,7 +77,7 @@ export function GameScreen() {
   const facts = useAppSelector(selectFacts);
   const vignette = useAppSelector(selectVignette);
   const activeMerchantId = useAppSelector(selectActiveMerchantId);
-  const activeMerchant = activeMerchantId ? currentRoom.merchants?.find(m => m.id === activeMerchantId) : null;
+  const activeMerchant = (activeMerchantId && currentRoom) ? currentRoom.merchants?.find(m => m.id === activeMerchantId) : null;
   const searchParams = useSearchParams();
 
   useEffect(() => {

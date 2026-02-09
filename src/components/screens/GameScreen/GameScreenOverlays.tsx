@@ -21,7 +21,7 @@ export function GameScreenOverlays({
   onCloseSpells: () => void;
   onAcceptConcession?: (type: 'flee' | 'capture') => void;
   onRejectConcession?: () => void;
-  activeMerchant?: { id: string; name: string } | null;
+  activeMerchant?: import("@/lib/quadar/types").Merchant | null;
   onCloseTrade?: () => void;
 }) {
   return (
