@@ -75,6 +75,28 @@ export const movePlayer = createAsyncThunk(
     }
 );
 
+const DIRECTIONS = ['North', 'South', 'East', 'West'] as const;
+
+/** One autoplay tick: move to a random exit if available, otherwise ask the oracle. */
+export const runAutoplayTick = createAsyncThunk(
+    'game/runAutoplayTick',
+    async (_, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const room = state.game.currentRoom;
+        if (!room?.exits) {
+            await dispatch(askOracle("What happens next?"));
+            return;
+        }
+        const available = DIRECTIONS.filter((d) => room.exits[d]);
+        if (available.length > 0) {
+            const dir = available[Math.floor(Math.random() * available.length)];
+            await dispatch(movePlayer(dir));
+        } else {
+            await dispatch(askOracle("What happens next?"));
+        }
+    }
+);
+
 export const gameSlice = createSlice({
     name: 'game',
     initialState,

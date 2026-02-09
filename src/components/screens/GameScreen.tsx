@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   selectPlayer,
@@ -11,15 +12,24 @@ import {
   movePlayer,
   askOracle,
   addLog,
+  runAutoplayTick,
 } from "@/features/game/slice/gameSlice";
 import {
   selectOracleInput,
   selectStageOfScene,
+  selectInventoryOpen,
+  selectSpellsPanelOpen,
   setOracleInput,
   clearOracleInput,
   setStageOfScene,
+  selectShowMap,
   toggleShowMap,
+  toggleInventory,
+  toggleSpellsPanel,
+  selectAutoPlay,
+  toggleAutoPlay,
 } from "@/features/core/ui/slice/uiSlice";
+import { usePlayButtonSound } from "@/features/audio";
 import {
   selectThreads,
   selectMainThreadId,
@@ -38,16 +48,20 @@ import {
   ActionDeck,
   StageSelector,
   RoomViewport,
+  MapView,
   OracleForm,
   ThreadList,
   FactsPanel,
   VignetteControls,
   NeuralLogPanel,
+  InventoryPanel,
+  SpellsPanel,
 } from "@/components/elements/unique";
 import type { VignetteStage } from "@/lib/quadar/types";
 
 export function GameScreen() {
   const dispatch = useAppDispatch();
+  const playSound = usePlayButtonSound();
   const player = useAppSelector(selectPlayer);
   const currentRoom = useAppSelector(selectCurrentRoom);
   const logs = useAppSelector(selectLogs);
@@ -55,10 +69,37 @@ export function GameScreen() {
   const isLoading = useAppSelector(selectIsLoading);
   const oracleInput = useAppSelector(selectOracleInput);
   const stageOfScene = useAppSelector(selectStageOfScene);
+  const inventoryOpen = useAppSelector(selectInventoryOpen);
+  const spellsPanelOpen = useAppSelector(selectSpellsPanelOpen);
+  const showMap = useAppSelector(selectShowMap);
+  const autoPlay = useAppSelector(selectAutoPlay);
   const threads = useAppSelector(selectThreads);
   const mainThreadId = useAppSelector(selectMainThreadId);
   const facts = useAppSelector(selectFacts);
   const vignette = useAppSelector(selectVignette);
+
+  // All hooks must run before any conditional return (Rules of Hooks)
+  const autoPlayIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (!autoPlay) {
+      if (autoPlayIntervalRef.current) {
+        clearInterval(autoPlayIntervalRef.current);
+        autoPlayIntervalRef.current = null;
+      }
+      return;
+    }
+    const AUTO_PLAY_DELAY_MS = 5000;
+    autoPlayIntervalRef.current = setInterval(() => {
+      dispatch(runAutoplayTick());
+    }, AUTO_PLAY_DELAY_MS);
+    return () => {
+      if (autoPlayIntervalRef.current) {
+        clearInterval(autoPlayIntervalRef.current);
+        autoPlayIntervalRef.current = null;
+      }
+    };
+  }, [autoPlay, dispatch]);
+
   if (!isInitialized && isLoading) {
     return (
       <LoadingOverlay
@@ -70,7 +111,7 @@ export function GameScreen() {
   if (!player || !currentRoom) {
     return (
       <LoadingOverlay
-        message="Initializing..."
+        message="INITIALIZING..."
         onRetry={() => dispatch(initializeGame())}
       />
     );
@@ -85,7 +126,7 @@ export function GameScreen() {
   };
 
   return (
-    <div className="flex flex-col h-screen min-h-0 bg-palette-bg-dark text-palette-white">
+    <div className="relative flex flex-col h-screen min-h-0 bg-palette-bg-dark text-palette-white">
       <PlayerHeader player={player} />
       <StageSelector
         stage={stageOfScene}
@@ -93,7 +134,30 @@ export function GameScreen() {
       />
       <main className="flex-1 flex min-h-0 overflow-hidden">
         <div className="flex-1 min-h-0 min-w-0 flex flex-col">
-          <RoomViewport room={currentRoom} />
+          {showMap ? (
+            <>
+              <div className="flex items-center justify-end shrink-0 px-2 py-1 border-b border-palette-border bg-palette-bg-mid/30">
+                <button
+                  type="button"
+                  onClick={() => dispatch(toggleShowMap())}
+                  className="text-xs uppercase tracking-wider text-palette-muted hover:text-palette-accent-cyan transition-colors"
+                  aria-label="Close map"
+                  data-testid="map-close"
+                >
+                  ✕ Close map
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 min-w-0 overflow-auto">
+                <MapView
+                  exploredRooms={currentRoom ? { [currentRoom.id]: currentRoom } : {}}
+                  roomCoordinates={currentRoom ? { [currentRoom.id]: { x: 0, y: 0 } } : {}}
+                  currentRoomId={currentRoom?.id ?? null}
+                />
+              </div>
+            </>
+          ) : (
+            <RoomViewport room={currentRoom} />
+          )}
         </div>
         <div className="flex flex-col w-72 lg:w-80 shrink-0 min-h-0 border-l border-palette-border">
           <ThreadList
@@ -129,7 +193,29 @@ export function GameScreen() {
         onScan={() => dispatch(addLog({ message: "Scanning...", type: "system" }))}
         onEngage={() => dispatch(addLog({ message: "Engaging hostiles.", type: "system" }))}
         onCommune={() => dispatch(addLog({ message: "Communing.", type: "system" }))}
+        onOpenInventory={() => dispatch(toggleInventory())}
+        onOpenSpells={() => dispatch(toggleSpellsPanel())}
+        autoPlay={autoPlay}
+        onToggleAutoPlay={() => {
+          playSound();
+          dispatch(toggleAutoPlay());
+        }}
       />
+      {inventoryOpen && (
+        <InventoryPanel
+          player={player}
+          onClose={() => dispatch(toggleInventory())}
+          onEquip={() => {}}
+          onUnequip={() => {}}
+          onUse={() => {}}
+        />
+      )}
+      {spellsPanelOpen && (
+        <SpellsPanel
+          player={player}
+          onClose={() => dispatch(toggleSpellsPanel())}
+        />
+      )}
     </div>
   );
 }

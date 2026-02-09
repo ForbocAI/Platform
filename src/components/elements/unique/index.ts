@@ -1,5 +1,5 @@
 export { StageSelector } from "./StageSelector";
-export { PlayerHeader } from "./PlayerHeader";
+export { PlayerHeader } from "./PlayerHeader/index";
 export { RoomViewport } from "./RoomViewport";
 export { MapView } from "./MapView";
 export { NeuralLogPanel } from "./NeuralLogPanel";
@@ -13,3 +13,4 @@ export { VignetteControls } from "./VignetteControls";
 export { VolumeControls } from "./VolumeControls";
 export { TradePanel } from "./TradePanel";
 export { InventoryPanel } from "./InventoryPanel";
+export { SpellsPanel } from "./SpellsPanel";

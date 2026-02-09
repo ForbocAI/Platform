@@ -1,4 +1,4 @@
-import { Shield, Zap, Skull, Map as MapIcon, Activity, Crosshair } from "lucide-react";
+import { Map as MapIcon, Crosshair, Package, Play, Square, Swords, MessageCircle, Wand2, Box } from "lucide-react";
 import { GameButton, NavButton } from "../generic";
 import type { Player, Room } from "@/lib/quadar/types";
 
@@ -10,6 +10,10 @@ export function ActionDeck({
   onScan,
   onEngage,
   onCommune,
+  onOpenInventory,
+  onOpenSpells,
+  autoPlay,
+  onToggleAutoPlay,
 }: {
   player: Player;
   currentRoom: Room;
@@ -18,10 +22,29 @@ export function ActionDeck({
   onScan: () => void;
   onEngage: () => void;
   onCommune: () => void;
+  onOpenInventory?: () => void;
+  onOpenSpells?: () => void;
+  autoPlay?: boolean;
+  onToggleAutoPlay?: () => void;
 }) {
   return (
     <footer className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-col lg:flex-row gap-1.5 sm:gap-2 items-center justify-start">
       <div className="flex w-full lg:w-max gap-1 sm:gap-1.5 justify-start items-center min-w-0">
+        {onToggleAutoPlay != null && (
+          <button
+            type="button"
+            onClick={onToggleAutoPlay}
+            className={autoPlay
+              ? "p-1.5 rounded border border-palette-accent-red/50 bg-palette-accent-red/20 text-palette-accent-red hover:bg-palette-accent-red/30 transition-colors shrink-0"
+              : "p-1.5 rounded border border-palette-border hover:border-palette-accent-cyan text-palette-muted hover:text-palette-accent-cyan transition-colors shrink-0"
+            }
+            data-testid="auto-play-toggle"
+            aria-label={autoPlay ? "Stop auto-play" : "Start auto-play"}
+            title={autoPlay ? "Stop auto-play" : "Start auto-play"}
+          >
+            {autoPlay ? <Square className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          </button>
+        )}
         <div className="grid grid-cols-3 gap-px sm:gap-0.5 w-14 h-14 sm:w-16 sm:h-16 shrink-0">
           <div />
           <NavButton dir="N" onClick={() => onMove("North")} active={!!currentRoom.exits.North} data-testid="move-north" />
@@ -45,43 +68,63 @@ export function ActionDeck({
           <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan">
             SCAN
           </GameButton>
-          <GameButton onClick={onEngage} variant="danger" icon={<Skull className="app-icon" />} data-testid="action-engage">
+          <GameButton onClick={onEngage} variant="danger" icon={<Swords className="app-icon" />} data-testid="action-engage">
             ENGAGE
           </GameButton>
-          <GameButton onClick={onCommune} variant="magic" icon={<Activity className="app-icon" />} data-testid="action-commune">
+          <GameButton onClick={onCommune} variant="magic" icon={<MessageCircle className="app-icon" />} data-testid="action-commune">
             COMMUNE
           </GameButton>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2 border-t lg:border-t-0 lg:border-l border-palette-border pt-1.5 lg:pt-0 lg:pl-2 mt-0 lg:mt-0">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs">Known Spells</span>
+      <div className="flex flex-col sm:flex-row gap-2 border-t lg:border-t-0 lg:border-l border-palette-border pt-1.5 lg:pt-0 lg:pl-2 mt-0 lg:mt-0 items-center">
+        <button
+          type="button"
+          onClick={onOpenSpells}
+          className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-cyan/50 rounded p-1 -m-1 transition-colors cursor-pointer"
+          data-testid="spells-toggle"
+          aria-label="View spells"
+          title="View spells"
+        >
+          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1">
+            <Wand2 className="w-3.5 h-3.5" />
+            View spells
+          </span>
           <div className="flex gap-px">
             {player.spells.map((spell) => (
               <div
                 key={spell}
-                className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted hover:border-palette-accent-cyan hover:text-palette-accent-cyan cursor-pointer transition-colors"
+                className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
                 title={spell}
               >
-                <Zap className="app-icon" />
+                <Wand2 className="app-icon" />
               </div>
             ))}
           </div>
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs">Inventory</span>
+        </button>
+        <button
+          type="button"
+          onClick={onOpenInventory}
+          className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-gold/50 rounded p-1 -m-1 transition-colors cursor-pointer"
+          data-testid="inventory-toggle"
+          aria-label="View items"
+          title="View items"
+        >
+          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1">
+            <Package className="w-3.5 h-3.5" />
+            View items
+          </span>
           <div className="flex gap-px">
             {player.inventory.map((item) => (
               <div
                 key={item.id}
-                className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted hover:border-palette-accent-gold hover:text-palette-accent-gold cursor-pointer transition-colors"
+                className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
                 title={item.name}
               >
-                <Shield className="app-icon" />
+                <Box className="app-icon" />
               </div>
             ))}
           </div>
-        </div>
+        </button>
       </div>
     </footer>
   );
