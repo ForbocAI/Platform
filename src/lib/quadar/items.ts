@@ -19,14 +19,14 @@ export function calculateEffectiveStats(player: Player): Stats {
 
     const slots: EquipmentSlot[] = ["mainHand", "armor", "relic"];
     for (const slot of slots) {
-        const item = player.equipment[slot];
+        const item = player.equipment?.[slot];
         if (item && item.bonus) {
             stats.Str += item.bonus.Str || 0;
             stats.Agi += item.bonus.Agi || 0;
             stats.Arcane += item.bonus.Arcane || 0;
             stats.maxHp += item.bonus.maxHp || 0;
             stats.maxStress += item.bonus.maxStress || 0;
-            stats.ac += item.bonus.ac || 0;
+            stats.ac = (stats.ac ?? 0) + (item.bonus.ac || 0);
         }
     }
 

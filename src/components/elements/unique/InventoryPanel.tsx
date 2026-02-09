@@ -8,11 +8,10 @@ interface InventoryPanelProps {
     onEquip: (itemId: string, slot: EquipmentSlot) => void;
     onUnequip: (slot: EquipmentSlot) => void;
     onUse: (itemId: string) => void;
-    onSacrifice: (itemId: string) => void;
     onClose: () => void;
 }
 
-export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice, onClose }: InventoryPanelProps) {
+export function InventoryPanel({ player, onEquip, onUnequip, onUse, onClose }: InventoryPanelProps) {
     const stats = calculateEffectiveStats(player);
 
     const renderItemBonus = (item: Item) => {
@@ -25,7 +24,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
     };
 
     const renderEquippedItem = (slot: EquipmentSlot, icon: React.ReactNode, label: string) => {
-        const item = player.equipment[slot];
+        const item = player.equipment?.[slot];
         return (
             <div className="flex items-center justify-between p-2 bg-palette-bg-mid/30 border border-palette-border rounded">
                 <div className="flex items-center gap-2">
@@ -62,7 +61,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                         <Package className="w-5 h-5 text-palette-accent-gold" />
                         Inventory & Equipment
                     </h2>
-                    <button onClick={onClose} className="p-1 hover:text-palette-accent-red transition-colors" data-testid="inventory-close" aria-label="Close Inventory">
+                    <button onClick={onClose} className="p-1 hover:text-palette-accent-red transition-colors" data-testid="inventory-close">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -131,9 +130,6 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                                             )}
                                             {item.type === "consumable" && (
                                                 <button onClick={() => onUse(item.id)} className="text-xs px-2 py-1 border border-palette-border text-palette-accent-cyan border-palette-accent-cyan/50 hover:bg-palette-accent-cyan/10 transition-colors uppercase tracking-wider" data-testid={`inventory-use-${item.id}`}>Use</button>
-                                            )}
-                                            {(item.value ?? 0) > 0 && (
-                                                <button onClick={() => onSacrifice(item.id)} className="text-xs px-2 py-1 border border-palette-accent-red/50 text-palette-accent-red hover:bg-palette-accent-red/10 transition-colors uppercase tracking-wider" data-testid={`inventory-sacrifice-${item.id}`} title="Sacrifice for spirit">Sacrifice</button>
                                             )}
                                         </div>
                                     </div>

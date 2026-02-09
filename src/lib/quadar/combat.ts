@@ -83,7 +83,7 @@ export function resolveEnemyAttack(
 
     // Maybe AC adds to the defender total?
     // Let's add AC to defender's total for defensive rolls.
-    defenderTotal += effectiveDefender.ac;
+    defenderTotal += effectiveDefender.ac ?? 0;
 
     const isHit = attackerTotal > defenderTotal;
     let damage = 0;

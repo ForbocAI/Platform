@@ -9,15 +9,7 @@ export interface Stats {
     hp: number;
     maxStress: number;
     stress: number;
-    ac: number;
-}
-
-export type EquipmentSlot = "mainHand" | "armor" | "relic";
-
-export interface Equipment {
-    mainHand?: Item;
-    armor?: Item;
-    relic?: Item;
+    ac?: number;
 }
 
 export type CharacterClass =
@@ -40,15 +32,13 @@ export interface Player extends Stats {
     name: string;
     level: number;
     characterClass: CharacterClass;
-    ac: number; // Armor class for enemy attacks
     inventory: Item[];
-    equipment: Equipment;
     spells: string[]; // IDs of learned spells
     surgeCount: number; // For Loom of Fate
-    /** Currency (qvht/forboc): "what we spend spirit on. Currency becomes." Primary trade medium. */
-    spirit: number;
-    /** Price of revelation (qvht: "price paid in blood and sacrifice"). Ritual / high-tier cost. */
-    blood: number;
+    ac?: number;
+    equipment?: Partial<Record<EquipmentSlot, Item | null>>;
+    spirit?: number;
+    blood?: number;
 }
 
 export interface Enemy extends Stats {
@@ -60,31 +50,15 @@ export interface Enemy extends Stats {
     spells: string[];
 }
 
+export type EquipmentSlot = "mainHand" | "armor" | "relic";
+
 export interface Item {
     id: string;
     name: string;
     description: string;
     type: "weapon" | "armor" | "consumable" | "relic";
-    bonus?: Partial<Stats>;
-    /** For consumables: e.g. "heal_10", "stress_-5" */
+    bonus?: Partial<Stats> & { ac?: number };
     effect?: string;
-    /** Spirit cost to buy (qvht: spirit as currency). Sell grants spirit. */
-    value?: number;
-    /** Optional blood price for ritual / revelation wares (qvht: "price paid in blood"). */
-    bloodPrice?: number;
-}
-
-/** Friendly or neutral NPC (e.g. Fellow Ranger). */
-export interface Npc {
-    id: string;
-    name: string;
-    description: string;
-}
-
-/** Nomadic trader (quadar.md: Rangers and Merchants). Can barter wares. */
-export interface Merchant extends Npc {
-    /** Items the merchant offers for trade. */
-    wares: Item[];
 }
 
 export interface Room {
@@ -95,15 +69,11 @@ export interface Room {
     hazards: string[];
     exits: Record<Direction, string | null>; // Maps direction to room ID
     enemies: Enemy[];
-    /** Fellow rangers, recruits, or other non-hostile NPCs (Familiar). */
-    allies?: Npc[];
-    /** Nomadic traders who barter wares (quadar.md: Rangers and Merchants). */
-    merchants?: Merchant[];
+    allies?: { id: string; name: string }[];
+    merchants?: { id: string; name: string }[];
 }
 
 export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower";
-
-export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";
 export type Direction = "North" | "South" | "East" | "West";
 
 export interface Spell {
@@ -119,7 +89,7 @@ export interface GameLogEntry {
     id: string;
     timestamp: number;
     message: string;
-    type: "combat" | "exploration" | "system" | "loom" | "narrative";
+    type: "combat" | "exploration" | "system" | "loom";
 }
 
 export interface LoomResult {
@@ -128,24 +98,58 @@ export interface LoomResult {
     description: string;
     roll: number;
     surgeUpdate: number; // How much to add/reset to surge count
-    /** When qualifier is "unexpectedly", the d20 result 1–20 for Table 2. */
-    unexpectedEventIndex?: number;
-    unexpectedEventLabel?: string;
 }
 
-// --- Speculum Threads (quadar_ familiar) ---
+export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";
+export type VignetteStage = "Exposition" | "Rising Action" | "Climax" | "Epilogue";
 
-export type ThreadStage = "To Knowledge" | "To Conflict" | "To Endings";
+export type UnexpectedlyEffectType =
+  | "foreshadowing"
+  | "tying_off"
+  | "to_conflict"
+  | "costume_change"
+  | "key_grip"
+  | "to_knowledge"
+  | "framing"
+  | "set_change"
+  | "upstaged"
+  | "pattern_change"
+  | "limelit"
+  | "entering_the_red"
+  | "to_endings"
+  | "montage"
+  | "enter_stage_left"
+  | "cross_stitch"
+  | "six_degrees"
+  | "reroll_reserved";
+
+export interface UnexpectedlyEffect {
+  type: UnexpectedlyEffectType;
+  label: string;
+  applySetChange?: boolean;
+  applyEnteringRed?: boolean;
+  applyEnterStageLeft?: boolean;
+  suggestNextStage?: StageOfScene;
+}
+
+export interface Fact {
+    id: string;
+    sourceQuestion?: string;
+    sourceAnswer?: string;
+    text: string;
+    isFollowUp: boolean;
+    questionKind?: string;
+    timestamp: number;
+}
 
 export interface Thread {
     id: string;
     name: string;
-    stage?: ThreadStage;
+    stage: StageOfScene;
     visitedSceneIds: string[];
     relatedNpcIds: string[];
     facts: string[];
     createdAt: number;
-    updatedAt?: number;
 }
 
 export interface SceneRecord {
@@ -159,70 +163,10 @@ export interface SceneRecord {
     closedAt?: number;
 }
 
-export interface Fact {
-    id: string;
-    sourceQuestion?: string;
-    sourceAnswer?: string;
-    text: string;
-    isFollowUp: boolean;
-    /** Chipping (incremental) vs cutting (direct) question. */
-    questionKind?: QuestionKind;
-    timestamp: number;
-}
-
-export type VignetteStage = "Exposition" | "Rising Action" | "Climax" | "Epilogue";
-
 export interface Vignette {
     id: string;
     theme: string;
     stage: VignetteStage;
     threadIds: string[];
     createdAt: number;
-}
-
-// --- Combat concessions (Familiar) ---
-
-export type ConcessionOutcome = "flee" | "knocked_away" | "captured" | "other";
-
-export interface Concession {
-    offered: boolean;
-    outcome?: ConcessionOutcome;
-    narrative?: string;
-}
-
-// --- Question heuristics (Chipping vs Cutting) ---
-
-export type QuestionKind = "chipping" | "cutting";
-
-// --- Unexpectedly effect (Table 2 mechanical result) ---
-
-export type UnexpectedlyEffectType =
-    | "foreshadowing"
-    | "tying_off"
-    | "to_conflict"
-    | "costume_change"
-    | "key_grip"
-    | "to_knowledge"
-    | "framing"
-    | "set_change"
-    | "upstaged"
-    | "pattern_change"
-    | "limelit"
-    | "entering_the_red"
-    | "to_endings"
-    | "montage"
-    | "enter_stage_left"
-    | "cross_stitch"
-    | "six_degrees"
-    | "reroll_reserved";
-
-export interface UnexpectedlyEffect {
-    type: UnexpectedlyEffectType;
-    label: string;
-    applySetChange?: boolean;
-    applyEnteringRed?: boolean;
-    /** Enter Stage Left: add PC/NPC to scene (e.g. Fellow Ranger). */
-    applyEnterStageLeft?: boolean;
-    suggestNewMainThreadId?: string;
-    suggestNextStage?: StageOfScene;
 }

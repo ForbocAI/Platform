@@ -16,8 +16,8 @@ export const Cortex = {
     },
 
     // Simulates AI oracle response (Loom of Fate)
-    consultOracle: async (question: string, surgeCount: number, stage: StageOfScene = "To Knowledge"): Promise<LoomResult> => {
+    consultOracle: async (question: string, surgeCount: number, _stage?: StageOfScene): Promise<LoomResult> => {
         await new Promise(resolve => setTimeout(resolve, 500));
-        return consultLoom(question, surgeCount, stage);
+        return consultLoom(question, surgeCount);
     }
 };
