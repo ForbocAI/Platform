@@ -2,7 +2,7 @@ import type { Player } from "@/lib/quadar/types";
 
 export function PlayerHeaderBars({ player }: { player: Player }) {
   return (
-    <div className="flex-1 flex gap-1.5 sm:gap-2 lg:gap-8 justify-end lg:justify-start min-w-[11rem] items-center">
+    <div className="flex-1 flex flex-col gap-0.5 sm:gap-1 justify-center min-w-44">
       <div className="min-w-0 flex items-center gap-1" title="HP">
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>HP</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">

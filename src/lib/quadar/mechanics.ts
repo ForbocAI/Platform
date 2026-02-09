@@ -1,5 +1,5 @@
 
-import { CharacterClass, Spell, Stats } from "./types";
+import { CharacterClass, Spell, Stats, Item } from "./types";
 
 export const SPELLS: Record<string, Spell> = {
     // --- Ashwalker (Ranger/Rogue) Spells ---
@@ -120,6 +120,103 @@ export const SPELLS: Record<string, Spell> = {
         class: "Ashwalker",
         description: "Leave magikal flames in wake.",
         effect: (_a: Stats, _d: Stats) => "Burning trail"
+    },
+    // --- Iron Armored Guardian Spells ---
+    "ironclad_charge": {
+        id: "ironclad_charge",
+        name: "Ironclad Charge",
+        class: "Iron Armored Guardian",
+        description: "Powerful charge causing knockback and stun.",
+        damage: "1d10 + STR",
+        effect: () => "Knockback/Stun"
+    },
+    "steel_shield_block": {
+        id: "steel_shield_block",
+        name: "Steel Shield Block",
+        class: "Iron Armored Guardian",
+        description: "Block projectiles and reduce damage.",
+        effect: () => "Block/DR"
+    },
+    // --- Aether Spirit Spells ---
+    "ethereal_phasing": {
+        id: "ethereal_phasing",
+        name: "Ethereal Phasing",
+        class: "Aether Spirit",
+        description: "Phase in/out of material plane.",
+        effect: () => "Immunity"
+    },
+    "astral_bolt": {
+        id: "astral_bolt",
+        name: "Astral Bolt",
+        class: "Aether Spirit",
+        description: "Bolt of dark energy.",
+        damage: "2d6 + ARCANE",
+        effect: () => "Slow"
+    },
+    // --- Thunder Trooper Spells ---
+    "shotgun_barrage": {
+        id: "shotgun_barrage",
+        name: "Shotgun Barrage",
+        class: "Thunder Trooper",
+        description: "Rapid barrage of shotgun blasts.",
+        damage: "3d6",
+        effect: () => "Close-range devastation"
+    },
+    "grenade_assault": {
+        id: "grenade_assault",
+        name: "Grenade Assault",
+        class: "Thunder Trooper",
+        description: "Throw explosive projectiles.",
+        damage: "2d8",
+        effect: () => "AoE"
+    },
+    // --- Voidwraith Spells ---
+    "spectral_grasp": {
+        id: "spectral_grasp",
+        name: "Spectral Grasp",
+        class: "Voidwraith",
+        description: "Ensnare and immobilize enemies.",
+        damage: "1d6",
+        effect: () => "Immobilize"
+    },
+    "haunting_moan": {
+        id: "haunting_moan",
+        name: "Haunting Moan",
+        class: "Voidwraith",
+        description: "Instill fear and reduce efficiency.",
+        effect: () => "Fear debuff"
+    },
+    // --- Storm Titan Spells ---
+    "electrical_charge": {
+        id: "electrical_charge",
+        name: "Electrical Charge",
+        class: "Storm Titan",
+        description: "Imbue melee attacks with atomic damage.",
+        effect: () => "Extra Arcane Dmg"
+    },
+    "thunderous_slam": {
+        id: "thunderous_slam",
+        name: "Thunderous Slam",
+        class: "Storm Titan",
+        description: "Shockwaves that evaporate nearby enemies.",
+        damage: "4d6",
+        effect: () => "AoE Knockback"
+    },
+    // --- Flame Corps Spells ---
+    "napalm_grenade": {
+        id: "napalm_grenade",
+        name: "Napalm Grenade Toss",
+        class: "Flame Corps",
+        description: "Fiery explosions with burning effect.",
+        damage: "2d6",
+        effect: () => "Burning Dot"
+    },
+    "inferno_overdrive": {
+        id: "inferno_overdrive",
+        name: "Inferno Overdrive",
+        class: "Flame Corps",
+        description: "Heightened state of pyrokinetic power.",
+        effect: () => "Berserk state"
     }
 };
 
@@ -139,17 +236,66 @@ export const CLASS_TEMPLATES: Record<CharacterClass, {
         baseStats: { Str: 16, Agi: 10, Arcane: 12, maxHp: 180, maxStress: 90 },
         startingSpells: ["hellfire_explosion", "dreadful_charge", "explosive_barrage"]
     },
-    // Defaults for others to prevent crashes, implement full list later
-    "Iron Armored Guardian": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Aether Spirit": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Thunder Trooper": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Voidwraith": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Cyberflux Guardian": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Byssalspawn": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Twilight Weaver": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Storm Titan": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Aksov Hexe-Spinne": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
-    "Flame Corps": { baseStats: { Str: 10, Agi: 10, Arcane: 10, maxHp: 100, maxStress: 100 }, startingSpells: [] },
+    "Iron Armored Guardian": {
+        baseStats: { Str: 17, Agi: 9, Arcane: 8, maxHp: 170, maxStress: 100 },
+        startingSpells: ["ironclad_charge", "steel_shield_block"]
+    },
+    "Aether Spirit": {
+        baseStats: { Str: 8, Agi: 15, Arcane: 18, maxHp: 90, maxStress: 120 },
+        startingSpells: ["ethereal_phasing", "astral_bolt"]
+    },
+    "Thunder Trooper": {
+        baseStats: { Str: 13, Agi: 13, Arcane: 10, maxHp: 110, maxStress: 100 },
+        startingSpells: ["shotgun_barrage", "grenade_assault"]
+    },
+    "Voidwraith": {
+        baseStats: { Str: 10, Agi: 14, Arcane: 16, maxHp: 80, maxStress: 150 },
+        startingSpells: ["spectral_grasp", "haunting_moan"]
+    },
+    "Cyberflux Guardian": {
+        baseStats: { Str: 14, Agi: 14, Arcane: 15, maxHp: 140, maxStress: 110 },
+        startingSpells: []
+    },
+    "Byssalspawn": {
+        baseStats: { Str: 15, Agi: 12, Arcane: 16, maxHp: 130, maxStress: 130 },
+        startingSpells: []
+    },
+    "Twilight Weaver": {
+        baseStats: { Str: 11, Agi: 18, Arcane: 14, maxHp: 100, maxStress: 100 },
+        startingSpells: []
+    },
+    "Storm Titan": {
+        baseStats: { Str: 20, Agi: 10, Arcane: 18, maxHp: 250, maxStress: 120 },
+        startingSpells: ["electrical_charge", "thunderous_slam"]
+    },
+    "Aksov Hexe-Spinne": {
+        baseStats: { Str: 12, Agi: 15, Arcane: 17, maxHp: 120, maxStress: 110 },
+        startingSpells: []
+    },
+    "Flame Corps": {
+        baseStats: { Str: 15, Agi: 11, Arcane: 14, maxHp: 150, maxStress: 100 },
+        startingSpells: ["napalm_grenade", "inferno_overdrive"]
+    },
+    "Gravewalker": {
+        baseStats: { Str: 16, Agi: 8, Arcane: 12, maxHp: 160, maxStress: 200 },
+        startingSpells: []
+    },
+    "Shadowhorn Juggernaut": {
+        baseStats: { Str: 16, Agi: 17, Arcane: 10, maxHp: 140, maxStress: 100 },
+        startingSpells: []
+    },
+    "Magma Leviathan": {
+        baseStats: { Str: 22, Agi: 8, Arcane: 16, maxHp: 300, maxStress: 150 },
+        startingSpells: []
+    },
+    "Abyssal Overfiend": {
+        baseStats: { Str: 25, Agi: 15, Arcane: 25, maxHp: 500, maxStress: 200 },
+        startingSpells: []
+    },
+    "Aetherwing Herald": {
+        baseStats: { Str: 12, Agi: 18, Arcane: 16, maxHp: 120, maxStress: 100 },
+        startingSpells: []
+    },
 };
 
 export const UNEXPECTEDLY_TABLE = [
@@ -173,4 +319,75 @@ export const UNEXPECTEDLY_TABLE = [
     "Re-roll/Reserved",
     "Re-roll/Reserved",
     "Re-roll/Reserved"
+];
+
+export const ITEMS: Item[] = [
+    // Consumables
+    {
+        id: "ember_salve",
+        name: "Ember Salve",
+        description: "A soothing paste of crushed embers. Heals 20 HP, relieves 10 Stress.",
+        type: "consumable",
+        effect: "heal_20_stress_10",
+        cost: { spirit: 5 }
+    },
+    {
+        id: "spirit_echo",
+        name: "Spirit Echo",
+        description: "A captured whisper. Relieves 30 Stress.",
+        type: "consumable",
+        effect: "stress_30",
+        cost: { spirit: 8 }
+    },
+    {
+        id: "blood_vial",
+        name: "Vial of Old Blood",
+        description: "Thick, dark blood. Heals 50 HP but adds 10 Stress.",
+        type: "consumable",
+        effect: "heal_50_stress_add_10",
+        cost: { spirit: 10, blood: 2 }
+    },
+    // Weapons
+    {
+        id: "obsidian_dagger",
+        name: "Obsidian Dagger",
+        description: "Razor sharp volcanic glass. +2 Agi.",
+        type: "weapon",
+        bonus: { Agi: 2 },
+        cost: { spirit: 15 }
+    },
+    {
+        id: "iron_greatsword",
+        name: "Iron Greatsword",
+        description: "Heavy and brutal. +4 Str, -2 Agi.",
+        type: "weapon",
+        bonus: { Str: 4, Agi: -2 },
+        cost: { spirit: 25 }
+    },
+    // Armor
+    {
+        id: "reinforced_plate",
+        name: "Reinforced Plate",
+        description: "Solid protection. +4 AC, -2 Agi.",
+        type: "armor",
+        bonus: { ac: 4, Agi: -2 },
+        cost: { spirit: 30 }
+    },
+    {
+        id: "shadow_cloak",
+        name: "Shadow Cloak",
+        description: "Woven from shadows. +2 AC, +2 Agi.",
+        type: "armor",
+        bonus: { ac: 2, Agi: 2 },
+        cost: { spirit: 25 }
+    },
+    // Relics
+    {
+        id: "ancient_battery",
+        name: "Ancient Battery",
+        description: "Hums with power. +4 Arcane.",
+        type: "relic",
+        bonus: { Arcane: 4 },
+        cost: { spirit: 40, blood: 5 }
+    }
 ];

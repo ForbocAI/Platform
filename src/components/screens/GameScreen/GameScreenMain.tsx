@@ -25,6 +25,7 @@ export function GameScreenMain({
   onAdvanceVignette,
   onEndVignette,
   logs,
+  onTradeMerchant,
 }: {
   currentRoom: Room;
   showMap: boolean;
@@ -39,11 +40,12 @@ export function GameScreenMain({
   onAdvanceVignette: (stage: VignetteStage) => void;
   onEndVignette: () => void;
   logs: GameLogEntry[];
+  onTradeMerchant: (merchantId: string) => void;
 }) {
   return (
     <main className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-y-auto overflow-x-hidden lg:overflow-hidden">
       {/* Room / Map: full width on mobile (top), left column on lg+; flex-none on mobile so sidebar gets space below */}
-      <div className="flex-none lg:flex-1 min-h-0 min-w-0 flex flex-col min-h-[35vh] lg:min-h-0 order-1">
+      <div className="flex-none lg:flex-1 min-w-0 flex flex-col min-h-[35vh] lg:min-h-0 order-1">
         {showMap ? (
           <div className="flex-1 min-h-0 min-w-0 overflow-auto">
             <MapView
@@ -53,7 +55,7 @@ export function GameScreenMain({
             />
           </div>
         ) : (
-          <RoomViewport room={currentRoom} />
+          <RoomViewport room={currentRoom} onTradeMerchant={onTradeMerchant} />
         )}
       </div>
       {/* Sidebar: full width on mobile (below room), right column on lg+ */}

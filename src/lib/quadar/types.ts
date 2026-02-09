@@ -25,7 +25,12 @@ export type CharacterClass =
     | "Twilight Weaver"
     | "Storm Titan"
     | "Aksov Hexe-Spinne"
-    | "Flame Corps";
+    | "Flame Corps"
+    | "Gravewalker"
+    | "Shadowhorn Juggernaut"
+    | "Magma Leviathan"
+    | "Abyssal Overfiend"
+    | "Aetherwing Herald";
 
 export interface Player extends Stats {
     id: string;
@@ -59,6 +64,14 @@ export interface Item {
     type: "weapon" | "armor" | "consumable" | "relic";
     bonus?: Partial<Stats> & { ac?: number };
     effect?: string;
+    cost?: { spirit: number; blood?: number };
+}
+
+export interface Merchant {
+    id: string;
+    name: string;
+    description?: string;
+    wares: Item[];
 }
 
 export interface Room {
@@ -70,10 +83,10 @@ export interface Room {
     exits: Record<Direction, string | null>; // Maps direction to room ID
     enemies: Enemy[];
     allies?: { id: string; name: string }[];
-    merchants?: { id: string; name: string }[];
+    merchants?: Merchant[];
 }
 
-export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower";
+export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower" | "Military Installation" | "Eldritch Fortress" | "Labyrinthine Dungeon";
 export type Direction = "North" | "South" | "East" | "West";
 
 export interface Spell {
@@ -104,32 +117,32 @@ export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";
 export type VignetteStage = "Exposition" | "Rising Action" | "Climax" | "Epilogue";
 
 export type UnexpectedlyEffectType =
-  | "foreshadowing"
-  | "tying_off"
-  | "to_conflict"
-  | "costume_change"
-  | "key_grip"
-  | "to_knowledge"
-  | "framing"
-  | "set_change"
-  | "upstaged"
-  | "pattern_change"
-  | "limelit"
-  | "entering_the_red"
-  | "to_endings"
-  | "montage"
-  | "enter_stage_left"
-  | "cross_stitch"
-  | "six_degrees"
-  | "reroll_reserved";
+    | "foreshadowing"
+    | "tying_off"
+    | "to_conflict"
+    | "costume_change"
+    | "key_grip"
+    | "to_knowledge"
+    | "framing"
+    | "set_change"
+    | "upstaged"
+    | "pattern_change"
+    | "limelit"
+    | "entering_the_red"
+    | "to_endings"
+    | "montage"
+    | "enter_stage_left"
+    | "cross_stitch"
+    | "six_degrees"
+    | "reroll_reserved";
 
 export interface UnexpectedlyEffect {
-  type: UnexpectedlyEffectType;
-  label: string;
-  applySetChange?: boolean;
-  applyEnteringRed?: boolean;
-  applyEnterStageLeft?: boolean;
-  suggestNextStage?: StageOfScene;
+    type: UnexpectedlyEffectType;
+    label: string;
+    applySetChange?: boolean;
+    applyEnteringRed?: boolean;
+    applyEnterStageLeft?: boolean;
+    suggestNextStage?: StageOfScene;
 }
 
 export interface Fact {

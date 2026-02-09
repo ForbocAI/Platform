@@ -1,5 +1,5 @@
 import { Room, LoomResult, Biome, StageOfScene } from '@/lib/quadar/types';
-import { generateRoom, generateStartRoom, consultLoom, GenerateStartRoomOptions } from '@/lib/quadar/engine';
+import { generateRoom, generateRoomWithOptions, generateStartRoom, consultLoom, GenerateStartRoomOptions } from '@/lib/quadar/engine';
 
 // Cortex: Emits narrative and simulation data ("The Mind")
 export const Cortex = {
@@ -9,10 +9,10 @@ export const Cortex = {
     },
 
     // Simulates AI generation of a room description/state
-    generateRoom: async (id?: string, biomeOverride?: Biome): Promise<Room> => {
+    generateRoom: async (id?: string, biomeOverride?: Biome, options?: { forceMerchant?: boolean }): Promise<Room> => {
         // Simulate network latency
         await new Promise(resolve => setTimeout(resolve, 300));
-        return generateRoom(id, biomeOverride);
+        return generateRoomWithOptions(id, biomeOverride, options);
     },
 
     // Simulates AI oracle response (Loom of Fate)

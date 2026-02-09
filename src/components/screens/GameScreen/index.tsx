@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   selectPlayer,
@@ -13,6 +15,10 @@ import {
   movePlayer,
   askOracle,
   addLog,
+  scanSector,
+  communeWithVoid,
+  engageHostiles,
+  respawnPlayer,
 } from "@/features/game/slice/gameSlice";
 import {
   selectOracleInput,
@@ -28,6 +34,9 @@ import {
   toggleSpellsPanel,
   selectAutoPlay,
   toggleAutoPlay,
+  openTrade,
+  closeTrade,
+  selectActiveMerchantId,
 } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound } from "@/features/audio";
 import {
@@ -67,6 +76,16 @@ export function GameScreen() {
   const mainThreadId = useAppSelector(selectMainThreadId);
   const facts = useAppSelector(selectFacts);
   const vignette = useAppSelector(selectVignette);
+  const activeMerchantId = useAppSelector(selectActiveMerchantId);
+  const activeMerchant = activeMerchantId ? currentRoom.merchants?.find(m => m.id === activeMerchantId) : null;
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!isInitialized && !isLoading) {
+      const forceMerchant = searchParams.get("forceMerchant") === "1";
+      dispatch(initializeGame({ forceMerchant }));
+    }
+  }, [isInitialized, isLoading, dispatch, searchParams]);
 
   if (!isInitialized && isLoading) {
     return (
@@ -114,6 +133,7 @@ export function GameScreen() {
         onAdvanceVignette={(stage: VignetteStage) => dispatch(advanceVignetteStage({ stage }))}
         onEndVignette={() => dispatch(endVignette())}
         logs={logs}
+        onTradeMerchant={(id) => dispatch(openTrade(id))}
       />
       <GameScreenFooter
         oracleInput={oracleInput}
@@ -123,9 +143,9 @@ export function GameScreen() {
         currentRoom={currentRoom}
         onMove={(dir) => dispatch(movePlayer(dir))}
         onMapClick={() => dispatch(toggleShowMap())}
-        onScan={() => dispatch(addLog({ message: "Scanning...", type: "system" }))}
-        onEngage={() => dispatch(addLog({ message: "Engaging hostiles.", type: "system" }))}
-        onCommune={() => dispatch(addLog({ message: "Communing.", type: "system" }))}
+        onScan={() => dispatch(scanSector())}
+        onEngage={() => dispatch(engageHostiles())}
+        onCommune={() => dispatch(communeWithVoid())}
         onOpenInventory={() => dispatch(toggleInventory())}
         onOpenSpells={() => dispatch(toggleSpellsPanel())}
         autoPlay={autoPlay}
@@ -140,6 +160,10 @@ export function GameScreen() {
         player={player}
         onCloseInventory={() => dispatch(toggleInventory())}
         onCloseSpells={() => dispatch(toggleSpellsPanel())}
+        onRejectConcession={() => dispatch(respawnPlayer())}
+        onAcceptConcession={(type) => dispatch(addLog({ message: `You accepted concession: ${type}`, type: "system" }))}
+        activeMerchant={activeMerchant}
+        onCloseTrade={() => dispatch(closeTrade())}
       />
     </div>
   );
