@@ -109,7 +109,6 @@ export const gameSlice = createSlice({
                 type: action.payload.type
             });
         },
-        autoPlayTick: () => {},
     },
     extraReducers: (builder) => {
         // Initialize
@@ -160,7 +159,7 @@ export const gameSlice = createSlice({
     }
 });
 
-export const { addLog, autoPlayTick } = gameSlice.actions;
+export const { addLog } = gameSlice.actions;
 
 // Selectors
 export const selectPlayer = (state: { game: GameState }) => state.game.player;

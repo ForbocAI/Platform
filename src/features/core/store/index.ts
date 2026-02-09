@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
-import gameReducer, { initializeGame, autoPlayTick } from '@/features/game/slice/gameSlice';
+import gameReducer, { initializeGame, runAutoplayTick } from '@/features/game/slice/gameSlice';
 import uiReducer, { toggleAutoPlay, clearVignetteThemeInput } from '@/features/core/ui/slice/uiSlice';
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';
@@ -66,7 +66,7 @@ startAppListening({
       await listenerApi.delay(2800);
       const current = listenerApi.getState();
       if (!current.ui.autoPlay) break;
-      listenerApi.dispatch(autoPlayTick());
+      await listenerApi.dispatch(runAutoplayTick());
     }
   },
 });

@@ -1,19 +1,11 @@
 "use client";
 
-import { useRef, useEffect } from "react";
 import { Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GameLogEntry } from "@/lib/quadar/types";
 import { RuneSigil } from "./Runes";
 
 export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; children?: React.ReactNode }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [logs.length]);
-
   return (
     <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
       <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border bg-palette-bg-mid/20 shrink-0">
@@ -21,7 +13,7 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
         <span className="font-bold tracking-widest text-palette-muted uppercase leading-tight" data-macro-scramble>Neural Log</span>
         <RuneSigil className="ml-auto" />
       </div>
-      <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 sm:p-2 flex flex-col gap-1.5 sm:gap-2 scrollbar-thin scrollbar-thumb-palette-border scrollbar-track-transparent min-h-0 min-w-0">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 sm:p-2 flex flex-col gap-1.5 sm:gap-2 scrollbar-thin scrollbar-thumb-palette-border scrollbar-track-transparent min-h-0 min-w-0">
         {logs.map((log) => (
           <div key={log.id} className="min-w-0 break-words shrink-0">
             <p
@@ -40,6 +32,7 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
             </p>
           </div>
         ))}
+        <div data-log-anchor className="shrink-0 min-h-1" style={{ overflowAnchor: "auto" }} />
       </div>
       {children}
     </aside>

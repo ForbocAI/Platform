@@ -48,7 +48,9 @@ export function initializePlayer(): Player {
             { id: "relic_shard", name: "Relic Shard", type: "relic", description: "A buzzing shard of old tech." }
         ],
         spells: template.startingSpells,
-        surgeCount: 0 // Initial Surge Count
+        surgeCount: 0,
+        spirit: 20,
+        blood: 0
     };
 }
 

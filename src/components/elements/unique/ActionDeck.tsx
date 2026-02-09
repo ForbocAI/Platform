@@ -28,8 +28,8 @@ export function ActionDeck({
   onToggleAutoPlay?: () => void;
 }) {
   return (
-    <footer className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-col lg:flex-row gap-1.5 sm:gap-2 items-center justify-start">
-      <div className="flex w-full lg:w-max gap-1 sm:gap-1.5 justify-start items-center min-w-0">
+    <footer className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-col lg:flex-row gap-1.5 sm:gap-2 items-center justify-start overflow-x-auto min-h-0">
+      <div className="flex w-full lg:w-max gap-1 sm:gap-1.5 justify-start items-center min-w-0 shrink-0">
         {onToggleAutoPlay != null && (
           <button
             type="button"
@@ -76,18 +76,19 @@ export function ActionDeck({
           </GameButton>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2 border-t lg:border-t-0 lg:border-l border-palette-border pt-1.5 lg:pt-0 lg:pl-2 mt-0 lg:mt-0 items-center">
+      <div className="flex flex-row gap-2 border-t lg:border-t-0 lg:border-l border-palette-border pt-1.5 lg:pt-0 lg:pl-2 mt-0 lg:mt-0 items-center shrink-0">
         <button
           type="button"
           onClick={onOpenSpells}
-          className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-cyan/50 rounded p-1 -m-1 transition-colors cursor-pointer"
+          className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-cyan/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
           data-testid="spells-toggle"
           aria-label="View spells"
           title="View spells"
         >
-          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1">
-            <Wand2 className="w-3.5 h-3.5" />
-            View spells
+          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1 whitespace-nowrap">
+            <Wand2 className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">View spells</span>
+            <span className="sm:hidden">Spells</span>
           </span>
           <div className="flex gap-px">
             {player.spells.map((spell) => (
@@ -104,14 +105,15 @@ export function ActionDeck({
         <button
           type="button"
           onClick={onOpenInventory}
-          className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-gold/50 rounded p-1 -m-1 transition-colors cursor-pointer"
+          className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-gold/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
           data-testid="inventory-toggle"
-          aria-label="View items"
+          aria-label="Open inventory"
           title="View items"
         >
-          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1">
-            <Package className="w-3.5 h-3.5" />
-            View items
+          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1 whitespace-nowrap">
+            <Package className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">View items</span>
+            <span className="sm:hidden">Items</span>
           </span>
           <div className="flex gap-px">
             {player.inventory.map((item) => (

@@ -53,15 +53,15 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onClose }: I
     };
 
     return (
-        <div className="absolute inset-0 z-50 bg-palette-bg-dark/95 backdrop-blur-sm p-4 flex flex-col items-center justify-center" data-testid="inventory-panel">
-            <div className="w-full max-w-2xl bg-palette-bg-dark border border-palette-border shadow-2xl flex flex-col max-h-full">
+        <div className="absolute inset-0 z-50 bg-palette-bg-dark/95 backdrop-blur-sm p-3 sm:p-4 flex flex-col items-center justify-center overflow-y-auto" data-testid="inventory-panel">
+            <div className="w-full max-w-2xl bg-palette-bg-dark border border-palette-border shadow-2xl flex flex-col max-h-full min-h-0 my-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between p-3 border-b border-palette-border bg-palette-bg-mid/50">
                     <h2 className="text-lg font-bold text-palette-white tracking-widest uppercase flex items-center gap-2">
                         <Package className="w-5 h-5 text-palette-accent-gold" />
                         Inventory & Equipment
                     </h2>
-                    <button onClick={onClose} className="p-1 hover:text-palette-accent-red transition-colors" data-testid="inventory-close">
+                    <button onClick={onClose} className="p-2 -m-1 hover:text-palette-accent-red transition-colors touch-manipulation" data-testid="inventory-close" aria-label="Close inventory">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
