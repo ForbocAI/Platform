@@ -149,7 +149,7 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 3. `docs/PLAYTEST_AUTOMATION.md` kept current with test coverage, reproduction steps, and Known issues.
 
 **Technical constraints:**
-- Follow condensed.md for frontend architecture. No automated tests (Jest/Cypress), logging infra, backend, db, or Expo. Web client only.
+- Follow condensed.md for frontend architecture. No automated tests (Jest/Cypress), backend, db, or Expo. Web client only.
 
 **Suggested next steps:**
 1. Read PLAYTEST_AUTOMATION.md (What was tested, Known issues) and the referenced design docs.
@@ -159,4 +159,4 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 
 ---
 
-**Quick start:** Copy the Task section above into a new chat to run a full playtest cycle. Targets Platform at localhost:3000; references quadar_ familiar, quadar, and condensed.md; excludes multiplayer, tests, logging, backend, db, Expo.
+**Quick start:** Copy the Task section above into a new chat to run a full playtest cycle. Targets Platform at localhost:3000; references quadar_ familiar, quadar, and condensed.md; excludes multiplayer, tests, backend, db, Expo.

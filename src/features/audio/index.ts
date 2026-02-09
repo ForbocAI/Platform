@@ -8,4 +8,5 @@ export {
   setMusicStateGetter,
 } from "./audioSystem";
 export { usePlayButtonSound } from "./usePlayButtonSound";
-export { useSpeechOnNewLog } from "./useSpeechOnNewLog";
+export { flushTtsQueue } from "./audioListeners";
+

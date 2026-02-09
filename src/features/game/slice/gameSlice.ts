@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { Player, Room, GameLogEntry, Enemy, Thread, Npc, Direction } from '@/lib/quadar/types';
 import { initializePlayer, ENEMY_TEMPLATES, createMerchant } from '@/lib/quadar/engine';
-import { SDK } from '@/lib/sdk-placeholder';
+import { gameApi } from '@/features/core/api/gameApi';
 import { resolveDuel, resolveEnemyAttack } from '@/lib/quadar/combat';
 import { generateFollowUpFacts, resolveUnexpectedlyEffect, classifyQuestion } from '@/lib/quadar/narrativeHelpers';
 import {
@@ -78,11 +78,13 @@ export const initializeGame = createAsyncThunk(
 
         const deterministic = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('deterministic') === '1';
         const player = initializePlayer({ deterministic });
+
         // Dev/test: low HP so one enemy hit triggers concession modal (use with forceEnemy=1)
         if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('lowHp') === '1') {
             player.hp = 5;
         }
-        let initialRoom = await SDK.Cortex.generateStartRoom({ deterministic });
+
+        let initialRoom = await dispatch(gameApi.endpoints.getStartRoom.initiate({ deterministic })).unwrap();
 
         // Dev/test: force a merchant in the starting room for trading playtest
         if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('forceMerchant') === '1') {
@@ -141,7 +143,11 @@ export const askOracle = createAsyncThunk(
         dispatch(addLog({ message: `Your Question: "${question}"`, type: "system" }));
 
         const stage = state.ui?.stageOfScene ?? "To Knowledge";
-        const result = await SDK.Cortex.consultOracle(question, state.game.player.surgeCount, stage);
+        const result = await dispatch(gameApi.endpoints.consultOracle.initiate({
+            question,
+            surgeCount: state.game.player.surgeCount,
+            stage
+        })).unwrap();
 
         dispatch(addFact({
             sourceQuestion: question,
@@ -150,6 +156,7 @@ export const askOracle = createAsyncThunk(
             isFollowUp: false,
             questionKind: classifyQuestion(question),
         }));
+        dispatch(addLog({ message: result.description, type: "narrative" }));
         const followUps = generateFollowUpFacts(question, result);
         if (followUps.length) dispatch(addFollowUpFacts({ facts: followUps }));
 
@@ -179,13 +186,10 @@ export const movePlayer = createAsyncThunk(
         };
         if (!state.game.currentRoom) throw new Error("No room");
 
-        const isValid = await SDK.Bridge.validateMove(state.game.currentRoom, direction);
-        if (!isValid) {
-            dispatch(addLog({ message: "Path blocked or invalid vector.", type: "system" }));
-            throw new Error("Invalid move");
-        }
-
-        const newRoom = await SDK.Cortex.generateRoom();
+        const { newRoom } = await dispatch(gameApi.endpoints.navigate.initiate({
+            direction,
+            currentRoom: state.game.currentRoom
+        })).unwrap();
         dispatch(addLog({ message: `Moved ${direction}.`, type: "exploration" }));
 
         const { currentSceneId, threads, mainThreadId } = state.narrative;
@@ -298,7 +302,11 @@ export const communeWithVoid = createAsyncThunk(
         dispatch(addLog({ message: "You attempt to commune with the void...", type: "loom" }));
 
         const stage = state.ui?.stageOfScene ?? "To Knowledge";
-        const result = await SDK.Cortex.consultOracle(COMMUNE_QUESTION, state.game.player.surgeCount, stage);
+        const result = await dispatch(gameApi.endpoints.consultOracle.initiate({
+            question: COMMUNE_QUESTION,
+            surgeCount: state.game.player.surgeCount,
+            stage
+        })).unwrap();
 
         dispatch(addFact({
             sourceQuestion: COMMUNE_QUESTION,
@@ -306,6 +314,7 @@ export const communeWithVoid = createAsyncThunk(
             text: `${COMMUNE_QUESTION} → ${result.description}`,
             isFollowUp: false,
         }));
+        dispatch(addLog({ message: result.description, type: "narrative" }));
         const followUps = generateFollowUpFacts(COMMUNE_QUESTION, result);
         if (followUps.length) dispatch(addFollowUpFacts({ facts: followUps }));
 

@@ -73,7 +73,6 @@ export function GameScreen() {
   const mainThreadId = useAppSelector(selectMainThreadId);
   const currentSceneId = useAppSelector(selectCurrentSceneId);
   const playSound = usePlayButtonSound();
-  useSpeechOnNewLog();
 
   const handleAskOracle = (e: React.FormEvent) => {
     e.preventDefault();
