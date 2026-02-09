@@ -3,6 +3,7 @@
 import { RoomViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel } from "@/components/elements/unique";
 import type { Room, Fact, GameLogEntry, Thread } from "@/lib/quadar/types";
 import type { VignetteStage } from "@/lib/quadar/types";
+import type { RoomCoordinates } from "@/features/game/slice/gameSlice";
 
 interface VignetteState {
   theme: string;
@@ -13,7 +14,8 @@ interface VignetteState {
 export function GameScreenMain({
   currentRoom,
   showMap,
-  onCloseMap,
+  exploredRooms,
+  roomCoordinates,
   threads,
   mainThreadId,
   onSetMainThread,
@@ -26,7 +28,8 @@ export function GameScreenMain({
 }: {
   currentRoom: Room;
   showMap: boolean;
-  onCloseMap: () => void;
+  exploredRooms: Record<string, Room>;
+  roomCoordinates: Record<string, RoomCoordinates>;
   threads: Thread[];
   mainThreadId: string | null;
   onSetMainThread: (id: string) => void;
@@ -42,26 +45,13 @@ export function GameScreenMain({
       {/* Room / Map: full width on mobile (top), left column on lg+; flex-none on mobile so sidebar gets space below */}
       <div className="flex-none lg:flex-1 min-h-0 min-w-0 flex flex-col min-h-[35vh] lg:min-h-0 order-1">
         {showMap ? (
-          <>
-            <div className="flex items-center justify-end shrink-0 px-2 py-1 border-b border-palette-border bg-palette-bg-mid/30">
-              <button
-                type="button"
-                onClick={onCloseMap}
-                className="text-xs uppercase tracking-wider text-palette-muted hover:text-palette-accent-cyan transition-colors"
-                aria-label="Close map"
-                data-testid="map-close"
-              >
-                ✕ Close map
-              </button>
-            </div>
-            <div className="flex-1 min-h-0 min-w-0 overflow-auto">
-              <MapView
-                exploredRooms={{ [currentRoom.id]: currentRoom }}
-                roomCoordinates={{ [currentRoom.id]: { x: 0, y: 0 } }}
-                currentRoomId={currentRoom.id}
-              />
-            </div>
-          </>
+          <div className="flex-1 min-h-0 min-w-0 overflow-auto">
+            <MapView
+              exploredRooms={exploredRooms}
+              roomCoordinates={roomCoordinates}
+              currentRoomId={currentRoom.id}
+            />
+          </div>
         ) : (
           <RoomViewport room={currentRoom} />
         )}

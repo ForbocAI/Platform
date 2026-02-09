@@ -25,7 +25,7 @@ export function GameButton({
       )}
     >
       {icon}
-      <span className="inline group-hover:translate-x-1 transition-transform">{children}</span>
+      <span className="hidden sm:inline group-hover:translate-x-1 transition-transform">{children}</span>
     </button>
   );
 }

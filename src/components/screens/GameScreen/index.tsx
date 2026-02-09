@@ -4,6 +4,8 @@ import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   selectPlayer,
   selectCurrentRoom,
+  selectExploredRooms,
+  selectRoomCoordinates,
   selectLogs,
   selectIsInitialized,
   selectIsLoading,
@@ -50,6 +52,8 @@ export function GameScreen() {
   const playSound = usePlayButtonSound();
   const player = useAppSelector(selectPlayer);
   const currentRoom = useAppSelector(selectCurrentRoom);
+  const exploredRooms = useAppSelector(selectExploredRooms);
+  const roomCoordinates = useAppSelector(selectRoomCoordinates);
   const logs = useAppSelector(selectLogs);
   const isInitialized = useAppSelector(selectIsInitialized);
   const isLoading = useAppSelector(selectIsLoading);
@@ -99,7 +103,8 @@ export function GameScreen() {
       <GameScreenMain
         currentRoom={currentRoom}
         showMap={showMap}
-        onCloseMap={() => dispatch(toggleShowMap())}
+        exploredRooms={exploredRooms}
+        roomCoordinates={roomCoordinates}
         threads={threads}
         mainThreadId={mainThreadId}
         onSetMainThread={(id) => dispatch(setMainThread(id))}

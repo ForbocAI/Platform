@@ -12,6 +12,10 @@ export interface RoomCoordinates {
 interface GameState {
     player: Player | null;
     currentRoom: Room | null;
+    /** All rooms visited this session; map grid grows as player moves. */
+    exploredRooms: Record<string, Room>;
+    /** Grid position per room (start at 0,0). */
+    roomCoordinates: Record<string, RoomCoordinates>;
     logs: GameLogEntry[];
     isInitialized: boolean;
     isLoading: boolean;
@@ -21,6 +25,8 @@ interface GameState {
 const initialState: GameState = {
     player: null,
     currentRoom: null,
+    exploredRooms: {},
+    roomCoordinates: {},
     logs: [],
     isInitialized: false,
     isLoading: false,
@@ -71,7 +77,7 @@ export const movePlayer = createAsyncThunk(
         const newRoom = await SDK.Cortex.generateRoom();
         dispatch(addLog({ message: `Moved ${direction}.`, type: "exploration" }));
 
-        return newRoom;
+        return { room: newRoom, direction };
     }
 );
 
@@ -119,7 +125,10 @@ export const gameSlice = createSlice({
             state.isLoading = false;
             state.isInitialized = true;
             state.player = action.payload.player;
-            state.currentRoom = action.payload.initialRoom;
+            const initialRoom = action.payload.initialRoom;
+            state.currentRoom = initialRoom;
+            state.exploredRooms = { [initialRoom.id]: initialRoom };
+            state.roomCoordinates = { [initialRoom.id]: { x: 0, y: 0 } };
             state.logs.push({
                 id: Date.now().toString(),
                 timestamp: Date.now(),
@@ -152,9 +161,17 @@ export const gameSlice = createSlice({
             });
         });
 
-        // Move
+        // Move: add new room to explored map and assign grid coords from previous + direction
         builder.addCase(movePlayer.fulfilled, (state, action) => {
-            state.currentRoom = action.payload;
+            const { room: newRoom, direction } = action.payload;
+            const prevRoom = state.currentRoom;
+            if (!prevRoom) return;
+            const prevCoord = state.roomCoordinates[prevRoom.id] ?? { x: 0, y: 0 };
+            const delta = { North: { x: 0, y: -1 }, South: { x: 0, y: 1 }, East: { x: 1, y: 0 }, West: { x: -1, y: 0 } }[direction] ?? { x: 0, y: 0 };
+            const newCoord = { x: prevCoord.x + delta.x, y: prevCoord.y + delta.y };
+            state.currentRoom = newRoom;
+            state.exploredRooms[newRoom.id] = newRoom;
+            state.roomCoordinates[newRoom.id] = newCoord;
         });
     }
 });
@@ -164,6 +181,8 @@ export const { addLog } = gameSlice.actions;
 // Selectors
 export const selectPlayer = (state: { game: GameState }) => state.game.player;
 export const selectCurrentRoom = (state: { game: GameState }) => state.game.currentRoom;
+export const selectExploredRooms = (state: { game: GameState }) => state.game.exploredRooms;
+export const selectRoomCoordinates = (state: { game: GameState }) => state.game.roomCoordinates;
 export const selectLogs = (state: { game: GameState }) => state.game.logs;
 export const selectIsInitialized = (state: { game: GameState }) => state.game.isInitialized;
 export const selectIsLoading = (state: { game: GameState }) => state.game.isLoading;

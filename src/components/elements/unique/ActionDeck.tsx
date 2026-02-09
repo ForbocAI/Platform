@@ -88,7 +88,6 @@ export function ActionDeck({
           <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1 whitespace-nowrap">
             <Wand2 className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden sm:inline">View spells</span>
-            <span className="sm:hidden">Spells</span>
           </span>
           <div className="flex gap-px">
             {player.spells.map((spell) => (
@@ -113,7 +112,6 @@ export function ActionDeck({
           <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1 whitespace-nowrap">
             <Package className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden sm:inline">View items</span>
-            <span className="sm:hidden">Items</span>
           </span>
           <div className="flex gap-px">
             {player.inventory.map((item) => (
