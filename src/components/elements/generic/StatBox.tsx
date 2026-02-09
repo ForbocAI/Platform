@@ -12,7 +12,7 @@ export function StatBox({
       <div className="opacity-80">{icon}</div>
       <div className="flex flex-col gap-px">
         <span className="text-palette-muted uppercase font-bold leading-tight">{label}</span>
-        <span className="font-bold text-palette-foreground leading-tight">{value}</span>
+        <span className="hidden sm:inline font-bold text-palette-foreground leading-tight">{value}</span>
       </div>
     </div>
   );

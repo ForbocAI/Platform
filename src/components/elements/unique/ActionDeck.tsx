@@ -28,8 +28,8 @@ export function ActionDeck({
   onToggleAutoPlay?: () => void;
 }) {
   return (
-    <footer className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-col lg:flex-row gap-1.5 sm:gap-2 items-center justify-start overflow-x-auto min-h-0">
-      <div className="flex w-full lg:w-max gap-1 sm:gap-1.5 justify-start items-center min-w-0 shrink-0">
+    <footer className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-row gap-1.5 sm:gap-2 items-center justify-start overflow-x-auto min-h-0" style={{ WebkitOverflowScrolling: "touch" }}>
+      <div className="flex gap-1 sm:gap-1.5 justify-start items-center min-w-0 shrink-0">
         {onToggleAutoPlay != null && (
           <button
             type="button"
@@ -76,7 +76,7 @@ export function ActionDeck({
           </GameButton>
         </div>
       </div>
-      <div className="flex flex-row gap-2 border-t lg:border-t-0 lg:border-l border-palette-border pt-1.5 lg:pt-0 lg:pl-2 mt-0 lg:mt-0 items-center shrink-0">
+      <div className="flex flex-row gap-2 border-l border-palette-border pl-2 items-center shrink-0">
         <button
           type="button"
           onClick={onOpenSpells}

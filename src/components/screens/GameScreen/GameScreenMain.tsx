@@ -38,9 +38,9 @@ export function GameScreenMain({
   logs: GameLogEntry[];
 }) {
   return (
-    <main className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
-      {/* Room / Map: full width on mobile (top), left column on lg+ */}
-      <div className="flex-1 min-h-0 min-w-0 flex flex-col min-h-[38vh] lg:min-h-0 order-1">
+    <main className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-y-auto overflow-x-hidden lg:overflow-hidden">
+      {/* Room / Map: full width on mobile (top), left column on lg+; flex-none on mobile so sidebar gets space below */}
+      <div className="flex-none lg:flex-1 min-h-0 min-w-0 flex flex-col min-h-[35vh] lg:min-h-0 order-1">
         {showMap ? (
           <>
             <div className="flex items-center justify-end shrink-0 px-2 py-1 border-b border-palette-border bg-palette-bg-mid/30">
