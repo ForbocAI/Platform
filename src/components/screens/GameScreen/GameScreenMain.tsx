@@ -1,8 +1,8 @@
 "use client";
 
 import { RoomViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel } from "@/components/elements/unique";
-import type { Room, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore } from "@/lib/quadar/types";
-import type { VignetteStage } from "@/lib/quadar/types";
+import type { Room, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore } from "@/lib/game/types";
+import type { VignetteStage } from "@/lib/game/types";
 import type { RoomCoordinates } from "@/features/game/slice/gameSlice";
 
 interface VignetteState {

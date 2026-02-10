@@ -1,4 +1,5 @@
-import type { LoomResult, UnexpectedlyEffect, StageOfScene } from "./types";
+import type { OracleResult, UnexpectedlyEffect, StageOfScene } from "./types";
+import { LORE_VIGNETTE_THEMES } from "./content";
 
 export const VIGNETTE_THEMES = [
   "Shadows of the Past",
@@ -12,13 +13,14 @@ export const VIGNETTE_THEMES = [
   "Echoes of Silence",
   "Forbidden Knowledge",
   "The Machine God",
-  "Flesh and Steel"
+  "Flesh and Steel",
+  ...LORE_VIGNETTE_THEMES,
 ];
 
 /** Generate obvious follow-up facts from a Loom answer (Familiar: "record the answer, then create a few obvious follow-up facts"). */
 export function generateFollowUpFacts(
   question: string,
-  result: LoomResult
+  result: OracleResult
 ): string[] {
   const q = question.toLowerCase();
   const { answer, qualifier } = result;

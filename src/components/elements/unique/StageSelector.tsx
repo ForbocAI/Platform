@@ -1,6 +1,6 @@
 "use client";
 
-import type { StageOfScene } from "@/lib/quadar/types";
+import type { StageOfScene } from "@/lib/game/types";
 import { cn } from "@/lib/utils";
 import { usePlayButtonSound } from "@/features/audio";
 import { RuneSigil } from "./Runes";

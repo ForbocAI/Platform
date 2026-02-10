@@ -1,4 +1,4 @@
-import type { Player } from "@/lib/quadar/types";
+import type { Player } from "@/lib/game/types";
 
 export function PlayerHeaderBars({ player }: { player: Player }) {
   return (

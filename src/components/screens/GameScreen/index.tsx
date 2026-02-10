@@ -70,7 +70,7 @@ import { GameScreenHeader } from "./GameScreenHeader";
 import { GameScreenMain } from "./GameScreenMain";
 import { GameScreenFooter } from "./GameScreenFooter";
 import { GameScreenOverlays } from "./GameScreenOverlays";
-import type { VignetteStage } from "@/lib/quadar/types";
+import type { VignetteStage } from "@/lib/game/types";
 
 export function GameScreen() {
   const dispatch = useAppDispatch();

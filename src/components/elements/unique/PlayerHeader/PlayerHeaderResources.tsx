@@ -1,5 +1,5 @@
 import { Sparkles, Droplets, Activity } from "lucide-react";
-import type { Player } from "@/lib/quadar/types";
+import type { Player } from "@/lib/game/types";
 
 export function PlayerHeaderResources({ player }: { player: Player }) {
   return (

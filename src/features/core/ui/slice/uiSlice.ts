@@ -1,4 +1,4 @@
-import type { StageOfScene } from '@/lib/quadar/types';
+import type { StageOfScene } from '@/lib/game/types';
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 
 interface UIState {

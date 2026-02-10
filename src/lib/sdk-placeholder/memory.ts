@@ -1,5 +1,5 @@
 
-import { Player, Room, GameLogEntry } from '@/lib/quadar/types';
+import { Player, Room, GameLogEntry } from '@/lib/game/types';
 
 const STORAGE_KEY = 'forboc_platform_state_v1';
 

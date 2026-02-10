@@ -2,7 +2,7 @@
 
 import { Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { GameLogEntry } from "@/lib/quadar/types";
+import type { GameLogEntry } from "@/lib/game/types";
 import { RuneSigil } from "./Runes";
 import { useEffect, useRef } from "react";
 
@@ -33,7 +33,7 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
                 "leading-relaxed pl-1.5 border-l-2 wrap-break-word",
                 log.type === "combat" && "text-palette-accent-red border-palette-border-red",
                 log.type === "system" && "text-palette-accent-cyan border-palette-border",
-                log.type === "loom" && "text-palette-accent-magic border-palette-border bg-palette-accent-magic/10 p-1 italic",
+                log.type === "oracle" && "text-palette-accent-magic border-palette-border bg-palette-accent-magic/10 p-1 italic",
                 log.type === "exploration" && "text-palette-muted-light border-palette-border"
               )}
             >

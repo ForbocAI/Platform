@@ -1,6 +1,7 @@
 import { Stats, Enemy, Player, Spell } from "./types";
 import { calculateEffectiveStats } from "./items";
 import { parseDiceString } from "./dice";
+import { SPELLS } from "./mechanics";
 
 export interface CombatResult {
     hit: boolean;
@@ -67,22 +68,24 @@ export function resolveEnemyAttack(
 ): CombatResult {
     const effectiveDefender = calculateEffectiveStats(defender);
 
+    // AI Logic: Simple decision making
+    // 60% chance to use ability if available
+    let spell: Spell | undefined;
+    if (attacker.spells && attacker.spells.length > 0 && Math.random() < 0.6) {
+        const spellId = attacker.spells[Math.floor(Math.random() * attacker.spells.length)];
+        spell = SPELLS[spellId];
+    }
+
+    // Roll Combat Total
+    // If spell, add potential spell modifier? Currently spells don't have accuracy mods in this system, 
+    // but we can add attackerBonus if needed from GroupScore.
     let attackerTotal = rollCombatTotal(attacker);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
     let defenderTotal = rollCombatTotal(effectiveDefender);
     defenderTotal += groupScore?.defenderBonus ?? 0;
 
-    // Check vs AC? 
-    // The previous logic was contest roll. 
-    // "higher total wins"
-    // Also AC is in Stats now. Should AC be a threshold or modifier?
-    // Familiar doc doesn't explicitly specify AC vs Dodge. 
-    // "Shadows of Fate: d20 + Str + Agi + Arcane + optional spell modifier. Higher total wins."
-    // Let's stick to contest roll for now. If Defender wins, it's a miss/block.
-
-    // Maybe AC adds to the defender total?
-    // Let's add AC to defender's total for defensive rolls.
+    // AC Defensive Bonus
     defenderTotal += effectiveDefender.ac ?? 0;
 
     const isHit = attackerTotal > defenderTotal;
@@ -90,11 +93,34 @@ export function resolveEnemyAttack(
     let message = "";
 
     if (isHit) {
-        const diff = attackerTotal - defenderTotal;
-        damage = Math.max(1, Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1);
-        message = `${attacker.name} strikes you for ${damage} damage!`;
+        if (spell) {
+            // Spell Attack
+            if (spell.damage) {
+                damage = parseDiceString(spell.damage, attacker); // Attacker uses their own Stats
+            } else {
+                // Fallback for utility spells or un-stat-ed spells
+                const diff = attackerTotal - defenderTotal;
+                damage = Math.floor(diff / 3) + 1;
+            }
+            damage = Math.max(1, damage);
+
+            let effectMsg = "";
+            if (spell.effect) {
+                effectMsg = spell.effect(attacker, effectiveDefender);
+            }
+            message = `${attacker.name} casts ${spell.name}! It hits you for ${damage} damage! ${effectMsg ? `(${effectMsg})` : ""}`;
+        } else {
+            // Basic Attack
+            const diff = attackerTotal - defenderTotal;
+            damage = Math.max(1, Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1);
+            message = `${attacker.name} strikes you for ${damage} damage!`;
+        }
     } else {
-        message = `${attacker.name} attacks but you evade/block. Miss!`;
+        if (spell) {
+            message = `${attacker.name} tries to cast ${spell.name}, but you evade the effect!`;
+        } else {
+            message = `${attacker.name} attacks but you evade/block. Miss!`;
+        }
     }
 
     return {

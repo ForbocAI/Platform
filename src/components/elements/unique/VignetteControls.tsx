@@ -1,6 +1,6 @@
 "use client";
 
-import type { VignetteStage } from "@/lib/quadar/types";
+import type { VignetteStage } from "@/lib/game/types";
 
 const STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax", "Epilogue"];
 

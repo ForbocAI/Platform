@@ -1,7 +1,7 @@
 import { baseApi } from './baseApi';
 
 import { SDK } from '@/lib/sdk-placeholder';
-import type { Room, LoomResult, StageOfScene } from '@/lib/quadar/types';
+import type { Room, OracleResult, StageOfScene } from '@/lib/game/types';
 
 export const gameApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -14,7 +14,7 @@ export const gameApi = baseApi.injectEndpoints({
       keepUnusedDataFor: 0,
     }),
     consultOracle: build.mutation<
-      LoomResult,
+      OracleResult,
       { question: string; surgeCount: number; stage: StageOfScene }
     >({
       async queryFn({ question, surgeCount, stage }) {
@@ -29,14 +29,16 @@ export const gameApi = baseApi.injectEndpoints({
     }),
     navigate: build.mutation<
       { newRoom: Room },
-      { direction: string; currentRoom: Room }
+      { direction: string; currentRoom: Room; playerLevel?: number; roomsExplored?: number }
     >({
-      async queryFn({ direction, currentRoom }) {
+      async queryFn({ direction, currentRoom, playerLevel = 1, roomsExplored = 0 }) {
         const isValid = await SDK.Bridge.validateMove(currentRoom, direction);
         if (!isValid) {
           return { error: { status: 400, data: 'Invalid move' } };
         }
-        const newRoom = await SDK.Cortex.generateRoom();
+        const newRoom = await SDK.Cortex.generateRoom(undefined, undefined, {
+          context: { previousRoom: currentRoom, direction, playerLevel, roomsExplored },
+        });
         return { data: { newRoom } };
       },
     }),

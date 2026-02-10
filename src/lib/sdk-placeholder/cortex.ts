@@ -1,23 +1,19 @@
-import { Room, LoomResult, Biome, StageOfScene } from '@/lib/quadar/types';
-import { generateRoom, generateRoomWithOptions, generateStartRoom, consultLoom, GenerateStartRoomOptions } from '@/lib/quadar/engine';
+import { Room, OracleResult, Biome, StageOfScene } from '@/lib/game/types';
+import { generateRoom, generateRoomWithOptions, generateStartRoom, consultOracle as runOracle, GenerateStartRoomOptions, RoomGenContext } from '@/lib/game/engine';
 
-// Cortex: Emits narrative and simulation data ("The Mind")
 export const Cortex = {
     generateStartRoom: async (opts?: GenerateStartRoomOptions): Promise<Room> => {
         await new Promise(resolve => setTimeout(resolve, 300));
         return generateStartRoom(opts);
     },
 
-    // Simulates AI generation of a room description/state
-    generateRoom: async (id?: string, biomeOverride?: Biome, options?: { forceMerchant?: boolean }): Promise<Room> => {
-        // Simulate network latency
+    generateRoom: async (id?: string, biomeOverride?: Biome, options?: { forceMerchant?: boolean; context?: RoomGenContext | null }): Promise<Room> => {
         await new Promise(resolve => setTimeout(resolve, 300));
         return generateRoomWithOptions(id, biomeOverride, options);
     },
 
-    // Simulates AI oracle response (Loom of Fate)
-    consultOracle: async (question: string, surgeCount: number, _stage?: StageOfScene): Promise<LoomResult> => {
+    consultOracle: async (question: string, surgeCount: number, _stage?: StageOfScene): Promise<OracleResult> => {
         await new Promise(resolve => setTimeout(resolve, 500));
-        return consultLoom(question, surgeCount);
+        return runOracle(question, surgeCount);
     }
 };

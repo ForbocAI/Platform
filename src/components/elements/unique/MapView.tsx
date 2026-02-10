@@ -1,4 +1,4 @@
-import type { Room } from "@/lib/quadar/types";
+import type { Room } from "@/lib/game/types";
 import type { RoomCoordinates } from "@/features/game/slice/gameSlice";
 import { Map as MapIcon } from "lucide-react";
 

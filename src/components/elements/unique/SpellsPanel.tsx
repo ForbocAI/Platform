@@ -1,7 +1,7 @@
 "use client";
 
 import { X, Wand2 } from "lucide-react";
-import type { Player } from "@/lib/quadar/types";
+import type { Player } from "@/lib/game/types";
 
 interface SpellsPanelProps {
   player: Player;

@@ -40,7 +40,7 @@ export interface Player extends Stats {
     inventory: Item[];
     spells: string[]; // IDs of learned spells
     skills?: string[]; // IDs of unlocked skills (passive/active)
-    surgeCount: number; // For Loom of Fate
+    surgeCount: number; // For yes/no oracle
     ac?: number;
     equipment?: Partial<Record<EquipmentSlot, Item | null>>;
     spirit?: number;
@@ -96,6 +96,8 @@ export interface Room {
     enemies: Enemy[];
     allies?: { id: string; name: string }[];
     merchants?: Merchant[];
+    /** Materials and items scattered on the ground; player can pick up. */
+    groundLoot?: Item[];
     isBaseCamp?: boolean;
     features?: RoomFeature[];
 }
@@ -104,7 +106,26 @@ export type RoomFeature =
     | { type: "farming_plot"; crop?: "mushroom"; progress: number; ready: boolean }
     | { type: "crafting_station"; kind: "alchemy" | "smithing" };
 
-export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower" | "Military Installation" | "Eldritch Fortress" | "Labyrinthine Dungeon";
+export type Biome =
+  | "Ethereal Marshlands"
+  | "Toxic Wastes"
+  | "Haunted Chapel"
+  | "Obsidian Spire"
+  | "Quadar Tower"
+  | "Military Installation"
+  | "Eldritch Fortress"
+  | "Labyrinthine Dungeon"
+  | "Chromatic-Steel Fungi"
+  | "Chthonic Depths"
+  | "Static Sea of All Noise"
+  | "Twilight Alchemy Haven"
+  | "Abyss of Infernal Lore"
+  | "Precipice of the Shadowlands"
+  | "Rune Temples"
+  | "Crumbling Ruins"
+  | "Dimensional Nexus"
+  | "Cavernous Abyss"
+  | "The Sterile Chamber";
 export type Direction = "North" | "South" | "East" | "West";
 
 export interface Spell {
@@ -120,7 +141,7 @@ export interface GameLogEntry {
     id: string;
     timestamp: number;
     message: string;
-    type: "combat" | "exploration" | "system" | "loom";
+    type: "combat" | "exploration" | "system" | "oracle";
 }
 
 /** Quest kinds from playtest scope: reconnaissance, rescue, hostiles, merchant. */
@@ -150,7 +171,7 @@ export interface SessionScore {
     endTime: number | null;
 }
 
-export interface LoomResult {
+export interface OracleResult {
     answer: "Yes" | "No";
     qualifier?: "and" | "but" | "unexpectedly";
     description: string;

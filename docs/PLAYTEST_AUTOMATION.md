@@ -166,9 +166,10 @@ See `trade-panel`, `trade-merchant-*`, `trade-buy-*`, `trade-sell-*`.
 **Accelerated Autoplay:** Verified loop speed starts at 800ms and accelerates by 5% per tick down to 200ms. Bot behavior is significantly faster and smoother. Smart logic handles exploration (unvisited rooms priority), combat (spell usage), and economy (buy/sell).
 **Known Issue:** Death/Respawn modal interrupts autoplay; requires manual click "Reject (Die and Respawn)" to continue. Survival logic enhanced to flee if HP < 20% and enemies present.
 **Visual Feedback:** Combat animations verified. Enemy flashes on attack (`animate-enemy-attack`) and double-flashes on taking damage (`animate-enemy-damage`).
+**Combat Logic:** Enemy spellcasting verified. Enemies now use their specific class spells (e.g. Storm Titan casts Electrical Charge/Thunderous Slam) alongside basic attacks, with correct damage and effect logs.
 **Browser playtest (continued):** With `?deterministic=1&forceEnemy=1&lowHp=1`: Start vignette (e.g. "The Machine God" · Exposition), open Trade with merchant, complete a purchase → log "Purchased [item] from [merchant]"; vignette advances to "Rising Action" (button becomes "Advance to Climax"); Quests panel shows "Trade with 2 merchants: 1/2". Init, four quests, SCAN progress (1/5), trade panel, combat (ENGAGE) and vignette Start/Advance/End all verified. Session end on death and vignette advance on enemy defeat appear after respawn or kill in play.
 
-**Browser playtest (2026-02-09 - Comprehensive):** Systematic single-player playthrough via automation. **Verified:** Deterministic Init (Ashwalker Lvl 12, 120 HP); Movement/Scanning (Biomes: Ethereal Marshlands, Military Installation, etc.); Quests (Scan 5 sectors completed); Trading (Sold Relic Shard, Spirit +5); Combat (Engaged Gravewalker, logs confirmed damage/evade); Oracle (Question answered); Commune (Loom result); Inventory (Equipped items). **Improvements:** **UX Fix:** Engage button is now disabled when no hostiles are present in the room (preventing confusion). **Surge Logic Check:** Verified `engine.ts` implements Surge Count correctly per `quadar_ familiar.md` (Add 2 for Yes/No, Reset for qualifiers).
+**Browser playtest (2026-02-09 - Comprehensive):** Systematic single-player playthrough via automation. **Verified:** Deterministic Init (Ashwalker Lvl 12, 120 HP); Movement/Scanning (Biomes: Ethereal Marshlands, Military Installation, etc.); Quests (Scan 5 sectors completed); Trading (Sold Relic Shard, Spirit +5); Combat (Engaged Gravewalker, logs confirmed damage/evade); Oracle (Question answered); Commune (Oracle result); Inventory (Equipped items). **Improvements:** **UX Fix:** Engage button is now disabled when no hostiles are present in the room (preventing confusion). **Surge Logic Check:** Verified `engine.ts` implements Surge Count correctly per design doc (Add 2 for Yes/No, Reset for qualifiers).
 
 ---
 
@@ -207,6 +208,10 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 - Follow condensed.md for frontend architecture. No automated tests (Jest/Cypress), backend, db, or Expo. Web client only.
 
 **Suggested next steps:**
+0. Have all file names, folder names, function names, variable names, etc to be lore agnostic.
+0.5. Make sure the folder/file/function/engineering architecture represents a clear Entity-Component System. reference @Forboc/client/src
+0.75. Refactor files into subdomains prioritiezed by line count.
+0.8 Add vendor marketplace areas where there are lots of merchants to trade with selling different types of wares and servants/companions for hire.
 1. Read PLAYTEST_AUTOMATION.md (What was tested, Known issues) and the referenced design docs.
 2. **MANDATORY:** Use the browser tools (e.g. cursor-ide-browser) to open `http://localhost:3000` and verify flows: Init, Movement, SCAN, ENGAGE, COMMUNE, Oracle, Facts, Vignette, Concession, Merchants/Trading/Inventory, Level generation, Hazards, NPCs, autoplay, spells, abilities, weapons, player development, etc. Take a fresh snapshot before each interaction (refs go stale after actions). Take screenshots to confirm UI state.
 3. Identify discrepancies vs quadar_ familiar.md and quadar.md.

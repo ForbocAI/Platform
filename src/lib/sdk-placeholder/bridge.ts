@@ -1,5 +1,5 @@
 
-import { Player, Room } from '@/lib/quadar/types';
+import { Player, Room } from '@/lib/game/types';
 
 // Bridge: Validates actions and manages state rules ("The Body/Law")
 export const Bridge = {

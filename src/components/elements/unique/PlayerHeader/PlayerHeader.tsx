@@ -5,7 +5,7 @@ import { PlayerHeaderBars } from "./PlayerHeaderBars";
 import { PlayerHeaderResources } from "./PlayerHeaderResources";
 import { PlayerHeaderStats } from "./PlayerHeaderStats";
 import { PlayerHeaderMedia } from "./PlayerHeaderMedia";
-import type { Player } from "@/lib/quadar/types";
+import type { Player } from "@/lib/game/types";
 
 export function PlayerHeader({ player }: { player: Player }) {
   return (

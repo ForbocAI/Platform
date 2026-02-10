@@ -1,8 +1,8 @@
 "use client";
 
 import { PlayerHeader, StageSelector } from "@/components/elements/unique";
-import type { Player } from "@/lib/quadar/types";
-import type { StageOfScene } from "@/lib/quadar/types";
+import type { Player } from "@/lib/game/types";
+import type { StageOfScene } from "@/lib/game/types";
 
 export function GameScreenHeader({
   player,

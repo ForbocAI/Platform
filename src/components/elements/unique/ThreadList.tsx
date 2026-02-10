@@ -1,6 +1,6 @@
 "use client";
 
-import type { Thread } from "@/lib/quadar/types";
+import type { Thread } from "@/lib/game/types";
 import { cn } from "@/lib/utils";
 import { usePlayButtonSound } from "@/features/audio";
 

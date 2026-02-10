@@ -1,93 +1,18 @@
-
-import { Room, Biome, Enemy, Player, LoomResult, Merchant, Item } from "./types";
-import { UNEXPECTEDLY_TABLE, CLASS_TEMPLATES, ITEMS } from "./mechanics";
-
-const BIOMES: Biome[] = [
-    "Ethereal Marshlands",
-    "Toxic Wastes",
-    "Haunted Chapel",
-    "Obsidian Spire",
-    "Quadar Tower",
-    "Military Installation",
-    "Eldritch Fortress",
-    "Labyrinthine Dungeon"
-];
-
-const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
-    "Obsidian Warden": {
-        characterClass: "Obsidian Warden",
-        ac: 15, Str: 18, Agi: 8, Arcane: 10,
-        description: "A tower of black glass and malice.",
-        maxHp: 60, spells: ["obsidian_surge", "death_shard_strike"]
-    },
-    "Doomguard": {
-        characterClass: "Doomguard",
-        ac: 14, Str: 16, Agi: 10, Arcane: 5,
-        description: "A shell of armor powered by sheer hate.",
-        maxHp: 50, spells: ["hellfire_explosion", "dreadful_charge"]
-    },
-    "Ashwalker Renegade": {
-        characterClass: "Ashwalker",
-        ac: 13, Str: 12, Agi: 16, Arcane: 14,
-        description: "A fallen ranger turned to madness.",
-        maxHp: 40, spells: ["ember_dash", "relic_strike"]
-    },
-    "Iron Armored Guardian": {
-        characterClass: "Iron Armored Guardian",
-        ac: 16, Str: 17, Agi: 9, Arcane: 8,
-        description: "Heavily armored medieval swordfest knight.",
-        maxHp: 55, spells: ["ironclad_charge", "steel_shield_block"]
-    },
-    "Aether Spirit": {
-        characterClass: "Aether Spirit",
-        ac: 12, Str: 8, Agi: 15, Arcane: 18,
-        description: "A fleeting form of shimmering angles.",
-        maxHp: 35, spells: ["ethereal_phasing", "astral_bolt"]
-    },
-    "Thunder Trooper": {
-        characterClass: "Thunder Trooper",
-        ac: 13, Str: 13, Agi: 13, Arcane: 10,
-        description: "A raining commando with a love of carnage.",
-        maxHp: 45, spells: ["shotgun_barrage", "grenade_assault"]
-    },
-    "Storm Titan": {
-        characterClass: "Storm Titan",
-        ac: 18, Str: 20, Agi: 10, Arcane: 18,
-        description: "A hulking creature with quantum electric attacks.",
-        maxHp: 120, spells: ["electrical_charge", "thunderous_slam"]
-    },
-    "Flame Corps Brute": {
-        characterClass: "Flame Corps",
-        ac: 14, Str: 15, Agi: 11, Arcane: 14,
-        description: "A large, brutish phallic creature with a grenade launcher.",
-        maxHp: 65, spells: ["napalm_grenade", "inferno_overdrive"]
-    },
-    "Gravewalker": {
-        characterClass: "Gravewalker",
-        ac: 11, Str: 16, Agi: 8, Arcane: 12,
-        description: "A reanimated corpse, a dead wandering.",
-        maxHp: 70, spells: []
-    },
-    "Shadowhorn Juggernaut": {
-        characterClass: "Shadowhorn Juggernaut",
-        ac: 14, Str: 16, Agi: 17, Arcane: 10,
-        description: "An agile, horned creature with powerful melee attacks.",
-        maxHp: 60, spells: []
-    },
-    "Magma Leviathan": {
-        characterClass: "Magma Leviathan",
-        ac: 20, Str: 22, Agi: 8, Arcane: 16,
-        description: "A huge, massive lava creature from the core.",
-        maxHp: 200, spells: []
-    }
-};
+import { Room, Biome, Enemy, Player, Merchant, Item } from "./types";
+import { CLASS_TEMPLATES, ITEMS, MATERIALS } from "./mechanics";
+import { selectNextBiome, generateGroundLoot, generateRandomEnemy, BIOME_GROUND_LOOT, type RoomGenContext } from "./generation";
+import { getEnemyLoot } from "./generation/loot";
+export type { RoomGenContext } from "./generation";
+export { getEnemyLoot } from "./generation/loot";
+export { generateRandomEnemy } from "./generation";
+export { consultOracle } from "./oracle";
 
 export function initializePlayer(): Player {
     // Defines the "Starting Initiation" - Level 12 Ranger/Rogue (Ashwalker)
     const template = CLASS_TEMPLATES["Ashwalker"];
     return {
         id: "player_1",
-        name: "Kamenal", // The chronicler mentioned in docs
+        name: "Kamenal",
         level: 12,
         characterClass: "Ashwalker",
         ...template.baseStats,
@@ -133,24 +58,10 @@ export function initializePlayer(): Player {
     };
 }
 
-export function generateRandomEnemy(): Enemy {
-    const enemyNames = Object.keys(ENEMY_TEMPLATES);
-    const enemyName = enemyNames[Math.floor(Math.random() * enemyNames.length)];
-    const template = ENEMY_TEMPLATES[enemyName];
-    return {
-        id: Math.random().toString(36).substring(7),
-        name: enemyName,
-        ...template,
-        hp: template.maxHp || 10,
-        maxStress: 100,
-        stress: 0
-    } as Enemy;
-}
-
-export function generateRandomMerchant(): Merchant {
+export function generateRandomMerchant(biome?: Biome): Merchant {
     const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic"];
     const type = merchantTypes[Math.floor(Math.random() * merchantTypes.length)];
-    const wares = generateWares();
+    const wares = generateWares(biome);
     return {
         id: Math.random().toString(36).substring(7),
         name: `${type} ${Math.floor(Math.random() * 100)}`,
@@ -159,8 +70,8 @@ export function generateRandomMerchant(): Merchant {
     };
 }
 
-export function generateRoom(id?: string, biomeOverride?: Biome): Room {
-    const biome = biomeOverride || BIOMES[Math.floor(Math.random() * BIOMES.length)];
+export function generateRoom(id?: string, biomeOverride?: Biome, context?: RoomGenContext | null): Room {
+    const biome = biomeOverride ?? selectNextBiome(context);
     const nameParts: Record<Biome, string[]> = {
         "Ethereal Marshlands": ["Ghost", "Mist", "Dread", "Swamp", "Veil"],
         "Toxic Wastes": ["Sludge", "Rust", "Acid", "Wastes", "Pit"],
@@ -169,7 +80,18 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
         "Quadar Tower": ["Corridor", "Nexus", "Store Room", "Bunker", "Market"],
         "Military Installation": ["Barracks", "Armory", "Terminal", "Hangar", "Command"],
         "Eldritch Fortress": ["Bastion", "Stronghold", "Tower", "Gate", "Keep"],
-        "Labyrinthine Dungeon": ["Maze", "Passage", "Cell", "Catacomb", "Oubliette"]
+        "Labyrinthine Dungeon": ["Maze", "Passage", "Cell", "Catacomb", "Oubliette"],
+        "Chromatic-Steel Fungi": ["Pillar", "Spire", "Growth", "Canopy", "Nexus"],
+        "Chthonic Depths": ["Labyrinth", "Chamber", "Tunnel", "Grotto", "Crypt"],
+        "Static Sea of All Noise": ["Drift", "Shore", "Current", "Eddy", "Reef"],
+        "Twilight Alchemy Haven": ["Cauldron", "Still", "Garden", "Hearth", "Sanctum"],
+        "Abyss of Infernal Lore": ["Throat", "Maw", "Conduit", "Altar", "Shrine"],
+        "Precipice of the Shadowlands": ["Edge", "Brink", "Threshold", "Border", "Gate"],
+        "Rune Temples": ["Sanctum", "Altar", "Nave", "Crypt", "Shrine"],
+        "Crumbling Ruins": ["Vault", "Hulk", "Spire", "Bastion", "Keep"],
+        "Dimensional Nexus": ["Gate", "Vortex", "Conduit", "Threshold", "Fold"],
+        "Cavernous Abyss": ["Chasm", "Maw", "Hollow", "Pit", "Depth"],
+        "The Sterile Chamber": ["Theater", "Table", "Sanctum", "Vault", "Archives"],
     };
 
     const p1 = nameParts[biome][Math.floor(Math.random() * nameParts[biome].length)];
@@ -183,14 +105,30 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
         "Quadar Tower": "The central monolith of the realm, where reality itself seems to warp and decay.",
         "Military Installation": "Relics of a bygone era entwine with industrial machinations and complex alien tech.",
         "Eldritch Fortress": "Imposing structures of supernatural evil, eternally veiled in hatred and forbidden energies.",
-        "Labyrinthine Dungeon": "Convoluted mazes of winding corridors, illuminated by sickly, pallid lights."
+        "Labyrinthine Dungeon": "Convoluted mazes of winding corridors, illuminated by sickly, pallid lights.",
+        "Chromatic-Steel Fungi": "Colossal pillars of chromatic-steel rise like organic growth in cyberspace; neon reflections play upon shifting surfaces.",
+        "Chthonic Depths": "Subterranean labyrinths where echoes of forgotten whispers reverberate through ancient tunnels. Luminescent fungi illuminate the path.",
+        "Static Sea of All Noise": "A decaying land gripped by the enigmatic static. The very air hums with cosmic interference.",
+        "Twilight Alchemy Haven": "Verses of prose generate gnarled trees; holographic projections bathe the surroundings in an ethereal fusion of lore and twilight.",
+        "Abyss of Infernal Lore": "Conjured flames lick obsidian pillars. An intricate weave of cloned souls writhes along the data streams.",
+        "Precipice of the Shadowlands": "The boundaries between the known and the unknown blur. The horizon is an ever-shifting tapestry of twilight and dawn.",
+        "Rune Temples": "Ancient structures decorated with arcane symbols and mystical runes. The ambient glow casts shadowy tendrils that writhe in unearthly pollution.",
+        "Crumbling Ruins": "Forsaken remnants of erstwhile splendor. Decaying edifices bear witness to manifold demise. Power-laden artifacts and lore fragments may yet linger.",
+        "Dimensional Nexus": "A surreal sphere where reality is distorted and spatial anomalies abound. Platforms float in the void; pathways defy conventional physics.",
+        "Cavernous Abyss": "A subterranean network of twisting tunnels and sprawling caverns. Jagged rocks, pulsating lava pools, and the constant echo of distant rumblings.",
+        "The Sterile Chamber": "An operating table inscribed with ancient sigils pulsates in eerie half-light. Incisions pierce the veil between worlds; specters emerge from fissures. Entities ageless and vast scrutinize from beyond.",
     };
 
     const description = biomeDescriptions[biome] || "You stand in a strange, uncharted area.";
 
+    // Deeper biomes: higher enemy and hazard chance (story coherence)
+    const deepBiomes: Biome[] = ["Chthonic Depths", "Cavernous Abyss", "Abyss of Infernal Lore", "Dimensional Nexus", "Static Sea of All Noise", "Twilight Alchemy Haven", "Precipice of the Shadowlands", "Chromatic-Steel Fungi", "The Sterile Chamber", "Labyrinthine Dungeon", "Eldritch Fortress"];
+    const dangerFactor = deepBiomes.includes(biome) ? 1.25 : 1;
+
     const enemies: Enemy[] = [];
     const roll = Math.random() * 100;
-    if (roll > 70) {
+    const enemyThreshold = 70 / dangerFactor; // Deeper: enemy at roll > 56 instead of 70
+    if (roll > enemyThreshold) {
         enemies.push(generateRandomEnemy());
     }
 
@@ -199,15 +137,20 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
     if (p1.includes("Market") || p1.includes("Store")) merchantChance = 0.60;
 
     if (Math.random() < merchantChance) {
-        merchants.push(generateRandomMerchant());
+        merchants.push(generateRandomMerchant(biome));
     }
+
+    const hazardThreshold = 20 * dangerFactor; // Deeper: hazards at roll < 25 instead of 20
+    const hazardRoll = Math.random() * 100;
+
+    const groundLoot = generateGroundLoot(biome);
 
     return {
         id: id || Math.random().toString(36).substring(7),
         title: `${p1} ${p2}`,
         description,
         biome,
-        hazards: roll < 20 ? ["Toxic Air"] : [],
+        hazards: hazardRoll < hazardThreshold ? ["Toxic Air"] : [],
         exits: {
             North: Math.random() > 0.3 ? "new-room" : null,
             South: Math.random() > 0.3 ? "new-room" : null,
@@ -215,16 +158,23 @@ export function generateRoom(id?: string, biomeOverride?: Biome): Room {
             West: Math.random() > 0.3 ? "new-room" : null,
         },
         enemies,
-        merchants
+        merchants,
+        groundLoot,
     };
 }
 
-export function generateRoomWithOptions(id?: string, biomeOverride?: Biome, options?: { forceMerchant?: boolean }): Room {
-    const room = generateRoom(id, biomeOverride);
+export interface GenerateRoomOptions {
+    forceMerchant?: boolean;
+    /** Context for story-coherent biome progression (previous room, direction, etc.). */
+    context?: RoomGenContext | null;
+}
+
+export function generateRoomWithOptions(id?: string, biomeOverride?: Biome, options?: GenerateRoomOptions): Room {
+    const room = generateRoom(id, biomeOverride, options?.context);
     if (options?.forceMerchant && (!room.merchants || room.merchants.length === 0)) {
         const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic"];
         const type = merchantTypes[Math.floor(Math.random() * merchantTypes.length)];
-        const wares = generateWares();
+        const wares = generateWares(room.biome);
         room.merchants = [{
             id: Math.random().toString(36).substring(7),
             name: `${type} ${Math.floor(Math.random() * 100)}`,
@@ -235,13 +185,21 @@ export function generateRoomWithOptions(id?: string, biomeOverride?: Biome, opti
     return room;
 }
 
-function generateWares(): Item[] {
-    const numItems = Math.floor(Math.random() * 3) + 3; // 3-5 items
+function generateWares(biome?: Biome): Item[] {
     const wares: Item[] = [];
-    for (let i = 0; i < numItems; i++) {
+    const numGear = Math.floor(Math.random() * 2) + 2; // 2-3 gear items
+    for (let i = 0; i < numGear; i++) {
         const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-        // Clone to avoid reference issues
         wares.push({ ...randomItem, id: `${randomItem.id}_${Math.random().toString(36).substring(7)}` });
+    }
+    const numMaterials = Math.floor(Math.random() * 3) + 1; // 1-3 material items
+    const materialPool = biome && BIOME_GROUND_LOOT[biome]
+        ? BIOME_GROUND_LOOT[biome]!.map((e) => MATERIALS.find((m) => m.id === e.materialId)).filter((m): m is Item => !!m)
+        : MATERIALS;
+    const pool = materialPool.length > 0 ? materialPool : MATERIALS;
+    for (let i = 0; i < numMaterials; i++) {
+        const mat = pool[Math.floor(Math.random() * pool.length)];
+        if (mat) wares.push({ ...mat, id: `${mat.id}_${Math.random().toString(36).substring(7)}` });
     }
     return wares;
 }
@@ -258,7 +216,7 @@ export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
     if (opts?.deterministic) {
         const room: Room = {
             id: opts.id ?? "start_room",
-            title: "Recon Base Camp",
+            title: "Recon Base Camp // STORE ROOM",
             description: "A secure perimeter established within the ruins. A small hydroponic plot glows with UV light, and a makeshift workbench sits ready.",
             biome: opts.biome ?? "Quadar Tower",
             hazards: [],
@@ -273,7 +231,7 @@ export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
             ]
         };
         if (opts.forceMerchant) {
-            room.merchants = [generateRandomMerchant()];
+            room.merchants = [generateRandomMerchant(room.biome)];
         }
         // Force enemy even if protected if explicitly requested by playtest param (e.g. unit tests)
         if (opts.forceEnemy) {
@@ -303,104 +261,3 @@ export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
     return room;
 }
 
-// --- Loom of Fate Logic ---
-
-export function consultLoom(question: string, currentSurgeCount: number): LoomResult {
-    const d100 = Math.floor(Math.random() * 100) + 1;
-    let modifiedRoll = d100;
-
-    // Surge Logic: 
-    // If d100 > 50, ADD surge.
-    // If d100 <= 50, SUBTRACT surge.
-    if (d100 > 50) {
-        modifiedRoll += currentSurgeCount;
-    } else {
-        modifiedRoll -= currentSurgeCount;
-    }
-
-    // Clamp roll
-    if (modifiedRoll < 1) modifiedRoll = 1;
-    if (modifiedRoll > 100) modifiedRoll = 100;
-
-    let resultString = "";
-    let answer: "Yes" | "No";
-    let qualifier: "and" | "but" | "unexpectedly" | undefined;
-    let newSurge = 0; // The amount to UPDATE the current with or reset (if 0, implies reset? No, rules say "Add 2" or "Reset")
-
-    // Table 1 Logic
-    // Yes, and unexpectedly: 96-100+
-    // Yes, but: 86-95
-    // Yes, and: 81-85
-    // Yes: 51-80
-    // No: 21-50
-    // No, and: 16-20
-    // No, but: 6-15
-    // No, and unexpectedly: 1-5 (and < 1)
-
-    if (modifiedRoll >= 96) {
-        answer = "Yes";
-        qualifier = "unexpectedly";
-        resultString = "Yes, and unexpectedly...";
-    } else if (modifiedRoll >= 86) {
-        answer = "Yes";
-        qualifier = "but";
-        resultString = "Yes, but...";
-    } else if (modifiedRoll >= 81) {
-        answer = "Yes";
-        qualifier = "and";
-        resultString = "Yes, and...";
-    } else if (modifiedRoll >= 51) {
-        answer = "Yes";
-        resultString = "Yes.";
-    } else if (modifiedRoll >= 21) {
-        answer = "No";
-        resultString = "No.";
-    } else if (modifiedRoll >= 16) {
-        answer = "No";
-        qualifier = "and";
-        resultString = "No, and...";
-    } else if (modifiedRoll >= 6) {
-        answer = "No";
-        qualifier = "but";
-        resultString = "No, but...";
-    } else {
-        answer = "No";
-        qualifier = "unexpectedly";
-        resultString = "No, and unexpectedly...";
-    }
-
-    let description = resultString;
-
-    // Surge Update Rule:
-    // "If the answer is anything other than plain 'yes' or 'no', reset the Surge Count."
-    // "If the answer is just 'yes' or 'no', add another two (2) to the Surge Count."
-
-    if (!qualifier) {
-        // Plain Yes/No
-        newSurge = 2; // Helper will need to handle this as "add 2"
-    } else {
-        // Qualifier exists (and, but, unexpectedly)
-        newSurge = -1; // Helper will need to handle this as "reset to 0"
-    }
-
-    let unexpectedRoll: number | undefined;
-    let unexpectedEventName: string | undefined;
-
-    // Handle Unexpectedly Table
-    if (qualifier === "unexpectedly") {
-        const d20 = Math.floor(Math.random() * 20) + 1;
-        unexpectedRoll = d20;
-        unexpectedEventName = UNEXPECTEDLY_TABLE[d20 - 1] || "Re-roll";
-        description += ` [EVENT: ${unexpectedEventName}]`;
-    }
-
-    return {
-        answer,
-        qualifier,
-        description,
-        roll: modifiedRoll,
-        surgeUpdate: newSurge,
-        unexpectedRoll,
-        unexpectedEvent: unexpectedEventName
-    };
-}

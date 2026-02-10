@@ -1,5 +1,5 @@
 import { Activity, Skull, ShoppingBag, Clapperboard, Hash } from "lucide-react";
-import type { Room } from "@/lib/quadar/types";
+import type { Room } from "@/lib/game/types";
 import { RuneSigil } from "./Runes";
 import { useAppSelector } from "@/features/core/store";
 import { selectVignette, selectMainThread, selectCurrentScene } from "@/features/narrative/slice/narrativeSlice";

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { Player } from "@/lib/quadar/types";
+import type { Player } from "@/lib/game/types";
 
 export function PlayerHeaderIdentity({ player }: { player: Player }) {
   return (

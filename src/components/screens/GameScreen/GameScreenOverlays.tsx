@@ -1,7 +1,7 @@
 "use client";
 
 import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel } from "@/components/elements/unique";
-import type { Player } from "@/lib/quadar/types";
+import type { Player } from "@/lib/game/types";
 
 export function GameScreenOverlays({
   inventoryOpen,
@@ -29,10 +29,10 @@ export function GameScreenOverlays({
   onCloseSkills: () => void;
   onAcceptConcession?: (type: 'flee' | 'capture') => void;
   onRejectConcession?: () => void;
-  onEquipItem?: (itemId: string, slot: import("@/lib/quadar/types").EquipmentSlot) => void;
-  onUnequipItem?: (slot: import("@/lib/quadar/types").EquipmentSlot) => void;
+  onEquipItem?: (itemId: string, slot: import("@/lib/game/types").EquipmentSlot) => void;
+  onUnequipItem?: (slot: import("@/lib/game/types").EquipmentSlot) => void;
   onUseItem?: (itemId: string) => void;
-  activeMerchant?: import("@/lib/quadar/types").Merchant | null;
+  activeMerchant?: import("@/lib/game/types").Merchant | null;
   onCloseTrade?: () => void;
   onSelectSpell?: (spellId: string) => void;
 }) {
