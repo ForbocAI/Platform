@@ -64,5 +64,31 @@ export const ITEMS: Item[] = [
         type: "relic",
         bonus: { Arcane: 4 },
         cost: { spirit: 40, blood: 5 }
+    },
+    {
+        id: "contract_scout",
+        name: "Contract: Ashwalker Scout",
+        description: "Hires a skilled scout to join your party.",
+        type: "contract",
+        cost: { spirit: 50 },
+        contractDetails: {
+            servitorName: "Ashwalker Scout",
+            role: "Scout",
+            description: "A nimble explorer looking for work.",
+            maxHp: 40
+        }
+    },
+    {
+        id: "contract_mercenary",
+        name: "Contract: Iron Mercenary",
+        description: "Hires a tough warrior to fight for you.",
+        type: "contract",
+        cost: { spirit: 75, blood: 10 },
+        contractDetails: {
+            servitorName: "Iron Mercenary",
+            role: "Warrior",
+            description: "A seasoned fighter clad in iron.",
+            maxHp: 80
+        }
     }
 ];

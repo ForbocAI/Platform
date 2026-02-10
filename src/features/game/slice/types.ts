@@ -26,4 +26,7 @@ export interface InitializeGameOptions {
   deterministic?: boolean;
   forceEnemy?: boolean;
   lowHp?: boolean;
+  forceServitor?: boolean;
+  /** When true with forceServitor, servitor starts at 1 HP for quick death-state testing. */
+  lowServitorHp?: boolean;
 }

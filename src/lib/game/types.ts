@@ -48,6 +48,19 @@ export interface Player extends Stats {
     xp: number;
     maxXp: number;
     recipes: Recipe[];
+    servitors?: Servitor[];
+}
+
+export interface Servitor {
+    id: string;
+    name: string;
+    role: "Warrior" | "Scout" | "Mystic";
+    hp: number;
+    maxHp: number;
+    Str: number;
+    Agi: number;
+    Arcane: number;
+    description: string;
 }
 
 export interface Recipe {
@@ -73,10 +86,16 @@ export interface Item {
     id: string;
     name: string;
     description: string;
-    type: "weapon" | "armor" | "consumable" | "relic" | "resource";
+    type: "weapon" | "armor" | "consumable" | "relic" | "resource" | "contract";
     bonus?: Partial<Stats> & { ac?: number };
     effect?: string;
     cost?: { spirit: number; blood?: number };
+    contractDetails?: {
+        servitorName: string;
+        role: "Warrior" | "Scout" | "Mystic";
+        description: string;
+        maxHp: number;
+    };
 }
 
 export interface Merchant {
@@ -107,25 +126,25 @@ export type RoomFeature =
     | { type: "crafting_station"; kind: "alchemy" | "smithing" };
 
 export type Biome =
-  | "Ethereal Marshlands"
-  | "Toxic Wastes"
-  | "Haunted Chapel"
-  | "Obsidian Spire"
-  | "Quadar Tower"
-  | "Military Installation"
-  | "Eldritch Fortress"
-  | "Labyrinthine Dungeon"
-  | "Chromatic-Steel Fungi"
-  | "Chthonic Depths"
-  | "Static Sea of All Noise"
-  | "Twilight Alchemy Haven"
-  | "Abyss of Infernal Lore"
-  | "Precipice of the Shadowlands"
-  | "Rune Temples"
-  | "Crumbling Ruins"
-  | "Dimensional Nexus"
-  | "Cavernous Abyss"
-  | "The Sterile Chamber";
+    | "Ethereal Marshlands"
+    | "Toxic Wastes"
+    | "Haunted Chapel"
+    | "Obsidian Spire"
+    | "Quadar Tower"
+    | "Military Installation"
+    | "Eldritch Fortress"
+    | "Labyrinthine Dungeon"
+    | "Chromatic-Steel Fungi"
+    | "Chthonic Depths"
+    | "Static Sea of All Noise"
+    | "Twilight Alchemy Haven"
+    | "Abyss of Infernal Lore"
+    | "Precipice of the Shadowlands"
+    | "Rune Temples"
+    | "Crumbling Ruins"
+    | "Dimensional Nexus"
+    | "Cavernous Abyss"
+    | "The Sterile Chamber";
 export type Direction = "North" | "South" | "East" | "West";
 
 export interface Spell {

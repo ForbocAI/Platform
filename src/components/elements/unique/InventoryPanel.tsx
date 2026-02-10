@@ -8,10 +8,11 @@ interface InventoryPanelProps {
     onEquip: (itemId: string, slot: EquipmentSlot) => void;
     onUnequip: (slot: EquipmentSlot) => void;
     onUse: (itemId: string) => void;
+    onSacrifice: (itemId: string) => void;
     onClose: () => void;
 }
 
-export function InventoryPanel({ player, onEquip, onUnequip, onUse, onClose }: InventoryPanelProps) {
+export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice, onClose }: InventoryPanelProps) {
     const stats = calculateEffectiveStats(player);
 
     const renderItemBonus = (item: Item) => {
@@ -130,6 +131,14 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onClose }: I
                                             )}
                                             {item.type === "consumable" && (
                                                 <button onClick={() => onUse(item.id)} className="text-xs px-2 py-1 border border-palette-border text-palette-accent-cyan border-palette-accent-cyan/50 hover:bg-palette-accent-cyan/10 transition-colors uppercase tracking-wider" data-testid={`inventory-use-${item.id}`}>Use</button>
+                                            )}
+                                            {item.type === "contract" && (
+                                                <button onClick={() => onUse(item.id)} className="text-xs px-2 py-1 border border-palette-border text-palette-accent-warm border-palette-accent-warm/50 hover:bg-palette-accent-warm/10 transition-colors uppercase tracking-wider" data-testid={`inventory-use-${item.id}`}>Sign</button>
+                                            )}
+                                            {item.cost?.spirit && item.cost.spirit > 0 && (
+                                                <button onClick={() => onSacrifice(item.id)} className="text-xs px-2 py-1 border border-palette-border text-palette-accent-violet border-palette-accent-violet/50 hover:bg-palette-accent-violet/10 transition-colors uppercase tracking-wider" data-testid={`inventory-sacrifice-${item.id}`}>
+                                                    Sacrifice ({Math.max(1, Math.floor(item.cost.spirit / 2))})
+                                                </button>
                                             )}
                                         </div>
                                     </div>

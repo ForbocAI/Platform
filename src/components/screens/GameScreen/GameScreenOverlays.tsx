@@ -1,6 +1,6 @@
 "use client";
 
-import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel } from "@/components/elements/unique";
+import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel, PartyPanel } from "@/components/elements/unique";
 import type { Player } from "@/lib/game/types";
 
 export function GameScreenOverlays({
@@ -11,6 +11,8 @@ export function GameScreenOverlays({
   onCloseInventory,
   onCloseSpells,
   onCloseSkills,
+  partyPanelOpen,
+  onCloseParty,
   onAcceptConcession,
   onRejectConcession,
   onEquipItem,
@@ -19,6 +21,7 @@ export function GameScreenOverlays({
   activeMerchant,
   onCloseTrade,
   onSelectSpell,
+  onSacrificeItem,
 }: {
   inventoryOpen: boolean;
   spellsPanelOpen: boolean;
@@ -27,6 +30,8 @@ export function GameScreenOverlays({
   onCloseInventory: () => void;
   onCloseSpells: () => void;
   onCloseSkills: () => void;
+  partyPanelOpen: boolean;
+  onCloseParty: () => void;
   onAcceptConcession?: (type: 'flee' | 'capture') => void;
   onRejectConcession?: () => void;
   onEquipItem?: (itemId: string, slot: import("@/lib/game/types").EquipmentSlot) => void;
@@ -35,6 +40,7 @@ export function GameScreenOverlays({
   activeMerchant?: import("@/lib/game/types").Merchant | null;
   onCloseTrade?: () => void;
   onSelectSpell?: (spellId: string) => void;
+  onSacrificeItem?: (itemId: string) => void;
 }) {
   return (
     <>
@@ -45,6 +51,7 @@ export function GameScreenOverlays({
           onEquip={(id, slot) => onEquipItem?.(id, slot)}
           onUnequip={(slot) => onUnequipItem?.(slot)}
           onUse={(id) => onUseItem?.(id)}
+          onSacrifice={(id) => onSacrificeItem?.(id)}
         />
       )}
       {spellsPanelOpen && (
@@ -58,6 +65,12 @@ export function GameScreenOverlays({
         <SkillsPanel
           player={player}
           onClose={onCloseSkills}
+        />
+      )}
+      {partyPanelOpen && (
+        <PartyPanel
+          player={player}
+          onClose={onCloseParty}
         />
       )}
       <ConcessionModal

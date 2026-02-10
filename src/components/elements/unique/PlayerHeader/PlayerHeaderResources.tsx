@@ -1,7 +1,7 @@
-import { Sparkles, Droplets, Activity } from "lucide-react";
+import { Sparkles, Droplets, Activity, Users } from "lucide-react";
 import type { Player } from "@/lib/game/types";
 
-export function PlayerHeaderResources({ player }: { player: Player }) {
+export function PlayerHeaderResources({ player, onPartyClick }: { player: Player; onPartyClick?: () => void }) {
   return (
     <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2" title="Spirit / Blood / Surge">
       <div className="flex items-center gap-1" title="Spirit">
@@ -19,6 +19,13 @@ export function PlayerHeaderResources({ player }: { player: Player }) {
         <span className="hidden sm:inline text-palette-muted-light uppercase tracking-widest text-[10px] sm:text-xs leading-tight">Surge</span>
         <span className="hidden sm:inline font-black text-palette-white tabular-nums leading-tight">{player.surgeCount}</span>
       </div>
+      {(player.servitors?.length ?? 0) > 0 && (
+        <button onClick={onPartyClick} className="flex items-center gap-1 hover:brightness-125 transition-all outline-none focus-visible:ring-1 focus-visible:ring-palette-accent-lime rounded px-1" title="View Servitors">
+          <Users className="app-icon text-palette-accent-lime shrink-0" aria-hidden />
+          <span className="hidden sm:inline text-palette-muted-light uppercase tracking-widest text-[10px] sm:text-xs leading-tight">Servitors</span>
+          <span className="hidden sm:inline font-black text-palette-accent-lime tabular-nums leading-tight">{player.servitors!.length}</span>
+        </button>
+      )}
     </div>
   );
 }

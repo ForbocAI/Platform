@@ -16,8 +16,11 @@ export interface GroupScoreModifier {
     defenderBonus?: number;
 }
 
+// Basic stats fragment needed for combat rolls
+type CombatStats = { Str: number; Agi: number; Arcane: number };
+
 /** Shadows of Fate: d20 + Str + Agi + Arcane + optional spell modifier. Higher total wins. */
-function rollCombatTotal(stats: Stats, spellModifier = 0): number {
+function rollCombatTotal(stats: CombatStats, spellModifier = 0): number {
     const d20 = Math.floor(Math.random() * 20) + 1;
     return d20 + stats.Str + stats.Agi + stats.Arcane + spellModifier;
 }
@@ -180,4 +183,57 @@ export function resolveSpellDuel(
         roll: attackerTotal,
         message,
     };
+}
+
+export function resolveServitorAttack(
+    servitor: { name: string; Str: number; Agi: number; Arcane: number },
+    defender: Enemy,
+    groupScore?: GroupScoreModifier
+): CombatResult {
+    let attackerTotal = rollCombatTotal(servitor);
+    attackerTotal += groupScore?.attackerBonus ?? 0;
+
+    let defenderTotal = rollCombatTotal(defender);
+    defenderTotal += groupScore?.defenderBonus ?? 0;
+
+    const isHit = attackerTotal > defenderTotal;
+    let damage = 0;
+    let message = "";
+
+    if (isHit) {
+        const diff = attackerTotal - defenderTotal;
+        damage = Math.max(1, Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1);
+        message = `${servitor.name} attacks ${defender.name} for ${damage} damage!`;
+    } else {
+        message = `${servitor.name} attacks ${defender.name} but misses.`;
+    }
+
+    return { hit: isHit, damage, roll: attackerTotal, message };
+}
+
+export function resolveEnemyAttackOnServitor(
+    attacker: Enemy,
+    defender: { name: string; Str: number; Agi: number; Arcane: number; ac?: number },
+    groupScore?: GroupScoreModifier
+): CombatResult {
+    let attackerTotal = rollCombatTotal(attacker);
+    attackerTotal += groupScore?.attackerBonus ?? 0;
+
+    let defenderTotal = rollCombatTotal(defender);
+    defenderTotal += groupScore?.defenderBonus ?? 0;
+    // Servitors don't usually have AC yet, but if they do, add it
+    defenderTotal += defender.ac ?? 0;
+    const isHit = attackerTotal > defenderTotal;
+    let damage = 0;
+    let message = "";
+
+    if (isHit) {
+        const diff = attackerTotal - defenderTotal;
+        damage = Math.max(1, Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1);
+        message = `${attacker.name} strikes ${defender.name} for ${damage} damage!`;
+    } else {
+        message = `${attacker.name} attacks ${defender.name} but misses!`;
+    }
+
+    return { hit: isHit, damage, roll: attackerTotal, message };
 }

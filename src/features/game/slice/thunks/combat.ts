@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getEnemyLoot } from '@/lib/game/engine';
-import { resolveDuel, resolveEnemyAttack, resolveSpellDuel } from '@/lib/game/combat';
+import { resolveDuel, resolveEnemyAttack, resolveSpellDuel, resolveServitorAttack, resolveEnemyAttackOnServitor } from '@/lib/game/combat';
 import { SPELLS } from '@/lib/game/mechanics';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog, selectSpell } from '../actions';
@@ -63,29 +63,81 @@ export const engageHostiles = createAsyncThunk(
       return null;
     }
     const enemy = currentRoom.enemies[0];
+    let currentEnemyHp = enemy.hp;
+
+    // Player vs Enemy
     const duelResult = resolveDuel(player, enemy);
     dispatch(addLog({ message: duelResult.message, type: 'combat' }));
+
     let enemyDamage = 0;
-    let enemyDefeated = false;
     if (duelResult.hit) {
-      enemyDamage = duelResult.damage;
-      if (enemy.hp - enemyDamage <= 0) {
-        enemyDefeated = true;
-        dispatch(addLog({ message: `${enemy.name} has fallen!`, type: 'combat' }));
-        dispatch(addFact({ text: `Heroically defeated ${enemy.name}.`, questionKind: 'combat', isFollowUp: false }));
-        handleVignetteProgression(dispatch, getState);
+      enemyDamage += duelResult.damage;
+      currentEnemyHp -= duelResult.damage;
+    }
+
+    // Servitors vs Enemy
+    if (player.servitors && currentEnemyHp > 0) {
+      for (const servitor of player.servitors) {
+        if (servitor.hp > 0) {
+          const srvResult = resolveServitorAttack(servitor, enemy);
+          dispatch(addLog({ message: srvResult.message, type: 'combat' }));
+          if (srvResult.hit) {
+            enemyDamage += srvResult.damage;
+            currentEnemyHp -= srvResult.damage;
+          }
+        }
       }
     }
-    let playerDamage = 0;
-    if (!enemyDefeated) {
-      const enemyAttack = resolveEnemyAttack(enemy, player);
-      dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
-      if (enemyAttack.hit) playerDamage = enemyAttack.damage;
+
+    let enemyDefeated = false;
+    if (currentEnemyHp <= 0) {
+      enemyDefeated = true;
+      dispatch(addLog({ message: `${enemy.name} has fallen!`, type: 'combat' }));
+      dispatch(addFact({ text: `Heroically defeated ${enemy.name}.`, questionKind: 'combat', isFollowUp: false }));
+      handleVignetteProgression(dispatch, getState);
     }
+
+    let playerDamage = 0;
+    const servitorUpdates: { id: string; damageTaken: number }[] = [];
+
+    // Enemy Retaliation
+    if (!enemyDefeated) {
+      // Determine Target: Player or Servitor
+      let targetId = 'player';
+      const validServitors = player.servitors?.filter(c => c.hp > 0) || [];
+
+      // 25% chance to target a servitor if any exist
+      if (validServitors.length > 0 && Math.random() < 0.25) {
+        const victim = validServitors[Math.floor(Math.random() * validServitors.length)];
+        targetId = victim.id;
+
+        // Infer stats for victim if missing (though they should be there)
+        const victimStats = {
+          name: victim.name,
+          Str: victim.Str ?? 2,
+          Agi: victim.Agi ?? 2,
+          Arcane: victim.Arcane ?? 0,
+          ac: 10 // Default AC for servitors
+        };
+
+        const enemyAttack = resolveEnemyAttackOnServitor(enemy, victimStats);
+        dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
+        if (enemyAttack.hit) {
+          servitorUpdates.push({ id: victim.id, damageTaken: enemyAttack.damage });
+        }
+      } else {
+        // Target Player
+        const enemyAttack = resolveEnemyAttack(enemy, player);
+        dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
+        if (enemyAttack.hit) playerDamage = enemyAttack.damage;
+      }
+    }
+
     const lootItems = enemyDefeated ? getEnemyLoot(enemy.name) : [];
-    return { enemyId: enemy.id, enemyDamage, enemyDefeated, playerDamage, xpGain: enemyDefeated ? 50 : 0, lootItems };
+    return { enemyId: enemy.id, enemyDamage, enemyDefeated, playerDamage, servitorUpdates, xpGain: enemyDefeated ? 50 : 0, lootItems };
   }
 );
+
 
 export const respawnPlayer = createAsyncThunk('game/respawn', async (_, { dispatch }) => {
   dispatch(addLog({ message: 'Resurrecting...', type: 'system' }));

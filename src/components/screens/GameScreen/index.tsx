@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
@@ -28,6 +28,7 @@ import {
   equipItem,
   unequipItem,
   useItem,
+  sacrificeItem,
 } from "@/features/game/slice/gameSlice";
 import {
   selectOracleInput,
@@ -48,6 +49,8 @@ import {
   openTrade,
   closeTrade,
   selectActiveMerchantId,
+  selectPartyPanelOpen,
+  togglePartyPanel,
 } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound } from "@/features/audio";
 import {
@@ -87,6 +90,7 @@ export function GameScreen() {
   const inventoryOpen = useAppSelector(selectInventoryOpen);
   const spellsPanelOpen = useAppSelector(selectSpellsPanelOpen);
   const skillsPanelOpen = useAppSelector(selectSkillsPanelOpen);
+  const partyPanelOpen = useAppSelector(selectPartyPanelOpen);
   const showMap = useAppSelector(selectShowMap);
   const autoPlay = useAppSelector(selectAutoPlay);
   const threads = useAppSelector(selectThreads);
@@ -101,6 +105,7 @@ export function GameScreen() {
   const sessionComplete = useAppSelector(selectSessionComplete);
   const pendingQuestFacts = useAppSelector(selectPendingQuestFacts);
   const searchParams = useSearchParams();
+  const hasHonoredResetRef = useRef(false);
 
   useEffect(() => {
     if (pendingQuestFacts.length === 0) return;
@@ -132,14 +137,21 @@ export function GameScreen() {
       deterministic: params.get("deterministic") === "1",
       forceEnemy: params.get("forceEnemy") === "1",
       lowHp: params.get("lowHp") === "1",
+      forceServitor: params.get("forceServitor") === "1",
+      lowServitorHp: params.get("lowServitorHp") === "1",
+      reset: params.get("reset") === "1",
     };
   };
 
   useLayoutEffect(() => {
-    if (!isInitialized && !isLoading) {
-      dispatch(initializeGame(getInitOptions()));
+    const opts = getInitOptions();
+    const shouldReset = opts.reset && !hasHonoredResetRef.current;
+    const shouldInit = (!isInitialized && !isLoading) || shouldReset;
+    if (shouldInit) {
+      if (opts.reset) hasHonoredResetRef.current = true;
+      dispatch(initializeGame(opts));
     }
-  }, [isInitialized, isLoading, dispatch, searchParams]);
+  }, [isInitialized, isLoading, dispatch]);
 
   if (!isInitialized) {
     return (
@@ -173,6 +185,7 @@ export function GameScreen() {
         player={player}
         stage={stageOfScene}
         onStageChange={(s) => dispatch(setStageOfScene(s))}
+        onPartyClick={() => dispatch(togglePartyPanel())}
       />
       <GameScreenMain
         currentRoom={currentRoom}
@@ -229,6 +242,8 @@ export function GameScreen() {
         onCloseInventory={() => dispatch(toggleInventory())}
         onCloseSpells={() => dispatch(toggleSpellsPanel())}
         onCloseSkills={() => dispatch(toggleSkillsPanel())}
+        partyPanelOpen={partyPanelOpen}
+        onCloseParty={() => dispatch(togglePartyPanel())}
         onRejectConcession={() => dispatch(respawnPlayer())}
         onAcceptConcession={(type) => dispatch(addLog({ message: `You accepted concession: ${type}`, type: "system" }))}
         onEquipItem={(id, slot) => dispatch(equipItem({ itemId: id, slot }))}
@@ -237,6 +252,7 @@ export function GameScreen() {
         activeMerchant={activeMerchant}
         onCloseTrade={() => dispatch(closeTrade())}
         onSelectSpell={(id) => dispatch(selectSpell(id))}
+        onSacrificeItem={(id) => dispatch(sacrificeItem({ itemId: id }))}
       />
     </div>
   );

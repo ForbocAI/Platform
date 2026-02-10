@@ -114,6 +114,8 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 | **Level Progression / XP** | Defeat enemies to gain XP; Level Up at threshold | ✅ **Verified 2026-02-09:** Defeating enemy grants 50 XP (log "Gained 50 XP"). Bar updates. **Level Up:** Verified scaling (XP resets, Level++, MaxXP += 100, MaxHP += 10). **Level-up spell unlock:** At certain levels (e.g. Ashwalker 13–16) a new spell is unlocked and logged (e.g. "Unlocked: Smoldering Arsenal"). |
 | **Quests** | Init seeds four quests: "Scan 5 sectors", "Find a Fellow Ranger", "Defeat 3 hostiles", "Trade with 2 merchants". SCAN/move/combat/trade update progress. | ✅ **Implemented:** Quests panel (`quests-panel`) shows progress (e.g. "Scan 5 sectors: 2/5"). Completion adds log + Fact. Room exploration, SCAN, combat, and trade update progress. |
 | **Session completion / Scoring** | Complete all quests → session complete; score shows rooms explored, scans, foes defeated, quests completed, spirit earned. | ✅ **Implemented:** When all active quests are complete, `sessionComplete` is set; Quests panel shows "Session complete — Rooms: N | Scans: N | Foes: N | Quests: N | Spirit: N". |
+| **Companion Combat** | Load `?deterministic=1&forceMerchant=1&forceEnemy=1` (spawns Captain & Enemy). Trade -> Buy Contract -> Inventory -> Sign. Click "Engage enemy". | ✅ Companion participates in combat. Log shows "CompanionName attacks Enemy...". Enemy retaliates against Player OR Companion. |
+| **Servitor Management** | With a servitor hired (Servitors indicator visible in header), click "Servitors". | ✅ **Implemented:** Servitors panel opens showing servitor name, role, HP bar, and stats. |
 
 ### Reproduction steps (cursor-ide-browser)
 
@@ -169,7 +171,7 @@ See `trade-panel`, `trade-merchant-*`, `trade-buy-*`, `trade-sell-*`.
 **Combat Logic:** Enemy spellcasting verified. Enemies now use their specific class spells (e.g. Storm Titan casts Electrical Charge/Thunderous Slam) alongside basic attacks, with correct damage and effect logs.
 **Browser playtest (continued):** With `?deterministic=1&forceEnemy=1&lowHp=1`: Start vignette (e.g. "The Machine God" · Exposition), open Trade with merchant, complete a purchase → log "Purchased [item] from [merchant]"; vignette advances to "Rising Action" (button becomes "Advance to Climax"); Quests panel shows "Trade with 2 merchants: 1/2". Init, four quests, SCAN progress (1/5), trade panel, combat (ENGAGE) and vignette Start/Advance/End all verified. Session end on death and vignette advance on enemy defeat appear after respawn or kill in play.
 
-**Browser playtest (2026-02-09 - Comprehensive):** Systematic single-player playthrough via automation. **Verified:** Deterministic Init (Ashwalker Lvl 12, 120 HP); Movement/Scanning (Biomes: Ethereal Marshlands, Military Installation, etc.); Quests (Scan 5 sectors completed); Trading (Sold Relic Shard, Spirit +5); Combat (Engaged Gravewalker, logs confirmed damage/evade); Oracle (Question answered); Commune (Oracle result); Inventory (Equipped items). **Improvements:** **UX Fix:** Engage button is now disabled when no hostiles are present in the room (preventing confusion). **Surge Logic Check:** Verified `engine.ts` implements Surge Count correctly per design doc (Add 2 for Yes/No, Reset for qualifiers).
+**Browser playtest (2026-02-10 - Comprehensive):** Systematic single-player playthrough via automation. **Verified:** Deterministic Init (Ashwalker Lvl 12, 120 HP); Movement/Scanning (Biomes: Ethereal Marshlands, Military Installation, etc.); Quests (Scan 5 sectors completed); Trading (Sold Relic Shard, Spirit +5; Bought items); **Sacrifice:** Verified items with value (e.g. Rogue's Blade) show Sacrifice button. Clicking it removes item and grants Spirit (value/2). Log confirms action. **Marketplace Logic:** Engine now supports "Bustling Marketplace" rooms in "Market" areas (Quadar Tower) spawning 2-4 merchants. **Surge Logic Check:** Verified `engine.ts` implements Surge Count correctly per design doc (Add 2 for Yes/No, Reset for qualifiers).
 
 ---
 
@@ -186,7 +188,7 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 - **Game world / rules:** `@Forboc/notes/quadar.md` — Qua'dar setting, characters, classes, spells, Umbralyn, Quadar Tower.
 - **Currency / value system:** `@Forboc.AI/Platform/docs/CURRENCY_AUDIT.md` — spirit, blood, sacrifice (qvht/forboc macro vision; trading, sacrifice, gains).
 - additional context /Users/seandinwiddie/Documents/GitHub/qvht.github.io /Users/seandinwiddie/Documents/GitHub/forboc.github.io
-- **Code standards:** `@Forboc/notes/ref/standards/technology-maintenance/condensed.md` — FP/Redux, reducer-first. **Do NOT implement:** tests, logging, backend, db, or Expo.
+- **Code standards:** `@Forboc/notes/ref/standards/technology-maintenance/condensed.md` — FP/Redux, reducer-first. **Do NOT implement:** tests, backend, db, or Expo.
 - **Current status:** `@Forboc.AI/Platform/docs/PLAYTEST_AUTOMATION.md` — test coverage, Known issues, reproduction steps.
 
 **Scope:**
@@ -211,7 +213,7 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 0. Have all file names, folder names, function names, variable names, etc to be lore agnostic.
 0.5. Make sure the folder/file/function/engineering architecture represents a clear Entity-Component System. reference @Forboc/client/src
 0.75. Refactor files into subdomains prioritiezed by line count.
-0.8 Add vendor marketplace areas where there are lots of merchants to trade with selling different types of wares and servants/companions for hire.
+0.8 Add vendor marketplace areas where there are lots of merchants to trade with selling different types of wares and servants/servitors for hire.
 1. Read PLAYTEST_AUTOMATION.md (What was tested, Known issues) and the referenced design docs.
 2. **MANDATORY:** Use the browser tools (e.g. cursor-ide-browser) to open `http://localhost:3000` and verify flows: Init, Movement, SCAN, ENGAGE, COMMUNE, Oracle, Facts, Vignette, Concession, Merchants/Trading/Inventory, Level generation, Hazards, NPCs, autoplay, spells, abilities, weapons, player development, etc. Take a fresh snapshot before each interaction (refs go stale after actions). Take screenshots to confirm UI state.
 3. Identify discrepancies vs quadar_ familiar.md and quadar.md.

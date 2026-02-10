@@ -36,6 +36,11 @@ export const useItem = createAsyncThunk(
     if (itemIndex === -1) return;
     const item = player.inventory[itemIndex];
 
+    if (item.type === 'contract' && item.contractDetails) {
+      dispatch(addLog({ message: `You signed ${item.name}. ${item.contractDetails.servitorName} joins your party!`, type: 'system' }));
+      return { itemIndex, effect: 'hire_servitor' as const, contractDetails: item.contractDetails };
+    }
+
     if (item.type !== 'consumable') return;
 
     dispatch(addLog({ message: `Used ${item.name}.`, type: 'system' }));
@@ -88,5 +93,35 @@ export const unequipItem = createAsyncThunk(
 
     dispatch(addLog({ message: `Unequipped ${player.equipment[slot]?.name}.`, type: 'system' }));
     return { slot };
+  }
+);
+
+export const sacrificeItem = createAsyncThunk(
+  'game/sacrificeItem',
+  async ({ itemId }: { itemId: string }, { getState, dispatch }) => {
+    const state = getState() as { game: import('../types').GameState };
+    const { player } = state.game;
+    if (!player) return;
+
+    const itemIndex = player.inventory.findIndex((i) => i.id === itemId);
+    if (itemIndex === -1) return;
+
+    const item = player.inventory[itemIndex];
+    const value = item.cost?.spirit || 0;
+
+    if (value <= 0) return;
+
+    const gain = Math.max(1, Math.floor(value / 2));
+
+    dispatch(addLog({ message: `Sacrificed ${item.name} for ${gain} Spirit.`, type: 'system' }));
+    dispatch(
+      addFact({
+        text: `Sacrificed ${item.name} to the void.`,
+        questionKind: 'sacrifice',
+        isFollowUp: false,
+      })
+    );
+
+    return { itemIndex, gain };
   }
 );

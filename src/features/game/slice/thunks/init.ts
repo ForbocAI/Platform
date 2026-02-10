@@ -18,6 +18,18 @@ export const initializeGame = createAsyncThunk(
     if (options?.lowHp) {
       player.hp = 5;
     }
+    if (options?.forceServitor) {
+      const servitorHp = options.lowServitorHp ? 1 : 100;
+      player.servitors = [{
+        id: "test_servitor_1",
+        name: "Doomguard Veteran",
+        role: "Warrior",
+        hp: servitorHp,
+        maxHp: servitorHp,
+        Str: 4, Agi: 2, Arcane: 0,
+        description: "A seasoned warrior hired for testing."
+      }];
+    }
     const initialRoom = await SDK.Cortex.generateStartRoom({
       deterministic: options?.deterministic,
       forceMerchant: options?.forceMerchant,

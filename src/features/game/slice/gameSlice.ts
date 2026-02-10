@@ -11,23 +11,24 @@ import type { GameState } from './types';
 export type { RoomCoordinates, InitializeGameOptions } from './types';
 export { addLog, selectSpell, clearPendingQuestFacts } from './actions';
 export {
-  initializeGame,
-  askOracle,
-  communeWithVoid,
-  movePlayer,
-  scanSector,
-  castSpell,
-  engageHostiles,
-  respawnPlayer,
-  tradeBuy,
-  tradeSell,
-  pickUpGroundLoot,
-  useItem,
-  equipItem,
-  unequipItem,
-  harvestCrop,
-  craftItem,
-  runAutoplayTick,
+    initializeGame,
+    askOracle,
+    communeWithVoid,
+    movePlayer,
+    scanSector,
+    castSpell,
+    engageHostiles,
+    respawnPlayer,
+    tradeBuy,
+    tradeSell,
+    pickUpGroundLoot,
+    useItem,
+    sacrificeItem,
+    equipItem,
+    unequipItem,
+    harvestCrop,
+    craftItem,
+    runAutoplayTick,
 } from './thunks';
 
 export const gameSlice = createSlice({
@@ -203,6 +204,27 @@ export const gameSlice = createSlice({
             state.player.hp -= actualPlayerDamage;
             if (state.player.hp < 0) state.player.hp = 0;
             state.player.stress += 1;
+
+            // Servitor Updates
+            const servitorUpdates = (action.payload as any).servitorUpdates;
+            if (servitorUpdates && state.player.servitors) {
+                for (const update of servitorUpdates) {
+                    const srvIndex = state.player.servitors.findIndex(c => c.id === update.id);
+                    if (srvIndex !== -1) {
+                        const srv = state.player.servitors[srvIndex];
+                        srv.hp -= update.damageTaken;
+                        if (srv.hp <= 0) {
+                            state.logs.push({
+                                id: Date.now().toString(),
+                                timestamp: Date.now(),
+                                message: `${srv.name} has fallen in battle!`,
+                                type: "combat"
+                            });
+                            state.player.servitors.splice(srvIndex, 1);
+                        }
+                    }
+                }
+            }
 
             // Update Enemy
             const enemies = state.currentRoom.enemies.map(e => {
@@ -463,6 +485,34 @@ export const gameSlice = createSlice({
             if (!action.payload || !state.player) return;
             const { itemIndex, effect } = action.payload;
 
+            // Handle Contracts
+            if (effect === 'hire_servitor') {
+                const contractDetails = (action.payload as any).contractDetails;
+                if (contractDetails) {
+                    // Remove item
+                    state.player.inventory.splice(itemIndex, 1);
+                    // Add servitor
+                    if (!state.player.servitors) state.player.servitors = [];
+                    let stats = { Str: 2, Agi: 2, Arcane: 0 };
+                    switch (contractDetails.role) {
+                        case "Warrior": stats = { Str: 4, Agi: 2, Arcane: 0 }; break;
+                        case "Scout": stats = { Str: 2, Agi: 4, Arcane: 0 }; break;
+                        case "Mystic": stats = { Str: 0, Agi: 2, Arcane: 4 }; break;
+                    }
+
+                    state.player.servitors.push({
+                        id: Date.now().toString(),
+                        name: contractDetails.servitorName,
+                        role: contractDetails.role,
+                        hp: contractDetails.maxHp,
+                        maxHp: contractDetails.maxHp,
+                        ...stats,
+                        description: contractDetails.description
+                    });
+                }
+                return;
+            }
+
             // Remove item
             state.player.inventory.splice(itemIndex, 1);
 
@@ -471,6 +521,21 @@ export const gameSlice = createSlice({
                 state.player.hp = Math.min(state.player.maxHp, state.player.hp + 20);
             } else if (effect === "heal_stress_10") {
                 state.player.stress = Math.max(0, state.player.stress - 10);
+            }
+        });
+
+        builder.addCase(thunks.sacrificeItem.fulfilled, (state, action) => {
+            if (!action.payload || !state.player) return;
+            const { itemIndex, gain } = action.payload;
+
+            // Remove item
+            state.player.inventory.splice(itemIndex, 1);
+
+            // Add spirit
+            state.player.spirit = (state.player.spirit || 0) + gain;
+
+            if (state.sessionScore) {
+                state.sessionScore.spiritEarned += gain;
             }
         });
 

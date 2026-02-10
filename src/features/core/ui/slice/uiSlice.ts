@@ -12,6 +12,7 @@ interface UIState {
   inventoryOpen: boolean;
   spellsPanelOpen: boolean;
   skillsPanelOpen: boolean;
+  partyPanelOpen: boolean;
   /** Set true when app/bootstrap runs (client); used to avoid hydration mismatch (e.g. runes). */
   clientHydrated: boolean;
   activeMerchantId: string | null;
@@ -28,6 +29,7 @@ const initialState: UIState = {
   inventoryOpen: false,
   spellsPanelOpen: false,
   skillsPanelOpen: false,
+  partyPanelOpen: false,
   clientHydrated: false,
   activeMerchantId: null,
 };
@@ -72,6 +74,9 @@ export const uiSlice = createSlice({
     toggleSkillsPanel: (state) => {
       state.skillsPanelOpen = !state.skillsPanelOpen;
     },
+    togglePartyPanel: (state) => {
+      state.partyPanelOpen = !state.partyPanelOpen;
+    },
     openTrade: (state, action: PayloadAction<string>) => {
       state.activeMerchantId = action.payload;
     },
@@ -89,7 +94,7 @@ export const uiSlice = createSlice({
   },
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, openTrade, closeTrade } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, togglePartyPanel, openTrade, closeTrade } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -142,6 +147,11 @@ export const selectSpellsPanelOpen = createSelector(
 export const selectSkillsPanelOpen = createSelector(
   [selectUIState],
   (ui) => ui.skillsPanelOpen
+);
+
+export const selectPartyPanelOpen = createSelector(
+  [selectUIState],
+  (ui) => ui.partyPanelOpen
 );
 
 export const selectClientHydrated = createSelector(

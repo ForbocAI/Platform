@@ -19,9 +19,9 @@ export function initializePlayer(): Player {
         hp: template.baseStats.maxHp,
         stress: 0,
         inventory: [
-            { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword." },
-            { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor." },
-            { id: "relic_shard", name: "Relic Shard", type: "relic", description: "A buzzing shard of old tech." }
+            { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword.", cost: { spirit: 5 } },
+            { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor.", cost: { spirit: 5 } },
+            { id: "relic_shard", name: "Relic Shard", type: "relic", description: "A buzzing shard of old tech.", cost: { spirit: 10 } }
         ],
         spells: template.startingSpells,
         surgeCount: 0,
@@ -58,14 +58,14 @@ export function initializePlayer(): Player {
     };
 }
 
-export function generateRandomMerchant(biome?: Biome): Merchant {
-    const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic"];
-    const type = merchantTypes[Math.floor(Math.random() * merchantTypes.length)];
-    const wares = generateWares(biome);
+export function generateRandomMerchant(biome?: Biome, forcedType?: string): Merchant {
+    const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic", "Mercenary Captain"];
+    const type = forcedType ?? merchantTypes[Math.floor(Math.random() * merchantTypes.length)];
+    const wares = generateWares(biome, type);
     return {
         id: Math.random().toString(36).substring(7),
-        name: `${type} ${Math.floor(Math.random() * 100)}`,
-        description: "A wandering soul with goods to trade.",
+        name: type === "Mercenary Captain" ? `Captain ${Math.floor(Math.random() * 100)}` : `${type} ${Math.floor(Math.random() * 100)}`,
+        description: type === "Mercenary Captain" ? "A battle-hardened veteran looking for clients." : "A wandering soul with goods to trade.",
         wares: wares
     };
 }
@@ -134,10 +134,24 @@ export function generateRoom(id?: string, biomeOverride?: Biome, context?: RoomG
 
     const merchants: Merchant[] = [];
     let merchantChance = 0.15;
-    if (p1.includes("Market") || p1.includes("Store")) merchantChance = 0.60;
 
-    if (Math.random() < merchantChance) {
-        merchants.push(generateRandomMerchant(biome));
+    if (p1.includes("Market")) {
+        // Bustling marketplace area
+        if (Math.random() < 0.90) {
+            const count = Math.floor(Math.random() * 3) + 2; // 2-4 merchants
+            for (let i = 0; i < count; i++) {
+                merchants.push(generateRandomMerchant(biome));
+            }
+        }
+    } else if (p1.includes("Store") || p1.includes("Shop")) {
+        merchantChance = 0.60;
+        if (Math.random() < merchantChance) {
+            merchants.push(generateRandomMerchant(biome));
+        }
+    } else {
+        if (Math.random() < merchantChance) {
+            merchants.push(generateRandomMerchant(biome));
+        }
     }
 
     const hazardThreshold = 20 * dangerFactor; // Deeper: hazards at roll < 25 instead of 20
@@ -172,9 +186,9 @@ export interface GenerateRoomOptions {
 export function generateRoomWithOptions(id?: string, biomeOverride?: Biome, options?: GenerateRoomOptions): Room {
     const room = generateRoom(id, biomeOverride, options?.context);
     if (options?.forceMerchant && (!room.merchants || room.merchants.length === 0)) {
-        const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic"];
+        const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic", "Mercenary Captain"];
         const type = merchantTypes[Math.floor(Math.random() * merchantTypes.length)];
-        const wares = generateWares(room.biome);
+        const wares = generateWares(room.biome, type);
         room.merchants = [{
             id: Math.random().toString(36).substring(7),
             name: `${type} ${Math.floor(Math.random() * 100)}`,
@@ -185,11 +199,21 @@ export function generateRoomWithOptions(id?: string, biomeOverride?: Biome, opti
     return room;
 }
 
-function generateWares(biome?: Biome): Item[] {
+function generateWares(biome?: Biome, merchantType?: string): Item[] {
     const wares: Item[] = [];
+
+    // Contracts for Mercenary Captain
+    if (merchantType === "Mercenary Captain" || Math.random() < 0.1) {
+        const contracts = ITEMS.filter(i => i.type === "contract");
+        if (contracts.length > 0) {
+            const contract = contracts[Math.floor(Math.random() * contracts.length)];
+            wares.push({ ...contract, id: `${contract.id}_${Math.random().toString(36).substring(7)}` });
+        }
+    }
+
     const numGear = Math.floor(Math.random() * 2) + 2; // 2-3 gear items
     for (let i = 0; i < numGear; i++) {
-        const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+        const randomItem = ITEMS.filter(i => i.type !== "contract")[Math.floor(Math.random() * ITEMS.filter(i => i.type !== "contract").length)];
         wares.push({ ...randomItem, id: `${randomItem.id}_${Math.random().toString(36).substring(7)}` });
     }
     const numMaterials = Math.floor(Math.random() * 3) + 1; // 1-3 material items
@@ -231,7 +255,8 @@ export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
             ]
         };
         if (opts.forceMerchant) {
-            room.merchants = [generateRandomMerchant(room.biome)];
+            // Force Mercenary Captain for reliable automation of Servitor Hiring
+            room.merchants = [generateRandomMerchant(room.biome, "Mercenary Captain")];
         }
         // Force enemy even if protected if explicitly requested by playtest param (e.g. unit tests)
         if (opts.forceEnemy) {
