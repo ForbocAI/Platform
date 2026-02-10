@@ -16,6 +16,7 @@ export function GameScreenFooter({
   onCommune,
   onOpenInventory,
   onOpenSpells,
+  onOpenSkills,
   autoPlay,
   onToggleAutoPlay,
 }: {
@@ -31,6 +32,7 @@ export function GameScreenFooter({
   onCommune: () => void;
   onOpenInventory?: () => void;
   onOpenSpells?: () => void;
+  onOpenSkills?: () => void;
   autoPlay: boolean;
   onToggleAutoPlay: () => void;
 }) {
@@ -53,6 +55,7 @@ export function GameScreenFooter({
         onCommune={onCommune}
         onOpenInventory={onOpenInventory}
         onOpenSpells={onOpenSpells}
+        onOpenSkills={onOpenSkills}
         autoPlay={autoPlay}
         onToggleAutoPlay={onToggleAutoPlay}
       />

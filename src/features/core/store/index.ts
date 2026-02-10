@@ -52,7 +52,12 @@ startAppListening({
   effect: async (_, listenerApi) => {
     const state = listenerApi.getState();
     if (!state.game.player) {
-      await listenerApi.dispatch(initializeGame());
+      let forceMerchant = false;
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        forceMerchant = params.get('forceMerchant') === '1';
+      }
+      await listenerApi.dispatch(initializeGame({ forceMerchant }));
     }
   },
 });

@@ -1,4 +1,4 @@
-import { Map as MapIcon, Crosshair, Package, Play, Square, Swords, MessageCircle, Wand2, Box } from "lucide-react";
+import { Map as MapIcon, Crosshair, Package, Play, Square, Swords, MessageCircle, Wand2, Box, Sparkles } from "lucide-react";
 import { GameButton, NavButton } from "../generic";
 import type { Player, Room } from "@/lib/quadar/types";
 
@@ -12,6 +12,7 @@ export function ActionDeck({
   onCommune,
   onOpenInventory,
   onOpenSpells,
+  onOpenSkills,
   autoPlay,
   onToggleAutoPlay,
 }: {
@@ -24,6 +25,7 @@ export function ActionDeck({
   onCommune: () => void;
   onOpenInventory?: () => void;
   onOpenSpells?: () => void;
+  onOpenSkills?: () => void;
   autoPlay?: boolean;
   onToggleAutoPlay?: () => void;
 }) {
@@ -97,6 +99,30 @@ export function ActionDeck({
                 title={spell}
               >
                 <Wand2 className="app-icon" />
+              </div>
+            ))}
+          </div>
+        </button>
+        <button
+          type="button"
+          onClick={onOpenSkills}
+          className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-gold/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
+          data-testid="skills-toggle"
+          aria-label="View skills"
+          title="View skills"
+        >
+          <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1 whitespace-nowrap">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">View skills</span>
+          </span>
+          <div className="flex gap-px">
+            {(player.skills ?? []).map((skill) => (
+              <div
+                key={skill}
+                className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
+                title={skill}
+              >
+                <Sparkles className="app-icon" />
               </div>
             ))}
           </div>

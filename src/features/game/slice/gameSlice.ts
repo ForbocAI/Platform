@@ -1,12 +1,14 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Player, Room, GameLogEntry, LoomResult, Enemy } from '@/lib/quadar/types';
+import { Player, Room, GameLogEntry, LoomResult, Enemy, ActiveQuest, SessionScore } from '@/lib/quadar/types';
 import { initializePlayer, generateRandomEnemy, generateRandomMerchant } from '@/lib/quadar/engine';
 import { SDK } from '@/lib/sdk-placeholder';
-import { addFact } from '@/features/narrative/slice/narrativeSlice';
+import { addFact, advanceVignetteStage } from '@/features/narrative/slice/narrativeSlice';
 import { resolveDuel, resolveEnemyAttack, resolveSpellDuel } from '@/lib/quadar/combat';
-import { SPELLS } from '@/lib/quadar/mechanics';
+import { SPELLS, getSpellUnlockForLevel, getSkillUnlockForLevel, getSkillsForLevels } from '@/lib/quadar/mechanics';
+import type { VignetteStage } from '@/lib/quadar/types';
 import { resolveUnexpectedlyEffect } from '@/lib/quadar/narrativeHelpers';
+import { applyDamageDealtBonus, applyDamageTakenReduction, getKeenSensesScanExtra } from '@/lib/quadar/skills';
 
 export interface RoomCoordinates {
     x: number;
@@ -26,6 +28,42 @@ interface GameState {
     isLoading: boolean;
     error: string | null;
     selectedSpellId: string | null;
+    /** Active quests (reconnaissance, rescue). Progress updated by move/scan/combat. */
+    activeQuests: ActiveQuest[];
+    /** Session stats for scoring. */
+    sessionScore: SessionScore | null;
+    /** "quests" = all quests done; "death" = died; null = in progress. */
+    sessionComplete: "quests" | "death" | null;
+    /** Facts to flush to narrative when quests complete (component dispatches addFact then clear). */
+    pendingQuestFacts: string[];
+}
+
+const initialSessionScore = (): SessionScore => ({
+    roomsExplored: 0,
+    roomsScanned: 0,
+    enemiesDefeated: 0,
+    merchantTrades: 0,
+    questsCompleted: 0,
+    spiritEarned: 0,
+    startTime: Date.now(),
+    endTime: null,
+});
+
+const VIGNETTE_STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax", "Epilogue"];
+
+function nextVignetteStage(current: VignetteStage): VignetteStage | null {
+    const i = VIGNETTE_STAGES.indexOf(current);
+    return VIGNETTE_STAGES[i + 1] ?? null;
+}
+
+/** Seed starting quests: recon (scan 5), rescue (find 1 ally), hostiles (defeat 3), merchant (trade 2). */
+function seedQuests(): ActiveQuest[] {
+    return [
+        { id: "recon-1", kind: "reconnaissance", label: "Scan 5 sectors", target: 5, progress: 0, complete: false },
+        { id: "rescue-1", kind: "rescue", label: "Find a Fellow Ranger", target: 1, progress: 0, complete: false },
+        { id: "hostiles-1", kind: "hostiles", label: "Defeat 3 hostiles", target: 3, progress: 0, complete: false },
+        { id: "merchant-1", kind: "merchant", label: "Trade with 2 merchants", target: 2, progress: 0, complete: false },
+    ];
 }
 
 const initialState: GameState = {
@@ -38,11 +76,18 @@ const initialState: GameState = {
     isLoading: false,
     error: null,
     selectedSpellId: null,
+    activeQuests: [],
+    sessionScore: null,
+    sessionComplete: null,
+    pendingQuestFacts: [],
 };
 
 // Async Thunks
 export interface InitializeGameOptions {
     forceMerchant?: boolean;
+    deterministic?: boolean;
+    forceEnemy?: boolean;
+    lowHp?: boolean;
 }
 
 export const initializeGame = createAsyncThunk(
@@ -53,7 +98,15 @@ export const initializeGame = createAsyncThunk(
         await new Promise(resolve => setTimeout(resolve, 800));
 
         const player = initializePlayer();
-        const initialRoom = await SDK.Cortex.generateRoom("start_room", "Quadar Tower", { forceMerchant: options?.forceMerchant });
+        player.skills = getSkillsForLevels(player.characterClass, player.level);
+        if (options?.lowHp) {
+            player.hp = 5;
+        }
+        const initialRoom = await SDK.Cortex.generateStartRoom({
+            deterministic: options?.deterministic,
+            forceMerchant: options?.forceMerchant,
+            forceEnemy: options?.forceEnemy,
+        });
 
         return { player, initialRoom };
     }
@@ -114,7 +167,11 @@ export const scanSector = createAsyncThunk(
         const allies = room.allies ? room.allies.map(a => a.name).join(", ") : "None";
         const exits = Object.keys(room.exits).filter(k => room.exits[k as keyof typeof room.exits]).join(", ") || "None"; // Only show available exits
 
-        const message = `[SCAN RESULT]\nLocation: ${room.title}\nBiome: ${room.biome}\nHazards: ${room.hazards.join(", ") || "None"}\nHostiles: ${enemies}\nAllies: ${allies}\nExits: ${exits}`;
+        let message = `[SCAN RESULT]\nLocation: ${room.title}\nBiome: ${room.biome}\nHazards: ${room.hazards.join(", ") || "None"}\nHostiles: ${enemies}\nAllies: ${allies}\nExits: ${exits}`;
+        const player = state.game.player;
+        if (player?.skills?.includes("keen_senses")) {
+            message += `\n${getKeenSensesScanExtra(room)}`;
+        }
 
         dispatch(addLog({ message, type: "exploration" }));
         dispatch(addFact({
@@ -182,6 +239,11 @@ export const castSpell = createAsyncThunk(
                 enemyDefeated = true;
                 dispatch(addLog({ message: `${enemy.name} has been eradicated by arcane force!`, type: "combat" }));
                 dispatch(addFact({ text: `Vanquished ${enemy.name} with ${spell.name}.`, questionKind: "combat", isFollowUp: false }));
+                const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
+                if (narrativeState.narrative?.vignette) {
+                    const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
+                    if (next) dispatch(advanceVignetteStage({ stage: next }));
+                }
             }
         }
 
@@ -199,7 +261,8 @@ export const castSpell = createAsyncThunk(
             enemyId: enemy.id,
             enemyDamage,
             enemyDefeated,
-            playerDamage
+            playerDamage,
+            xpGain: enemyDefeated ? 50 : 0
         };
     }
 );
@@ -240,6 +303,11 @@ export const engageHostiles = createAsyncThunk(
                 enemyDefeated = true;
                 dispatch(addLog({ message: `${enemy.name} has fallen!`, type: "combat" }));
                 dispatch(addFact({ text: `Heroically defeated ${enemy.name}.`, questionKind: "combat", isFollowUp: false }));
+                const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
+                if (narrativeState.narrative?.vignette) {
+                    const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
+                    if (next) dispatch(advanceVignetteStage({ stage: next }));
+                }
             }
         }
 
@@ -257,7 +325,8 @@ export const engageHostiles = createAsyncThunk(
             enemyId: enemy.id,
             enemyDamage,
             enemyDefeated,
-            playerDamage
+            playerDamage,
+            xpGain: enemyDefeated ? 50 : 0
         };
     }
 );
@@ -297,7 +366,11 @@ export const tradeBuy = createAsyncThunk(
 
         dispatch(addLog({ message: `Purchased ${item.name} from ${merchant.name}.`, type: "system" }));
         dispatch(addFact({ text: `Purchased ${item.name} from ${merchant.name}.`, questionKind: "trade", isFollowUp: false }));
-
+        const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
+        if (narrativeState.narrative?.vignette) {
+            const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
+            if (next) dispatch(advanceVignetteStage({ stage: next }));
+        }
         return { item, spiritCost, bloodCost };
     }
 );
@@ -318,7 +391,11 @@ export const tradeSell = createAsyncThunk(
 
         dispatch(addLog({ message: `Sold ${item.name} for ${value} Spirit.`, type: "system" }));
         dispatch(addFact({ text: `Sold ${item.name}.`, questionKind: "trade", isFollowUp: false }));
-
+        const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
+        if (narrativeState.narrative?.vignette) {
+            const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
+            if (next) dispatch(advanceVignetteStage({ stage: next }));
+        }
         return { itemIndex, value };
     }
 );
@@ -411,6 +488,9 @@ export const gameSlice = createSlice({
         selectSpell: (state, action: PayloadAction<string | null>) => {
             state.selectedSpellId = action.payload;
         },
+        clearPendingQuestFacts: (state) => {
+            state.pendingQuestFacts = [];
+        },
     },
     extraReducers: (builder) => {
         // Initialize
@@ -425,6 +505,13 @@ export const gameSlice = createSlice({
             state.currentRoom = initialRoom;
             state.exploredRooms = { [initialRoom.id]: initialRoom };
             state.roomCoordinates = { [initialRoom.id]: { x: 0, y: 0 } };
+            state.activeQuests = seedQuests();
+            state.sessionScore = {
+                ...initialSessionScore(),
+                spiritEarned: action.payload.player.spirit ?? 0,
+            };
+            state.sessionComplete = null;
+            state.pendingQuestFacts = [];
             state.logs.push({
                 id: Date.now().toString(),
                 timestamp: Date.now(),
@@ -500,31 +587,70 @@ export const gameSlice = createSlice({
 
         // Move
         builder.addCase(movePlayer.fulfilled, (state, action) => {
-            const { room: newRoom, direction } = action.payload;
+            const { room: newRoom } = action.payload;
             const prevRoom = state.currentRoom;
             if (!prevRoom) return;
             const prevCoord = state.roomCoordinates[prevRoom.id] ?? { x: 0, y: 0 };
+            const direction = action.payload.direction;
             const delta = { North: { x: 0, y: -1 }, South: { x: 0, y: 1 }, East: { x: 1, y: 0 }, West: { x: -1, y: 0 } }[direction] ?? { x: 0, y: 0 };
             const newCoord = { x: prevCoord.x + delta.x, y: prevCoord.y + delta.y };
             state.currentRoom = newRoom;
             state.exploredRooms[newRoom.id] = newRoom;
             state.roomCoordinates[newRoom.id] = newCoord;
+            if (state.sessionScore) state.sessionScore.roomsExplored += 1;
+            // Rescue: find Fellow Ranger in this room
+            if (newRoom.allies?.length && state.sessionScore) {
+                const rescue = state.activeQuests.find(q => q.kind === "rescue" && !q.complete);
+                if (rescue) {
+                    rescue.progress = 1;
+                    rescue.complete = true;
+                    state.sessionScore.questsCompleted += 1;
+                    state.pendingQuestFacts.push(`Completed quest: ${rescue.label}.`);
+                    state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${rescue.label}.`, type: "system" });
+                    if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
+                        state.sessionComplete = "quests";
+                        state.sessionScore.endTime = Date.now();
+                    }
+                }
+            }
+        });
+
+        // Scan: advance reconnaissance and session score
+        builder.addCase(scanSector.fulfilled, (state) => {
+            if (state.sessionScore) state.sessionScore.roomsScanned += 1;
+            const recon = state.activeQuests.find(q => q.kind === "reconnaissance" && !q.complete);
+            if (recon && state.sessionScore) {
+                recon.progress = state.sessionScore.roomsScanned;
+                if (recon.progress >= recon.target) {
+                    recon.complete = true;
+                    state.sessionScore.questsCompleted += 1;
+                    state.pendingQuestFacts.push(`Completed quest: ${recon.label}.`);
+                    state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${recon.label}.`, type: "system" });
+                    if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
+                        state.sessionComplete = "quests";
+                        state.sessionScore.endTime = Date.now();
+                    }
+                }
+            }
         });
 
         // Combat
         builder.addCase(engageHostiles.fulfilled, (state, action) => {
             if (!action.payload || !state.player || !state.currentRoom) return;
             const { enemyId, enemyDamage, enemyDefeated, playerDamage } = action.payload;
+            const skills = state.player.skills ?? [];
+            const actualPlayerDamage = applyDamageTakenReduction(skills, playerDamage);
+            const actualEnemyDamage = applyDamageDealtBonus(skills, enemyDamage);
 
             // Update Player
-            state.player.hp -= playerDamage;
+            state.player.hp -= actualPlayerDamage;
             if (state.player.hp < 0) state.player.hp = 0;
             state.player.stress += 1;
 
             // Update Enemy
             const enemies = state.currentRoom.enemies.map(e => {
                 if (e.id === enemyId) {
-                    return { ...e, hp: e.hp - enemyDamage };
+                    return { ...e, hp: e.hp - actualEnemyDamage };
                 }
                 return e;
             });
@@ -535,6 +661,63 @@ export const gameSlice = createSlice({
                 // Rewards
                 state.player.spirit = (state.player.spirit || 0) + 5;
                 state.player.blood = (state.player.blood || 0) + 2;
+                if (state.sessionScore) {
+                    state.sessionScore.enemiesDefeated += 1;
+                    state.sessionScore.spiritEarned += 5;
+                    // Hostiles quest
+                    const hostilesQuest = state.activeQuests.find(q => q.kind === "hostiles" && !q.complete);
+                    if (hostilesQuest) {
+                        hostilesQuest.progress = state.sessionScore.enemiesDefeated;
+                        if (hostilesQuest.progress >= hostilesQuest.target) {
+                            hostilesQuest.complete = true;
+                            state.sessionScore.questsCompleted += 1;
+                            state.pendingQuestFacts.push(`Completed quest: ${hostilesQuest.label}.`);
+                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${hostilesQuest.label}.`, type: "system" });
+                            if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
+                                state.sessionComplete = "quests";
+                                state.sessionScore.endTime = Date.now();
+                            }
+                        }
+                    }
+                }
+
+                // XP Logic and level-up spell/skill unlock
+                const xpGain = (action.payload as any).xpGain || 0;
+                if (xpGain > 0) {
+                    state.player.xp += xpGain;
+                    if (state.player.xp >= state.player.maxXp) {
+                        state.player.xp -= state.player.maxXp;
+                        state.player.level += 1;
+                        state.player.maxXp += 100;
+                        state.player.maxHp += 10;
+                        state.player.hp = state.player.maxHp;
+                        state.player.stress = Math.max(0, state.player.stress - 20);
+                        const newSpell = getSpellUnlockForLevel(state.player.characterClass, state.player.level);
+                        const newSkill = getSkillUnlockForLevel(state.player.characterClass, state.player.level);
+                        if (newSpell && !state.player.spells.includes(newSpell)) {
+                            state.player.spells = [...state.player.spells, newSpell];
+                            const spellName = SPELLS[newSpell]?.name ?? newSpell;
+                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked: ${spellName}.`, type: "system" });
+                        } else if (newSkill) {
+                            const skills = state.player.skills ?? [];
+                            if (!skills.includes(newSkill)) {
+                                state.player.skills = [...skills, newSkill];
+                                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked skill: ${newSkill}.`, type: "system" });
+                            } else {
+                                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
+                            }
+                        } else {
+                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
+                        }
+                    } else {
+                        state.logs.push({
+                            id: Date.now().toString(),
+                            timestamp: Date.now(),
+                            message: `Gained ${xpGain} XP.`,
+                            type: "system"
+                        });
+                    }
+                }
             } else {
                 state.currentRoom.enemies = enemies;
             }
@@ -544,38 +727,98 @@ export const gameSlice = createSlice({
         builder.addCase(castSpell.fulfilled, (state, action) => {
             if (!action.payload || !state.player || !state.currentRoom) return;
             const { enemyId, enemyDamage, enemyDefeated, playerDamage } = action.payload;
+            const spellSkills = state.player.skills ?? [];
+            const actualPlayerDamageSpell = applyDamageTakenReduction(spellSkills, playerDamage);
+            const actualEnemyDamageSpell = applyDamageDealtBonus(spellSkills, enemyDamage);
 
             // Update Player
-            state.player.hp -= playerDamage;
+            state.player.hp -= actualPlayerDamageSpell;
             if (state.player.hp < 0) state.player.hp = 0;
             state.player.stress += 1;
 
             // Update Enemy
-            const enemies = state.currentRoom.enemies.map(e => {
+            const enemiesSpell = state.currentRoom.enemies.map(e => {
                 if (e.id === enemyId) {
-                    return { ...e, hp: e.hp - enemyDamage };
+                    return { ...e, hp: e.hp - actualEnemyDamageSpell };
                 }
                 return e;
             });
 
             if (enemyDefeated) {
                 // Remove defeated enemy
-                state.currentRoom.enemies = enemies.filter(e => e.id !== enemyId);
+                state.currentRoom.enemies = enemiesSpell.filter(e => e.id !== enemyId);
                 // Rewards
                 state.player.spirit = (state.player.spirit || 0) + 5;
                 state.player.blood = (state.player.blood || 0) + 2;
+                if (state.sessionScore) {
+                    state.sessionScore.enemiesDefeated += 1;
+                    state.sessionScore.spiritEarned += 5;
+                    const hostilesQuest = state.activeQuests.find(q => q.kind === "hostiles" && !q.complete);
+                    if (hostilesQuest) {
+                        hostilesQuest.progress = state.sessionScore.enemiesDefeated;
+                        if (hostilesQuest.progress >= hostilesQuest.target) {
+                            hostilesQuest.complete = true;
+                            state.sessionScore.questsCompleted += 1;
+                            state.pendingQuestFacts.push(`Completed quest: ${hostilesQuest.label}.`);
+                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${hostilesQuest.label}.`, type: "system" });
+                            if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
+                                state.sessionComplete = "quests";
+                                state.sessionScore.endTime = Date.now();
+                            }
+                        }
+                    }
+                }
+
+                // XP Logic and level-up spell/skill unlock
+                const xpGain = (action.payload as any).xpGain || 0;
+                if (xpGain > 0) {
+                    state.player.xp += xpGain;
+                    if (state.player.xp >= state.player.maxXp) {
+                        state.player.xp -= state.player.maxXp;
+                        state.player.level += 1;
+                        state.player.maxXp += 100;
+                        state.player.maxHp += 10;
+                        state.player.hp = state.player.maxHp;
+                        state.player.stress = Math.max(0, state.player.stress - 20);
+                        const newSpell = getSpellUnlockForLevel(state.player.characterClass, state.player.level);
+                        const newSkill = getSkillUnlockForLevel(state.player.characterClass, state.player.level);
+                        if (newSpell && !state.player.spells.includes(newSpell)) {
+                            state.player.spells = [...state.player.spells, newSpell];
+                            const spellName = SPELLS[newSpell]?.name ?? newSpell;
+                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked: ${spellName}.`, type: "system" });
+                        } else if (newSkill) {
+                            const skills = state.player.skills ?? [];
+                            if (!skills.includes(newSkill)) {
+                                state.player.skills = [...skills, newSkill];
+                                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked skill: ${newSkill}.`, type: "system" });
+                            } else {
+                                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
+                            }
+                        } else {
+                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
+                        }
+                    } else {
+                        state.logs.push({
+                            id: Date.now().toString(),
+                            timestamp: Date.now(),
+                            message: `Gained ${xpGain} XP.`,
+                            type: "system"
+                        });
+                    }
+                }
             } else {
-                state.currentRoom.enemies = enemies;
+                state.currentRoom.enemies = enemiesSpell;
             }
         });
 
-        // Respawn
+        // Respawn: session ends on death
         builder.addCase(respawnPlayer.fulfilled, (state) => {
             if (!state.player || !state.currentRoom) return;
             state.player.hp = state.player.maxHp;
-            state.player.stress = 0; // Reset stress too? Usually.
-            state.player.stress = 0; // Reset stress too? Usually.
-            state.currentRoom.enemies = []; // Clear enemies as per doc.
+            state.player.stress = 0;
+            state.currentRoom.enemies = [];
+            state.sessionComplete = "death";
+            if (state.sessionScore) state.sessionScore.endTime = Date.now();
         });
 
         // Trade
@@ -583,29 +826,58 @@ export const gameSlice = createSlice({
             if (!action.payload || !state.player) return;
             const { item, spiritCost, bloodCost } = action.payload;
 
-            // Deduct cost
             state.player.spirit = (state.player.spirit || 0) - spiritCost;
             state.player.blood = (state.player.blood || 0) - bloodCost;
-
-            // Add item (clone with new unique ID just in case, though simple ID is fine for now)
-            // actually engine.ts generates unique IDs for wares, so we can likely push directly or clone to be safe
             state.player.inventory.push({ ...item });
+
+            if (state.sessionScore) {
+                state.sessionScore.merchantTrades += 1;
+                const merchantQuest = state.activeQuests.find(q => q.kind === "merchant" && !q.complete);
+                if (merchantQuest) {
+                    merchantQuest.progress = state.sessionScore.merchantTrades;
+                    if (merchantQuest.progress >= merchantQuest.target) {
+                        merchantQuest.complete = true;
+                        state.sessionScore.questsCompleted += 1;
+                        state.pendingQuestFacts.push(`Completed quest: ${merchantQuest.label}.`);
+                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${merchantQuest.label}.`, type: "system" });
+                        if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
+                            state.sessionComplete = "quests";
+                            state.sessionScore.endTime = Date.now();
+                        }
+                    }
+                }
+            }
         });
 
         builder.addCase(tradeSell.fulfilled, (state, action) => {
             if (!action.payload || !state.player) return;
             const { itemIndex, value } = action.payload;
 
-            // Remove item
             state.player.inventory.splice(itemIndex, 1);
-
-            // Add value
             state.player.spirit = (state.player.spirit || 0) + value;
+
+            if (state.sessionScore) {
+                state.sessionScore.merchantTrades += 1;
+                const merchantQuest = state.activeQuests.find(q => q.kind === "merchant" && !q.complete);
+                if (merchantQuest) {
+                    merchantQuest.progress = state.sessionScore.merchantTrades;
+                    if (merchantQuest.progress >= merchantQuest.target) {
+                        merchantQuest.complete = true;
+                        state.sessionScore.questsCompleted += 1;
+                        state.pendingQuestFacts.push(`Completed quest: ${merchantQuest.label}.`);
+                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${merchantQuest.label}.`, type: "system" });
+                        if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
+                            state.sessionComplete = "quests";
+                            state.sessionScore.endTime = Date.now();
+                        }
+                    }
+                }
+            }
         });
     }
 });
 
-export const { addLog, selectSpell } = gameSlice.actions;
+export const { addLog, selectSpell, clearPendingQuestFacts } = gameSlice.actions;
 
 // Selectors
 export const selectPlayer = (state: { game: GameState }) => state.game.player;
@@ -616,5 +888,9 @@ export const selectLogs = (state: { game: GameState }) => state.game.logs;
 export const selectIsInitialized = (state: { game: GameState }) => state.game.isInitialized;
 export const selectIsLoading = (state: { game: GameState }) => state.game.isLoading;
 export const selectSelectedSpellId = (state: { game: GameState }) => state.game.selectedSpellId;
+export const selectActiveQuests = (state: { game: GameState }) => state.game.activeQuests;
+export const selectSessionScore = (state: { game: GameState }) => state.game.sessionScore;
+export const selectSessionComplete = (state: { game: GameState }) => state.game.sessionComplete;
+export const selectPendingQuestFacts = (state: { game: GameState }) => state.game.pendingQuestFacts;
 
 export default gameSlice.reducer;

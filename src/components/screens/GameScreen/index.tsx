@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
@@ -11,6 +11,10 @@ import {
   selectLogs,
   selectIsInitialized,
   selectIsLoading,
+  selectActiveQuests,
+  selectSessionScore,
+  selectSessionComplete,
+  selectPendingQuestFacts,
   initializeGame,
   movePlayer,
   askOracle,
@@ -20,12 +24,14 @@ import {
   engageHostiles,
   respawnPlayer,
   selectSpell,
+  clearPendingQuestFacts,
 } from "@/features/game/slice/gameSlice";
 import {
   selectOracleInput,
   selectStageOfScene,
   selectInventoryOpen,
   selectSpellsPanelOpen,
+  selectSkillsPanelOpen,
   setOracleInput,
   clearOracleInput,
   setStageOfScene,
@@ -33,6 +39,7 @@ import {
   toggleShowMap,
   toggleInventory,
   toggleSpellsPanel,
+  toggleSkillsPanel,
   selectAutoPlay,
   toggleAutoPlay,
   openTrade,
@@ -45,10 +52,15 @@ import {
   selectMainThreadId,
   selectFacts,
   selectVignette,
+  selectCurrentSceneId,
+  addThread,
   setMainThread,
   startVignette,
   advanceVignetteStage,
   endVignette,
+  fadeInScene,
+  fadeOutScene,
+  addFact,
 } from "@/features/narrative/slice/narrativeSlice";
 import { LoadingOverlay } from "@/components/elements/generic/LoadingOverlay";
 import { GameScreenHeader } from "./GameScreenHeader";
@@ -71,27 +83,60 @@ export function GameScreen() {
   const stageOfScene = useAppSelector(selectStageOfScene);
   const inventoryOpen = useAppSelector(selectInventoryOpen);
   const spellsPanelOpen = useAppSelector(selectSpellsPanelOpen);
+  const skillsPanelOpen = useAppSelector(selectSkillsPanelOpen);
   const showMap = useAppSelector(selectShowMap);
   const autoPlay = useAppSelector(selectAutoPlay);
   const threads = useAppSelector(selectThreads);
   const mainThreadId = useAppSelector(selectMainThreadId);
   const facts = useAppSelector(selectFacts);
   const vignette = useAppSelector(selectVignette);
+  const currentSceneId = useAppSelector(selectCurrentSceneId);
   const activeMerchantId = useAppSelector(selectActiveMerchantId);
   const activeMerchant = (activeMerchantId && currentRoom) ? currentRoom.merchants?.find(m => m.id === activeMerchantId) : null;
+  const activeQuests = useAppSelector(selectActiveQuests);
+  const sessionScore = useAppSelector(selectSessionScore);
+  const sessionComplete = useAppSelector(selectSessionComplete);
+  const pendingQuestFacts = useAppSelector(selectPendingQuestFacts);
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    if (pendingQuestFacts.length === 0) return;
+    const toAdd = [...pendingQuestFacts];
+    dispatch(clearPendingQuestFacts());
+    toAdd.forEach((text) => {
+      dispatch(addFact({ text, questionKind: "quest", isFollowUp: false }));
+    });
+  }, [pendingQuestFacts, dispatch]);
+
+  // Seed one thread so vignette + Fade out can run (fadeInScene needs mainThreadId)
+  useEffect(() => {
+    if (!isInitialized || threads.length > 0) return;
+    dispatch(addThread({ name: "Reconnaissance", stage: "To Knowledge" }));
+  }, [isInitialized, threads.length, dispatch]);
+  useEffect(() => {
+    if (threads.length === 1 && !mainThreadId) {
+      dispatch(setMainThread(threads[0].id));
+    }
+  }, [threads, mainThreadId, dispatch]);
+
+  const getInitOptions = () => ({
+    forceMerchant: searchParams.get("forceMerchant") === "1",
+    deterministic: searchParams.get("deterministic") === "1",
+    forceEnemy: searchParams.get("forceEnemy") === "1",
+    lowHp: searchParams.get("lowHp") === "1",
+  });
+
+  useLayoutEffect(() => {
     if (!isInitialized && !isLoading) {
-      const forceMerchant = searchParams.get("forceMerchant") === "1";
-      dispatch(initializeGame({ forceMerchant }));
+      dispatch(initializeGame(getInitOptions()));
     }
   }, [isInitialized, isLoading, dispatch, searchParams]);
 
-  if (!isInitialized && isLoading) {
+  if (!isInitialized) {
     return (
       <LoadingOverlay
-        onRetry={() => dispatch(initializeGame())}
+        message="INITIALIZING..."
+        onRetry={() => dispatch(initializeGame(getInitOptions()))}
       />
     );
   }
@@ -100,7 +145,7 @@ export function GameScreen() {
     return (
       <LoadingOverlay
         message="INITIALIZING..."
-        onRetry={() => dispatch(initializeGame())}
+        onRetry={() => dispatch(initializeGame(getInitOptions()))}
       />
     );
   }
@@ -130,11 +175,22 @@ export function GameScreen() {
         onSetMainThread={(id) => dispatch(setMainThread(id))}
         facts={facts}
         vignette={vignette ? { theme: vignette.theme, stage: vignette.stage, threadIds: vignette.threadIds } : null}
-        onStartVignette={(theme) => dispatch(startVignette({ theme }))}
+        onStartVignette={(theme) => {
+          dispatch(startVignette({ theme }));
+          const threadId = mainThreadId ?? threads[0]?.id;
+          if (currentRoom && threadId) {
+            dispatch(fadeInScene({ roomId: currentRoom.id, mainThreadId: threadId, stageOfScene }));
+          }
+        }}
         onAdvanceVignette={(stage: VignetteStage) => dispatch(advanceVignetteStage({ stage }))}
         onEndVignette={() => dispatch(endVignette())}
         logs={logs}
         onTradeMerchant={(id) => dispatch(openTrade(id))}
+        activeQuests={activeQuests}
+        sessionScore={sessionScore}
+        sessionComplete={sessionComplete}
+        currentSceneId={currentSceneId}
+        onFadeOutScene={() => dispatch(fadeOutScene({ sceneId: currentSceneId ?? undefined }))}
       />
       <GameScreenFooter
         oracleInput={oracleInput}
@@ -149,6 +205,7 @@ export function GameScreen() {
         onCommune={() => dispatch(communeWithVoid())}
         onOpenInventory={() => dispatch(toggleInventory())}
         onOpenSpells={() => dispatch(toggleSpellsPanel())}
+        onOpenSkills={() => dispatch(toggleSkillsPanel())}
         autoPlay={autoPlay}
         onToggleAutoPlay={() => {
           playSound();
@@ -158,9 +215,11 @@ export function GameScreen() {
       <GameScreenOverlays
         inventoryOpen={inventoryOpen}
         spellsPanelOpen={spellsPanelOpen}
+        skillsPanelOpen={skillsPanelOpen}
         player={player}
         onCloseInventory={() => dispatch(toggleInventory())}
         onCloseSpells={() => dispatch(toggleSpellsPanel())}
+        onCloseSkills={() => dispatch(toggleSkillsPanel())}
         onRejectConcession={() => dispatch(respawnPlayer())}
         onAcceptConcession={(type) => dispatch(addLog({ message: `You accepted concession: ${type}`, type: "system" }))}
         activeMerchant={activeMerchant}

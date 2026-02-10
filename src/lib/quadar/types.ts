@@ -39,11 +39,14 @@ export interface Player extends Stats {
     characterClass: CharacterClass;
     inventory: Item[];
     spells: string[]; // IDs of learned spells
+    skills?: string[]; // IDs of unlocked skills (passive/active)
     surgeCount: number; // For Loom of Fate
     ac?: number;
     equipment?: Partial<Record<EquipmentSlot, Item | null>>;
     spirit?: number;
     blood?: number;
+    xp: number;
+    maxXp: number;
 }
 
 export interface Enemy extends Stats {
@@ -103,6 +106,33 @@ export interface GameLogEntry {
     timestamp: number;
     message: string;
     type: "combat" | "exploration" | "system" | "loom";
+}
+
+/** Quest kinds from playtest scope: reconnaissance, rescue, hostiles, merchant. */
+export type QuestKind = "reconnaissance" | "rescue" | "hostiles" | "merchant";
+
+export interface ActiveQuest {
+    id: string;
+    kind: QuestKind;
+    /** Short label for UI (e.g. "Scan 5 sectors"). */
+    label: string;
+    /** Target value to complete (e.g. 5 scans, 3 hostiles cleared, or 1 ally found). */
+    target: number;
+    /** Current progress. */
+    progress: number;
+    /** When target is met, quest is complete. */
+    complete: boolean;
+}
+
+export interface SessionScore {
+    roomsExplored: number;
+    roomsScanned: number;
+    enemiesDefeated: number;
+    merchantTrades: number;
+    questsCompleted: number;
+    spiritEarned: number;
+    startTime: number;
+    endTime: number | null;
 }
 
 export interface LoomResult {

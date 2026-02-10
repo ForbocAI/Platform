@@ -101,7 +101,9 @@ export function initializePlayer(): Player {
         spells: template.startingSpells,
         surgeCount: 0,
         spirit: 20,
-        blood: 0
+        blood: 0,
+        xp: 0,
+        maxXp: 1200 // Level 12 * 100
     };
 }
 
@@ -223,10 +225,31 @@ export interface GenerateStartRoomOptions {
     biome?: Biome;
     deterministic?: boolean;
     forceMerchant?: boolean;
+    forceEnemy?: boolean;
 }
 
 export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
-    return generateRoomWithOptions(opts?.id ?? "start_room", opts?.biome ?? "Quadar Tower", { forceMerchant: opts?.forceMerchant });
+    if (opts?.deterministic) {
+        const room: Room = {
+            id: opts.id ?? "start_room",
+            title: "Store Room",
+            description: "The central monolith of the realm, where reality itself seems to warp and decay.",
+            biome: opts.biome ?? "Quadar Tower",
+            hazards: [],
+            exits: { North: "new-room", South: "new-room", East: "new-room", West: "new-room" },
+            enemies: opts.forceEnemy ? [generateRandomEnemy()] : [],
+            merchants: [],
+        };
+        if (opts.forceMerchant) {
+            room.merchants = [generateRandomMerchant()];
+        }
+        return room;
+    }
+    const room = generateRoomWithOptions(opts?.id ?? "start_room", opts?.biome ?? "Quadar Tower", { forceMerchant: opts?.forceMerchant });
+    if (opts?.forceEnemy && (!room.enemies || room.enemies.length === 0)) {
+        room.enemies = [...(room.enemies || []), generateRandomEnemy()];
+    }
+    return room;
 }
 
 // --- Loom of Fate Logic ---

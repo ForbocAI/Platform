@@ -14,3 +14,4 @@ export { VolumeControls } from "./VolumeControls";
 export { TradePanel } from "./TradePanel";
 export { InventoryPanel } from "./InventoryPanel";
 export { SpellsPanel } from "./SpellsPanel";
+export { SkillsPanel } from "./SkillsPanel";

@@ -32,16 +32,19 @@ export function VignetteControls({
   onEnd,
   threadIds,
   threads = [],
+  currentSceneId = null,
+  onFadeOutScene,
 }: {
   theme?: string;
   stage?: VignetteStage;
-  /** Thread ids tied to this vignette (narrative–spatial wiring). */
   threadIds?: string[];
-  /** Thread list to resolve names for display. */
   threads?: { id: string; name: string }[];
   onStart: (theme: string) => void;
   onAdvance: (stage: VignetteStage) => void;
   onEnd: () => void;
+  /** Current scene id (from narrative); Fade out button only active when set. */
+  currentSceneId?: string | null;
+  onFadeOutScene?: () => void;
 }) {
   const dispatch = useAppDispatch();
   const inputTheme = useAppSelector(selectVignetteThemeInput);
@@ -131,6 +134,20 @@ export function VignetteControls({
             aria-label="End vignette"
           >
             End
+          </button>
+        )}
+        {currentSceneId && onFadeOutScene && (
+          <button
+            type="button"
+            onClick={() => {
+              playSound();
+              onFadeOutScene();
+            }}
+            className="px-2 py-0.5 border border-palette-border text-palette-muted hover:text-palette-accent-cyan hover:border-palette-accent-cyan text-xs uppercase transition-colors"
+            data-testid="fade-out-scene"
+            aria-label="Fade out scene"
+          >
+            Fade out
           </button>
         )}
       </div>

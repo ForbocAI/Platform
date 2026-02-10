@@ -1,14 +1,16 @@
 "use client";
 
-import { InventoryPanel, SpellsPanel, ConcessionModal, TradePanel } from "@/components/elements/unique";
+import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel } from "@/components/elements/unique";
 import type { Player } from "@/lib/quadar/types";
 
 export function GameScreenOverlays({
   inventoryOpen,
   spellsPanelOpen,
+  skillsPanelOpen,
   player,
   onCloseInventory,
   onCloseSpells,
+  onCloseSkills,
   onAcceptConcession,
   onRejectConcession,
   activeMerchant,
@@ -17,9 +19,11 @@ export function GameScreenOverlays({
 }: {
   inventoryOpen: boolean;
   spellsPanelOpen: boolean;
+  skillsPanelOpen: boolean;
   player: Player;
   onCloseInventory: () => void;
   onCloseSpells: () => void;
+  onCloseSkills: () => void;
   onAcceptConcession?: (type: 'flee' | 'capture') => void;
   onRejectConcession?: () => void;
   activeMerchant?: import("@/lib/quadar/types").Merchant | null;
@@ -42,6 +46,12 @@ export function GameScreenOverlays({
           player={player}
           onClose={onCloseSpells}
           onSelectSpell={onSelectSpell}
+        />
+      )}
+      {skillsPanelOpen && (
+        <SkillsPanel
+          player={player}
+          onClose={onCloseSkills}
         />
       )}
       <ConcessionModal
