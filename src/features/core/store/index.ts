@@ -62,19 +62,9 @@ startAppListening({
   },
 });
 
-startAppListening({
-  predicate: (action) => action.type === toggleAutoPlay.type,
-  effect: async (_, listenerApi) => {
-    const state = listenerApi.getState();
-    if (!state.ui.autoPlay) return;
-    while (true) {
-      await listenerApi.delay(2800);
-      const current = listenerApi.getState();
-      if (!current.ui.autoPlay) break;
-      await listenerApi.dispatch(runAutoplayTick());
-    }
-  },
-});
+import { autoplayListener } from '@/features/game/middleware/autoplayListener';
+
+autoplayListener.startListening(startAppListening);
 
 startAppListening({
   predicate: (action) => action.type === endVignette.type,

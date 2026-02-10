@@ -87,14 +87,78 @@ export function RoomViewport({
         )}
         {room.enemies.length > 0 && (
           <div className="mt-2 sm:mt-3 grid grid-cols-1 gap-1 sm:gap-1.5 w-full">
-            {room.enemies.map((enemy) => (
-              <div key={enemy.id} className="p-1.5 sm:p-2 bg-palette-bg-dark/80 border border-palette-border-red/30 text-left flex justify-between items-center">
-                <h3 className="text-palette-accent-red font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Skull className="app-icon" /> {enemy.name}
-                </h3>
-                <span className="font-bold text-palette-white">HP {enemy.hp}</span>
-              </div>
-            ))}
+            {room.enemies.map((enemy) => {
+              const lastAttack = enemy.lastAttackTime || 0;
+              const lastDamage = enemy.lastDamageTime || 0;
+              const latestActionTime = Math.max(lastAttack, lastDamage);
+
+              let animationClass = "";
+              if (latestActionTime > 0) {
+                // If timestamps are close/equal, prioritize damage visualization
+                if (lastDamage >= lastAttack) {
+                  animationClass = "animate-enemy-damage";
+                } else {
+                  animationClass = "animate-enemy-attack";
+                }
+              }
+
+              return (
+                <div
+                  key={`${enemy.id}-${latestActionTime}`}
+                  className={`p-1.5 sm:p-2 bg-palette-bg-dark/80 border border-palette-border-red/30 text-left flex justify-between items-center ${animationClass}`}
+                >
+                  <h3 className="text-palette-accent-red font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Skull className="app-icon" /> {enemy.name}
+                  </h3>
+                  <span className="font-bold text-palette-white">HP {enemy.hp}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Base Camp Features */}
+        {room.isBaseCamp && room.features && (
+          <div className="mt-4 w-full border-t border-palette-border pt-3">
+            <h3 className="text-palette-accent-cyan font-bold uppercase tracking-widest text-xs mb-2">Base Camp Operations</h3>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {room.features.map((feature, idx) => {
+                if (feature.type === 'farming_plot') {
+                  return (
+                    <div key={idx} className="p-2 border border-palette-accent-magic/30 bg-palette-accent-magic/5 rounded flex flex-col items-center min-w-[120px]">
+                      <span className="text-xs text-palette-muted uppercase">Hydroponics</span>
+                      <span className="font-bold text-palette-white capitalize">{feature.crop}</span>
+                      <div className="w-full h-1 bg-palette-bg-dark mt-1 mb-1 rounded overflow-hidden">
+                        <div className="h-full bg-palette-accent-magic transition-all duration-500" style={{ width: `${feature.progress}%` }} />
+                      </div>
+                      {feature.ready ? (
+                        <button className="text-xs px-2 py-0.5 bg-palette-accent-magic/20 text-palette-accent-magic border border-palette-accent-magic hover:bg-palette-accent-magic/40 transition-colors uppercase"
+                          onClick={() => window.dispatchEvent(new CustomEvent('harvest_crop', { detail: { index: idx } }))}
+                        >
+                          Harvest
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-palette-muted-light">Growing... ({feature.progress}%)</span>
+                      )}
+                    </div>
+                  );
+                }
+                if (feature.type === 'crafting_station') {
+                  return (
+                    <div key={idx} className="p-2 border border-palette-accent-gold/30 bg-palette-accent-gold/5 rounded flex flex-col items-center min-w-[120px]">
+                      <span className="text-xs text-palette-muted uppercase">Station</span>
+                      <span className="font-bold text-palette-white capitalize">{feature.kind}</span>
+                      <button className="mt-2 text-xs px-2 py-0.5 border border-palette-border text-palette-muted hover:text-palette-white hover:border-palette-white transition-colors uppercase"
+                        onClick={() => window.dispatchEvent(new CustomEvent('open_crafting', { detail: { kind: feature.kind } }))}
+                      >
+                        Access
+                      </button>
+                    </div>
+                  );
+                }
+                return null;
+              })}
+            </div>
           </div>
         )}
       </div>

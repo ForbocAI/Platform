@@ -103,7 +103,33 @@ export function initializePlayer(): Player {
         spirit: 20,
         blood: 0,
         xp: 0,
-        maxXp: 1200 // Level 12 * 100
+        maxXp: 1200, // Level 12 * 100
+        recipes: [
+            {
+                id: "recipe_minor_healing_potion",
+                ingredients: [{ name: "Glowing Mushroom", quantity: 2 }],
+                produces: {
+                    id: "minor_healing_potion_crafted",
+                    name: "Minor Healing Potion",
+                    type: "consumable",
+                    description: "A small vial of healing liquid.",
+                    effect: "heal_hp_20",
+                    cost: { spirit: 5 }
+                }
+            },
+            {
+                id: "recipe_improved_armor",
+                ingredients: [{ name: "Scrap Metal", quantity: 3 }, { name: "Leather Scraps", quantity: 2 }],
+                produces: {
+                    id: "improved_armor_crafted",
+                    name: "Reinforced Plating",
+                    type: "armor",
+                    description: "Sturdy armor reinforced with metal plates.",
+                    bonus: { ac: 2, maxHp: 10 },
+                    cost: { spirit: 20 }
+                }
+            }
+        ]
     };
 }
 
@@ -232,22 +258,47 @@ export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
     if (opts?.deterministic) {
         const room: Room = {
             id: opts.id ?? "start_room",
-            title: "Store Room",
-            description: "The central monolith of the realm, where reality itself seems to warp and decay.",
+            title: "Recon Base Camp",
+            description: "A secure perimeter established within the ruins. A small hydroponic plot glows with UV light, and a makeshift workbench sits ready.",
             biome: opts.biome ?? "Quadar Tower",
             hazards: [],
             exits: { North: "new-room", South: "new-room", East: "new-room", West: "new-room" },
-            enemies: opts.forceEnemy ? [generateRandomEnemy()] : [],
+            enemies: [], // Base camp is safe
             merchants: [],
+            isBaseCamp: true,
+            features: [
+                { type: "farming_plot", crop: "mushroom", progress: 0, ready: false },
+                { type: "crafting_station", kind: "smithing" },
+                { type: "crafting_station", kind: "alchemy" }
+            ]
         };
         if (opts.forceMerchant) {
             room.merchants = [generateRandomMerchant()];
         }
+        // Force enemy even if protected if explicitly requested by playtest param (e.g. unit tests)
+        if (opts.forceEnemy) {
+            room.enemies = [generateRandomEnemy()];
+            room.isBaseCamp = false; // Corrupted base
+        }
         return room;
     }
     const room = generateRoomWithOptions(opts?.id ?? "start_room", opts?.biome ?? "Quadar Tower", { forceMerchant: opts?.forceMerchant });
-    if (opts?.forceEnemy && (!room.enemies || room.enemies.length === 0)) {
-        room.enemies = [...(room.enemies || []), generateRandomEnemy()];
+    // Override random room to make it Base Camp unless enemy forced
+    room.title = "Recon Base Camp";
+    room.description = "A secure perimeter established within the ruins. A small hydroponic plot glows with UV light, and a makeshift workbench sits ready.";
+    if (!opts?.forceEnemy) {
+        room.enemies = [];
+        room.isBaseCamp = true;
+        room.features = [
+            { type: "farming_plot", crop: "mushroom", progress: 0, ready: false },
+            { type: "crafting_station", kind: "smithing" },
+            { type: "crafting_station", kind: "alchemy" }
+        ];
+    } else {
+        // Just add an enemy if forced
+        if (!room.enemies || room.enemies.length === 0) {
+            room.enemies = [generateRandomEnemy()];
+        }
     }
     return room;
 }

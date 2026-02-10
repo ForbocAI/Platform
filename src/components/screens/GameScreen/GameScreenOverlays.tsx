@@ -13,6 +13,9 @@ export function GameScreenOverlays({
   onCloseSkills,
   onAcceptConcession,
   onRejectConcession,
+  onEquipItem,
+  onUnequipItem,
+  onUseItem,
   activeMerchant,
   onCloseTrade,
   onSelectSpell,
@@ -26,6 +29,9 @@ export function GameScreenOverlays({
   onCloseSkills: () => void;
   onAcceptConcession?: (type: 'flee' | 'capture') => void;
   onRejectConcession?: () => void;
+  onEquipItem?: (itemId: string, slot: import("@/lib/quadar/types").EquipmentSlot) => void;
+  onUnequipItem?: (slot: import("@/lib/quadar/types").EquipmentSlot) => void;
+  onUseItem?: (itemId: string) => void;
   activeMerchant?: import("@/lib/quadar/types").Merchant | null;
   onCloseTrade?: () => void;
   onSelectSpell?: (spellId: string) => void;
@@ -36,9 +42,9 @@ export function GameScreenOverlays({
         <InventoryPanel
           player={player}
           onClose={onCloseInventory}
-          onEquip={() => { }}
-          onUnequip={() => { }}
-          onUse={() => { }}
+          onEquip={(id, slot) => onEquipItem?.(id, slot)}
+          onUnequip={(slot) => onUnequipItem?.(slot)}
+          onUse={(id) => onUseItem?.(id)}
         />
       )}
       {spellsPanelOpen && (

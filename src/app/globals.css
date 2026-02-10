@@ -216,6 +216,27 @@
   100% { clip: rect(4px, 9999px, 9px, 0); transform: skew(0.93deg); }
 }
 
+/* Enemy Animations */
+@keyframes enemy-flash-attack {
+  0%, 100% { filter: brightness(1) sepia(0); }
+  50% { filter: brightness(2) red(255); box-shadow: 0 0 15px var(--accent-red); transform: scale(1.02); }
+}
+
+@keyframes enemy-flash-damage {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  25% { opacity: 0.5; filter: brightness(3) invert(1); }
+  50% { opacity: 1; filter: brightness(1); }
+  75% { opacity: 0.5; filter: brightness(3) invert(1); }
+}
+
+.animate-enemy-attack {
+  animation: enemy-flash-attack 0.3s ease-out forwards;
+}
+
+.animate-enemy-damage {
+  animation: enemy-flash-damage 0.5s ease-out forwards;
+}
+
 /* Status LED — monochrome pulse (use animation: ambient-breathe) */
 .status-led {
   width: 5px;

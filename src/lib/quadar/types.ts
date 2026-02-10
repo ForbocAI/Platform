@@ -47,6 +47,13 @@ export interface Player extends Stats {
     blood?: number;
     xp: number;
     maxXp: number;
+    recipes: Recipe[];
+}
+
+export interface Recipe {
+    id: string;
+    ingredients: { name: string; quantity: number }[];
+    produces: Item;
 }
 
 export interface Enemy extends Stats {
@@ -56,6 +63,8 @@ export interface Enemy extends Stats {
     ac: number;
     description: string;
     spells: string[];
+    lastAttackTime?: number; // Timestamp of last attack action
+    lastDamageTime?: number; // Timestamp of last damage taken
 }
 
 export type EquipmentSlot = "mainHand" | "armor" | "relic";
@@ -64,7 +73,7 @@ export interface Item {
     id: string;
     name: string;
     description: string;
-    type: "weapon" | "armor" | "consumable" | "relic";
+    type: "weapon" | "armor" | "consumable" | "relic" | "resource";
     bonus?: Partial<Stats> & { ac?: number };
     effect?: string;
     cost?: { spirit: number; blood?: number };
@@ -87,7 +96,13 @@ export interface Room {
     enemies: Enemy[];
     allies?: { id: string; name: string }[];
     merchants?: Merchant[];
+    isBaseCamp?: boolean;
+    features?: RoomFeature[];
 }
+
+export type RoomFeature =
+    | { type: "farming_plot"; crop?: "mushroom"; progress: number; ready: boolean }
+    | { type: "crafting_station"; kind: "alchemy" | "smithing" };
 
 export type Biome = "Ethereal Marshlands" | "Toxic Wastes" | "Haunted Chapel" | "Obsidian Spire" | "Quadar Tower" | "Military Installation" | "Eldritch Fortress" | "Labyrinthine Dungeon";
 export type Direction = "North" | "South" | "East" | "West";

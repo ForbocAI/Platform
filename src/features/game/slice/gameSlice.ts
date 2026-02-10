@@ -3,11 +3,11 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Player, Room, GameLogEntry, LoomResult, Enemy, ActiveQuest, SessionScore } from '@/lib/quadar/types';
 import { initializePlayer, generateRandomEnemy, generateRandomMerchant } from '@/lib/quadar/engine';
 import { SDK } from '@/lib/sdk-placeholder';
-import { addFact, advanceVignetteStage } from '@/features/narrative/slice/narrativeSlice';
+import { addFact, advanceVignetteStage, startVignette, endVignette } from '@/features/narrative/slice/narrativeSlice';
 import { resolveDuel, resolveEnemyAttack, resolveSpellDuel } from '@/lib/quadar/combat';
 import { SPELLS, getSpellUnlockForLevel, getSkillUnlockForLevel, getSkillsForLevels } from '@/lib/quadar/mechanics';
 import type { VignetteStage } from '@/lib/quadar/types';
-import { resolveUnexpectedlyEffect } from '@/lib/quadar/narrativeHelpers';
+import { resolveUnexpectedlyEffect, VIGNETTE_THEMES } from '@/lib/quadar/narrativeHelpers';
 import { applyDamageDealtBonus, applyDamageTakenReduction, getKeenSensesScanExtra } from '@/lib/quadar/skills';
 
 export interface RoomCoordinates {
@@ -54,6 +54,26 @@ const VIGNETTE_STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax
 function nextVignetteStage(current: VignetteStage): VignetteStage | null {
     const i = VIGNETTE_STAGES.indexOf(current);
     return VIGNETTE_STAGES[i + 1] ?? null;
+}
+
+function handleVignetteProgression(dispatch: any, getState: any) {
+    const state = getState();
+    const vignette = state.narrative?.vignette;
+
+    if (vignette) {
+        const next = nextVignetteStage(vignette.stage);
+        if (next) {
+            dispatch(advanceVignetteStage({ stage: next }));
+        } else {
+            // End curent and start new
+            dispatch(endVignette());
+            const theme = VIGNETTE_THEMES[Math.floor(Math.random() * VIGNETTE_THEMES.length)];
+            dispatch(startVignette({ theme }));
+        }
+    } else {
+        const theme = VIGNETTE_THEMES[Math.floor(Math.random() * VIGNETTE_THEMES.length)];
+        dispatch(startVignette({ theme }));
+    }
 }
 
 /** Seed starting quests: recon (scan 5), rescue (find 1 ally), hostiles (defeat 3), merchant (trade 2). */
@@ -107,6 +127,10 @@ export const initializeGame = createAsyncThunk(
             forceMerchant: options?.forceMerchant,
             forceEnemy: options?.forceEnemy,
         });
+
+        // Initialize Vignette automatically
+        const theme = VIGNETTE_THEMES[Math.floor(Math.random() * VIGNETTE_THEMES.length)];
+        dispatch(startVignette({ theme }));
 
         return { player, initialRoom };
     }
@@ -239,11 +263,7 @@ export const castSpell = createAsyncThunk(
                 enemyDefeated = true;
                 dispatch(addLog({ message: `${enemy.name} has been eradicated by arcane force!`, type: "combat" }));
                 dispatch(addFact({ text: `Vanquished ${enemy.name} with ${spell.name}.`, questionKind: "combat", isFollowUp: false }));
-                const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
-                if (narrativeState.narrative?.vignette) {
-                    const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
-                    if (next) dispatch(advanceVignetteStage({ stage: next }));
-                }
+                handleVignetteProgression(dispatch, getState);
             }
         }
 
@@ -303,11 +323,7 @@ export const engageHostiles = createAsyncThunk(
                 enemyDefeated = true;
                 dispatch(addLog({ message: `${enemy.name} has fallen!`, type: "combat" }));
                 dispatch(addFact({ text: `Heroically defeated ${enemy.name}.`, questionKind: "combat", isFollowUp: false }));
-                const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
-                if (narrativeState.narrative?.vignette) {
-                    const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
-                    if (next) dispatch(advanceVignetteStage({ stage: next }));
-                }
+                handleVignetteProgression(dispatch, getState);
             }
         }
 
@@ -366,11 +382,7 @@ export const tradeBuy = createAsyncThunk(
 
         dispatch(addLog({ message: `Purchased ${item.name} from ${merchant.name}.`, type: "system" }));
         dispatch(addFact({ text: `Purchased ${item.name} from ${merchant.name}.`, questionKind: "trade", isFollowUp: false }));
-        const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
-        if (narrativeState.narrative?.vignette) {
-            const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
-            if (next) dispatch(advanceVignetteStage({ stage: next }));
-        }
+        handleVignetteProgression(dispatch, getState);
         return { item, spiritCost, bloodCost };
     }
 );
@@ -391,16 +403,147 @@ export const tradeSell = createAsyncThunk(
 
         dispatch(addLog({ message: `Sold ${item.name} for ${value} Spirit.`, type: "system" }));
         dispatch(addFact({ text: `Sold ${item.name}.`, questionKind: "trade", isFollowUp: false }));
-        const narrativeState = getState() as { narrative: { vignette: { stage: VignetteStage } | null } };
-        if (narrativeState.narrative?.vignette) {
-            const next = nextVignetteStage(narrativeState.narrative.vignette.stage);
-            if (next) dispatch(advanceVignetteStage({ stage: next }));
-        }
+        handleVignetteProgression(dispatch, getState);
         return { itemIndex, value };
     }
 );
 
+export const useItem = createAsyncThunk(
+    'game/useItem',
+    async ({ itemId }: { itemId: string }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { player } = state.game;
+        if (!player) return;
+
+        const itemIndex = player.inventory.findIndex(i => i.id === itemId);
+        if (itemIndex === -1) return;
+        const item = player.inventory[itemIndex];
+
+        if (item.type !== 'consumable') return;
+
+        dispatch(addLog({ message: `Used ${item.name}.`, type: "system" }));
+
+        // Effect application (Hardcoded for now based on names or description)
+        if (item.name.includes("Healing") || item.name.includes("Potion")) {
+            dispatch(addLog({ message: "Health restored.", type: "system" }));
+            // HP logic handled in reducer or follow-up action? 
+            // Ideally we modify state here via return payload
+            return { itemIndex, effect: "heal_hp_20" };
+        }
+        if (item.name.includes("Clarity") || item.name.includes("Elixir")) {
+            dispatch(addLog({ message: "Stress reduced.", type: "system" }));
+            return { itemIndex, effect: "heal_stress_10" };
+        }
+
+        return { itemIndex, effect: "unknown" };
+    }
+);
+
+export const equipItem = createAsyncThunk(
+    'game/equipItem',
+    async ({ itemId, slot }: { itemId: string; slot: import("@/lib/quadar/types").EquipmentSlot }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { player } = state.game;
+        if (!player) return;
+
+        const itemIndex = player.inventory.findIndex(i => i.id === itemId);
+        if (itemIndex === -1) return;
+
+        const item = player.inventory[itemIndex];
+        // Basic validation
+        if (slot === 'mainHand' && item.type !== 'weapon') return; // Relaxed check?
+        if (slot === 'armor' && item.type !== 'armor') return;
+        if (slot === 'relic' && item.type !== 'relic') return;
+
+        dispatch(addLog({ message: `Equipped ${item.name}.`, type: "system" }));
+        return { itemIndex, slot, item };
+    }
+);
+
+export const unequipItem = createAsyncThunk(
+    'game/unequipItem',
+    async ({ slot }: { slot: import("@/lib/quadar/types").EquipmentSlot }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { player } = state.game;
+        if (!player || !player.equipment || !player.equipment[slot]) return;
+
+        dispatch(addLog({ message: `Unequipped ${player.equipment[slot]?.name}.`, type: "system" }));
+        return { slot };
+    }
+);
+
 const DIRECTIONS = ['North', 'South', 'East', 'West'] as const;
+
+// --- Base Camp Logic ---
+
+export const harvestCrop = createAsyncThunk(
+    'game/harvestCrop',
+    async ({ featureIndex }: { featureIndex: number }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { currentRoom, player } = state.game;
+
+        if (!currentRoom?.isBaseCamp || !currentRoom.features) return;
+        const feature = currentRoom.features[featureIndex];
+        if (!feature || feature.type !== 'farming_plot' || !feature.ready) return;
+
+        // Reward: Mushroom (Consumable)
+        // Check if item exists in DB or create a temp one
+        const cropItem: import("@/lib/quadar/types").Item = {
+            id: `harvested_mushroom_${Date.now()}`,
+            name: "Glowing Mushroom",
+            type: "consumable",
+            description: "A faint blue fungus with regenerative properties.",
+            effect: "heal_hp_15",
+            cost: { spirit: 5 }
+        };
+
+        dispatch(addLog({ message: `Harvested ${cropItem.name}.`, type: "system" }));
+        dispatch(addFact({ text: `Harvested crop from Base Camp.`, questionKind: "basecamp", isFollowUp: false }));
+
+        return { featureIndex, item: cropItem };
+    }
+);
+
+export const craftItem = createAsyncThunk(
+    'game/craftItem',
+    async ({ recipeId }: { recipeId: string }, { getState, dispatch }) => {
+        const state = getState() as { game: GameState };
+        const { player, currentRoom } = state.game;
+        if (!player || !currentRoom?.isBaseCamp) return;
+
+        const recipe = player.recipes.find(r => r.id === recipeId);
+        if (!recipe) {
+            dispatch(addLog({ message: "Unknown recipe.", type: "system" }));
+            return;
+        }
+
+        // Check if player has ingredients
+        const hasIngredients = recipe.ingredients.every(ingredient => {
+            const playerItemCount = player.inventory.filter(item => item.name === ingredient.name).length;
+            return playerItemCount >= ingredient.quantity;
+        });
+
+        if (!hasIngredients) {
+            dispatch(addLog({ message: "Insufficient ingredients.", type: "system" }));
+            return;
+        }
+
+        // Create the item
+        const craftedItem: import("@/lib/quadar/types").Item = {
+            id: `${recipe.produces.name.toLowerCase().replace(/\s/g, '_')}_${Date.now()}`,
+            name: recipe.produces.name,
+            type: recipe.produces.type,
+            description: recipe.produces.description,
+            effect: recipe.produces.effect,
+            cost: recipe.produces.cost
+        };
+
+        dispatch(addLog({ message: `Crafted ${craftedItem.name}.`, type: "system" }));
+        dispatch(addFact({ text: `Crafted ${craftedItem.name} at Base Camp.`, questionKind: "basecamp", isFollowUp: false }));
+
+        return { craftedItem, ingredients: recipe.ingredients };
+    }
+);
 
 /** One autoplay tick: simulates a relentless chronicler following the Shadows of Fate. */
 export const runAutoplayTick = createAsyncThunk(
@@ -411,30 +554,111 @@ export const runAutoplayTick = createAsyncThunk(
 
         if (!room || !player) return;
 
-        // 1. COMBAT PRIORITY: If malevolent adversaries cross our path, vanquish foes.
+        // 0. BASE CAMP MAINTENANCE: Harvest & Craft
+        if (room.isBaseCamp && room.features) {
+            let activityDone = false;
+            // Harvest
+            room.features.forEach((f: any, idx: number) => {
+                if (f.type === 'farming_plot' && f.ready) {
+                    dispatch(harvestCrop({ featureIndex: idx }));
+                    activityDone = true;
+                }
+            });
+            // Craft (Simple Logic: Craft healing potions if possible)
+            player.recipes.forEach((recipe: any) => {
+                const hasIngredients = recipe.ingredients.every((ing: any) => {
+                    const count = player.inventory.filter((i: any) => i.name === ing.name).length;
+                    return count >= ing.quantity;
+                });
+                if (hasIngredients) {
+                    dispatch(craftItem({ recipeId: recipe.id }));
+                    activityDone = true;
+                }
+            });
+            if (activityDone) return;
+        }
+
+        // 1. SURVIVAL: Heal if critically wounded (HP < 40%)
+        if (player.hp > 0 && player.hp < player.maxHp * 0.4) {
+            const healingItem = player.inventory.find((i: any) => i.type === 'consumable' && (i.name.includes("Healing") || i.name.includes("Potion") || i.name.includes("Mushroom")));
+            if (healingItem) {
+                await dispatch(useItem({ itemId: healingItem.id }));
+                return;
+            }
+        }
+
+        // 2. EQUIPMENT: Ensure armed and armored (Check periodically or if empty slots)
+        if (!player.equipment?.mainHand || !player.equipment?.armor) {
+            if (player.inventory.length > 0) {
+                if (!player.equipment?.mainHand) {
+                    const weapon = player.inventory.find((i: any) => i.type === 'weapon');
+                    if (weapon) { await dispatch(equipItem({ itemId: weapon.id, slot: 'mainHand' })); return; }
+                }
+                if (!player.equipment?.armor) {
+                    const armor = player.inventory.find((i: any) => i.type === 'armor');
+                    if (armor) { await dispatch(equipItem({ itemId: armor.id, slot: 'armor' })); return; }
+                }
+            }
+        }
+
+        // 3. COMBAT: Smart engagement
         if (room.enemies.length > 0) {
-            await dispatch(engageHostiles());
+            // Use Spell if mana permits (Arcane/Spirit abstraction or just cooldown/random)
+            // Let's assume Arcane stat influences mana efficiency but we don't track MP yet.
+            // Just use cooldown/random logic but favor spells against tough enemies (HP > 20)
+            const enemy = room.enemies[0];
+            const useSpell = (player.spells && player.spells.length > 0) && (enemy.hp > 20 || Math.random() < 0.4);
+
+            if (useSpell) {
+                const randomSpellId = player.spells[Math.floor(Math.random() * player.spells.length)];
+                await dispatch(castSpell({ spellId: randomSpellId }));
+            } else {
+                await dispatch(engageHostiles());
+            }
             return;
         }
 
-        // 2. SURVIVAL/RESPAWN: If the void is claiming us (HP < 10), we gasp for air.
+        // 4. RESPAWN
         if (player.hp <= 0) {
             await dispatch(respawnPlayer());
             return;
         }
 
-        // 3. TRADE PRIORITY: Exchange gems for cryptic artifacts if a merchant materialize.
-        if (room.merchants && room.merchants.length > 0 && (player.spirit > 50 || player.blood > 10)) {
-            const merchant = room.merchants[0];
-            const item = merchant.wares[0];
-            if (item) {
-                await dispatch(tradeBuy({ merchantId: merchant.id, itemId: item.id }));
+        // 5. SURVIVAL RETREAT (New): If HP < 20% and enemies present, try to move away immediately instead of fighting
+        if (player.hp < player.maxHp * 0.2 && room.enemies.length > 0) {
+            const available = DIRECTIONS.filter((d) => room.exits[d]);
+            if (available.length > 0) {
+                const dir = available[Math.floor(Math.random() * available.length)];
+                await dispatch(movePlayer(dir));
                 return;
             }
         }
 
-        // 4. INFORMATION GATHERING: The chronicler must catalog the labyrinth.
-        // If we haven't scanned this room yet (check logs?), we scan.
+        // 6. TRADE: Smart Economy
+        if (room.merchants && room.merchants.length > 0) {
+            // BUY: If rich (Spirit > 50) - prioritize upgrades or healing
+            if (player.spirit > 50) {
+                const merchant = room.merchants[0];
+                // Find useful item
+                const usefulItem = merchant.wares.find(w => w.type === 'relic' || w.type === 'weapon'); // Buy gear/relics
+                const item = usefulItem || merchant.wares[0];
+                if (item) {
+                    await dispatch(tradeBuy({ merchantId: merchant.id, itemId: item.id }));
+                    return;
+                }
+            }
+            // SELL: Maintain inventory space and liquid capital
+            if ((player.inventory.length > 8) || (player.spirit < 10 && player.inventory.length > 2)) {
+                // Sell low value or excess items (not implemented well yet, just pick last non-equipped)
+                const itemToSell = player.inventory[player.inventory.length - 1];
+                if (itemToSell) {
+                    await dispatch(tradeSell({ itemId: itemToSell.id }));
+                    return;
+                }
+            }
+        }
+
+        // 6. EXPLORATION: Scan & Move Smartly
         const recentLogs = state.game.logs.slice(-5);
         const alreadyScanned = recentLogs.some((l: any) => l.message.includes("[SCAN RESULT]") && l.message.includes(room.title));
 
@@ -443,22 +667,47 @@ export const runAutoplayTick = createAsyncThunk(
             return;
         }
 
-        // 5. MYSTICAL CONECTION: At times, we must commune with the void.
-        if (Math.random() < 0.15) {
+        // 7. COMMUNE: Occasional lore
+        if (Math.random() < 0.1) { // Reduced chance to favor speed
             await dispatch(communeWithVoid());
             return;
         }
 
-        // 6. MOVEMENT: Advance through the interdimensional tapestry.
+        // 8. MOVEMENT: Directed Exploration
         const available = DIRECTIONS.filter((d) => room.exits[d]);
         if (available.length > 0) {
-            // Favor unexplored or interesting vectors
-            const dir = available[Math.floor(Math.random() * available.length)];
+            // Prioritize Base Camp if critically wounded and no healing items
+            if (player.hp < player.maxHp * 0.3) {
+                // Simple memory: if we know where base camp is (room id 'start_room' or 'recon_base')...
+                // But we don't have pathfinding. 
+                // Just random move is fine for now, but maybe avoid known hazards?
+            }
+
+            // Check established map to find unvisited neighbors
+            // state.game.exploredRooms contains all rooms by ID.
+            // Exits map direction -> roomID.
+            const exploredRoomIds = Object.keys(state.game.exploredRooms);
+
+            // Prefer exits where the room ID is NOT in exploredRoomIds
+            // But we don't know the ID of the next room until we enter it if it's generated? 
+            // Actually `generateRoom` logic sets exit ID to "new-room" string literal.
+            // If it's "new-room", it's definitely unvisited!
+
+            const unvisited = available.filter(d => room.exits[d] === "new-room" || !exploredRoomIds.includes(room.exits[d]!));
+
+            let dir: string;
+            if (unvisited.length > 0) {
+                dir = unvisited[Math.floor(Math.random() * unvisited.length)];
+            } else {
+                dir = available[Math.floor(Math.random() * available.length)];
+            }
+
             await dispatch(movePlayer(dir));
+            handleVignetteProgression(dispatch, getState);
             return;
         }
 
-        // 7. ORACLE FALLBACK: When reality ripples, interpellate the Loom of Fate.
+        // 9. ORACLE FALLBACK
         const themes = [
             "What shadows lurk in this corner of the otherworld?",
             "Is the fabric of reality weakening here?",
@@ -650,7 +899,12 @@ export const gameSlice = createSlice({
             // Update Enemy
             const enemies = state.currentRoom.enemies.map(e => {
                 if (e.id === enemyId) {
-                    return { ...e, hp: e.hp - actualEnemyDamage };
+                    return {
+                        ...e,
+                        hp: e.hp - actualEnemyDamage,
+                        lastDamageTime: actualEnemyDamage > 0 ? Date.now() : e.lastDamageTime,
+                        lastAttackTime: Date.now() // Enemy always retaliates in this model
+                    };
                 }
                 return e;
             });
@@ -739,7 +993,12 @@ export const gameSlice = createSlice({
             // Update Enemy
             const enemiesSpell = state.currentRoom.enemies.map(e => {
                 if (e.id === enemyId) {
-                    return { ...e, hp: e.hp - actualEnemyDamageSpell };
+                    return {
+                        ...e,
+                        hp: e.hp - actualEnemyDamageSpell,
+                        lastDamageTime: actualEnemyDamageSpell > 0 ? Date.now() : e.lastDamageTime,
+                        lastAttackTime: Date.now()
+                    };
                 }
                 return e;
             });
@@ -817,8 +1076,8 @@ export const gameSlice = createSlice({
             state.player.hp = state.player.maxHp;
             state.player.stress = 0;
             state.currentRoom.enemies = [];
-            state.sessionComplete = "death";
-            if (state.sessionScore) state.sessionScore.endTime = Date.now();
+            state.sessionComplete = null; // Resume play
+            // state.sessionScore.endTime = Date.now(); // Do not end session
         });
 
         // Trade
@@ -872,6 +1131,84 @@ export const gameSlice = createSlice({
                         }
                     }
                 }
+            }
+        });
+
+        // Inventory Actions
+        builder.addCase(useItem.fulfilled, (state, action) => {
+            if (!action.payload || !state.player) return;
+            const { itemIndex, effect } = action.payload;
+
+            // Remove item
+            state.player.inventory.splice(itemIndex, 1);
+
+            // Apply effect
+            if (effect === "heal_hp_20") {
+                state.player.hp = Math.min(state.player.maxHp, state.player.hp + 20);
+            } else if (effect === "heal_stress_10") {
+                state.player.stress = Math.max(0, state.player.stress - 10);
+            }
+        });
+
+        builder.addCase(equipItem.fulfilled, (state, action) => {
+            if (!action.payload || !state.player) return;
+            const { itemIndex, slot, item } = action.payload;
+
+            // Remove from inventory
+            state.player.inventory.splice(itemIndex, 1);
+
+            // If something already in slot, move to inventory
+            const existing = state.player.equipment?.[slot];
+            if (existing) {
+                state.player.inventory.push(existing);
+            }
+
+            // Set new item
+            if (!state.player.equipment) state.player.equipment = {};
+            state.player.equipment[slot] = item;
+        });
+
+        builder.addCase(unequipItem.fulfilled, (state, action) => {
+            if (!action.payload || !state.player || !state.player.equipment) return;
+            const { slot } = action.payload;
+
+            // Move to inventory
+            const item = state.player.equipment[slot];
+            if (item) {
+                state.player.inventory.push(item);
+                delete state.player.equipment[slot];
+            }
+        });
+
+        // Base Camp Logic
+        builder.addCase(harvestCrop.fulfilled, (state, action) => {
+            if (!action.payload || !state.currentRoom?.features) return;
+            const { featureIndex, item } = action.payload;
+
+            // Reset plot
+            const plot = state.currentRoom.features[featureIndex];
+            if (plot && plot.type === 'farming_plot') {
+                plot.progress = 0;
+                plot.ready = false;
+            }
+
+            // Add item
+            state.player?.inventory.push(item);
+        });
+
+        // Autoplay Tick - Grow Crops
+        builder.addCase(runAutoplayTick.fulfilled, (state) => {
+            // Passive crop growth on every tick
+            if (state.currentRoom?.features) {
+                state.currentRoom.features.forEach(f => {
+                    if (f.type === 'farming_plot' && !f.ready) {
+                        f.progress += 20; // 5 ticks to grow
+                        if (f.progress >= 100) {
+                            f.progress = 100;
+                            f.ready = true;
+                        }
+                    }
+                });
             }
         });
     }

@@ -1,5 +1,20 @@
 import type { LoomResult, UnexpectedlyEffect, StageOfScene } from "./types";
 
+export const VIGNETTE_THEMES = [
+  "Shadows of the Past",
+  "Lost Technology",
+  "Betrayal",
+  "Hope in Darkness",
+  "The Void Calls",
+  "Ancient Rituals",
+  "Technomancer's Dream",
+  "Cyber-Organic Fusion",
+  "Echoes of Silence",
+  "Forbidden Knowledge",
+  "The Machine God",
+  "Flesh and Steel"
+];
+
 /** Generate obvious follow-up facts from a Loom answer (Familiar: "record the answer, then create a few obvious follow-up facts"). */
 export function generateFollowUpFacts(
   question: string,

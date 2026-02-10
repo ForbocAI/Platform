@@ -119,12 +119,18 @@ export function GameScreen() {
     }
   }, [threads, mainThreadId, dispatch]);
 
-  const getInitOptions = () => ({
-    forceMerchant: searchParams.get("forceMerchant") === "1",
-    deterministic: searchParams.get("deterministic") === "1",
-    forceEnemy: searchParams.get("forceEnemy") === "1",
-    lowHp: searchParams.get("lowHp") === "1",
-  });
+  const getInitOptions = () => {
+    const params =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search)
+        : searchParams;
+    return {
+      forceMerchant: params.get("forceMerchant") === "1",
+      deterministic: params.get("deterministic") === "1",
+      forceEnemy: params.get("forceEnemy") === "1",
+      lowHp: params.get("lowHp") === "1",
+    };
+  };
 
   useLayoutEffect(() => {
     if (!isInitialized && !isLoading) {
@@ -222,6 +228,9 @@ export function GameScreen() {
         onCloseSkills={() => dispatch(toggleSkillsPanel())}
         onRejectConcession={() => dispatch(respawnPlayer())}
         onAcceptConcession={(type) => dispatch(addLog({ message: `You accepted concession: ${type}`, type: "system" }))}
+        onEquipItem={(id, slot) => dispatch(equipItem({ itemId: id, slot }))}
+        onUnequipItem={(slot) => dispatch(unequipItem({ slot }))}
+        onUseItem={(id) => dispatch(useItem({ itemId: id }))}
         activeMerchant={activeMerchant}
         onCloseTrade={() => dispatch(closeTrade())}
         onSelectSpell={(id) => dispatch(selectSpell(id))}

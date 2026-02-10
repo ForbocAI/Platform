@@ -1,4 +1,4 @@
-import { Map as MapIcon, Crosshair, Package, Play, Square, Swords, MessageCircle, Wand2, Box, Sparkles } from "lucide-react";
+import { Map as MapIcon, Crosshair, Package, Play, Square, Swords, MessageCircle, Wand2, Box, Award } from "lucide-react";
 import { GameButton, NavButton } from "../generic";
 import type { Player, Room } from "@/lib/quadar/types";
 
@@ -70,7 +70,7 @@ export function ActionDeck({
           <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan">
             SCAN
           </GameButton>
-          <GameButton onClick={onEngage} variant="danger" icon={<Swords className="app-icon" />} data-testid="action-engage">
+          <GameButton onClick={onEngage} variant="danger" icon={<Swords className="app-icon" />} data-testid="action-engage" disabled={currentRoom.enemies.length === 0}>
             ENGAGE
           </GameButton>
           <GameButton onClick={onCommune} variant="magic" icon={<MessageCircle className="app-icon" />} data-testid="action-commune">
@@ -112,7 +112,7 @@ export function ActionDeck({
           title="View skills"
         >
           <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs flex items-center gap-1 whitespace-nowrap">
-            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <Award className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden sm:inline">View skills</span>
           </span>
           <div className="flex gap-px">
@@ -122,7 +122,7 @@ export function ActionDeck({
                 className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
                 title={skill}
               >
-                <Sparkles className="app-icon" />
+                <Award className="app-icon" />
               </div>
             ))}
           </div>
