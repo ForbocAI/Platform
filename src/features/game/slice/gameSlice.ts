@@ -640,7 +640,7 @@ export const runAutoplayTick = createAsyncThunk(
             if (player.spirit > 50) {
                 const merchant = room.merchants[0];
                 // Find useful item
-                const usefulItem = merchant.wares.find(w => w.type === 'relic' || w.type === 'weapon'); // Buy gear/relics
+                const usefulItem = merchant.wares.find((w: any) => w.type === 'relic' || w.type === 'weapon'); // Buy gear/relics
                 const item = usefulItem || merchant.wares[0];
                 if (item) {
                     await dispatch(tradeBuy({ merchantId: merchant.id, itemId: item.id }));

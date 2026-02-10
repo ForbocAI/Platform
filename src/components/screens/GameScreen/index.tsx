@@ -25,6 +25,9 @@ import {
   respawnPlayer,
   selectSpell,
   clearPendingQuestFacts,
+  equipItem,
+  unequipItem,
+  useItem,
 } from "@/features/game/slice/gameSlice";
 import {
   selectOracleInput,
