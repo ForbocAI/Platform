@@ -1,4 +1,4 @@
-import type { CharacterClass, Spell, Stats } from "../types";
+import type { CharacterClass, Spell, Stats } from "@/features/game/types";
 
 export const SPELLS: Record<string, Spell> = {
     "relic_strike": {

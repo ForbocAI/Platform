@@ -1,4 +1,4 @@
-import type { Item } from "../types";
+import type { Item } from "@/features/game/types";
 
 export const MATERIALS: Item[] = [
     { id: "glowing_mushroom", name: "Glowing Mushroom", type: "resource", description: "A faint blue fungus with regenerative properties.", cost: { spirit: 5 } },

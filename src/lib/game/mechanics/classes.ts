@@ -1,4 +1,4 @@
-import type { CharacterClass } from "../types";
+import type { CharacterClass } from "@/features/game/types";
 
 type ClassTemplate = {
     baseStats: { Str: number; Agi: number; Arcane: number; maxHp: number; maxStress: number };

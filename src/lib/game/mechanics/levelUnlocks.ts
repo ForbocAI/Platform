@@ -1,4 +1,4 @@
-import type { CharacterClass } from "../types";
+import type { CharacterClass } from "@/features/game/types";
 
 export const LEVEL_SKILL_UNLOCKS: Partial<Record<CharacterClass, Partial<Record<number, string>>>> = {
     Ashwalker: { 12: "keen_senses", 14: "ember_veil", 16: "scout_instinct" },
