@@ -1,5 +1,5 @@
-import type { OracleResult, UnexpectedlyEffect, StageOfScene } from "./types";
-import { LORE_VIGNETTE_THEMES } from "./content";
+import type { OracleResult, UnexpectedlyEffect, StageOfScene } from "@/features/game/types";
+import { LORE_VIGNETTE_THEMES } from "@/features/game/content";
 
 export const VIGNETTE_THEMES = [
   "Shadows of the Past",

@@ -1,4 +1,4 @@
-import type { OracleResult } from "./types";
+import type { OracleResult } from "@/features/game/types";
 import { UNEXPECTEDLY_TABLE } from "./mechanics/tables";
 
 export function consultOracle(question: string, currentSurgeCount: number): OracleResult {
