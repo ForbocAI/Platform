@@ -25,8 +25,8 @@ Under `src/` we keep exactly five top-level directories:
 
 ## Components
 
-- **elements/generic** — Reusable primitives (buttons, modals, stat box, etc.).
-- **elements/unique** — Game-specific components, grouped by subdomain: **game/** (ActionDeck, RoomViewport, panels, PlayerHeader, …), **narrative/** (FactsPanel, OracleForm, StageSelector, ThreadList, VignetteControls), **shared/** (Runes, VolumeControls).
-- **screens** — Composed from unique and generic components; no subdomain folders under screens.
+- **elements/generic** — Reusable primitives (buttons, modals, stat box, etc.). No domain types.
+- **elements/unique** — Domain components by subdomain: **game/** (ActionDeck, RoomViewport, panels, PlayerHeader, QuestsPanel, …), **narrative/** (FactsPanel, OracleForm, StageSelector, ThreadList, VignetteControls), **shared/** (Runes, VolumeControls).
+- **screens** — Full-page compositions; one folder per screen. Built only from unique and generic components.
 
-Screens are built from unique and generic elements; unique elements use generic elements where possible.
+Screens → unique + generic. Unique → generic (and other unique) where possible. See **docs/COMPONENTS.md** for folder layout and composition rules.

@@ -1,7 +1,7 @@
-
-import { X, Shield, Sword, Gem, Package } from "lucide-react";
+import { Shield, Sword, Gem, Package } from "lucide-react";
 import type { Player, Item, EquipmentSlot } from "@/features/game/types";
 import { calculateEffectiveStats } from "@/features/game/items";
+import { Modal, GameButton } from "@/components/elements/generic";
 
 interface InventoryPanelProps {
     player: Player;
@@ -40,13 +40,13 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                 {item && (
                     <div className="flex items-center gap-2">
                         {renderItemBonus(item)}
-                        <button
+                        <GameButton
+                            variant="danger"
                             onClick={() => onUnequip(slot)}
-                            className="text-xs px-2 py-1 border border-palette-border hover:bg-palette-accent-red/20 hover:text-palette-accent-red transition-colors"
                             data-testid={`inventory-unequip-${slot}`}
                         >
                             Unequip
-                        </button>
+                        </GameButton>
                     </div>
                 )}
             </div>
@@ -54,21 +54,14 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
     };
 
     return (
-        <div className="absolute inset-0 z-50 bg-palette-bg-dark/95 backdrop-blur-sm p-3 sm:p-4 flex flex-col items-center justify-center overflow-y-auto" data-testid="inventory-panel">
-            <div className="w-full max-w-2xl bg-palette-bg-dark border border-palette-border shadow-2xl flex flex-col max-h-full min-h-0 my-auto">
-                {/* Header */}
-                <div className="flex items-center justify-between p-3 border-b border-palette-border bg-palette-bg-mid/50">
-                    <h2 className="text-lg font-bold text-palette-white tracking-widest uppercase flex items-center gap-2">
-                        <Package className="w-5 h-5 text-palette-accent-gold" />
-                        Inventory & Equipment
-                    </h2>
-                    <button onClick={onClose} className="p-2 -m-1 hover:text-palette-accent-red transition-colors touch-manipulation" data-testid="inventory-close" aria-label="Close inventory">
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <Modal
+            title="Inventory & Equipment"
+            titleIcon={<Package className="w-5 h-5 text-palette-accent-gold" />}
+            onClose={onClose}
+            maxWidth="2xl"
+            data-testid="inventory-panel"
+        >
+            <div className="space-y-6">
 
                     {/* Stats Summary */}
                     <div className="grid grid-cols-4 gap-2 text-center text-sm p-2 bg-palette-bg-mid/20 border border-palette-border/50 rounded">
@@ -119,26 +112,26 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                                             <span className="text-xs text-palette-muted truncate">{item.description}</span>
                                             {renderItemBonus(item)}
                                         </div>
-                                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                                        <div className="flex items-center gap-2 shrink-0 ml-2 flex-wrap">
                                             {item.type === "weapon" && (
-                                                <button onClick={() => onEquip(item.id, "mainHand")} className="text-xs px-2 py-1 border border-palette-border hover:bg-palette-accent-cyan/10 hover:text-palette-accent-cyan hover:border-palette-accent-cyan transition-colors uppercase tracking-wider" data-testid={`inventory-equip-${item.id}`}>Equip</button>
+                                                <GameButton onClick={() => onEquip(item.id, "mainHand")} data-testid={`inventory-equip-${item.id}`}>Equip</GameButton>
                                             )}
                                             {item.type === "armor" && (
-                                                <button onClick={() => onEquip(item.id, "armor")} className="text-xs px-2 py-1 border border-palette-border hover:bg-palette-accent-cyan/10 hover:text-palette-accent-cyan hover:border-palette-accent-cyan transition-colors uppercase tracking-wider" data-testid={`inventory-equip-${item.id}`}>Equip</button>
+                                                <GameButton onClick={() => onEquip(item.id, "armor")} data-testid={`inventory-equip-${item.id}`}>Equip</GameButton>
                                             )}
                                             {item.type === "relic" && (
-                                                <button onClick={() => onEquip(item.id, "relic")} className="text-xs px-2 py-1 border border-palette-border hover:bg-palette-accent-cyan/10 hover:text-palette-accent-cyan hover:border-palette-accent-cyan transition-colors uppercase tracking-wider" data-testid={`inventory-equip-${item.id}`}>Equip</button>
+                                                <GameButton onClick={() => onEquip(item.id, "relic")} data-testid={`inventory-equip-${item.id}`}>Equip</GameButton>
                                             )}
                                             {item.type === "consumable" && (
-                                                <button onClick={() => onUse(item.id)} className="text-xs px-2 py-1 border border-palette-border text-palette-accent-cyan border-palette-accent-cyan/50 hover:bg-palette-accent-cyan/10 transition-colors uppercase tracking-wider" data-testid={`inventory-use-${item.id}`}>Use</button>
+                                                <GameButton variant="magic" onClick={() => onUse(item.id)} data-testid={`inventory-use-${item.id}`}>Use</GameButton>
                                             )}
                                             {item.type === "contract" && (
-                                                <button onClick={() => onUse(item.id)} className="text-xs px-2 py-1 border border-palette-border text-palette-accent-warm border-palette-accent-warm/50 hover:bg-palette-accent-warm/10 transition-colors uppercase tracking-wider" data-testid={`inventory-use-${item.id}`}>Sign</button>
+                                                <GameButton variant="magic" onClick={() => onUse(item.id)} data-testid={`inventory-use-${item.id}`}>Sign</GameButton>
                                             )}
                                             {item.cost?.spirit && item.cost.spirit > 0 && (
-                                                <button onClick={() => onSacrifice(item.id)} className="text-xs px-2 py-1 border border-palette-border text-palette-accent-violet border-palette-accent-violet/50 hover:bg-palette-accent-violet/10 transition-colors uppercase tracking-wider" data-testid={`inventory-sacrifice-${item.id}`}>
+                                                <GameButton variant="magic" onClick={() => onSacrifice(item.id)} data-testid={`inventory-sacrifice-${item.id}`}>
                                                     Sacrifice ({Math.max(1, Math.floor(item.cost.spirit / 2))})
-                                                </button>
+                                                </GameButton>
                                             )}
                                         </div>
                                     </div>
@@ -146,9 +139,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                             </div>
                         )}
                     </div>
-
-                </div>
             </div>
-        </div>
+        </Modal>
     );
 }

@@ -1,0 +1,27 @@
+---
+description: Component folder structure and composition (generic / unique / screens)
+globs: src/components/**/*.tsx
+alwaysApply: false
+---
+
+# Component structure (Platform)
+
+## Folders
+
+- **components/elements/generic** — Reusable primitives (buttons, modal, overlay, stat box). No domain types.
+- **components/elements/unique** — Domain components by subdomain: `game/`, `narrative/`, `shared/`.
+- **components/screens** — Full-page screens; one folder per screen (e.g. `GameScreen/`).
+
+## Composition
+
+1. **Screens** — As much as possible, build screens from **unique** and **generic** components. Prefer screen sub-components that use unique/generic. Extract inline UI blocks into unique components.
+2. **Unique** — As much as possible, build unique components from **generic** components (Modal, GameButton, NavButton, StatBox, LoadingOverlay).
+3. **Generic** — No imports from `features/game` or `features/narrative`; stay domain-agnostic.
+
+## Imports
+
+- Screens: `@/components/elements/unique`, `@/components/elements/generic`.
+- Unique: `@/components/elements/generic` (and other unique as needed).
+- Generic: no component imports; only lib/features for non-domain utils.
+
+See `docs/COMPONENTS.md` for full details.

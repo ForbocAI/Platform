@@ -1,6 +1,6 @@
 "use client";
 
-import { RoomViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel } from "@/components/elements/unique";
+import { RoomViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel, QuestsPanel } from "@/components/elements/unique";
 import type { Room, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore, VignetteStage } from "@/features/game/types";
 import type { RoomCoordinates } from "@/features/game/slice/gameSlice";
 
@@ -69,29 +69,11 @@ export function GameScreenMain({
       </div>
       {/* Sidebar: full width on mobile (below room), right column on lg+ */}
       <div className="flex flex-col w-full lg:w-72 xl:w-80 shrink-0 min-h-0 border-t lg:border-t-0 lg:border-l border-palette-border order-2 overflow-hidden">
-        {/* Quests & Session */}
-        {(activeQuests.length > 0 || sessionComplete) && (
-          <div className="shrink-0 border-b border-palette-border p-2 space-y-1.5 bg-palette-bg-mid/10" data-testid="quests-panel">
-            {activeQuests.map((q) => (
-              <div key={q.id} className="text-xs text-palette-muted">
-                <span className={q.complete ? "line-through text-palette-muted/70" : ""}>
-                  {q.label}: {q.progress}/{q.target}
-                </span>
-                {q.complete && <span className="ml-1 text-palette-accent-cyan">✓</span>}
-              </div>
-            ))}
-            {sessionComplete === "quests" && sessionScore && (
-              <div className="text-xs text-palette-accent-cyan pt-1 border-t border-palette-border/50">
-                Session complete — Rooms: {sessionScore.roomsExplored} | Scans: {sessionScore.roomsScanned} | Foes: {sessionScore.enemiesDefeated} | Trades: {sessionScore.merchantTrades} | Quests: {sessionScore.questsCompleted} | Spirit: {sessionScore.spiritEarned}
-              </div>
-            )}
-            {sessionComplete === "death" && sessionScore && (
-              <div className="text-xs text-palette-accent-red pt-1 border-t border-palette-border/50">
-                Session ended (death) — Rooms: {sessionScore.roomsExplored} | Scans: {sessionScore.roomsScanned} | Foes: {sessionScore.enemiesDefeated} | Trades: {sessionScore.merchantTrades} | Quests: {sessionScore.questsCompleted} | Spirit: {sessionScore.spiritEarned}
-              </div>
-            )}
-          </div>
-        )}
+        <QuestsPanel
+          activeQuests={activeQuests}
+          sessionComplete={sessionComplete}
+          sessionScore={sessionScore}
+        />
         <ThreadList
           threads={threads}
           mainThreadId={mainThreadId}

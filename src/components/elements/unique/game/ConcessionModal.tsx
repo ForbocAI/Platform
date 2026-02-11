@@ -1,43 +1,48 @@
 "use client";
 
-import { Modal } from "@/components/elements/generic";
+import { Modal, GameButton } from "@/components/elements/generic";
 
 interface ConcessionModalProps {
   open: boolean;
-  onAccept: (type: 'flee' | 'capture') => void;
+  onAccept: (type: "flee" | "capture") => void;
   onReject: () => void;
 }
 
-export function ConcessionModal({ open, onAccept, onReject }: ConcessionModalProps) {
+export function ConcessionModal({
+  open,
+  onAccept,
+  onReject,
+}: ConcessionModalProps) {
   if (!open) return null;
 
   return (
-    <Modal title="Concession Required" onClose={() => { }}>
+    <Modal title="Concession Required" onClose={() => {}}>
       <div className="space-y-4" data-testid="concession-modal">
         <p>You have been bested in combat. The shadows claim you.</p>
         <div className="flex flex-col gap-2">
-          <button
-            onClick={() => onAccept('flee')}
-            className="w-full p-2 border border-palette-border hover:bg-palette-bg-light text-left"
+          <GameButton
+            onClick={() => onAccept("flee")}
             data-testid="concession-accept-flee"
+            className="w-full text-left justify-start"
           >
             Flee (Lose progress, keep life)
-          </button>
-          <button
-            onClick={() => onAccept('capture')}
-            className="w-full p-2 border border-palette-border hover:bg-palette-bg-light text-left"
+          </GameButton>
+          <GameButton
+            onClick={() => onAccept("capture")}
             data-testid="concession-accept-capture"
+            className="w-full text-left justify-start"
           >
-            Surrender ( captured, lose items)
-          </button>
+            Surrender (captured, lose items)
+          </GameButton>
           <div className="border-t border-palette-border my-2" />
-          <button
+          <GameButton
             onClick={onReject}
-            className="w-full p-2 bg-red-900/50 border border-red-800 hover:bg-red-800/50 text-white font-bold"
+            variant="danger"
             data-testid="concession-reject"
+            className="w-full"
           >
             Reject (Die and Respawn)
-          </button>
+          </GameButton>
         </div>
       </div>
     </Modal>
