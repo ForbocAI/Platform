@@ -1,7 +1,5 @@
-// Game subdomain
 export { StageSelector } from "./narrative/StageSelector";
 export { PlayerHeader } from "./game/PlayerHeader/index";
-export { PlayerHeaderIdentity, PlayerHeaderBars, PlayerHeaderResources, PlayerHeaderStats, PlayerHeaderMedia } from "./game/PlayerHeader/index";
 export { RoomViewport } from "./game/RoomViewport";
 export { MapView } from "./game/MapView";
 export { NeuralLogPanel } from "./game/NeuralLogPanel";

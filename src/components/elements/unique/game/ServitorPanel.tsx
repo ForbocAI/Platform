@@ -59,16 +59,9 @@ export function ServitorPanel({ player, onClose }: ServitorPanelProps) {
                     style={{ width: `${Math.max(0, Math.min(100, (comp.hp / comp.maxHp) * 100))}%` }}
                   />
                 </div>
-                <div className="flex justify-between items-end">
-                  <p className="text-xs text-palette-muted-light line-clamp-2 md:line-clamp-none italic">
-                    &quot;{comp.description}&quot;
-                  </p>
-                  <div className="flex gap-2 text-[10px] text-palette-muted uppercase tracking-wider">
-                    <span>STR {comp.Str}</span>
-                    <span>AGI {comp.Agi}</span>
-                    <span>ARC {comp.Arcane}</span>
-                  </div>
-                </div>
+                <p className="text-xs text-palette-muted-light line-clamp-2 md:line-clamp-none italic">
+                  &quot;{comp.description}&quot;
+                </p>
               </div>
             ))}
           </div>

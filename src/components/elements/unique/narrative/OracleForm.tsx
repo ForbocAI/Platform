@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Send } from "lucide-react";
 import { usePlayButtonSound } from "@/features/audio";
+import { GameButton } from "@/components/elements/generic";
 
 export function OracleForm({
   value,
@@ -47,14 +48,13 @@ export function OracleForm({
           data-testid="oracle-input"
           aria-label="Ask Oracle (press Enter to send)"
         />
-        <button
+        <GameButton
           type="submit"
+          icon={<Send className="app-icon" />}
           data-testid="oracle-submit"
-          className="bg-palette-accent-magic/20 border border-palette-accent-cyan/30 text-palette-accent-cyan hover:bg-palette-accent-magic/40 hover:text-palette-white px-1.5 sm:px-2 flex items-center justify-center transition-colors shrink-0 touch-manipulation"
+          className="shrink-0"
           aria-label="Send"
-        >
-          <Send className="app-icon" />
-        </button>
+        />
       </form>
     </div>
   );

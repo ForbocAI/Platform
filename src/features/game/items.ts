@@ -5,11 +5,7 @@ import { Player, Stats, Item, EquipmentSlot } from "./types";
  * Calculates effective stats by summing base stats and equipment bonuses.
  */
 export function calculateEffectiveStats(player: Player): Stats {
-    // Start with base stats
     const stats: Stats = {
-        Str: player.Str,
-        Agi: player.Agi,
-        Arcane: player.Arcane,
         maxHp: player.maxHp,
         hp: player.hp,
         maxStress: player.maxStress,
@@ -21,9 +17,6 @@ export function calculateEffectiveStats(player: Player): Stats {
     for (const slot of slots) {
         const item = player.equipment?.[slot];
         if (item && item.bonus) {
-            stats.Str += item.bonus.Str || 0;
-            stats.Agi += item.bonus.Agi || 0;
-            stats.Arcane += item.bonus.Arcane || 0;
             stats.maxHp += item.bonus.maxHp || 0;
             stats.maxStress += item.bonus.maxStress || 0;
             stats.ac = (stats.ac ?? 0) + (item.bonus.ac || 0);

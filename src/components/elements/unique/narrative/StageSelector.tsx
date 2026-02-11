@@ -4,6 +4,7 @@ import type { StageOfScene } from "@/features/game/types";
 import { cn } from "@/lib/utils";
 import { usePlayButtonSound } from "@/features/audio";
 import { RuneSigil } from "../shared/Runes";
+import { GameButton } from "@/components/elements/generic";
 
 const STAGES: { value: StageOfScene; label: string }[] = [
   { value: "To Knowledge", label: "Knowledge" },
@@ -24,9 +25,9 @@ export function StageSelector({
       <RuneSigil className="shrink-0" />
       <span className="text-palette-muted-light uppercase tracking-wider mr-0.5 shrink-0 leading-tight">Stage:</span>
       {STAGES.map(({ value, label }) => (
-        <button
+        <GameButton
           key={value}
-          type="button"
+          variant={stage === value ? "magic" : "default"}
           onClick={() => {
             playSound();
             onStageChange(value);
@@ -34,14 +35,14 @@ export function StageSelector({
           data-testid={`stage-${value.replace(/\s+/g, "-").toLowerCase()}`}
           aria-label={`Stage: ${label}`}
           className={cn(
-            "px-1.5 sm:px-2 py-0.5 font-bold uppercase tracking-wider transition-colors touch-manipulation leading-tight",
+            "px-1.5 sm:px-2 py-0.5 h-auto leading-tight",
             stage === value
-              ? "bg-palette-accent-magic/50 text-palette-accent-magic border border-palette-accent-cyan/50"
-              : "text-palette-muted hover:text-palette-muted-light border border-transparent"
+              ? "bg-palette-accent-magic/50 text-palette-accent-magic border-palette-accent-cyan/50"
+              : "text-palette-muted hover:text-palette-muted-light border-transparent"
           )}
         >
           {label}
-        </button>
+        </GameButton>
       ))}
     </div>
   );

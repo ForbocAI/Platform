@@ -2,22 +2,17 @@
 
 ## Folder layout
 
-Under `src/components/` use exactly three areas. **Maintain this folder structure** for all components:
+**Maintain this folder structure** under `src/components/`:
 
-- **components/elements/generic** — Reusable primitives with no game/narrative domain. Examples: `GameButton`, `NavButton`, `Modal`, `LoadingOverlay`, `StatBox`.
-- **components/elements/unique** — Domain-specific components. Group by subdomain: `game/`, `narrative/`, `shared/`. Examples: `ActionDeck`, `RoomViewport`, `PlayerHeader`, `FactsPanel`, `OracleForm`, `Runes`, `VolumeControls`.
-- **components/screens** — Full-page compositions. One folder per screen (e.g. `GameScreen/` with `index.tsx`, `GameScreenHeader.tsx`, etc.). No subdomain folders under `screens/`.
+- **components/elements/generic** — Reusable primitives; no game/narrative domain. Examples: `GameButton`, `NavButton`, `Modal`, `LoadingOverlay`, `StatBox`.
+- **components/elements/unique** — Domain-specific components. Subfolders by subdomain: `game/`, `narrative/`, `shared/`. Examples: `ActionDeck`, `RoomViewport`, `PlayerHeader`, `FactsPanel`, `OracleForm`, `Runes`, `VolumeControls`.
+- **components/screens** — Full-page screens. One folder per screen (e.g. `GameScreen/` with `index.tsx`, `GameScreenHeader.tsx`, etc.). No subdomain folders under `screens/`.
 
-## Composition rules
+## Composition
 
-1. **Screens**  
-   **As much as possible**, screen components are made of **unique** and **generic** components. Build screens only from unique and generic elements. Prefer screen sub-components (e.g. `GameScreenHeader`, `GameScreenMain`) that themselves use unique/generic elements. Avoid large blocks of inline JSX in screen files; extract to unique components when it represents a distinct UI area.
-
-2. **Unique elements**  
-   **As much as possible**, unique components are made of **generic** components. Use `Modal` for dialogs and overlay panels, `GameButton`/`NavButton` for actions, `StatBox` for stat display, `LoadingOverlay` for loading states. Use raw `<button>` or `<div>` only when a generic doesn’t fit (e.g. icon-only, custom layout).
-
-3. **Generic elements**  
-   Stay domain-agnostic. No imports from `features/game`, `features/narrative`, or domain types. Accept only props that describe presentation (labels, callbacks, variants).
+- **Screens** — As much as possible, screen components are made of **unique** and **generic** components. Prefer screen sub-components (e.g. `GameScreenHeader`, `GameScreenMain`) that use unique/generic elements. Extract inline UI blocks into unique components.
+- **Unique** — As much as possible, unique components are made of **generic** components (Modal, GameButton, NavButton, StatBox, LoadingOverlay). Use raw elements only when no generic fits.
+- **Generic** — Stay domain-agnostic. No imports from `features/game` or `features/narrative`; no domain types.
 
 ## Imports
 

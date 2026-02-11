@@ -185,7 +185,6 @@ export function GameScreen() {
         player={player}
         stage={stageOfScene}
         onStageChange={(s) => dispatch(setStageOfScene(s))}
-        onServitorClick={() => dispatch(toggleServitorPanel())}
       />
       <GameScreenMain
         currentRoom={currentRoom}
@@ -228,6 +227,7 @@ export function GameScreen() {
         onOpenInventory={() => dispatch(toggleInventory())}
         onOpenSpells={() => dispatch(toggleSpellsPanel())}
         onOpenSkills={() => dispatch(toggleSkillsPanel())}
+        onOpenServitor={() => dispatch(toggleServitorPanel())}
         autoPlay={autoPlay}
         onToggleAutoPlay={() => {
           playSound();

@@ -12,20 +12,12 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
             if (contractDetails) {
                 state.player.inventory.splice(itemIndex, 1);
                 if (!state.player.servitors) state.player.servitors = [];
-                let stats = { Str: 2, Agi: 2, Arcane: 0 };
-                switch (contractDetails.role) {
-                    case "Warrior": stats = { Str: 4, Agi: 2, Arcane: 0 }; break;
-                    case "Scout": stats = { Str: 2, Agi: 4, Arcane: 0 }; break;
-                    case "Mystic": stats = { Str: 0, Agi: 2, Arcane: 4 }; break;
-                }
-
                 state.player.servitors.push({
                     id: Date.now().toString(),
                     name: contractDetails.servitorName,
                     role: contractDetails.role as "Warrior" | "Scout" | "Mystic",
                     hp: contractDetails.maxHp,
                     maxHp: contractDetails.maxHp,
-                    ...stats,
                     description: contractDetails.description
                 });
             }

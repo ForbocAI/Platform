@@ -6,8 +6,8 @@ export const SPELLS: Record<string, Spell> = {
         name: "Relic Strike",
         class: "Ashwalker",
         description: "Powerful melee strike with ancient relic.",
-        damage: "1d8 + STR",
-        effect: (attacker, _defender) => `${attacker.Str} damage`
+        damage: "1d8",
+        effect: () => "Melee damage"
     },
     "ember_dash": {
         id: "ember_dash",
@@ -80,7 +80,7 @@ export const SPELLS: Record<string, Spell> = {
         name: "Dreadful Charge",
         class: "Doomguard",
         description: "Bludgeoning charge closing gap.",
-        damage: "1d10 + STR",
+        damage: "1d10",
         effect: () => "Charge Damage"
     },
     "explosive_barrage": {
@@ -96,7 +96,7 @@ export const SPELLS: Record<string, Spell> = {
         name: "Ripping Blade Slash",
         class: "Doomguard",
         description: "Searing jagged blade slash.",
-        damage: "1d8 + STR",
+        damage: "1d8",
         effect: (_a: Stats, _d: Stats) => "Fire/melee"
     },
     "eternal_flame": {
@@ -118,7 +118,7 @@ export const SPELLS: Record<string, Spell> = {
         name: "Ironclad Charge",
         class: "Iron Armored Guardian",
         description: "Powerful charge causing knockback and stun.",
-        damage: "1d10 + STR",
+        damage: "1d10",
         effect: () => "Knockback/Stun"
     },
     "steel_shield_block": {
@@ -140,7 +140,7 @@ export const SPELLS: Record<string, Spell> = {
         name: "Astral Bolt",
         class: "Aether Spirit",
         description: "Bolt of dark energy.",
-        damage: "2d6 + ARCANE",
+        damage: "2d6",
         effect: () => "Slow"
     },
     "shotgun_barrage": {

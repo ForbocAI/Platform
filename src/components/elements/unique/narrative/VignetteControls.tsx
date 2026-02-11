@@ -1,6 +1,7 @@
 "use client";
 
 import type { VignetteStage } from "@/features/game/types";
+import { GameButton } from "@/components/elements/generic";
 
 const STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax", "Epilogue"];
 
@@ -30,15 +31,14 @@ export function VignetteControls({
       <div className="flex items-center justify-between">
         <span className="text-palette-muted uppercase tracking-wider text-xs block">Vignette</span>
         {currentSceneId && onFadeOutScene && (
-          <button
-            type="button"
+          <GameButton
             onClick={onFadeOutScene}
-            className="px-2 py-0.5 border border-palette-border text-palette-muted hover:text-palette-accent-cyan hover:border-palette-accent-cyan text-xs uppercase transition-colors"
+            className="px-2 py-0.5 text-xs h-auto"
             data-testid="fade-out-scene"
             aria-label="Fade out scene"
           >
             Fade out
-          </button>
+          </GameButton>
         )}
       </div>
 

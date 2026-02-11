@@ -111,16 +111,12 @@ export const engageHostiles = createAsyncThunk(
         const victim = validServitors[Math.floor(Math.random() * validServitors.length)];
         targetId = victim.id;
 
-        // Infer stats for victim if missing (though they should be there)
-        const victimStats = {
+        const victimDefender = {
           name: victim.name,
-          Str: victim.Str ?? 2,
-          Agi: victim.Agi ?? 2,
-          Arcane: victim.Arcane ?? 0,
-          ac: 10 // Default AC for servitors
+          ac: 10
         };
 
-        const enemyAttack = resolveEnemyAttackOnServitor(enemy, victimStats);
+        const enemyAttack = resolveEnemyAttackOnServitor(enemy, victimDefender);
         dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
         if (enemyAttack.hit) {
           servitorUpdates.push({ id: victim.id, damageTaken: enemyAttack.damage });

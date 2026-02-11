@@ -1,6 +1,5 @@
 import { Shield, Sword, Gem, Package } from "lucide-react";
 import type { Player, Item, EquipmentSlot } from "@/features/game/types";
-import { calculateEffectiveStats } from "@/features/game/items";
 import { Modal, GameButton } from "@/components/elements/generic";
 
 interface InventoryPanelProps {
@@ -13,8 +12,6 @@ interface InventoryPanelProps {
 }
 
 export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice, onClose }: InventoryPanelProps) {
-    const stats = calculateEffectiveStats(player);
-
     const renderItemBonus = (item: Item) => {
         if (!item.bonus) return null;
         return (
@@ -62,26 +59,6 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
             data-testid="inventory-panel"
         >
             <div className="space-y-6">
-
-                    {/* Stats Summary */}
-                    <div className="grid grid-cols-4 gap-2 text-center text-sm p-2 bg-palette-bg-mid/20 border border-palette-border/50 rounded">
-                        <div>
-                            <div className="text-palette-muted uppercase text-xs">STR</div>
-                            <div className="text-palette-white font-bold">{stats.Str}</div>
-                        </div>
-                        <div>
-                            <div className="text-palette-muted uppercase text-xs">AGI</div>
-                            <div className="text-palette-white font-bold">{stats.Agi}</div>
-                        </div>
-                        <div>
-                            <div className="text-palette-muted uppercase text-xs">ARC</div>
-                            <div className="text-palette-white font-bold">{stats.Arcane}</div>
-                        </div>
-                        <div>
-                            <div className="text-palette-muted uppercase text-xs">AC</div>
-                            <div className="text-palette-white font-bold">{stats.ac}</div>
-                        </div>
-                    </div>
 
                     {/* Equipment */}
                     <div className="space-y-2">

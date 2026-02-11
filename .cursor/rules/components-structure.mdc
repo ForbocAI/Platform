@@ -14,9 +14,9 @@ alwaysApply: false
 
 ## Composition
 
-1. **Screens** — As much as possible, build screens from **unique** and **generic** components. Prefer screen sub-components that use unique/generic. Extract inline UI blocks into unique components.
-2. **Unique** — As much as possible, build unique components from **generic** components (Modal, GameButton, NavButton, StatBox, LoadingOverlay).
-3. **Generic** — No imports from `features/game` or `features/narrative`; stay domain-agnostic.
+- **Screens** — As much as possible, screens are made of **unique** and **generic** components. Prefer screen sub-components that use unique/generic. Extract inline UI into unique components.
+- **Unique** — As much as possible, unique components are made of **generic** components (Modal, GameButton, NavButton, StatBox, LoadingOverlay).
+- **Generic** — No imports from `features/game` or `features/narrative`; stay domain-agnostic.
 
 ## Imports
 

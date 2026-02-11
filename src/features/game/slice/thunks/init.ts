@@ -26,7 +26,6 @@ export const initializeGame = createAsyncThunk(
         role: "Warrior",
         hp: servitorHp,
         maxHp: servitorHp,
-        Str: 4, Agi: 2, Arcane: 0,
         description: "A seasoned warrior hired for testing."
       }];
     }

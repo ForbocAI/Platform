@@ -16,13 +16,10 @@ export interface GroupScoreModifier {
     defenderBonus?: number;
 }
 
-// Basic stats fragment needed for combat rolls
-type CombatStats = { Str: number; Agi: number; Arcane: number };
-
-/** Shadows of Fate: d20 + Str + Agi + Arcane + optional spell modifier. Higher total wins. */
-function rollCombatTotal(stats: CombatStats, spellModifier = 0): number {
+/** Combat roll: d20 + modifier. Higher total wins. */
+function rollCombatTotal(modifier = 0): number {
     const d20 = Math.floor(Math.random() * 20) + 1;
-    return d20 + stats.Str + stats.Agi + stats.Arcane + spellModifier;
+    return d20 + modifier;
 }
 
 export function resolveDuel(
@@ -31,14 +28,12 @@ export function resolveDuel(
     spellModifier = 0,
     groupScore?: GroupScoreModifier
 ): CombatResult {
-    const effectiveAttacker = calculateEffectiveStats(attacker);
-
     // Attacker roll
-    let attackerTotal = rollCombatTotal(effectiveAttacker, spellModifier);
+    let attackerTotal = rollCombatTotal(spellModifier);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
     // Defender roll
-    let defenderTotal = rollCombatTotal(defender);
+    let defenderTotal = rollCombatTotal(0);
     defenderTotal += groupScore?.defenderBonus ?? 0;
 
     const isHit = attackerTotal > defenderTotal;
@@ -80,12 +75,10 @@ export function resolveEnemyAttack(
     }
 
     // Roll Combat Total
-    // If spell, add potential spell modifier? Currently spells don't have accuracy mods in this system, 
-    // but we can add attackerBonus if needed from GroupScore.
-    let attackerTotal = rollCombatTotal(attacker);
+    let attackerTotal = rollCombatTotal(0);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
-    let defenderTotal = rollCombatTotal(effectiveDefender);
+    let defenderTotal = rollCombatTotal(0);
     defenderTotal += groupScore?.defenderBonus ?? 0;
 
     // AC Defensive Bonus
@@ -99,7 +92,7 @@ export function resolveEnemyAttack(
         if (spell) {
             // Spell Attack
             if (spell.damage) {
-                damage = parseDiceString(spell.damage, attacker); // Attacker uses their own Stats
+                damage = parseDiceString(spell.damage);
             } else {
                 // Fallback for utility spells or un-stat-ed spells
                 const diff = attackerTotal - defenderTotal;
@@ -142,11 +135,11 @@ export function resolveSpellDuel(
 ): CombatResult {
     const effectiveAttacker = calculateEffectiveStats(attacker);
 
-    // Roll d20 + Total Stats vs Defender Total Stats
-    let attackerTotal = rollCombatTotal(effectiveAttacker, 0);
+    // Roll d20 vs d20
+    let attackerTotal = rollCombatTotal(0);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
-    let defenderTotal = rollCombatTotal(defender);
+    let defenderTotal = rollCombatTotal(0);
     defenderTotal += groupScore?.defenderBonus ?? 0;
 
     const isHit = attackerTotal > defenderTotal;
@@ -156,7 +149,7 @@ export function resolveSpellDuel(
     if (isHit) {
         // Calculate spell damage
         if (spell.damage) {
-            damage = parseDiceString(spell.damage, effectiveAttacker);
+            damage = parseDiceString(spell.damage);
         } else {
             // Default if no damage string provided (e.g. basic magic missle equivalent)
             const diff = attackerTotal - defenderTotal;
@@ -186,14 +179,14 @@ export function resolveSpellDuel(
 }
 
 export function resolveServitorAttack(
-    servitor: { name: string; Str: number; Agi: number; Arcane: number },
+    servitor: { name: string },
     defender: Enemy,
     groupScore?: GroupScoreModifier
 ): CombatResult {
-    let attackerTotal = rollCombatTotal(servitor);
+    let attackerTotal = rollCombatTotal(0);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
-    let defenderTotal = rollCombatTotal(defender);
+    let defenderTotal = rollCombatTotal(0);
     defenderTotal += groupScore?.defenderBonus ?? 0;
 
     const isHit = attackerTotal > defenderTotal;
@@ -213,13 +206,13 @@ export function resolveServitorAttack(
 
 export function resolveEnemyAttackOnServitor(
     attacker: Enemy,
-    defender: { name: string; Str: number; Agi: number; Arcane: number; ac?: number },
+    defender: { name: string; ac?: number },
     groupScore?: GroupScoreModifier
 ): CombatResult {
-    let attackerTotal = rollCombatTotal(attacker);
+    let attackerTotal = rollCombatTotal(0);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
-    let defenderTotal = rollCombatTotal(defender);
+    let defenderTotal = rollCombatTotal(0);
     defenderTotal += groupScore?.defenderBonus ?? 0;
     // Servitors don't usually have AC yet, but if they do, add it
     defenderTotal += defender.ac ?? 0;

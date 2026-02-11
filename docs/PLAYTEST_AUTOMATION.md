@@ -35,7 +35,7 @@ All interactive elements in the game UI have:
 | Vignette theme / Start / Advance / End | `vignette-theme`, `vignette-start`, `vignette-advance-{stage}`, `vignette-end` (e.g. `vignette-advance-rising-action`, `vignette-advance-climax`, `vignette-advance-epilogue`; `{stage}` is kebab-case of next stage name) |
 | Concession modal / Accept (flee, etc.) / Reject | `concession-modal`, `concession-accept-flee`, `concession-accept-knocked_away`, `concession-accept-captured`, `concession-accept-other`, `concession-reject` |
 | Volume / Music | `volume-up`, `volume-down`, `music-toggle` |
-| Player header | `player-header` (displays HP, Stress, STR/AGI/ARC, Spirit, Blood, Surge) |
+| Player header | `player-header` (displays HP, Stress, Spirit, Blood, Surge) |
 | Stage selector | `stage-selector` |
 | Thread list | `thread-list` |
 | Vignette controls | `vignette-controls` |

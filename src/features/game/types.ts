@@ -1,10 +1,4 @@
-
-export type Attribute = "Str" | "Agi" | "Arcane";
-
 export interface Stats {
-    Str: number;
-    Agi: number;
-    Arcane: number;
     maxHp: number;
     hp: number;
     maxStress: number;
@@ -57,9 +51,6 @@ export interface Servitor {
     role: "Warrior" | "Scout" | "Mystic";
     hp: number;
     maxHp: number;
-    Str: number;
-    Agi: number;
-    Arcane: number;
     description: string;
 }
 

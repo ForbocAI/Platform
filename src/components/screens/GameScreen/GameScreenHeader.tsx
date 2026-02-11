@@ -8,16 +8,14 @@ export function GameScreenHeader({
   player,
   stage,
   onStageChange,
-  onServitorClick,
 }: {
   player: Player;
   stage: StageOfScene;
   onStageChange: (s: StageOfScene) => void;
-  onServitorClick?: () => void;
 }) {
   return (
     <>
-      <PlayerHeader player={player} onServitorClick={onServitorClick} />
+      <PlayerHeader player={player} />
       <StageSelector stage={stage} onStageChange={onStageChange} />
     </>
   );

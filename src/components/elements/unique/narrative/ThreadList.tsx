@@ -3,6 +3,7 @@
 import type { Thread } from "@/features/game/types";
 import { cn } from "@/lib/utils";
 import { usePlayButtonSound } from "@/features/audio";
+import { GameButton } from "@/components/elements/generic";
 
 export function ThreadList({
   threads,
@@ -21,9 +22,9 @@ export function ThreadList({
       <span className="text-palette-muted uppercase tracking-wider text-xs block mb-1">Threads</span>
       <div className="flex flex-wrap gap-1">
         {threads.map((t) => (
-          <button
+          <GameButton
             key={t.id}
-            type="button"
+            variant={mainThreadId === t.id ? "magic" : "default"}
             onClick={() => {
               playSound();
               onSetMain(t.id);
@@ -31,14 +32,14 @@ export function ThreadList({
             data-testid={`thread-${t.id}`}
             aria-label={mainThreadId === t.id ? `Main thread: ${t.name}` : `Set main thread: ${t.name}`}
             className={cn(
-              "px-2 py-0.5 text-xs font-bold uppercase tracking-wider border transition-colors",
+              "px-2 py-0.5 text-xs h-auto",
               mainThreadId === t.id
                 ? "bg-palette-accent-magic/50 border-palette-accent-cyan/50 text-palette-accent-cyan"
                 : "border-palette-border text-palette-muted hover:text-palette-muted-light"
             )}
           >
             {t.name}
-          </button>
+          </GameButton>
         ))}
       </div>
     </div>

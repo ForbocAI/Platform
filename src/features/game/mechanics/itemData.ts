@@ -28,41 +28,38 @@ export const ITEMS: Item[] = [
     {
         id: "obsidian_dagger",
         name: "Obsidian Dagger",
-        description: "Razor sharp volcanic glass. +2 Agi.",
+        description: "Razor sharp volcanic glass.",
         type: "weapon",
-        bonus: { Agi: 2 },
         cost: { spirit: 15 }
     },
     {
         id: "iron_greatsword",
         name: "Iron Greatsword",
-        description: "Heavy and brutal. +4 Str, -2 Agi.",
+        description: "Heavy and brutal.",
         type: "weapon",
-        bonus: { Str: 4, Agi: -2 },
         cost: { spirit: 25 }
     },
     {
         id: "reinforced_plate",
         name: "Reinforced Plate",
-        description: "Solid protection. +4 AC, -2 Agi.",
+        description: "Solid protection. +4 AC.",
         type: "armor",
-        bonus: { ac: 4, Agi: -2 },
+        bonus: { ac: 4 },
         cost: { spirit: 30 }
     },
     {
         id: "shadow_cloak",
         name: "Shadow Cloak",
-        description: "Woven from shadows. +2 AC, +2 Agi.",
+        description: "Woven from shadows. +2 AC.",
         type: "armor",
-        bonus: { ac: 2, Agi: 2 },
+        bonus: { ac: 2 },
         cost: { spirit: 25 }
     },
     {
         id: "ancient_battery",
         name: "Ancient Battery",
-        description: "Hums with power. +4 Arcane.",
+        description: "Hums with power.",
         type: "relic",
-        bonus: { Arcane: 4 },
         cost: { spirit: 40, blood: 5 }
     },
     {

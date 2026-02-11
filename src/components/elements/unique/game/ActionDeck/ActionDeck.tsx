@@ -1,12 +1,10 @@
 "use client";
 
-import { OracleForm, ActionDeck } from "@/components/elements/unique";
 import type { Player, Room } from "@/features/game/types";
+import { ActionButtons } from "./ActionButtons";
+import { DeckToggles } from "./DeckToggles";
 
-export function GameScreenFooter({
-  oracleInput,
-  onOracleChange,
-  onOracleSubmit,
+export function ActionDeck({
   player,
   currentRoom,
   onMove,
@@ -21,12 +19,9 @@ export function GameScreenFooter({
   autoPlay,
   onToggleAutoPlay,
 }: {
-  oracleInput: string;
-  onOracleChange: (v: string) => void;
-  onOracleSubmit: (e: React.FormEvent) => void;
   player: Player;
   currentRoom: Room;
-  onMove: (dir: string) => void;
+  onMove: (direction: string) => void;
   onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;
@@ -35,33 +30,31 @@ export function GameScreenFooter({
   onOpenSpells?: () => void;
   onOpenSkills?: () => void;
   onOpenServitor?: () => void;
-  autoPlay: boolean;
-  onToggleAutoPlay: () => void;
+  autoPlay?: boolean;
+  onToggleAutoPlay?: () => void;
 }) {
   return (
-    <>
-      <div className="shrink-0 border-t border-palette-border">
-        <OracleForm
-          value={oracleInput}
-          onChange={onOracleChange}
-          onSubmit={onOracleSubmit}
-        />
-      </div>
-      <ActionDeck
-        player={player}
+    <footer
+      className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-row gap-1.5 sm:gap-2 items-center justify-start overflow-x-auto min-h-0"
+      style={{ WebkitOverflowScrolling: "touch" }}
+    >
+      <ActionButtons
         currentRoom={currentRoom}
         onMove={onMove}
         onMapClick={onMapClick}
         onScan={onScan}
         onEngage={onEngage}
         onCommune={onCommune}
-        onOpenInventory={onOpenInventory}
-        onOpenSpells={onOpenSpells}
-        onOpenSkills={onOpenSkills}
-        onOpenServitor={onOpenServitor}
         autoPlay={autoPlay}
         onToggleAutoPlay={onToggleAutoPlay}
       />
-    </>
+      <DeckToggles
+        player={player}
+        onOpenSpells={onOpenSpells}
+        onOpenSkills={onOpenSkills}
+        onOpenInventory={onOpenInventory}
+        onOpenServitor={onOpenServitor}
+      />
+    </footer>
   );
 }

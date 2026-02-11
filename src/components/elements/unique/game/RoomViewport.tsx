@@ -2,6 +2,7 @@ import { Activity, Skull, ShoppingBag, Clapperboard, Hash } from "lucide-react";
 import type { Room } from "@/features/game/types";
 import { RuneSigil } from "../shared/Runes";
 import { useAppSelector } from "@/features/core/store";
+import { GameButton } from "@/components/elements/generic";
 import { selectVignette, selectMainThread, selectCurrentScene } from "@/features/narrative/slice/narrativeSlice";
 
 export function RoomViewport({
@@ -72,16 +73,16 @@ export function RoomViewport({
         {room.merchants && room.merchants.length > 0 && (
           <div className="mt-1.5 flex flex-wrap justify-center gap-1">
             {room.merchants.map((merchant) => (
-              <button
+              <GameButton
                 key={merchant.id}
-                type="button"
+                icon={<ShoppingBag className="app-icon" />}
                 onClick={() => onTradeMerchant?.(merchant.id)}
                 data-testid={`trade-merchant-${merchant.id}`}
                 aria-label={`Trade with ${merchant.name}`}
-                className="px-2 py-0.5 bg-palette-accent-gold/20 border border-palette-accent-gold/50 text-palette-accent-gold text-xs uppercase hover:bg-palette-accent-gold/30 flex items-center gap-1"
+                className="px-2 py-0.5 h-auto bg-palette-accent-gold/20 border-palette-accent-gold/50 text-palette-accent-gold text-xs hover:bg-palette-accent-gold/30"
               >
-                <ShoppingBag className="app-icon" /> {merchant.name} — Trade
-              </button>
+                {merchant.name} — Trade
+              </GameButton>
             ))}
           </div>
         )}
@@ -132,11 +133,13 @@ export function RoomViewport({
                         <div className="h-full bg-palette-accent-magic transition-all duration-500" style={{ width: `${feature.progress}%` }} />
                       </div>
                       {feature.ready ? (
-                        <button className="text-xs px-2 py-0.5 bg-palette-accent-magic/20 text-palette-accent-magic border border-palette-accent-magic hover:bg-palette-accent-magic/40 transition-colors uppercase"
+                        <GameButton
+                          variant="magic"
+                          className="text-xs px-2 py-0.5 h-auto"
                           onClick={() => window.dispatchEvent(new CustomEvent('harvest_crop', { detail: { index: idx } }))}
                         >
                           Harvest
-                        </button>
+                        </GameButton>
                       ) : (
                         <span className="text-[10px] text-palette-muted-light">Growing... ({feature.progress}%)</span>
                       )}
@@ -148,11 +151,12 @@ export function RoomViewport({
                     <div key={idx} className="p-2 border border-palette-accent-gold/30 bg-palette-accent-gold/5 rounded flex flex-col items-center min-w-[120px]">
                       <span className="text-xs text-palette-muted uppercase">Station</span>
                       <span className="font-bold text-palette-white capitalize">{feature.kind}</span>
-                      <button className="mt-2 text-xs px-2 py-0.5 border border-palette-border text-palette-muted hover:text-palette-white hover:border-palette-white transition-colors uppercase"
+                      <GameButton
+                        className="mt-2 text-xs px-2 py-0.5 h-auto"
                         onClick={() => window.dispatchEvent(new CustomEvent('open_crafting', { detail: { kind: feature.kind } }))}
                       >
                         Access
-                      </button>
+                      </GameButton>
                     </div>
                   );
                 }

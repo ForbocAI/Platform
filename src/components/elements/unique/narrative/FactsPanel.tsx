@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import { selectFactsPanelOpen, toggleFactsPanel } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound } from "@/features/audio";
+import { GameButton } from "@/components/elements/generic";
 
 export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDisplay?: number }) {
   const dispatch = useAppDispatch();
@@ -16,19 +17,18 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
 
   return (
     <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0" data-testid="facts-panel">
-      <button
-        type="button"
+      <GameButton
+        icon={open ? <ChevronDown className="app-icon" /> : <ChevronRight className="app-icon" />}
         onClick={() => {
           playSound();
           dispatch(toggleFactsPanel());
         }}
-        className="w-full flex items-center gap-1 p-1.5 text-left text-palette-muted-light hover:text-palette-muted uppercase tracking-wider"
+        className="w-full flex items-center gap-1 p-1.5 h-auto text-left justify-start border-transparent bg-transparent text-palette-muted-light hover:text-palette-muted uppercase tracking-wider hover:bg-transparent"
         data-testid="facts-toggle"
         aria-label={open ? "Close Facts" : "Open Facts"}
       >
-        {open ? <ChevronDown className="app-icon" /> : <ChevronRight className="app-icon" />}
-        <span>Facts ({facts.length})</span>
-      </button>
+        <span className="normal-case">Facts ({facts.length})</span>
+      </GameButton>
       {open && (
         <ul className="max-h-32 overflow-y-auto p-1.5 space-y-1 text-sm">
           {display.map((f) => (
