@@ -29,4 +29,6 @@ export interface InitializeGameOptions {
   forceServitor?: boolean;
   /** When true with forceServitor, servitor starts at 1 HP for quick death-state testing. */
   lowServitorHp?: boolean;
+  /** Force re-initialization even if already initialized (e.g. ?reset=1). */
+  reset?: boolean;
 }

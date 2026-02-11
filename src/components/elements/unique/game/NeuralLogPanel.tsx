@@ -4,17 +4,8 @@ import { Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GameLogEntry } from "@/features/game/types";
 import { RuneSigil } from "../shared/Runes";
-import { useEffect, useRef } from "react";
 
 export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; children?: React.ReactNode }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [logs]);
-
   return (
     <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
       <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border bg-palette-bg-mid/20 shrink-0">
@@ -23,7 +14,6 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
         <RuneSigil className="ml-auto" />
       </div>
       <div
-        ref={scrollRef}
         className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 sm:p-2 flex flex-col gap-1.5 sm:gap-2 scrollbar-thin scrollbar-thumb-palette-border scrollbar-track-transparent min-h-0 min-w-0"
       >
         {logs.map((log) => (

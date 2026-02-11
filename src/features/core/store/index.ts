@@ -1,14 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
-import gameReducer, { initializeGame, runAutoplayTick } from '@/features/game/slice/gameSlice';
-import uiReducer, { toggleAutoPlay, clearVignetteThemeInput } from '@/features/core/ui/slice/uiSlice';
+import gameReducer from '@/features/game/slice/gameSlice';
+import uiReducer, { clearVignetteThemeInput } from '@/features/core/ui/slice/uiSlice';
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';
 import { baseApi } from '@/features/core/api/baseApi';
 import { registerAudioListeners, flushTtsQueue } from '@/features/audio/audioListeners';
+import { registerGameListeners } from '@/features/core/store/listeners';
 import '@/features/core/api/gameApi';
 
 export const appBootstrap = { type: 'app/bootstrap' as const };
+export { retryInitialize } from './listeners';
 
 const listenerMiddleware = createListenerMiddleware();
 
@@ -35,6 +37,7 @@ export { useAppDispatch, useAppSelector } from './hooks';
 const startAppListening = listenerMiddleware.startListening as TypedStartListening<RootState, AppDispatch>;
 
 registerAudioListeners(startAppListening);
+registerGameListeners(startAppListening);
 
 // Flush TTS queue on user click so speechSynthesis.speak() runs with a user gesture (Chrome requirement).
 startAppListening({
@@ -44,21 +47,6 @@ startAppListening({
       document.addEventListener('click', () => flushTtsQueue(), true);
     }
     listenerApi.cancel();
-  },
-});
-
-startAppListening({
-  predicate: (action) => action.type === 'app/bootstrap',
-  effect: async (_, listenerApi) => {
-    const state = listenerApi.getState();
-    if (!state.game.player) {
-      let forceMerchant = false;
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        forceMerchant = params.get('forceMerchant') === '1';
-      }
-      await listenerApi.dispatch(initializeGame({ forceMerchant }));
-    }
   },
 });
 

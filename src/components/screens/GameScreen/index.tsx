@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   selectPlayer,
@@ -10,11 +8,9 @@ import {
   selectRoomCoordinates,
   selectLogs,
   selectIsInitialized,
-  selectIsLoading,
   selectActiveQuests,
   selectSessionScore,
   selectSessionComplete,
-  selectPendingQuestFacts,
   initializeGame,
   movePlayer,
   askOracle,
@@ -24,7 +20,6 @@ import {
   engageHostiles,
   respawnPlayer,
   selectSpell,
-  clearPendingQuestFacts,
   equipItem,
   unequipItem,
   useItem,
@@ -59,15 +54,14 @@ import {
   selectFacts,
   selectVignette,
   selectCurrentSceneId,
-  addThread,
-  setMainThread,
   startVignette,
   advanceVignetteStage,
   endVignette,
   fadeInScene,
   fadeOutScene,
-  addFact,
+  setMainThread,
 } from "@/features/narrative/slice/narrativeSlice";
+import { retryInitialize } from "@/features/core/store";
 import { LoadingOverlay } from "@/components/elements/generic/LoadingOverlay";
 import { GameScreenHeader } from "./GameScreenHeader";
 import { GameScreenMain } from "./GameScreenMain";
@@ -84,7 +78,6 @@ export function GameScreen() {
   const roomCoordinates = useAppSelector(selectRoomCoordinates);
   const logs = useAppSelector(selectLogs);
   const isInitialized = useAppSelector(selectIsInitialized);
-  const isLoading = useAppSelector(selectIsLoading);
   const oracleInput = useAppSelector(selectOracleInput);
   const stageOfScene = useAppSelector(selectStageOfScene);
   const inventoryOpen = useAppSelector(selectInventoryOpen);
@@ -103,61 +96,12 @@ export function GameScreen() {
   const activeQuests = useAppSelector(selectActiveQuests);
   const sessionScore = useAppSelector(selectSessionScore);
   const sessionComplete = useAppSelector(selectSessionComplete);
-  const pendingQuestFacts = useAppSelector(selectPendingQuestFacts);
-  const searchParams = useSearchParams();
-  const hasHonoredResetRef = useRef(false);
-
-  useEffect(() => {
-    if (pendingQuestFacts.length === 0) return;
-    const toAdd = [...pendingQuestFacts];
-    dispatch(clearPendingQuestFacts());
-    toAdd.forEach((text) => {
-      dispatch(addFact({ text, questionKind: "quest", isFollowUp: false }));
-    });
-  }, [pendingQuestFacts, dispatch]);
-
-  // Seed one thread so vignette + Fade out can run (fadeInScene needs mainThreadId)
-  useEffect(() => {
-    if (!isInitialized || threads.length > 0) return;
-    dispatch(addThread({ name: "Reconnaissance", stage: "To Knowledge" }));
-  }, [isInitialized, threads.length, dispatch]);
-  useEffect(() => {
-    if (threads.length === 1 && !mainThreadId) {
-      dispatch(setMainThread(threads[0].id));
-    }
-  }, [threads, mainThreadId, dispatch]);
-
-  const getInitOptions = () => {
-    const params =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search)
-        : searchParams;
-    return {
-      forceMerchant: params.get("forceMerchant") === "1",
-      deterministic: params.get("deterministic") === "1",
-      forceEnemy: params.get("forceEnemy") === "1",
-      lowHp: params.get("lowHp") === "1",
-      forceServitor: params.get("forceServitor") === "1",
-      lowServitorHp: params.get("lowServitorHp") === "1",
-      reset: params.get("reset") === "1",
-    };
-  };
-
-  useLayoutEffect(() => {
-    const opts = getInitOptions();
-    const shouldReset = opts.reset && !hasHonoredResetRef.current;
-    const shouldInit = (!isInitialized && !isLoading) || shouldReset;
-    if (shouldInit) {
-      if (opts.reset) hasHonoredResetRef.current = true;
-      dispatch(initializeGame(opts));
-    }
-  }, [isInitialized, isLoading, dispatch]);
 
   if (!isInitialized) {
     return (
       <LoadingOverlay
         message="INITIALIZING..."
-        onRetry={() => dispatch(initializeGame(getInitOptions()))}
+        onRetry={() => dispatch(retryInitialize)}
       />
     );
   }
@@ -166,7 +110,7 @@ export function GameScreen() {
     return (
       <LoadingOverlay
         message="INITIALIZING..."
-        onRetry={() => dispatch(initializeGame(getInitOptions()))}
+        onRetry={() => dispatch(retryInitialize)}
       />
     );
   }
