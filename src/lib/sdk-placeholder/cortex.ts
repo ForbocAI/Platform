@@ -1,5 +1,5 @@
-import { Room, OracleResult, Biome, StageOfScene } from '@/lib/game/types';
-import { generateRoom, generateRoomWithOptions, generateStartRoom, consultOracle as runOracle, GenerateStartRoomOptions, RoomGenContext } from '@/lib/game/engine';
+import { Room, OracleResult, Biome, StageOfScene } from '@/features/game/types';
+import { generateRoom, generateRoomWithOptions, generateStartRoom, consultOracle as runOracle, GenerateStartRoomOptions, RoomGenContext } from '@/features/game/engine';
 
 export const Cortex = {
     generateStartRoom: async (opts?: GenerateStartRoomOptions): Promise<Room> => {

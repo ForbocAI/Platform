@@ -1,7 +1,7 @@
 "use client";
 
-import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel, PartyPanel } from "@/components/elements/unique";
-import type { Player } from "@/lib/game/types";
+import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel, ServitorPanel } from "@/components/elements/unique";
+import type { Player, EquipmentSlot, Merchant } from "@/features/game/types";
 
 export function GameScreenOverlays({
   inventoryOpen,
@@ -11,8 +11,8 @@ export function GameScreenOverlays({
   onCloseInventory,
   onCloseSpells,
   onCloseSkills,
-  partyPanelOpen,
-  onCloseParty,
+  servitorPanelOpen,
+  onCloseServitor,
   onAcceptConcession,
   onRejectConcession,
   onEquipItem,
@@ -30,14 +30,14 @@ export function GameScreenOverlays({
   onCloseInventory: () => void;
   onCloseSpells: () => void;
   onCloseSkills: () => void;
-  partyPanelOpen: boolean;
-  onCloseParty: () => void;
+  servitorPanelOpen: boolean;
+  onCloseServitor: () => void;
   onAcceptConcession?: (type: 'flee' | 'capture') => void;
   onRejectConcession?: () => void;
-  onEquipItem?: (itemId: string, slot: import("@/lib/game/types").EquipmentSlot) => void;
-  onUnequipItem?: (slot: import("@/lib/game/types").EquipmentSlot) => void;
+  onEquipItem?: (itemId: string, slot: EquipmentSlot) => void;
+  onUnequipItem?: (slot: EquipmentSlot) => void;
   onUseItem?: (itemId: string) => void;
-  activeMerchant?: import("@/lib/game/types").Merchant | null;
+  activeMerchant?: Merchant | null;
   onCloseTrade?: () => void;
   onSelectSpell?: (spellId: string) => void;
   onSacrificeItem?: (itemId: string) => void;
@@ -67,10 +67,10 @@ export function GameScreenOverlays({
           onClose={onCloseSkills}
         />
       )}
-      {partyPanelOpen && (
-        <PartyPanel
+      {servitorPanelOpen && (
+        <ServitorPanel
           player={player}
-          onClose={onCloseParty}
+          onClose={onCloseServitor}
         />
       )}
       <ConcessionModal

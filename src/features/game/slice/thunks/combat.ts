@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getEnemyLoot } from '@/lib/game/engine';
-import { resolveDuel, resolveEnemyAttack, resolveSpellDuel, resolveServitorAttack, resolveEnemyAttackOnServitor } from '@/lib/game/combat';
-import { SPELLS } from '@/lib/game/mechanics';
+import { getEnemyLoot } from '@/features/game/engine';
+import { resolveDuel, resolveEnemyAttack, resolveSpellDuel, resolveServitorAttack, resolveEnemyAttackOnServitor } from '@/features/game/combat';
+import { SPELLS } from '@/features/game/mechanics';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog, selectSpell } from '../actions';
 import { handleVignetteProgression } from '../constants';

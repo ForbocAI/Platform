@@ -1,4 +1,4 @@
-import { TopRunes } from "@/components/elements/unique/Runes";
+import { TopRunes } from "@/components/elements/unique";
 
 export function LoadingOverlay({
   message = "INITIALIZING...",

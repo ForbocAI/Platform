@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import type { Item } from '@/lib/game/types';
+import type { Item } from '@/features/game/types';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../actions';
 import type { GameState } from '../types';

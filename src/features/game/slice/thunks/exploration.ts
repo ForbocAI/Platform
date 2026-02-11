@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { SDK } from '@/lib/sdk-placeholder';
-import { getKeenSensesScanExtra } from '@/lib/game/skills';
+import { getKeenSensesScanExtra } from '@/features/game/skills';
 import { addLog } from '../actions';
 import type { GameState } from '../types';
 

@@ -49,6 +49,7 @@ All interactive elements in the game UI have:
 | Equip / Unequip / Use / Sacrifice | `inventory-equip-{itemId}`, `inventory-unequip-{slot}`, `inventory-use-{itemId}`, `inventory-sacrifice-{itemId}` |
 | Quests panel (progress + session score) | `quests-panel` — shows four active quests (Scan 5, Find Fellow Ranger, Defeat 3 hostiles, Trade 2 merchants) and "Session complete" or "Session ended (death)" with score. |
 | Skills panel / View skills | `skills-panel`, `skills-toggle`, `skills-panel-close` — View skills button in Action Deck; panel lists unlocked skills. |
+| Servitors panel / Toggle / Close | `servitor-toggle`, `servitor-panel`, `servitor-close` — Servitors button in header (visible when a servitor is hired); panel opens from header "View Servitors". |
 
 ## Query params (dev / test)
 

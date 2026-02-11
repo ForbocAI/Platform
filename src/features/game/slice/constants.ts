@@ -1,7 +1,6 @@
-import type { SessionScore, ActiveQuest } from '@/lib/game/types';
-import type { VignetteStage } from '@/lib/game/types';
+import type { SessionScore, ActiveQuest, VignetteStage } from '@/features/game/types';
 import { advanceVignetteStage, startVignette, endVignette } from '@/features/narrative/slice/narrativeSlice';
-import { VIGNETTE_THEMES } from '@/lib/game/narrativeHelpers';
+import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
 import type { GameState } from './types';
 
 export const initialSessionScore = (): SessionScore => ({

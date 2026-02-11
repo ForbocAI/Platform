@@ -10,7 +10,7 @@ import type {
   Vignette,
   StageOfScene,
   VignetteStage,
-} from "@/lib/game/types";
+} from "@/features/game/types";
 
 function nanoid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;

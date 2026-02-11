@@ -1,6 +1,6 @@
 import { Map as MapIcon, Crosshair, Package, Play, Square, Swords, MessageCircle, Wand2, Box, Award } from "lucide-react";
-import { GameButton, NavButton } from "../generic";
-import type { Player, Room } from "@/lib/game/types";
+import { GameButton, NavButton } from "@/components/elements/generic";
+import type { Player, Room } from "@/features/game/types";
 
 export function ActionDeck({
   player,

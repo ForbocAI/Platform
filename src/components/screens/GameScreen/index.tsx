@@ -49,8 +49,8 @@ import {
   openTrade,
   closeTrade,
   selectActiveMerchantId,
-  selectPartyPanelOpen,
-  togglePartyPanel,
+  selectServitorPanelOpen,
+  toggleServitorPanel,
 } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound } from "@/features/audio";
 import {
@@ -73,7 +73,7 @@ import { GameScreenHeader } from "./GameScreenHeader";
 import { GameScreenMain } from "./GameScreenMain";
 import { GameScreenFooter } from "./GameScreenFooter";
 import { GameScreenOverlays } from "./GameScreenOverlays";
-import type { VignetteStage } from "@/lib/game/types";
+import type { VignetteStage } from "@/features/game/types";
 
 export function GameScreen() {
   const dispatch = useAppDispatch();
@@ -90,7 +90,7 @@ export function GameScreen() {
   const inventoryOpen = useAppSelector(selectInventoryOpen);
   const spellsPanelOpen = useAppSelector(selectSpellsPanelOpen);
   const skillsPanelOpen = useAppSelector(selectSkillsPanelOpen);
-  const partyPanelOpen = useAppSelector(selectPartyPanelOpen);
+  const servitorPanelOpen = useAppSelector(selectServitorPanelOpen);
   const showMap = useAppSelector(selectShowMap);
   const autoPlay = useAppSelector(selectAutoPlay);
   const threads = useAppSelector(selectThreads);
@@ -185,7 +185,7 @@ export function GameScreen() {
         player={player}
         stage={stageOfScene}
         onStageChange={(s) => dispatch(setStageOfScene(s))}
-        onPartyClick={() => dispatch(togglePartyPanel())}
+        onServitorClick={() => dispatch(toggleServitorPanel())}
       />
       <GameScreenMain
         currentRoom={currentRoom}
@@ -242,8 +242,8 @@ export function GameScreen() {
         onCloseInventory={() => dispatch(toggleInventory())}
         onCloseSpells={() => dispatch(toggleSpellsPanel())}
         onCloseSkills={() => dispatch(toggleSkillsPanel())}
-        partyPanelOpen={partyPanelOpen}
-        onCloseParty={() => dispatch(togglePartyPanel())}
+        servitorPanelOpen={servitorPanelOpen}
+        onCloseServitor={() => dispatch(toggleServitorPanel())}
         onRejectConcession={() => dispatch(respawnPlayer())}
         onAcceptConcession={(type) => dispatch(addLog({ message: `You accepted concession: ${type}`, type: "system" }))}
         onEquipItem={(id, slot) => dispatch(equipItem({ itemId: id, slot }))}

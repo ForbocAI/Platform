@@ -1,0 +1,22 @@
+export const UNEXPECTEDLY_TABLE = [
+    "Foreshadowing: Set a thread to be the main thread for the next scene.",
+    "Tying Off: The main thread resolves or substantially moves forward.",
+    "To Conflict: The next scene centers on a conflict.",
+    "Costume Change: An NPC drastically changes their mind, motivations, or alliances.",
+    "Key Grip: Set the location or general elements for the next scene.",
+    "To Knowledge: The next scene centers on lore or investigation.",
+    "Framing: An NPC or object becomes critical to the main thread.",
+    "Set Change: Scene continues in another location.",
+    "Upstaged: An NPC makes a big move/goes into Overdrive.",
+    "Pattern Change: The main thread gets modified drastically (Hard Left).",
+    "Limelit: The rest of the scene goes great for the PCs.",
+    "Entering the Red: Threat of danger or combat arrives.",
+    "To Endings: The next scene resolves or substantially moves forward a thread.",
+    "Montage: Timeframe changes to a montage of actions.",
+    "Enter Stage Left: A PC or NPC arrives fresh in the scene.",
+    "Cross-stitch: Choose another thread to be the main thread.",
+    "Six Degrees: A meaningful connection forms between two PCs/NPCs.",
+    "Re-roll/Reserved",
+    "Re-roll/Reserved",
+    "Re-roll/Reserved"
+];

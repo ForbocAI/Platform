@@ -1,10 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { initializePlayer } from '@/lib/game/engine';
-import { getSkillsForLevels } from '@/lib/game/mechanics';
+import { initializePlayer } from '@/features/game/engine';
+import { getSkillsForLevels } from '@/features/game/mechanics';
 import { SDK } from '@/lib/sdk-placeholder';
 import { startVignette } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../actions';
-import { VIGNETTE_THEMES } from '@/lib/game/narrativeHelpers';
+import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
 import type { GameState, InitializeGameOptions } from '../types';
 
 export const initializeGame = createAsyncThunk(

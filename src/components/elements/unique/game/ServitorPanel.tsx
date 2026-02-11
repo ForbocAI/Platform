@@ -1,13 +1,13 @@
 
 import { X, Users, Sword, Shield, Eye } from "lucide-react";
-import type { Player } from "@/lib/game/types";
+import type { Player } from "@/features/game/types";
 
-interface PartyPanelProps {
+interface ServitorPanelProps {
     player: Player;
     onClose: () => void;
 }
 
-export function PartyPanel({ player, onClose }: PartyPanelProps) {
+export function ServitorPanel({ player, onClose }: ServitorPanelProps) {
     const servitors = player.servitors || [];
 
     const getRoleIcon = (role: string) => {
@@ -20,7 +20,7 @@ export function PartyPanel({ player, onClose }: PartyPanelProps) {
     };
 
     return (
-        <div className="absolute inset-0 z-50 bg-palette-bg-dark/95 backdrop-blur-sm p-3 sm:p-4 flex flex-col items-center justify-center overflow-y-auto" data-testid="party-panel">
+        <div className="absolute inset-0 z-50 bg-palette-bg-dark/95 backdrop-blur-sm p-3 sm:p-4 flex flex-col items-center justify-center overflow-y-auto" data-testid="servitor-panel">
             <div className="w-full max-w-2xl bg-palette-bg-dark border border-palette-border shadow-2xl flex flex-col max-h-full min-h-0 my-auto animate-fade-in-up">
                 {/* Header */}
                 <div className="flex items-center justify-between p-3 border-b border-palette-border bg-palette-bg-mid/50">
@@ -28,7 +28,7 @@ export function PartyPanel({ player, onClose }: PartyPanelProps) {
                         <Users className="w-5 h-5 text-palette-accent-lime" />
                         Servitors
                     </h2>
-                    <button onClick={onClose} className="p-2 -m-1 hover:text-palette-accent-red transition-colors touch-manipulation" data-testid="party-close" aria-label="Close servitors panel">
+                    <button onClick={onClose} className="p-2 -m-1 hover:text-palette-accent-red transition-colors touch-manipulation" data-testid="servitor-close" aria-label="Close servitors panel">
                         <X className="w-5 h-5" />
                     </button>
                 </div>

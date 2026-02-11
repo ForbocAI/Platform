@@ -1,4 +1,4 @@
-import type { StageOfScene } from '@/lib/game/types';
+import type { StageOfScene } from '@/features/game/types';
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 
 interface UIState {
@@ -12,7 +12,7 @@ interface UIState {
   inventoryOpen: boolean;
   spellsPanelOpen: boolean;
   skillsPanelOpen: boolean;
-  partyPanelOpen: boolean;
+  servitorPanelOpen: boolean;
   /** Set true when app/bootstrap runs (client); used to avoid hydration mismatch (e.g. runes). */
   clientHydrated: boolean;
   activeMerchantId: string | null;
@@ -29,7 +29,7 @@ const initialState: UIState = {
   inventoryOpen: false,
   spellsPanelOpen: false,
   skillsPanelOpen: false,
-  partyPanelOpen: false,
+  servitorPanelOpen: false,
   clientHydrated: false,
   activeMerchantId: null,
 };
@@ -74,8 +74,8 @@ export const uiSlice = createSlice({
     toggleSkillsPanel: (state) => {
       state.skillsPanelOpen = !state.skillsPanelOpen;
     },
-    togglePartyPanel: (state) => {
-      state.partyPanelOpen = !state.partyPanelOpen;
+    toggleServitorPanel: (state) => {
+      state.servitorPanelOpen = !state.servitorPanelOpen;
     },
     openTrade: (state, action: PayloadAction<string>) => {
       state.activeMerchantId = action.payload;
@@ -94,7 +94,7 @@ export const uiSlice = createSlice({
   },
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, togglePartyPanel, openTrade, closeTrade } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -149,9 +149,9 @@ export const selectSkillsPanelOpen = createSelector(
   (ui) => ui.skillsPanelOpen
 );
 
-export const selectPartyPanelOpen = createSelector(
+export const selectServitorPanelOpen = createSelector(
   [selectUIState],
-  (ui) => ui.partyPanelOpen
+  (ui) => ui.servitorPanelOpen
 );
 
 export const selectClientHydrated = createSelector(

@@ -1,6 +1,6 @@
 import { Shield, Zap, Skull } from "lucide-react";
 import { StatBox } from "@/components/elements/generic";
-import type { Player } from "@/lib/game/types";
+import type { Player } from "@/features/game/types";
 
 export function PlayerHeaderStats({ player }: { player: Player }) {
   return (

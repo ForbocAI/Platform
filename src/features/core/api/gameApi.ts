@@ -1,7 +1,7 @@
 import { baseApi } from './baseApi';
 
 import { SDK } from '@/lib/sdk-placeholder';
-import type { Room, OracleResult, StageOfScene } from '@/lib/game/types';
+import type { Room, OracleResult, StageOfScene } from '@/features/game/types';
 
 export const gameApi = baseApi.injectEndpoints({
   endpoints: (build) => ({

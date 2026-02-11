@@ -1,9 +1,9 @@
 "use client";
 
-import type { StageOfScene } from "@/lib/game/types";
+import type { StageOfScene } from "@/features/game/types";
 import { cn } from "@/lib/utils";
 import { usePlayButtonSound } from "@/features/audio";
-import { RuneSigil } from "./Runes";
+import { RuneSigil } from "../shared/Runes";
 
 const STAGES: { value: StageOfScene; label: string }[] = [
   { value: "To Knowledge", label: "Knowledge" },

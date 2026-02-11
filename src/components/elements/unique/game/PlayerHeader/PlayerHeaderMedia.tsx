@@ -1,7 +1,7 @@
 "use client";
 
 import { Speech, Music } from "lucide-react";
-import { VolumeControls } from "@/components/elements/unique/VolumeControls";
+import { VolumeControls } from "@/components/elements/unique";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import { selectTextToSpeech, toggleTextToSpeech } from "@/features/core/ui/slice/uiSlice";
 import { usePlayButtonSound, startMusic, stopMusic, selectMusicPlaying } from "@/features/audio";

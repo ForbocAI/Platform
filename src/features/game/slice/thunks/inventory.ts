@@ -64,7 +64,7 @@ export const equipItem = createAsyncThunk(
     {
       itemId,
       slot,
-    }: { itemId: string; slot: import('@/lib/game/types').EquipmentSlot },
+    }: { itemId: string; slot: import('@/features/game/types').EquipmentSlot },
     { getState, dispatch }
   ) => {
     const state = getState() as { game: GameState };
@@ -86,7 +86,7 @@ export const equipItem = createAsyncThunk(
 
 export const unequipItem = createAsyncThunk(
   'game/unequipItem',
-  async ({ slot }: { slot: import('@/lib/game/types').EquipmentSlot }, { getState, dispatch }) => {
+  async ({ slot }: { slot: import('@/features/game/types').EquipmentSlot }, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
     const { player } = state.game;
     if (!player || !player.equipment || !player.equipment[slot]) return;

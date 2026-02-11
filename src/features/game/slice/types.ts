@@ -1,4 +1,4 @@
-import type { Player, Room, GameLogEntry, ActiveQuest, SessionScore } from '@/lib/game/types';
+import type { Player, Room, GameLogEntry, ActiveQuest, SessionScore } from '@/features/game/types';
 
 export interface RoomCoordinates {
   x: number;

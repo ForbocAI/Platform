@@ -1,7 +1,7 @@
 "use client";
 
 import { X, Sparkles } from "lucide-react";
-import type { Player } from "@/lib/game/types";
+import type { Player } from "@/features/game/types";
 
 /** Format skill id for display (e.g. keen_senses -> Keen Senses). */
 function formatSkillLabel(skillId: string): string {

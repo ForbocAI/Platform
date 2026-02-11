@@ -1,7 +1,7 @@
 "use client";
 
 import { X, ShoppingBag, Coins } from "lucide-react";
-import type { Player, Merchant, Item } from "@/lib/game/types";
+import type { Player, Merchant, Item } from "@/features/game/types";
 import { useAppDispatch } from "@/features/core/store";
 import { tradeBuy, tradeSell } from "@/features/game/slice/gameSlice";
 import { usePlayButtonSound } from "@/features/audio";

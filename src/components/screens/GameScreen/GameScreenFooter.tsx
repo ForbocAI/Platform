@@ -1,7 +1,7 @@
 "use client";
 
 import { OracleForm, ActionDeck } from "@/components/elements/unique";
-import type { Player, Room } from "@/lib/game/types";
+import type { Player, Room } from "@/features/game/types";
 
 export function GameScreenFooter({
   oracleInput,

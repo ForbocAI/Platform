@@ -1,5 +1,5 @@
 
-import { Player, Room } from '@/lib/game/types';
+import { Player, Room } from '@/features/game/types';
 
 // Agent: Controls NPCs and Entities ("The Shadows")
 export const Agent = {

@@ -1,7 +1,7 @@
 
 import { X, Shield, Sword, Gem, Package } from "lucide-react";
-import type { Player, Item, EquipmentSlot } from "@/lib/game/types";
-import { calculateEffectiveStats } from "@/lib/game/items";
+import type { Player, Item, EquipmentSlot } from "@/features/game/types";
+import { calculateEffectiveStats } from "@/features/game/items";
 
 interface InventoryPanelProps {
     player: Player;

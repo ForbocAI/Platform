@@ -2,8 +2,8 @@
 
 import { Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { GameLogEntry } from "@/lib/game/types";
-import { RuneSigil } from "./Runes";
+import type { GameLogEntry } from "@/features/game/types";
+import { RuneSigil } from "../shared/Runes";
 import { useEffect, useRef } from "react";
 
 export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; children?: React.ReactNode }) {
