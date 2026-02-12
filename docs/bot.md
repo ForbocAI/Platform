@@ -50,6 +50,16 @@ The Platform uses a unified AI system for NPCs (Servitors, Enemies) and the Auto
 
 ---
 
+## Deployment
+
+**⚠️ Manual Deployment Required**: After committing and pushing changes, deployment to Vercel must be done manually using:
+
+```bash
+vercel --prod --yes
+```
+
+This ensures builds are tested locally before deployment and prevents automatic deployments from breaking production.
+
 ## Testing & Automation (`autoplayListener.ts`)
 
 The system supports URL parameters for automated testing ("Ghost Mode"):
