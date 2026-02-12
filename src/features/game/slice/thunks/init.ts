@@ -33,7 +33,7 @@ export const initializeGame = createAsyncThunk(
     const initialRoom = await SDK.Cortex.generateStartRoom({
       deterministic: options?.deterministic,
       forceMerchant: options?.forceMerchant,
-      forceEnemy: options?.forceEnemy,
+      forceEnemy: options?.forceEnemy === true || typeof options?.forceEnemy === 'string',
     });
 
     const theme = VIGNETTE_THEMES[Math.floor(Math.random() * VIGNETTE_THEMES.length)];

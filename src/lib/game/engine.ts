@@ -1,11 +1,16 @@
 import { Room, Biome, Enemy, Player, Merchant, Item } from "./types";
 import { CLASS_TEMPLATES, ITEMS, MATERIALS } from "./mechanics";
-import { selectNextBiome, generateGroundLoot, generateRandomEnemy, BIOME_GROUND_LOOT, type RoomGenContext } from "./generation";
-import { getEnemyLoot } from "./generation/loot";
-export type { RoomGenContext } from "./generation";
-export { getEnemyLoot } from "./generation/loot";
-export { generateRandomEnemy } from "./generation";
+import { selectNextBiome, generateGroundLoot, generateRandomEnemy, BIOME_GROUND_LOOT, type RoomGenContext } from "@/features/game/generation";
+import { getEnemyLoot } from "@/features/game/generation/loot";
+export type { RoomGenContext } from "@/features/game/generation";
+export { getEnemyLoot } from "@/features/game/generation/loot";
+export { generateRandomEnemy } from "@/features/game/generation";
 export { consultOracle } from "./oracle";
+
+/** Map features/game Enemy (no Str/Agi/Arcane) to lib/game Enemy. */
+function toLibEnemy(raw: ReturnType<typeof generateRandomEnemy>): Enemy {
+    return { ...raw, Str: 10, Agi: 10, Arcane: 10 };
+}
 
 export function initializePlayer(): Player {
     // Defines the "Starting Initiation" - Level 12 Ranger/Rogue (Ashwalker)
@@ -15,6 +20,9 @@ export function initializePlayer(): Player {
         name: "Kamenal",
         level: 12,
         characterClass: "Ashwalker",
+        Str: 12,
+        Agi: 14,
+        Arcane: 10,
         ...template.baseStats,
         hp: template.baseStats.maxHp,
         stress: 0,
@@ -129,7 +137,7 @@ export function generateRoom(id?: string, biomeOverride?: Biome, context?: RoomG
     const roll = Math.random() * 100;
     const enemyThreshold = 70 / dangerFactor; // Deeper: enemy at roll > 56 instead of 70
     if (roll > enemyThreshold) {
-        enemies.push(generateRandomEnemy());
+        enemies.push(toLibEnemy(generateRandomEnemy()));
     }
 
     const merchants: Merchant[] = [];
@@ -260,7 +268,7 @@ export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
         }
         // Force enemy even if protected if explicitly requested by playtest param (e.g. unit tests)
         if (opts.forceEnemy) {
-            room.enemies = [generateRandomEnemy()];
+            room.enemies = [toLibEnemy(generateRandomEnemy())];
             room.isBaseCamp = false; // Corrupted base
         }
         return room;
@@ -280,7 +288,7 @@ export function generateStartRoom(opts?: GenerateStartRoomOptions): Room {
     } else {
         // Just add an enemy if forced
         if (!room.enemies || room.enemies.length === 0) {
-            room.enemies = [generateRandomEnemy()];
+            room.enemies = [toLibEnemy(generateRandomEnemy())];
         }
     }
     return room;

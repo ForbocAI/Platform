@@ -1,6 +1,6 @@
 import { Stats, Enemy, Player, Spell } from "./types";
-import { calculateEffectiveStats } from "./items";
-import { parseDiceString } from "./dice";
+import { calculateEffectiveStats } from "@/features/game/items";
+import { parseDiceString } from "@/features/game/dice";
 import { SPELLS } from "./mechanics";
 
 export interface CombatResult {
@@ -33,8 +33,8 @@ export function resolveDuel(
 ): CombatResult {
     const effectiveAttacker = calculateEffectiveStats(attacker);
 
-    // Attacker roll
-    let attackerTotal = rollCombatTotal(effectiveAttacker, spellModifier);
+    // Attacker roll (use attacker's Str/Agi/Arcane from lib/game types)
+    let attackerTotal = rollCombatTotal(attacker, spellModifier);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
     // Defender roll
@@ -71,6 +71,7 @@ export function resolveEnemyAttack(
 ): CombatResult {
     const effectiveDefender = calculateEffectiveStats(defender);
 
+    // Defender roll (use defender's Str/Agi/Arcane from lib/game types)
     // AI Logic: Simple decision making
     // 60% chance to use ability if available
     let spell: Spell | undefined;
@@ -85,7 +86,7 @@ export function resolveEnemyAttack(
     let attackerTotal = rollCombatTotal(attacker);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
-    let defenderTotal = rollCombatTotal(effectiveDefender);
+    let defenderTotal = rollCombatTotal(defender);
     defenderTotal += groupScore?.defenderBonus ?? 0;
 
     // AC Defensive Bonus
@@ -99,7 +100,7 @@ export function resolveEnemyAttack(
         if (spell) {
             // Spell Attack
             if (spell.damage) {
-                damage = parseDiceString(spell.damage, attacker); // Attacker uses their own Stats
+                damage = parseDiceString(spell.damage); // Attacker uses their own Stats
             } else {
                 // Fallback for utility spells or un-stat-ed spells
                 const diff = attackerTotal - defenderTotal;
@@ -109,7 +110,7 @@ export function resolveEnemyAttack(
 
             let effectMsg = "";
             if (spell.effect) {
-                effectMsg = spell.effect(attacker, effectiveDefender);
+                effectMsg = spell.effect(attacker, defender);
             }
             message = `${attacker.name} casts ${spell.name}! It hits you for ${damage} damage! ${effectMsg ? `(${effectMsg})` : ""}`;
         } else {
@@ -143,7 +144,7 @@ export function resolveSpellDuel(
     const effectiveAttacker = calculateEffectiveStats(attacker);
 
     // Roll d20 + Total Stats vs Defender Total Stats
-    let attackerTotal = rollCombatTotal(effectiveAttacker, 0);
+    let attackerTotal = rollCombatTotal(attacker, 0);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
     let defenderTotal = rollCombatTotal(defender);
@@ -156,7 +157,7 @@ export function resolveSpellDuel(
     if (isHit) {
         // Calculate spell damage
         if (spell.damage) {
-            damage = parseDiceString(spell.damage, effectiveAttacker);
+            damage = parseDiceString(spell.damage);
         } else {
             // Default if no damage string provided (e.g. basic magic missle equivalent)
             const diff = attackerTotal - defenderTotal;
@@ -168,7 +169,7 @@ export function resolveSpellDuel(
 
         let effectMsg = "";
         if (spell.effect) {
-            effectMsg = spell.effect(effectiveAttacker, defender);
+            effectMsg = spell.effect(attacker, defender);
         }
 
         message = `You cast ${spell.name}! It hits for ${damage} damage. ${effectMsg ? `(${effectMsg})` : ""}`;
