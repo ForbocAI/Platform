@@ -1,5 +1,5 @@
-import type { AutoFocusMode, AutoSpeedMode, AutoplayURLConfig, AgentActionType } from './types';
-import type { CortexDirective } from '@/features/game/mechanics/ai/types';
+import type { AutoFocusMode, AutoSpeedMode, AutoplayURLConfig } from './types';
+import type { AgentActionType } from '@/features/game/mechanics/ai/types';
 
 /**
  * Parse autoplay URL parameters
