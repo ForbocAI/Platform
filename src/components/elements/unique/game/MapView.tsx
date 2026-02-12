@@ -52,7 +52,7 @@ export function MapView({
       <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#ff0000_1px,transparent_1px)] bg-size-[20px_20px]" />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-palette-bg-dark/80 pointer-events-none" />
       <div className="flex-1 min-h-0 w-full overflow-auto p-1.5 sm:p-2 scrollbar-thin scrollbar-thumb-palette-border scrollbar-track-transparent">
-        <div className="flex items-center gap-1.5 text-palette-accent-cyan shrink-0 mb-2">
+        <div className="flex items-center gap-1.5 text-palette-accent-mid shrink-0 mb-2">
           <MapIcon className="app-icon" />
           <span className="font-bold tracking-widest uppercase leading-tight">
             Explored map
@@ -84,7 +84,7 @@ export function MapView({
                   className={`flex flex-col items-center justify-center p-1 sm:p-1.5 text-center min-w-0 ${
                     room
                       ? isCurrent
-                        ? "bg-palette-accent-cyan/20 border-2 border-palette-accent-cyan text-palette-accent-cyan"
+                        ? "bg-palette-accent-mid/20 border-2 border-palette-accent-mid text-palette-accent-mid"
                         : "bg-palette-bg-dark/80 text-palette-muted-light border border-palette-border"
                       : "bg-palette-bg-dark/40 border border-palette-border/50"
                   }`}
@@ -92,7 +92,7 @@ export function MapView({
                   {room ? (
                     <>
                       {isCurrent && (
-                        <span className="text-[0.6rem] uppercase text-palette-accent-cyan font-bold mb-0.5">
+                        <span className="text-[0.6rem] uppercase text-palette-accent-mid font-bold mb-0.5">
                           You are here
                         </span>
                       )}

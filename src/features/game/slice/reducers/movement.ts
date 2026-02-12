@@ -4,7 +4,11 @@ import type { GameState } from '../types';
 
 export function addMovementReducers(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.movePlayer.fulfilled, (state, action) => {
-        const { room: newRoom } = action.payload;
+        const { room: newRoom, hazardEffects } = action.payload;
+        if (state.player && hazardEffects) {
+            state.player.hp = Math.max(0, state.player.hp - hazardEffects.damage);
+            state.player.stress = Math.min(state.player.maxStress, state.player.stress + hazardEffects.stress);
+        }
         const prevRoom = state.currentRoom;
         if (!prevRoom) return;
         const prevCoord = state.roomCoordinates[prevRoom.id] ?? { x: 0, y: 0 };

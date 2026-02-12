@@ -60,6 +60,9 @@ All interactive elements in the game UI have:
 | `?lowHp=1` | Sets player HP to 5 at init. Use with `forceEnemy=1` so an enemy hit that would take you out triggers the **Concession** modal (RNG: enemy must land a hit; may need several ENGAGEs). |
 | `?forceMerchant=1` | Adds one merchant to the starting room so **Trading** can be tested (60% chance by default). |
 | `?deterministic=1` | **Deterministic starting state:** Ranger (Ashwalker), level 12, full health (120 HP), basic equip, no progress flags; start room has no random allies or merchants. Use for reliable playtest automation. |
+| `?autoStart=1` | **Auto-start autoplay:** Skips class selection, auto-initializes game, and begins autoplay loop ~1.5s after init. No manual clicks needed. |
+| `?autoFocus=<mode>` | **SDK Focus mode:** Directs autoplay AI to only perform actions in a specific domain. Values: `combat`, `explore`, `trade`, `heal`, `oracle`, `loot`, `baseCamp`, `full` (default, no override). |
+| `?autoSpeed=<speed>` | **Tick speed:** `fast` (1s start, accelerates to 200ms), `slow` (5s start, decelerates to 500ms), `normal` (2.8s default, accelerates to 200ms). |
 
 ## Layout (for snapshot / scrolling)
 
@@ -71,6 +74,8 @@ The header **auto-play** button (`auto-play-toggle`, aria-label "Start auto-play
 
 -   It simulates a "Relentless Chronicler" who fights (using spells/attacks), heals (using items), equips gear, scans, trades (buy/sell), and communes.
 -   Auto-play runs via Redux listener middleware (no component `useEffect`).
+-   **SDK Pipeline (Mock):** Each tick calls `getSDKDirective(gameState)` which simulates `Observe → Reason → Act`. The directive (if any) is injected into the behavior tree as Node 0 (highest priority). URL `?autoFocus` controls which domain the mock SDK focuses on.
+-   **URL-driven automation:** Use `?autoStart=1&autoFocus=combat&autoSpeed=fast` for fully hands-free testing.
 
 Use auto-play for soak testing or to quickly generate log/facts state for manual checks.
 
@@ -115,7 +120,7 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 | **Level Progression / XP** | Defeat enemies to gain XP; Level Up at threshold | ✅ **Verified 2026-02-09:** Defeating enemy grants 50 XP (log "Gained 50 XP"). Bar updates. **Level Up:** Verified scaling (XP resets, Level++, MaxXP += 100, MaxHP += 10). **Level-up spell unlock:** At certain levels (e.g. Ashwalker 13–16) a new spell is unlocked and logged (e.g. "Unlocked: Smoldering Arsenal"). |
 | **Quests** | Init seeds four quests: "Scan 5 sectors", "Find a Fellow Ranger", "Defeat 3 hostiles", "Trade with 2 merchants". SCAN/move/combat/trade update progress. | ✅ **Implemented:** Quests panel (`quests-panel`) shows progress (e.g. "Scan 5 sectors: 2/5"). Completion adds log + Fact. Room exploration, SCAN, combat, and trade update progress. |
 | **Session completion / Scoring** | Complete all quests → session complete; score shows rooms explored, scans, foes defeated, quests completed, spirit earned. | ✅ **Implemented:** When all active quests are complete, `sessionComplete` is set; Quests panel shows "Session complete — Rooms: N | Scans: N | Foes: N | Quests: N | Spirit: N". |
-| **Companion Combat** | Load `?deterministic=1&forceMerchant=1&forceEnemy=1` (spawns Captain & Enemy). Trade -> Buy Contract -> Inventory -> Sign. Click "Engage enemy". | ✅ Companion participates in combat. Log shows "CompanionName attacks Enemy...". Enemy retaliates against Player OR Companion. |
+| **Servitor Combat** | Load `?deterministic=1&forceMerchant=1&forceEnemy=1` (spawns Captain & Enemy). Trade -> Buy Contract -> Inventory -> Sign. Click "Engage enemy". | ✅ Servitor participates in combat. Log shows "ServitorName attacks Enemy...". Enemy retaliates against Player OR Servitor. |
 | **Servitor Management** | With a servitor hired (Servitors indicator visible in header), click "Servitors". | ✅ **Implemented:** Servitors panel opens showing servitor name, role, HP bar, and stats. |
 
 ### Reproduction steps (cursor-ide-browser)
@@ -132,7 +137,7 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 
 ### Known issues / notes
 
-- **Auto-play:** Driven by Redux listener on `toggleAutoPlay`; dispatches `runAutoplayTick` every ~2.8s. Valid actions (move, SCAN, ENGAGE, COMMUNE, Oracle) and concession handling in thunk. Doc table and layout unchanged.
+- **Auto-play (Behavior Tree + Mock SDK — Verified 2026-02-11):** Refactored to shared Perceive→SDK→Decide→Act architecture aligned with Forboc `createBotBrain` (see `src/features/game/mechanics/ai/`). Architecture: `awareness.ts` (perception) → `cortexDirective.ts` (mock SDK pipeline) → `behaviorTree.ts` (decision) → `autoplay.ts` (actuation). **Mock SDK wired:** `autoplay.ts` now calls `getSDKDirective(gameState)` which simulates `Cortex.processObservation()` → `Cortex.generateAction()` and returns a `CortexDirective` injected into `runBehaviorTree()` as Node 0. Behavior tree nodes: **SDK Directive (Node 0, active via mock)** > Safety > Base Camp > Equipment > Combat (spell+melee) > Loot > Economy > Recon > Exploration > Idle. Preset configs: `AUTOPLAY_CONFIG` (player), `NPC_RANGER_CONFIG`, `SERVITOR_CONFIG`. **URL automation:** `?autoStart=1` auto-inits game and starts autoplay; `?autoFocus=combat|explore|trade|heal|oracle|loot|baseCamp|full` directs SDK focus; `?autoSpeed=fast|slow|normal` controls tick interval. **Verified (2026-02-11):** `?autoFocus=combat` — only combat actions taken; `?autoFocus=explore` — only movement/scan; `?autoSpeed=fast` — ~1s ticks accelerating to 200ms; `?autoStart=1` — fully hands-free from page load. **SDK integration point:** Replace `getSDKDirective()` with real `SDK.Cortex.processObservation()` + `SDK.Cortex.generateAction()` when SDK v1.0 is ready — see `Forboc/notes/TODOs/system-todo.md §1.2`. **Expanded materials:** 6 mushroom types (Glowing, Chromatic Cap, Void Morel, Chthonic Truffle, Ember Puffball, Static Lichen) distributed across biomes; weighted random harvest in base camp.
 - **Init race:** On first load, "INITIALIZING..." may show until user clicks Retry; bootstrap runs in microtask and init thunk can complete after first paint. Click Retry to force init if needed. **Deterministic param:** `getInitOptions` now reads from `window.location.search` when available so `?deterministic=1` applies reliably on first load (fixes useSearchParams hydration timing).
 - **SCAN allies:** As of this pass, SCAN readout includes "Allies: …" (e.g. Fellow Ranger or "None") so reconnaissance discovers non-hostile NPCs (Familiar alignment).
 - **Merchants / Trading implemented:** Nomadic traders (Gloamstrider, Twilightrider, Emberogue) spawn in Store Room (60%) and randomly in rooms (15%). Enter Stage Left can add a merchant. Click "Trade" on merchant → TradePanel (Verified 2026-02-09): shows player Spirit/Blood; wares show spirit cost and optional blood cost; Buy disabled when insufficient; buy deducts spirit (and blood); sell adds spirit. Log entries for trades. SCAN reports Merchants.
@@ -174,6 +179,10 @@ See `trade-panel`, `trade-merchant-*`, `trade-buy-*`, `trade-sell-*`.
 
 **Browser playtest (2026-02-10 - Comprehensive):** Systematic single-player playthrough via automation. **Verified:** Deterministic Init (Ashwalker Lvl 12, 120 HP); Movement/Scanning (Biomes: Ethereal Marshlands, Military Installation, etc.); Quests (Scan 5 sectors completed); Trading (Sold Relic Shard, Spirit +5; Bought items); **Sacrifice:** Verified items with value (e.g. Rogue's Blade) show Sacrifice button. Clicking it removes item and grants Spirit (value/2). Log confirms action. **Marketplace Logic:** Engine now supports "Bustling Marketplace" rooms in "Market" areas (Quadar Tower) spawning 2-4 merchants. **Surge Logic Check:** Verified `engine.ts` implements Surge Count correctly per design doc (Add 2 for Yes/No, Reset for qualifiers).
 
+**Browser playtest (2026-02-11 - Systematic Deep Dive):** Validated all core loops via browser subagent. **Movement/Scan:** Explored Nave Vault/Haunted Chapel. **Combat:** Defeated Obsidian Warden (60 HP), verified XP/Spirit/Blood loot, Quest updates, and Vignette progression (Rising Action). **Trading:** Verified Spirit deduction and item acquisition (Ember Salve). **Magic:** Verified Spell casting (Relic Strike) and Sacrifice mechanics (Spirit gain). **Death:** Verified Concession modal, death/respawn loop (Reset HP, remove enemy). **Events:** Verified COMMUNE triggers 'Enter Stage Left' (NPCs) and 'Entering the Red' (Hazard/Enemy) via Oracle logic. Confirmed "HAZARD!" UI appearance. **Fixes Verified:** Resolved "1 Issue" hydration mismatch in `Runes.tsx`; Implemented Auto-Scan on initialization (`init.ts`).
+
+**Browser playtest (2026-02-11 - Feature Complete):** Implemented and verified remaining core single-player features. **Crafting:** Created `CraftingPanel`; verified UI opens from Base Camp and crafting deduction logic works (ingredients consumed, item added). **Hazards:** Implemented active hazard logic; verified moving into hazardous rooms (e.g. Toxic Air) applies damage/stress and logs warning. **Class Selection:** Implemented `ClassSelectionScreen` as new entry point; verified `initializePlayer` honors selected class (stats, items, spells). **Servitors:** Verified "Contract" items correctly trigger `hire_servitor` effect, adding NPC to `player.servitors` and `ServitorPanel`. **Init Flow:** Verified new flow: Load Page -> Class Selection -> Initialize -> Game Loop. `?deterministic=1` or `?classId=...` bypasses selection for automation reliability.
+
 ---
 
 ## Task (prompt for new chat) - Make sure to keep updated.
@@ -189,6 +198,7 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 - **Game world / rules:** `@Forboc/notes/quadar.md` — Qua'dar setting, characters, classes, spells, Umbralyn, Quadar Tower.
 - **Currency / value system:** `@Forboc.AI/Platform/docs/CURRENCY_AUDIT.md` — spirit, blood, sacrifice (qvht/forboc macro vision; trading, sacrifice, gains).
 - additional context /Users/seandinwiddie/Documents/GitHub/qvht.github.io /Users/seandinwiddie/Documents/GitHub/forboc.github.io
+- **Crafting and farming and looting gathering:** — Itteratively improve. Think a cozy farming sim in the esotiric games Mortal Shell, Shadow of the Colossus, Diablo, Quake, Cyberpunk. Add more types of mushroom (with different effects) within the mushroom growing system.
 - **Code standards:** `@Forboc/notes/ref/standards/technology-maintenance/condensed.md` — FP/Redux, reducer-first. **Do NOT implement:** tests, backend, db, or Expo.
 - **Current status:** `@Forboc.AI/Platform/docs/PLAYTEST_AUTOMATION.md` — test coverage, Known issues, reproduction steps.
 
@@ -201,6 +211,10 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 - **Deterministic starting state:** **Implemented.** Use `?deterministic=1` for ranger, level 12, full health, basic equip, no progress flags.
 - **Threads, Vignette, rooms, NPCs tie together:** **Implemented.** `relatedNpcIds`, Vignette `threadIds`, RoomViewport scene–room links.
 - **Story integration:** Verified. Combat yields XP and commodities. Level-up increases power (MaxHP). Trading implemented. Mechanics now feed into progression loop.
+- **Crafting:** **Implemented.** UI/Thunks complete.
+- **Active Hazards:** **Implemented.** Logic/UI complete.
+- **Class Selection:** **Implemented.** Screen/Init logic complete.
+- **Servitors:** **Verified.**
 
 **Deliverables:**
 1. Systematic playthrough of all single-player mechanics.
@@ -211,14 +225,14 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 - Follow condensed.md for frontend architecture. No automated tests (Jest/Cypress), backend, db, or Expo. Web client only.
 
 **Suggested next steps:**
-0. Have all file names, folder names, function names, variable names, etc to be lore agnostic.
+0. Have all file names, folder names, function names, variable names, etc to be lore agnostic. Keep all lore in the ui and ux.
 0.5. Make sure the folder/file/function/engineering architecture represents a clear Entity-Component System. reference @Forboc/client/src
-0.75. Refactor files into subdomains prioritiezed by line count.
-0.8 Add vendor marketplace areas where there are lots of merchants to trade with selling different types of wares and servants/servitors for hire.
+0.75. Refactor files into subdomains prioritiezed by line count. keep the top level folder structure of /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/components/elements/generic, /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/components/elements/unique, /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/components/screens, /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features. all screen components should be composed of generic and unique components. all unique components should be composed of generic components. refactor as much unique components into generic components as possible. make sure the feature directory uses a Entity-Component System sub organized by domain.
 1. Read PLAYTEST_AUTOMATION.md (What was tested, Known issues) and the referenced design docs.
-2. **MANDATORY:** Use the browser tools (e.g. cursor-ide-browser) to open `http://localhost:3000` and verify flows: Init, Movement, SCAN, ENGAGE, COMMUNE, Oracle, Facts, Vignette, Concession, Merchants/Trading/Inventory, Level generation, Hazards, NPCs, autoplay, spells, abilities, weapons, player development, etc. Take a fresh snapshot before each interaction (refs go stale after actions). Take screenshots to confirm UI state.
+2. **MANDATORY:** Use the browser tools (e.g. cursor-ide-browser) to open `http://localhost:3000` and verify flows: Init, Movement, SCAN, ENGAGE, COMMUNE, Oracle, Facts, Vignette, Concession, Merchants/Trading/Inventory, Level generation, Hazards, NPCs, autoplay, spells, abilities, weapons, player development, etc. Use the autoplay to test the game and improve the autoplays intelegence of using all features of the game. Autoplay and  npcs should use the same logic, see: /Users/seandinwiddie/GitHub/Forboc/client/src/features. Take a fresh snapshot before each interaction (refs go stale after actions). Take screenshots to confirm UI state. keep /Users/seandinwiddie/GitHub/Forboc.AI/Platform/docs/bot.md up to date as you go along
 3. Identify discrepancies vs quadar_ familiar.md and quadar.md.
-4. Implement fixes or enhancements; update the doc after each change.
+4. Implement fixes or enhancements (always be improving the gameplay and design); update the doc after each change.
+5. Constantly be adding and improving the lore ux from Quadar, Forboc, Qvht.
 
 ---
 

@@ -1,6 +1,6 @@
 import type { Enemy } from "../types";
 
-const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
+export const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
     "Obsidian Warden": {
         characterClass: "Obsidian Warden",
         ac: 15,
@@ -53,19 +53,31 @@ const ENEMY_TEMPLATES: Record<string, Partial<Enemy>> = {
         characterClass: "Gravewalker",
         ac: 11,
         description: "A reanimated corpse, a dead wandering.",
-        maxHp: 70, spells: []
+        maxHp: 70, spells: ["necrotic_strike", "rotting_grasp", "bone_shatter"]
     },
     "Shadowhorn Juggernaut": {
         characterClass: "Shadowhorn Juggernaut",
         ac: 14,
         description: "An agile, horned creature with powerful melee attacks.",
-        maxHp: 60, spells: []
+        maxHp: 60, spells: ["horn_charge", "seismic_stomp", "shadow_rush"]
     },
     "Magma Leviathan": {
         characterClass: "Magma Leviathan",
         ac: 20,
         description: "A huge, massive lava creature from the core.",
-        maxHp: 200, spells: []
+        maxHp: 200, spells: ["molten_breath", "lava_slam", "magma_eruption"]
+    },
+    "Abyssal Overfiend": {
+        characterClass: "Abyssal Overfiend",
+        ac: 22,
+        description: "The ultimate antagonist. A monstrous entity with tentacles and void power.",
+        maxHp: 500, spells: ["void_tentacles", "chaos_gaze", "netherstorm"]
+    },
+    "Aetherwing Herald": {
+        characterClass: "Aetherwing Herald",
+        ac: 15,
+        description: "A flying, otherworldly creature that shoots energy projectiles.",
+        maxHp: 120, spells: ["celestial_beam", "spectral_tempest", "dimensional_rift"]
     }
 };
 
@@ -79,6 +91,7 @@ export function generateRandomEnemy(): Enemy {
         ...template,
         hp: template.maxHp || 10,
         maxStress: 100,
-        stress: 0
+        stress: 0,
+        activeEffects: []
     } as Enemy;
 }

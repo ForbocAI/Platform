@@ -21,7 +21,7 @@ export function DeckToggles({
       <button
         type="button"
         onClick={onOpenSpells}
-        className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-cyan/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
+        className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-mid/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
         data-testid="spells-toggle"
         aria-label="View spells"
         title="View spells"
@@ -44,7 +44,7 @@ export function DeckToggles({
       <button
         type="button"
         onClick={onOpenSkills}
-        className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-gold/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
+        className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-bright/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
         data-testid="skills-toggle"
         aria-label="View skills"
         title="View skills"
@@ -67,7 +67,7 @@ export function DeckToggles({
       <button
         type="button"
         onClick={onOpenInventory}
-        className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-gold/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
+        className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-bright/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
         data-testid="inventory-toggle"
         aria-label="Open inventory"
         title="View items"

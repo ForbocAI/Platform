@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   setMasterVolume,
   selectMasterVolume,
-  usePlayButtonSound,
+  playButtonSound,
 } from "@/features/audio";
 import { Minus, Plus } from "lucide-react";
 import { GameButton } from "@/components/elements/generic";
@@ -15,15 +15,14 @@ export function VolumeControls() {
   const dispatch = useAppDispatch();
   const masterVolume = useAppSelector(selectMasterVolume);
   const isMuted = masterVolume <= 0;
-  const playSound = usePlayButtonSound();
 
   const handleVolumeUp = () => {
-    playSound();
+    dispatch(playButtonSound());
     dispatch(setMasterVolume(Math.min(1, masterVolume + VOLUME_STEP)));
   };
 
   const handleVolumeDown = () => {
-    playSound();
+    dispatch(playButtonSound());
     dispatch(setMasterVolume(Math.max(0, masterVolume - VOLUME_STEP)));
   };
 

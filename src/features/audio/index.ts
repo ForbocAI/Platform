@@ -7,6 +7,5 @@ export {
   stopMusic as stopMusicLoop,
   setMusicStateGetter,
 } from "./audioSystem";
-export { usePlayButtonSound } from "./usePlayButtonSound";
 export { flushTtsQueue } from "./audioListeners";
 

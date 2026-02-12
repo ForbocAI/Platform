@@ -1,6 +1,6 @@
 "use client";
 
-import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel, ServitorPanel } from "@/components/elements/unique";
+import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel, ServitorPanel, CraftingPanel } from "@/components/elements/unique";
 import type { Player, EquipmentSlot, Merchant } from "@/features/game/types";
 
 export function GameScreenOverlays({
@@ -22,6 +22,8 @@ export function GameScreenOverlays({
   onCloseTrade,
   onSelectSpell,
   onSacrificeItem,
+  craftingPanelOpen,
+  onCloseCrafting,
 }: {
   inventoryOpen: boolean;
   spellsPanelOpen: boolean;
@@ -41,6 +43,8 @@ export function GameScreenOverlays({
   onCloseTrade?: () => void;
   onSelectSpell?: (spellId: string) => void;
   onSacrificeItem?: (itemId: string) => void;
+  craftingPanelOpen: boolean;
+  onCloseCrafting: () => void;
 }) {
   return (
     <>
@@ -83,6 +87,12 @@ export function GameScreenOverlays({
           player={player}
           merchant={activeMerchant}
           onClose={() => onCloseTrade?.()}
+        />
+      )}
+      {craftingPanelOpen && (
+        <CraftingPanel
+          player={player}
+          onClose={onCloseCrafting}
         />
       )}
     </>

@@ -1,7 +1,9 @@
 import type { TypedStartListening } from '@reduxjs/toolkit';
 import { getInitOptionsFromUrl } from '@/lib/getInitOptions';
 import { initializeGame, clearPendingQuestFacts } from '@/features/game/slice/gameSlice';
+import { normalizeClassIdFromParam } from '@/features/game/mechanics/classes';
 import { addThread, setMainThread, addFact } from '@/features/narrative/slice/narrativeSlice';
+import { toggleAutoPlay, setSelectedClassId } from '@/features/core/ui/slice/uiSlice';
 import type { RootState, AppDispatch } from './index';
 
 export const retryInitialize = { type: 'app/retryInitialize' as const };
@@ -9,14 +11,31 @@ export const retryInitialize = { type: 'app/retryInitialize' as const };
 export function registerGameListeners(
   startAppListening: TypedStartListening<RootState, AppDispatch>
 ): void {
-  // Bootstrap: init game when no player, using full URL params
+  // Bootstrap: init game when no player, using full URL params; sync selectedClassId from URL
   startAppListening({
     predicate: (action) => action.type === 'app/bootstrap',
     effect: async (_, listenerApi) => {
       const state = listenerApi.getState();
+      const opts = getInitOptionsFromUrl();
+      const normalizedClassId = opts.classId ? normalizeClassIdFromParam(opts.classId) : undefined;
+
+      if (normalizedClassId) {
+        listenerApi.dispatch(setSelectedClassId(normalizedClassId));
+      }
+
       if (!state.game.player) {
-        const opts = getInitOptionsFromUrl();
-        await listenerApi.dispatch(initializeGame(opts));
+        // Only auto-init if deterministic (test), class explicitly provided, or autoStart requested
+        if (opts.deterministic || opts.classId || opts.autoStart) {
+          await listenerApi.dispatch(
+            initializeGame({ ...opts, classId: normalizedClassId ?? opts.classId })
+          );
+
+          // Auto-start autoplay if requested
+          if (opts.autoStart) {
+            await listenerApi.delay(1500);
+            listenerApi.dispatch(toggleAutoPlay());
+          }
+        }
       }
     },
   });

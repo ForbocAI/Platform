@@ -9,10 +9,24 @@ const STONE_SKIN_REDUCTION = 2;
 /**
  * Apply skill-based bonus to damage dealt to enemies (e.g. battle_fervor).
  */
-export function applyDamageDealtBonus(skills: string[], damage: number): number {
+import type { StatusEffect } from "./types";
+
+/**
+ * Apply skill-based bonus to damage dealt to enemies (e.g. battle_fervor).
+ */
+export function applyDamageDealtBonus(skills: string[], activeEffects: StatusEffect[] | undefined, damage: number): number {
+    let finalDamage = damage;
     if (damage <= 0) return damage;
-    if (skills.includes("battle_fervor")) return damage + BATTLE_FERVOR_BONUS;
-    return damage;
+    if (skills.includes("battle_fervor")) finalDamage += BATTLE_FERVOR_BONUS;
+
+    if (activeEffects) {
+        for (const effect of activeEffects) {
+            if (effect.damageBonus) {
+                finalDamage += effect.damageBonus;
+            }
+        }
+    }
+    return finalDamage;
 }
 
 /**

@@ -17,3 +17,4 @@ export { SpellsPanel } from "./game/SpellsPanel";
 export { SkillsPanel } from "./game/SkillsPanel";
 export { ServitorPanel } from "./game/ServitorPanel";
 export { QuestsPanel } from "./game/QuestsPanel";
+export { CraftingPanel } from "./game/CraftingPanel";

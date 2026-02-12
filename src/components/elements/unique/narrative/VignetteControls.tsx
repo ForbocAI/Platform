@@ -44,7 +44,7 @@ export function VignetteControls({
 
       {theme ? (
         <p className="text-xs text-palette-muted animate-in fade-in slide-in-from-top-1 duration-300">
-          <span className="text-palette-accent-magic font-bold">Acting:</span> {theme} <span className="opacity-50">·</span> {stage}
+          <span className="text-palette-accent-soft font-bold">Acting:</span> {theme} <span className="opacity-50">·</span> {stage}
           {threadIds?.length && threads.length
             ? <span className="block mt-0.5 text-palette-text-muted/70">Threads: {threadIds.map((id) => threads.find((t) => t.id === id)?.name ?? id).join(", ")}</span>
             : null}

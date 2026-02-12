@@ -4,6 +4,18 @@ export interface Stats {
     maxStress: number;
     stress: number;
     ac?: number;
+    activeEffects?: StatusEffect[];
+}
+
+export interface StatusEffect {
+    id: string; // e.g. "shield_block"
+    name: string;
+    type: "buff" | "debuff";
+    statModifiers?: Partial<Stats>;
+    duration: number; // turns
+    description: string;
+    damagePerTurn?: number;
+    damageBonus?: number;
 }
 
 export type CharacterClass =
@@ -93,6 +105,7 @@ export interface Merchant {
     id: string;
     name: string;
     description?: string;
+    specialty?: "Weaponsmith" | "Alchemist" | "Relic Hunter" | string;
     wares: Item[];
 }
 
@@ -110,6 +123,7 @@ export interface Room {
     groundLoot?: Item[];
     isBaseCamp?: boolean;
     features?: RoomFeature[];
+    isMarketplace?: boolean;
 }
 
 export type RoomFeature =

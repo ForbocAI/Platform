@@ -28,8 +28,8 @@ export const askOracle = createAsyncThunk(
   }
 );
 
-export const communeWithVoid = createAsyncThunk(
-  'game/communeWithVoid',
+export const queryOracle = createAsyncThunk(
+  'game/queryOracle',
   async (_, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
     if (!state.game.player) return;

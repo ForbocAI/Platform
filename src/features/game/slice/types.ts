@@ -24,11 +24,15 @@ export interface GameState {
 export interface InitializeGameOptions {
   forceMerchant?: boolean;
   deterministic?: boolean;
-  forceEnemy?: boolean;
+  forceEnemy?: boolean | string;
   lowHp?: boolean;
   forceServitor?: boolean;
   /** When true with forceServitor, servitor starts at 1 HP for quick death-state testing. */
   lowServitorHp?: boolean;
   /** Force re-initialization even if already initialized (e.g. ?reset=1). */
   reset?: boolean;
+  /** Select specific class to play. */
+  classId?: string;
+  /** Auto-enable autoplay on load (?autoStart=1). */
+  autoStart?: boolean;
 }

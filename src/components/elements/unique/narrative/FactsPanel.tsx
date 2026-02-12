@@ -4,13 +4,12 @@ import type { Fact } from "@/features/game/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import { selectFactsPanelOpen, toggleFactsPanel } from "@/features/core/ui/slice/uiSlice";
-import { usePlayButtonSound } from "@/features/audio";
+import { playButtonSound } from "@/features/audio";
 import { GameButton } from "@/components/elements/generic";
 
 export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDisplay?: number }) {
   const dispatch = useAppDispatch();
   const open = useAppSelector(selectFactsPanelOpen);
-  const playSound = usePlayButtonSound();
   const display = facts.slice(-maxDisplay).reverse();
 
   if (facts.length === 0) return null;
@@ -20,7 +19,7 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
       <GameButton
         icon={open ? <ChevronDown className="app-icon" /> : <ChevronRight className="app-icon" />}
         onClick={() => {
-          playSound();
+          dispatch(playButtonSound());
           dispatch(toggleFactsPanel());
         }}
         className="w-full flex items-center gap-1 p-1.5 h-auto text-left justify-start border-transparent bg-transparent text-palette-muted-light hover:text-palette-muted uppercase tracking-wider hover:bg-transparent"
@@ -34,7 +33,7 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
           {display.map((f) => (
             <li
               key={f.id}
-              className={`px-1.5 py-0.5 border-l-2 ${f.isFollowUp ? "border-palette-accent-cyan/50" : "border-palette-border"}`}
+              className={`px-1.5 py-0.5 border-l-2 ${f.isFollowUp ? "border-palette-accent-mid/50" : "border-palette-border"}`}
             >
               {f.questionKind && <span className="text-palette-muted mr-1">[{f.questionKind}]</span>}
               {f.text}

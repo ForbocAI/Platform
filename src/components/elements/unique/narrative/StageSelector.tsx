@@ -2,7 +2,8 @@
 
 import type { StageOfScene } from "@/features/game/types";
 import { cn } from "@/lib/utils";
-import { usePlayButtonSound } from "@/features/audio";
+import { useAppDispatch } from "@/features/core/store";
+import { playButtonSound } from "@/features/audio";
 import { RuneSigil } from "../shared/Runes";
 import { GameButton } from "@/components/elements/generic";
 
@@ -19,7 +20,7 @@ export function StageSelector({
   stage: StageOfScene;
   onStageChange: (s: StageOfScene) => void;
 }) {
-  const playSound = usePlayButtonSound();
+  const dispatch = useAppDispatch();
   return (
     <div className="flex items-center gap-1 p-1 sm:p-1.5 border-b border-palette-border bg-palette-bg-mid/10 shrink-0 overflow-x-auto min-w-0" data-testid="stage-selector">
       <RuneSigil className="shrink-0" />
@@ -29,7 +30,7 @@ export function StageSelector({
           key={value}
           variant={stage === value ? "magic" : "default"}
           onClick={() => {
-            playSound();
+            dispatch(playButtonSound());
             onStageChange(value);
           }}
           data-testid={`stage-${value.replace(/\s+/g, "-").toLowerCase()}`}
@@ -37,7 +38,7 @@ export function StageSelector({
           className={cn(
             "px-1.5 sm:px-2 py-0.5 h-auto leading-tight",
             stage === value
-              ? "bg-palette-accent-magic/50 text-palette-accent-magic border-palette-accent-cyan/50"
+              ? "bg-palette-accent-soft/50 text-palette-accent-soft border-palette-accent-mid/50"
               : "text-palette-muted hover:text-palette-muted-light border-transparent"
           )}
         >

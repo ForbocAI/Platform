@@ -13,37 +13,203 @@ export const castSpell = createAsyncThunk(
     const state = getState() as { game: GameState };
     const { player, currentRoom } = state.game;
     if (!player || !currentRoom) return null;
-    if (currentRoom.enemies.length === 0) {
-      dispatch(addLog({ message: 'No target for spell.', type: 'system' }));
-      return null;
-    }
+
     const spell = SPELLS[arg.spellId];
     if (!spell) {
       dispatch(addLog({ message: 'Unknown spell.', type: 'system' }));
       return null;
     }
-    const enemy = currentRoom.enemies[0];
-    const duelResult = resolveSpellDuel(player, enemy, spell);
-    dispatch(addLog({ message: duelResult.message, type: 'combat' }));
-    let enemyDamage = 0;
-    let enemyDefeated = false;
-    if (duelResult.hit) {
-      enemyDamage = duelResult.damage;
-      if (enemy.hp - enemyDamage <= 0) {
-        enemyDefeated = true;
-        dispatch(addLog({ message: `${enemy.name} has been eradicated by arcane force!`, type: 'combat' }));
-        dispatch(addFact({ text: `Vanquished ${enemy.name} with ${spell.name}.`, questionKind: 'combat', isFollowUp: false }));
-        handleVignetteProgression(dispatch, getState);
+
+    // Effect Parsing
+    const effectStr = spell.effect(player, { ...player, hp: 0, maxHp: 0, maxStress: 0, stress: 0, ac: 0 });
+    const isAoE = effectStr.toLowerCase().includes("aoe");
+    const isBuff = effectStr.toLowerCase().includes("buff") || effectStr.toLowerCase().includes("aura") || effectStr.toLowerCase().includes("defense") || effectStr.toLowerCase().includes("evasion");
+    const isInvuln = effectStr.toLowerCase().includes("invulnerability");
+    const isHeal = effectStr.toLowerCase().includes("regeneration") || effectStr.toLowerCase().includes("heal");
+    const isLifeSteal = effectStr.toLowerCase().includes("life steal");
+    const isSummon = effectStr.toLowerCase().includes("summon");
+    const isImmobilize = effectStr.toLowerCase().includes("immobilize");
+    const isStun = effectStr.toLowerCase().includes("stun");
+    const isConfuse = effectStr.toLowerCase().includes("confuse");
+    const isFear = effectStr.toLowerCase().includes("fear");
+    const isBurn = effectStr.toLowerCase().includes("burn");
+    const isBuffDamage = effectStr.toLowerCase().includes("buff damage");
+
+    const playerStatusUpdates: any[] = [];
+    let playerHeal = 0;
+
+    // 1. Buffs / Healing / Self-Target
+    if (isBuff || isInvuln) {
+      if (effectStr.toLowerCase().includes("evasion")) {
+        playerStatusUpdates.push({
+          id: "evasion_buff",
+          name: "Shadowmeld",
+          type: "buff",
+          statModifiers: { ac: 5 }, // +5 AC
+          duration: 3,
+          description: "Harder to hit."
+        });
+      } else if (effectStr.toLowerCase().includes("defense")) {
+        playerStatusUpdates.push({
+          id: "defense_buff",
+          name: "Defensive Stance",
+          type: "buff",
+          statModifiers: { ac: 2 },
+          duration: 3,
+          description: "Braced for impact."
+        });
+      } else if (isBuffDamage) {
+        playerStatusUpdates.push({
+          id: "damage_buff",
+          name: "Inferno Overdrive",
+          type: "buff",
+          damageBonus: 5,
+          duration: 3,
+          description: "Attacks deal +5 damage."
+        });
+      }
+      dispatch(addLog({ message: `You cast ${spell.name}. ${effectStr}!`, type: 'combat' }));
+    }
+
+    if (isHeal) {
+      playerHeal = 15;
+      dispatch(addLog({ message: `You cast ${spell.name} and feel revitalized.`, type: 'combat' }));
+    }
+
+    if (isSummon) {
+      dispatch(addLog({ message: `You cast ${spell.name}. An echo forms to aid you.`, type: 'combat' }));
+      // TODO: Add servitor logic if needed
+    }
+
+    // 2. Offensive Spells (AoE or Single Target)
+    if (currentRoom.enemies.length === 0 && !isBuff && !isHeal && !isSummon) {
+      dispatch(addLog({ message: 'No target for offensive spell.', type: 'system' }));
+      return null;
+    }
+
+    // If pure buff/heal and no enemies, return early with updates
+    if (currentRoom.enemies.length === 0) {
+      return {
+        enemyId: "",
+        enemyDamage: 0,
+        enemyDefeated: false,
+        playerDamage: 0,
+        xpGain: 0,
+        lootItems: [],
+        aoeUpdates: [],
+        playerStatusUpdates,
+        playerHeal
+      };
+    }
+
+    const targets = isAoE ? currentRoom.enemies : [currentRoom.enemies[0]];
+    const defeatedEnemies: string[] = [];
+    const updates = targets.map(e => {
+      const result = resolveSpellDuel(player, e, spell);
+      let damage = result.hit ? result.damage : 0;
+
+      // Life Steal Logic
+      if (isLifeSteal && result.hit) {
+        playerHeal += damage;
+      }
+
+      const defeated = (e.hp - damage) <= 0;
+
+      const statusEffects: any[] = [];
+      if (result.hit) {
+        if (isImmobilize) {
+          statusEffects.push({ id: "immobilized", name: "Immobilized", type: "debuff", duration: 2, description: "Cannot move or attack." });
+        }
+        if (isStun) {
+          statusEffects.push({ id: "stun", name: "Stunned", type: "debuff", duration: 2, description: "Cannot act." });
+        }
+        if (isBurn) {
+          statusEffects.push({ id: "burn", name: "Burn", type: "debuff", duration: 3, description: "Takes fire damage.", damagePerTurn: 3 });
+        }
+        if (isConfuse) {
+          statusEffects.push({ id: "confused", name: "Confused", type: "debuff", duration: 2, description: "Chance to attack allies." });
+        }
+        if (isFear) {
+          statusEffects.push({ id: "fear", name: "Fear", type: "debuff", duration: 2, description: "Reduced accuracy." });
+        }
+      }
+
+      return { enemyId: e.id, damage, defeated, statusEffects };
+    });
+
+    // Logging for first target
+    const primaryUpdate = updates[0];
+    const enemy = currentRoom.enemies.find(e => e.id === primaryUpdate.enemyId);
+    if (enemy) {
+      if (primaryUpdate.damage > 0) {
+        let msg = `You cast ${spell.name}! It hits for ${primaryUpdate.damage} damage.`;
+        if (updates.length > 1) msg += ` (And ${updates.length - 1} others)`;
+        dispatch(addLog({ message: msg, type: 'combat' }));
+        if (isLifeSteal) dispatch(addLog({ message: `You drain life from ${enemy.name}!`, type: 'combat' }));
+      } else {
+        dispatch(addLog({ message: `You cast ${spell.name} but ${enemy.name} resists!`, type: 'combat' }));
       }
     }
-    let playerDamage = 0;
-    if (!enemyDefeated) {
-      const enemyAttack = resolveEnemyAttack(enemy, player);
-      dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
-      if (enemyAttack.hit) playerDamage = enemyAttack.damage;
+
+    updates.forEach(u => {
+      if (u.defeated) defeatedEnemies.push(u.enemyId);
+    });
+
+    if (defeatedEnemies.length > 0) {
+      defeatedEnemies.forEach(id => {
+        const en = currentRoom.enemies.find(e => e.id === id);
+        if (en) {
+          dispatch(addLog({ message: `${en.name} (${id}) is vanquished!`, type: 'combat' }));
+          dispatch(addFact({ text: `Vanquished ${en.name}.`, questionKind: 'combat', isFollowUp: false }));
+        }
+      });
+      handleVignetteProgression(dispatch, getState);
     }
-    const lootItems = enemyDefeated ? getEnemyLoot(enemy.name) : [];
-    return { enemyId: enemy.id, enemyDamage, enemyDefeated, playerDamage, xpGain: enemyDefeated ? 50 : 0, lootItems };
+
+    // Enemy Retaliation (survivors only)
+    // If immobilized, maybe they don't attack?
+    // For simplicity, we'll let existing logic handle pure damage, but we should verify status effects in a real turn system.
+    // Since this thunk resolves "One Round", we should respect the just-applied status? 
+    // Yes, but `resolveEnemyAttack` doesn't know about the status we just applied in `updates`.
+    // We would need to pass `updates` to `resolveEnemyAttack` or just apply it.
+    // Current architecture limitation: State is not updated yet.
+    // So we can check if the enemy IS immobilized in `updates` list.
+
+    let playerDamage = 0;
+    const survivors = currentRoom.enemies.filter(e => !defeatedEnemies.includes(e.id));
+
+    if (survivors.length > 0) {
+      const attacker = survivors[0]; // Primary attacker
+      const attackerUpdate = updates.find(u => u.enemyId === attacker.id);
+      const isAttackerDisabled = attackerUpdate?.statusEffects?.some(s => s.id === "immobilized" || s.id === "stun" || s.id === "fear" || s.id === "confused"); // Fear/Confuse might not disable but reduce hit, but for now treating as disable or just ignoring
+
+      // If immobilized/confused/fear, maybe skip attack or reduce it?
+      // Let's verify: Immobilize -> Skip. Fear -> ? Confuse -> Self damage?
+      if (isAttackerDisabled) {
+        dispatch(addLog({ message: `${attacker.name} is affected by status and cannot attack properly!`, type: 'combat' }));
+      } else {
+        const enemyAttack = resolveEnemyAttack(attacker, player);
+        dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
+        if (enemyAttack.hit) playerDamage = enemyAttack.damage;
+      }
+    }
+
+    const lootItems = defeatedEnemies.map(id => {
+      const e = currentRoom.enemies.find(en => en.id === id);
+      return e ? getEnemyLoot(e.name) : [];
+    }).flat();
+
+    return {
+      enemyId: primaryUpdate?.enemyId || "",
+      enemyDamage: primaryUpdate?.damage || 0,
+      enemyDefeated: primaryUpdate?.defeated || false,
+      playerDamage,
+      xpGain: defeatedEnemies.length * 50,
+      lootItems,
+      aoeUpdates: updates,
+      playerStatusUpdates,
+      playerHeal
+    };
   }
 );
 
@@ -102,30 +268,37 @@ export const engageHostiles = createAsyncThunk(
 
     // Enemy Retaliation
     if (!enemyDefeated) {
-      // Determine Target: Player or Servitor
-      let targetId = 'player';
-      const validServitors = player.servitors?.filter(c => c.hp > 0) || [];
+      // Check for Stun/Immobilize check
+      const isStunned = enemy.activeEffects?.some(e => e.id === "immobilized" || e.id === "stun");
 
-      // 25% chance to target a servitor if any exist
-      if (validServitors.length > 0 && Math.random() < 0.25) {
-        const victim = validServitors[Math.floor(Math.random() * validServitors.length)];
-        targetId = victim.id;
-
-        const victimDefender = {
-          name: victim.name,
-          ac: 10
-        };
-
-        const enemyAttack = resolveEnemyAttackOnServitor(enemy, victimDefender);
-        dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
-        if (enemyAttack.hit) {
-          servitorUpdates.push({ id: victim.id, damageTaken: enemyAttack.damage });
-        }
+      if (isStunned) {
+        dispatch(addLog({ message: `${enemy.name} is stunned and cannot attack!`, type: 'combat' }));
       } else {
-        // Target Player
-        const enemyAttack = resolveEnemyAttack(enemy, player);
-        dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
-        if (enemyAttack.hit) playerDamage = enemyAttack.damage;
+        // Determine Target: Player or Servitor
+        let targetId = 'player';
+        const validServitors = player.servitors?.filter(c => c.hp > 0) || [];
+
+        // 25% chance to target a servitor if any exist
+        if (validServitors.length > 0 && Math.random() < 0.25) {
+          const victim = validServitors[Math.floor(Math.random() * validServitors.length)];
+          targetId = victim.id;
+
+          const victimDefender = {
+            name: victim.name,
+            ac: 10
+          };
+
+          const enemyAttack = resolveEnemyAttackOnServitor(enemy, victimDefender);
+          dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
+          if (enemyAttack.hit) {
+            servitorUpdates.push({ id: victim.id, damageTaken: enemyAttack.damage });
+          }
+        } else {
+          // Target Player
+          const enemyAttack = resolveEnemyAttack(enemy, player);
+          dispatch(addLog({ message: enemyAttack.message, type: 'combat' }));
+          if (enemyAttack.hit) playerDamage = enemyAttack.damage;
+        }
       }
     }
 

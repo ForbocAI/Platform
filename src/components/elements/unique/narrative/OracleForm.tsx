@@ -2,7 +2,8 @@
 
 import { useRef } from "react";
 import { Send } from "lucide-react";
-import { usePlayButtonSound } from "@/features/audio";
+import { useAppDispatch } from "@/features/core/store";
+import { playButtonSound } from "@/features/audio";
 import { GameButton } from "@/components/elements/generic";
 
 export function OracleForm({
@@ -14,13 +15,13 @@ export function OracleForm({
   onChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
+  const dispatch = useAppDispatch();
   const formContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const playSound = usePlayButtonSound();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    playSound();
+    dispatch(playButtonSound());
     onSubmit(e);
   };
 
@@ -44,7 +45,7 @@ export function OracleForm({
           onFocus={() => formContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
           onKeyDown={handleKeyDown}
           placeholder="Ask Oracle… (Enter to send)"
-          className="w-full bg-palette-bg-dark border border-palette-border text-palette-accent-magic px-1.5 sm:px-2 py-1 sm:py-1.5 leading-relaxed focus:outline-none focus:border-palette-accent-cyan/50 placeholder:text-palette-muted min-w-0"
+          className="w-full bg-palette-bg-dark border border-palette-border text-palette-accent-soft px-1.5 sm:px-2 py-1 sm:py-1.5 leading-relaxed focus:outline-none focus:border-palette-accent-mid/50 placeholder:text-palette-muted min-w-0"
           data-testid="oracle-input"
           aria-label="Ask Oracle (press Enter to send)"
         />

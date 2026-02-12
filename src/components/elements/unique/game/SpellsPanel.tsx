@@ -14,7 +14,7 @@ export function SpellsPanel({ player, onClose, onSelectSpell }: SpellsPanelProps
   return (
     <Modal
       title="Known Spells"
-      titleIcon={<Wand2 className="w-5 h-5 text-palette-accent-cyan" />}
+      titleIcon={<Wand2 className="w-5 h-5 text-palette-accent-mid" />}
       onClose={onClose}
       data-testid="spells-panel"
     >
@@ -26,7 +26,7 @@ export function SpellsPanel({ player, onClose, onSelectSpell }: SpellsPanelProps
             <li key={spell}>
               <GameButton
                 variant="magic"
-                icon={<Wand2 className="w-4 h-4 text-palette-accent-cyan shrink-0" />}
+                icon={<Wand2 className="w-4 h-4 text-palette-accent-mid shrink-0" />}
                 onClick={() => {
                   onSelectSpell?.(spell);
                   onClose();

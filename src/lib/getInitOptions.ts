@@ -12,5 +12,8 @@ export function getInitOptionsFromUrl(): InitializeGameOptions {
     forceServitor: params.get('forceServitor') === '1',
     lowServitorHp: params.get('lowServitorHp') === '1',
     reset: params.get('reset') === '1',
+    classId: params.get('classId') || undefined,
+    autoStart: params.get('autoStart') === '1',
   };
 }
+

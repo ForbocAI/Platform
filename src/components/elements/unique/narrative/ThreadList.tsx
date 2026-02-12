@@ -2,7 +2,8 @@
 
 import type { Thread } from "@/features/game/types";
 import { cn } from "@/lib/utils";
-import { usePlayButtonSound } from "@/features/audio";
+import { useAppDispatch } from "@/features/core/store";
+import { playButtonSound } from "@/features/audio";
 import { GameButton } from "@/components/elements/generic";
 
 export function ThreadList({
@@ -14,7 +15,7 @@ export function ThreadList({
   mainThreadId: string | null;
   onSetMain: (id: string) => void;
 }) {
-  const playSound = usePlayButtonSound();
+  const dispatch = useAppDispatch();
   if (threads.length === 0) return null;
 
   return (
@@ -26,7 +27,7 @@ export function ThreadList({
             key={t.id}
             variant={mainThreadId === t.id ? "magic" : "default"}
             onClick={() => {
-              playSound();
+              dispatch(playButtonSound());
               onSetMain(t.id);
             }}
             data-testid={`thread-${t.id}`}
@@ -34,7 +35,7 @@ export function ThreadList({
             className={cn(
               "px-2 py-0.5 text-xs h-auto",
               mainThreadId === t.id
-                ? "bg-palette-accent-magic/50 border-palette-accent-cyan/50 text-palette-accent-cyan"
+                ? "bg-palette-accent-soft/50 border-palette-accent-mid/50 text-palette-accent-mid"
                 : "border-palette-border text-palette-muted hover:text-palette-muted-light"
             )}
           >

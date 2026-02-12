@@ -36,10 +36,12 @@ export const audioSlice = createSlice({
     stopMusic: (state) => {
       state.musicPlaying = false;
     },
+    /** Signal action: listener plays button click at current master volume. No state change. */
+    playButtonSound: () => {},
   },
 });
 
-export const { setMasterVolume, setMusicPlaying, startMusic, stopMusic } =
+export const { setMasterVolume, setMusicPlaying, startMusic, stopMusic, playButtonSound } =
   audioSlice.actions;
 
 export default audioSlice.reducer;

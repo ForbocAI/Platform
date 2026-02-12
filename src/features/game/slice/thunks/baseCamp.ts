@@ -4,6 +4,26 @@ import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../actions';
 import type { GameState } from '../types';
 
+/** Weighted mushroom pool for farming harvests */
+const HARVESTABLE_MUSHROOMS: { id: string; name: string; description: string; cost: { spirit: number; blood?: number }; weight: number }[] = [
+  { id: "glowing_mushroom", name: "Glowing Mushroom", description: "A faint blue fungus with regenerative properties.", cost: { spirit: 5 }, weight: 30 },
+  { id: "chromatic_cap", name: "Chromatic Cap", description: "Iridescent fungus from chromatic-steel growths. Shifts hue when touched.", cost: { spirit: 8 }, weight: 22 },
+  { id: "ember_puffball", name: "Ember Puffball", description: "Smoldering orange puffball that radiates faint warmth. Used in pyrokinetic compounds.", cost: { spirit: 7 }, weight: 20 },
+  { id: "static_lichen", name: "Static Lichen", description: "Lichen crackling with residual noise from the Static Sea. Disrupts nearby enchantments.", cost: { spirit: 10 }, weight: 12 },
+  { id: "void_morel", name: "Void Morel", description: "A pitch-black morel that hums with dimensional resonance. Potent in rift alchemy.", cost: { spirit: 12 }, weight: 10 },
+  { id: "chthonic_truffle", name: "Chthonic Truffle", description: "Subterranean truffle veined with crimson. Whispers of the deep cling to it.", cost: { spirit: 14, blood: 1 }, weight: 6 },
+];
+
+function pickRandomMushroom(): (typeof HARVESTABLE_MUSHROOMS)[number] {
+  const total = HARVESTABLE_MUSHROOMS.reduce((s, m) => s + m.weight, 0);
+  let r = Math.random() * total;
+  for (const m of HARVESTABLE_MUSHROOMS) {
+    r -= m.weight;
+    if (r <= 0) return m;
+  }
+  return HARVESTABLE_MUSHROOMS[0];
+}
+
 export const harvestCrop = createAsyncThunk(
   'game/harvestCrop',
   async (arg: { featureIndex: number }, { getState, dispatch }) => {
@@ -13,16 +33,17 @@ export const harvestCrop = createAsyncThunk(
     const feature = currentRoom.features[arg.featureIndex];
     if (!feature || feature.type !== 'farming_plot' || !feature.ready) return;
 
+    const mushroom = pickRandomMushroom();
     const cropItem: Item = {
-      id: `glowing_mushroom_${Date.now()}`,
-      name: 'Glowing Mushroom',
+      id: `${mushroom.id}_${Date.now()}`,
+      name: mushroom.name,
       type: 'resource',
-      description: 'A faint blue fungus with regenerative properties. Used in alchemy.',
-      cost: { spirit: 5 },
+      description: mushroom.description,
+      cost: mushroom.cost,
     };
 
     dispatch(addLog({ message: `Harvested ${cropItem.name}.`, type: 'system' }));
-    dispatch(addFact({ text: 'Harvested crop from Base Camp.', questionKind: 'basecamp', isFollowUp: false }));
+    dispatch(addFact({ text: `Harvested ${cropItem.name} from Base Camp.`, questionKind: 'basecamp', isFollowUp: false }));
     return { featureIndex: arg.featureIndex, item: cropItem };
   }
 );

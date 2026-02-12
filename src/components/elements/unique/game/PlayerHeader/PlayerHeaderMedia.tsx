@@ -4,13 +4,12 @@ import { Speech, Music } from "lucide-react";
 import { VolumeControls } from "@/components/elements/unique";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import { selectTextToSpeech, toggleTextToSpeech } from "@/features/core/ui/slice/uiSlice";
-import { usePlayButtonSound, startMusic, stopMusic, selectMusicPlaying } from "@/features/audio";
+import { playButtonSound, startMusic, stopMusic, selectMusicPlaying } from "@/features/audio";
 
 export function PlayerHeaderMedia() {
   const dispatch = useAppDispatch();
   const textToSpeech = useAppSelector(selectTextToSpeech);
   const musicPlaying = useAppSelector(selectMusicPlaying);
-  const playSound = usePlayButtonSound();
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-2">
@@ -18,12 +17,12 @@ export function PlayerHeaderMedia() {
         <button
           type="button"
           onClick={() => {
-            playSound();
+            dispatch(playButtonSound());
             dispatch(toggleTextToSpeech());
           }}
           className={textToSpeech
-            ? "p-1 sm:p-1.5 rounded border border-palette-accent-cyan/50 bg-palette-accent-cyan/20 text-palette-accent-cyan hover:bg-palette-accent-cyan/30 transition-colors"
-            : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-cyan text-palette-muted hover:text-palette-accent-cyan transition-colors"
+            ? "p-1 sm:p-1.5 rounded border border-palette-accent-mid/50 bg-palette-accent-mid/20 text-palette-accent-mid hover:bg-palette-accent-mid/30 transition-colors"
+            : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-mid text-palette-muted hover:text-palette-accent-mid transition-colors"
           }
           data-testid="text-to-speech-toggle"
           aria-label={textToSpeech ? "Turn off text-to-speech" : "Turn on text-to-speech"}
@@ -34,12 +33,12 @@ export function PlayerHeaderMedia() {
         <button
           type="button"
           onClick={() => {
-            playSound();
+            dispatch(playButtonSound());
             dispatch(musicPlaying ? stopMusic() : startMusic());
           }}
           className={musicPlaying
-            ? "p-1 sm:p-1.5 rounded border border-palette-accent-cyan/50 bg-palette-accent-cyan/20 text-palette-accent-cyan hover:bg-palette-accent-cyan/30 transition-colors"
-            : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-cyan text-palette-muted hover:text-palette-accent-cyan transition-colors"
+            ? "p-1 sm:p-1.5 rounded border border-palette-accent-mid/50 bg-palette-accent-mid/20 text-palette-accent-mid hover:bg-palette-accent-mid/30 transition-colors"
+            : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-mid text-palette-muted hover:text-palette-accent-mid transition-colors"
           }
           data-testid="music-toggle"
           aria-label={musicPlaying ? "Pause music" : "Play music"}

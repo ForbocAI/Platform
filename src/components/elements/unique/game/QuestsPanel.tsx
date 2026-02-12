@@ -30,12 +30,12 @@ export function QuestsPanel({
             {q.label}: {q.progress}/{q.target}
           </span>
           {q.complete && (
-            <span className="ml-1 text-palette-accent-cyan">✓</span>
+            <span className="ml-1 text-palette-accent-mid">✓</span>
           )}
         </div>
       ))}
       {sessionComplete === "quests" && sessionScore && (
-        <div className="text-xs text-palette-accent-cyan pt-1 border-t border-palette-border/50">
+        <div className="text-xs text-palette-accent-mid pt-1 border-t border-palette-border/50">
           Session complete — Rooms: {sessionScore.roomsExplored} | Scans:{" "}
           {sessionScore.roomsScanned} | Foes: {sessionScore.enemiesDefeated} |
           Trades: {sessionScore.merchantTrades} | Quests:{" "}
@@ -43,7 +43,7 @@ export function QuestsPanel({
         </div>
       )}
       {sessionComplete === "death" && sessionScore && (
-        <div className="text-xs text-palette-accent-red pt-1 border-t border-palette-border/50">
+        <div className="text-xs text-palette-accent-mid pt-1 border-t border-palette-border/50">
           Session ended (death) — Rooms: {sessionScore.roomsExplored} | Scans:{" "}
           {sessionScore.roomsScanned} | Foes: {sessionScore.enemiesDefeated} |
           Trades: {sessionScore.merchantTrades} | Quests:{" "}

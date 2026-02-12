@@ -1,9 +1,10 @@
 import type { ActionReducerMapBuilder } from '@reduxjs/toolkit';
-import { SPELLS, getSpellUnlockForLevel, getSkillUnlockForLevel } from '@/features/game/mechanics';
 import { applyDamageDealtBonus, applyDamageTakenReduction } from '@/features/game/skills';
-import type { Item } from '@/features/game/types';
+import type { Item, StatusEffect } from '@/features/game/types';
 import * as thunks from '../thunks';
 import type { GameState } from '../types';
+import { applyLoot, applyCombatRewards, applyXpGain } from './loot';
+import { addDeathReducers } from './death';
 
 function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.engageHostiles.fulfilled, (state, action) => {
@@ -11,7 +12,35 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
         const { enemyId, enemyDamage, enemyDefeated, playerDamage } = action.payload;
         const skills = state.player.skills ?? [];
         const actualPlayerDamage = applyDamageTakenReduction(skills, playerDamage);
-        const actualEnemyDamage = applyDamageDealtBonus(skills, enemyDamage);
+        const actualEnemyDamage = applyDamageDealtBonus(skills, state.player.activeEffects, enemyDamage);
+
+        // Process Player Effects (DoT & Duration)
+        if (state.player.activeEffects) {
+            const nextEffects: typeof state.player.activeEffects = [];
+            for (const effect of state.player.activeEffects) {
+                if (effect.damagePerTurn) {
+                    state.player.hp -= effect.damagePerTurn;
+                    state.logs.push({
+                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        timestamp: Date.now(),
+                        message: `You take ${effect.damagePerTurn} damage from ${effect.name}.`,
+                        type: "combat"
+                    });
+                }
+                const nextDuration = effect.duration - 1;
+                if (nextDuration > 0) {
+                    nextEffects.push({ ...effect, duration: nextDuration });
+                } else {
+                    state.logs.push({
+                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        timestamp: Date.now(),
+                        message: `${effect.name} fades.`,
+                        type: "combat"
+                    });
+                }
+            }
+            state.player.activeEffects = nextEffects;
+        }
 
         state.player.hp -= actualPlayerDamage;
         if (state.player.hp < 0) state.player.hp = 0;
@@ -38,83 +67,52 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
         }
 
         const enemies = state.currentRoom.enemies.map(e => {
+            // Process Enemy Effects (DoT & Duration)
+            let currentHp = e.hp;
+            let currentEffects = e.activeEffects || [];
+            const nextEffects: typeof currentEffects = [];
+
+            for (const effect of currentEffects) {
+                if (effect.damagePerTurn) {
+                    currentHp -= effect.damagePerTurn;
+                    state.logs.push({
+                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        timestamp: Date.now(),
+                        message: `${e.name} takes ${effect.damagePerTurn} damage from ${effect.name}.`,
+                        type: "combat"
+                    });
+                }
+                const nextDuration = effect.duration - 1;
+                if (nextDuration > 0) {
+                    nextEffects.push({ ...effect, duration: nextDuration });
+                }
+            }
+
             if (e.id === enemyId) {
+                const afterAttackHp = currentHp - actualEnemyDamage;
                 return {
                     ...e,
-                    hp: e.hp - actualEnemyDamage,
+                    hp: afterAttackHp,
                     lastDamageTime: actualEnemyDamage > 0 ? Date.now() : e.lastDamageTime,
-                    lastAttackTime: Date.now()
+                    lastAttackTime: Date.now(),
+                    activeEffects: nextEffects
                 };
             }
-            return e;
+
+            return {
+                ...e,
+                hp: currentHp,
+                activeEffects: nextEffects
+            };
         });
 
         if (enemyDefeated) {
             state.currentRoom.enemies = enemies.filter(e => e.id !== enemyId);
             const lootItems = (action.payload as { lootItems?: Item[] }).lootItems ?? [];
-            for (const loot of lootItems) {
-                state.player.inventory.push(loot);
-            }
-            if (lootItems.length > 0) {
-                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Loot: ${lootItems.map((l) => l.name).join(", ")}.`, type: "system" });
-            }
-            state.player.spirit = (state.player.spirit || 0) + 5;
-            state.player.blood = (state.player.blood || 0) + 2;
-            if (state.sessionScore) {
-                state.sessionScore.enemiesDefeated += 1;
-                state.sessionScore.spiritEarned += 5;
-                const hostilesQuest = state.activeQuests.find(q => q.kind === "hostiles" && !q.complete);
-                if (hostilesQuest) {
-                    hostilesQuest.progress = state.sessionScore.enemiesDefeated;
-                    if (hostilesQuest.progress >= hostilesQuest.target) {
-                        hostilesQuest.complete = true;
-                        state.sessionScore.questsCompleted += 1;
-                        state.pendingQuestFacts.push(`Completed quest: ${hostilesQuest.label}.`);
-                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${hostilesQuest.label}.`, type: "system" });
-                        if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
-                            state.sessionComplete = "quests";
-                            state.sessionScore.endTime = Date.now();
-                        }
-                    }
-                }
-            }
-
+            applyLoot(state, lootItems);
+            applyCombatRewards(state, 1);
             const xpGain = (action.payload as { xpGain?: number }).xpGain || 0;
-            if (xpGain > 0) {
-                state.player.xp += xpGain;
-                if (state.player.xp >= state.player.maxXp) {
-                    state.player.xp -= state.player.maxXp;
-                    state.player.level += 1;
-                    state.player.maxXp += 100;
-                    state.player.maxHp += 10;
-                    state.player.hp = state.player.maxHp;
-                    state.player.stress = Math.max(0, state.player.stress - 20);
-                    const newSpell = getSpellUnlockForLevel(state.player.characterClass, state.player.level);
-                    const newSkill = getSkillUnlockForLevel(state.player.characterClass, state.player.level);
-                    if (newSpell && !state.player.spells.includes(newSpell)) {
-                        state.player.spells = [...state.player.spells, newSpell];
-                        const spellName = SPELLS[newSpell]?.name ?? newSpell;
-                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked: ${spellName}.`, type: "system" });
-                    } else if (newSkill) {
-                        const skillList = state.player.skills ?? [];
-                        if (!skillList.includes(newSkill)) {
-                            state.player.skills = [...skillList, newSkill];
-                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked skill: ${newSkill}.`, type: "system" });
-                        } else {
-                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
-                        }
-                    } else {
-                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
-                    }
-                } else {
-                    state.logs.push({
-                        id: Date.now().toString(),
-                        timestamp: Date.now(),
-                        message: `Gained ${xpGain} XP.`,
-                        type: "system"
-                    });
-                }
-            }
+            applyXpGain(state, xpGain);
         } else {
             state.currentRoom.enemies = enemies;
         }
@@ -124,107 +122,105 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
 function addCastSpellReducer(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.castSpell.fulfilled, (state, action) => {
         if (!action.payload || !state.player || !state.currentRoom) return;
-        const { enemyId, enemyDamage, enemyDefeated, playerDamage } = action.payload;
+
+        const payload = action.payload as {
+            enemyId: string;
+            enemyDamage: number;
+            enemyDefeated: boolean;
+            playerDamage: number;
+            xpGain: number;
+            lootItems: Item[];
+            aoeUpdates?: { enemyId: string; damage: number; defeated: boolean; statusEffects?: StatusEffect[] }[];
+            playerStatusUpdates?: StatusEffect[];
+            playerHeal?: number;
+        };
+
+        const { playerDamage, aoeUpdates, playerStatusUpdates, playerHeal } = payload;
         const spellSkills = state.player.skills ?? [];
+
+        // 1. Apply Player Damage, Heal, and Status
         const actualPlayerDamageSpell = applyDamageTakenReduction(spellSkills, playerDamage);
-        const actualEnemyDamageSpell = applyDamageDealtBonus(spellSkills, enemyDamage);
+
+        // Apply Heal
+        if (playerHeal && playerHeal > 0) {
+            state.player.hp = Math.min(state.player.maxHp, state.player.hp + playerHeal);
+        }
 
         state.player.hp -= actualPlayerDamageSpell;
         if (state.player.hp < 0) state.player.hp = 0;
         state.player.stress += 1;
 
+        // Apply Player Status Updates
+        if (playerStatusUpdates && playerStatusUpdates.length > 0) {
+            state.player.activeEffects = state.player.activeEffects || [];
+            for (const effect of playerStatusUpdates) {
+                state.player.activeEffects = state.player.activeEffects.filter(e => e.id !== effect.id);
+                state.player.activeEffects.push(effect);
+            }
+        }
+
+        // 2. Apply Enemy Damage (AoE or Single) and Status
+        let updates = aoeUpdates;
+        if (!updates) {
+            updates = [{
+                enemyId: payload.enemyId,
+                damage: payload.enemyDamage,
+                defeated: payload.enemyDefeated,
+                statusEffects: []
+            }];
+        }
+
         const enemiesSpell = state.currentRoom.enemies.map(e => {
-            if (e.id === enemyId) {
+            const update = updates?.find(u => u.enemyId === e.id);
+            if (update) {
+                const actualDamage = applyDamageDealtBonus(spellSkills, state.player?.activeEffects, update.damage);
+                let newHp = e.hp - actualDamage;
+
+                let newEffects = e.activeEffects || [];
+                if (update.statusEffects && update.statusEffects.length > 0) {
+                    for (const effect of update.statusEffects) {
+                        newEffects = newEffects.filter(ef => ef.id !== effect.id);
+                        newEffects.push(effect);
+                    }
+                }
+
                 return {
                     ...e,
-                    hp: e.hp - actualEnemyDamageSpell,
-                    lastDamageTime: actualEnemyDamageSpell > 0 ? Date.now() : e.lastDamageTime,
-                    lastAttackTime: Date.now()
+                    hp: newHp,
+                    lastDamageTime: actualDamage > 0 ? Date.now() : e.lastDamageTime,
+                    lastAttackTime: Date.now(),
+                    activeEffects: newEffects
                 };
             }
             return e;
         });
 
-        if (enemyDefeated) {
-            state.currentRoom.enemies = enemiesSpell.filter(e => e.id !== enemyId);
-            const lootItemsSpell = (action.payload as { lootItems?: Item[] }).lootItems ?? [];
-            for (const loot of lootItemsSpell) {
-                state.player.inventory.push(loot);
-            }
-            if (lootItemsSpell.length > 0) {
-                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Loot: ${lootItemsSpell.map((l) => l.name).join(", ")}.`, type: "system" });
-            }
-            state.player.spirit = (state.player.spirit || 0) + 5;
-            state.player.blood = (state.player.blood || 0) + 2;
-            if (state.sessionScore) {
-                state.sessionScore.enemiesDefeated += 1;
-                state.sessionScore.spiritEarned += 5;
-                const hostilesQuest = state.activeQuests.find(q => q.kind === "hostiles" && !q.complete);
-                if (hostilesQuest) {
-                    hostilesQuest.progress = state.sessionScore.enemiesDefeated;
-                    if (hostilesQuest.progress >= hostilesQuest.target) {
-                        hostilesQuest.complete = true;
-                        state.sessionScore.questsCompleted += 1;
-                        state.pendingQuestFacts.push(`Completed quest: ${hostilesQuest.label}.`);
-                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${hostilesQuest.label}.`, type: "system" });
-                        if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
-                            state.sessionComplete = "quests";
-                            state.sessionScore.endTime = Date.now();
-                        }
-                    }
-                }
-            }
+        // 3. Handle Death and Loot
+        const livingEnemies = enemiesSpell.filter(e => e.hp > 0);
+        const deadEnemiesCount = state.currentRoom.enemies.length - livingEnemies.length;
 
-            const xpGain = (action.payload as { xpGain?: number }).xpGain || 0;
-            if (xpGain > 0) {
-                state.player.xp += xpGain;
-                if (state.player.xp >= state.player.maxXp) {
-                    state.player.xp -= state.player.maxXp;
-                    state.player.level += 1;
-                    state.player.maxXp += 100;
-                    state.player.maxHp += 10;
-                    state.player.hp = state.player.maxHp;
-                    state.player.stress = Math.max(0, state.player.stress - 20);
-                    const newSpell = getSpellUnlockForLevel(state.player.characterClass, state.player.level);
-                    const newSkill = getSkillUnlockForLevel(state.player.characterClass, state.player.level);
-                    if (newSpell && !state.player.spells.includes(newSpell)) {
-                        state.player.spells = [...state.player.spells, newSpell];
-                        const spellName = SPELLS[newSpell]?.name ?? newSpell;
-                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked: ${spellName}.`, type: "system" });
-                    } else if (newSkill) {
-                        const skillList = state.player.skills ?? [];
-                        if (!skillList.includes(newSkill)) {
-                            state.player.skills = [...skillList, newSkill];
-                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Unlocked skill: ${newSkill}.`, type: "system" });
-                        } else {
-                            state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
-                        }
-                    } else {
-                        state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`, type: "system" });
-                    }
-                } else {
-                    state.logs.push({
-                        id: Date.now().toString(),
-                        timestamp: Date.now(),
-                        message: `Gained ${xpGain} XP.`,
-                        type: "system"
-                    });
-                }
-            }
+        if (deadEnemiesCount > 0) {
+            state.currentRoom.enemies = livingEnemies;
+            applyLoot(state, payload.lootItems ?? []);
+            applyCombatRewards(state, deadEnemiesCount);
         } else {
             state.currentRoom.enemies = enemiesSpell;
         }
+
+        applyXpGain(state, payload.xpGain || 0);
+    });
+    builder.addCase(thunks.castSpell.rejected, (state, action) => {
+        state.logs.push({
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            timestamp: Date.now(),
+            message: `Spell cast failed: ${action.error.message || "Unknown error"}`,
+            type: "system"
+        });
     });
 }
 
 export function addCombatReducers(builder: ActionReducerMapBuilder<GameState>): void {
     addEngageHostilesReducer(builder);
     addCastSpellReducer(builder);
-    builder.addCase(thunks.respawnPlayer.fulfilled, (state) => {
-        if (!state.player || !state.currentRoom) return;
-        state.player.hp = state.player.maxHp;
-        state.player.stress = 0;
-        state.currentRoom.enemies = [];
-        state.sessionComplete = null;
-    });
+    addDeathReducers(builder);
 }

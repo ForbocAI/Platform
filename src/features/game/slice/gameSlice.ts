@@ -8,7 +8,7 @@ export { addLog, selectSpell, clearPendingQuestFacts } from './actions';
 export {
     initializeGame,
     askOracle,
-    communeWithVoid,
+    queryOracle,
     movePlayer,
     scanSector,
     castSpell,

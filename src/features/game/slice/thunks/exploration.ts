@@ -26,9 +26,17 @@ export const movePlayer = createAsyncThunk(
         roomsExplored,
       },
     });
-    dispatch(addLog({ message: `Moved ${direction}.`, type: 'exploration' }));
 
-    return { room: newRoom, direction };
+    // Check for hazards
+    const { calculateHazardEffects } = await import('@/features/game/mechanics/hazards');
+    const hazardEffects = calculateHazardEffects(newRoom.hazards);
+
+    dispatch(addLog({ message: `Moved ${direction}.`, type: 'exploration' }));
+    if (hazardEffects.message) {
+      dispatch(addLog({ message: hazardEffects.message, type: 'system' }));
+    }
+
+    return { room: newRoom, direction, hazardEffects };
   }
 );
 

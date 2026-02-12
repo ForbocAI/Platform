@@ -1,5 +1,7 @@
-import type { StageOfScene } from '@/features/game/types';
+import type { StageOfScene, CharacterClass } from '@/features/game/types';
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
+
+const DEFAULT_SELECTED_CLASS: CharacterClass = 'Ashwalker';
 
 interface UIState {
   oracleInput: string;
@@ -16,6 +18,9 @@ interface UIState {
   /** Set true when app/bootstrap runs (client); used to avoid hydration mismatch (e.g. runes). */
   clientHydrated: boolean;
   activeMerchantId: string | null;
+  craftingPanelOpen: boolean;
+  /** Selected class on class selection screen (UI state). */
+  selectedClassId: CharacterClass;
 }
 
 const initialState: UIState = {
@@ -32,6 +37,8 @@ const initialState: UIState = {
   servitorPanelOpen: false,
   clientHydrated: false,
   activeMerchantId: null,
+  craftingPanelOpen: false,
+  selectedClassId: DEFAULT_SELECTED_CLASS,
 };
 
 export const uiSlice = createSlice({
@@ -83,6 +90,12 @@ export const uiSlice = createSlice({
     closeTrade: (state) => {
       state.activeMerchantId = null;
     },
+    toggleCraftingPanel: (state, action: PayloadAction<boolean | undefined>) => {
+      state.craftingPanelOpen = action.payload !== undefined ? action.payload : !state.craftingPanelOpen;
+    },
+    setSelectedClassId: (state, action: PayloadAction<CharacterClass>) => {
+      state.selectedClassId = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
@@ -94,7 +107,7 @@ export const uiSlice = createSlice({
   },
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -162,6 +175,16 @@ export const selectClientHydrated = createSelector(
 export const selectActiveMerchantId = createSelector(
   [selectUIState],
   (ui) => ui.activeMerchantId
+);
+
+export const selectCraftingPanelOpen = createSelector(
+  [selectUIState],
+  (ui) => ui.craftingPanelOpen
+);
+
+export const selectSelectedClassId = createSelector(
+  [selectUIState],
+  (ui) => ui.selectedClassId
 );
 
 export default uiSlice.reducer;

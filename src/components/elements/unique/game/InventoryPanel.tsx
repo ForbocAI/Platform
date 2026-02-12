@@ -15,8 +15,11 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
     const renderItemBonus = (item: Item) => {
         if (!item.bonus) return null;
         return (
-            <span className="text-xs text-palette-accent-cyan ml-2">
-                {Object.entries(item.bonus).map(([k, v]) => `${k} ${v > 0 ? '+' : ''}${v}`).join(", ")}
+            <span className="text-xs text-palette-accent-mid ml-2">
+                {Object.entries(item.bonus)
+                  .filter(([, v]) => typeof v === "number")
+                  .map(([k, v]) => `${k} ${(v as number) > 0 ? "+" : ""}${v}`)
+                  .join(", ")}
             </span>
         );
     };
@@ -53,7 +56,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
     return (
         <Modal
             title="Inventory & Equipment"
-            titleIcon={<Package className="w-5 h-5 text-palette-accent-gold" />}
+            titleIcon={<Package className="w-5 h-5 text-palette-accent-bright" />}
             onClose={onClose}
             maxWidth="2xl"
             data-testid="inventory-panel"
@@ -64,9 +67,9 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                     <div className="space-y-2">
                         <h3 className="text-xs uppercase text-palette-muted-light font-bold">Equipment</h3>
                         <div className="space-y-2">
-                            {renderEquippedItem("mainHand", <Sword className="w-4 h-4 text-palette-accent-warm" />, "Main Hand")}
-                            {renderEquippedItem("armor", <Shield className="w-4 h-4 text-palette-accent-gold" />, "Armor")}
-                            {renderEquippedItem("relic", <Gem className="w-4 h-4 text-palette-accent-magic" />, "Relic")}
+                            {renderEquippedItem("mainHand", <Sword className="w-4 h-4 text-palette-accent-dim" />, "Main Hand")}
+                            {renderEquippedItem("armor", <Shield className="w-4 h-4 text-palette-accent-bright" />, "Armor")}
+                            {renderEquippedItem("relic", <Gem className="w-4 h-4 text-palette-accent-soft" />, "Relic")}
                         </div>
                     </div>
 

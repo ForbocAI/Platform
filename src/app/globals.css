@@ -15,12 +15,11 @@
   --color-palette-muted: #4b4b4b;
   --color-palette-muted-light: #5b5b5b;
   --color-palette-border: #2f2f2f;
-  --color-palette-accent-red: #b0b0b0;
-  --color-palette-accent-cyan: #b0b0b0;
-  --color-palette-border-red: #4b4b4b;
-  --color-palette-accent-magic: #a0a0a0;
-  --color-palette-accent-warm: #909090;
-  --color-palette-accent-gold: #c0c0c0;
+  --color-palette-accent-mid: #b0b0b0;
+  --color-palette-border-dim: #4b4b4b;
+  --color-palette-accent-soft: #a0a0a0;
+  --color-palette-accent-dim: #909090;
+  --color-palette-accent-bright: #c0c0c0;
   --color-palette-white: #ffffff;
   --color-palette-foreground: #ebebeb;
 }
@@ -39,9 +38,8 @@
 :root {
   --background: #0f0f0f;
   --foreground: #ebebeb;
-  --accent-red: #b0b0b0;
-  --accent-cyan: #b0b0b0;
-  --border-red: #4b4b4b;
+  --accent-mid: #b0b0b0;
+  --border-dim: #4b4b4b;
   --palette-bg-dark: #000000;
   --palette-bg-mid: #1f1f1f;
   --palette-bg-panel: #2f2f2f;
@@ -49,9 +47,9 @@
   --palette-muted-light: #5b5b5b;
   --palette-border: #2f2f2f;
   --palette-border-light: #4b4b4b;
-  --palette-accent-magic: #a0a0a0;
-  --palette-accent-warm: #909090;
-  --palette-accent-gold: #c0c0c0;
+  --palette-accent-soft: #a0a0a0;
+  --palette-accent-dim: #909090;
+  --palette-accent-bright: #c0c0c0;
   --palette-white: #ffffff;
   --color-rune-ink: #4b4b4b;
   /* Single font and icon size — all text and icons use these globally */
@@ -219,7 +217,7 @@
 /* Enemy Animations */
 @keyframes enemy-flash-attack {
   0%, 100% { filter: brightness(1) sepia(0); }
-  50% { filter: brightness(2) red(255); box-shadow: 0 0 15px var(--accent-red); transform: scale(1.02); }
+  50% { filter: brightness(2) red(255); box-shadow: 0 0 15px var(--accent-mid); transform: scale(1.02); }
 }
 
 @keyframes enemy-flash-damage {
@@ -243,9 +241,9 @@
   height: 5px;
   min-width: 5px;
   min-height: 5px;
-  background: var(--accent-cyan);
+  background: var(--accent-mid);
   border-radius: 50%;
-  box-shadow: 0 0 6px var(--accent-cyan), 0 0 8px var(--accent-cyan);
+  box-shadow: 0 0 6px var(--accent-mid), 0 0 8px var(--accent-mid);
   margin-left: 0.5rem;
   position: relative;
   opacity: 0.9;
@@ -298,7 +296,7 @@
   opacity: 0;
   animation: cursor-blink 0.8s step-end infinite;
   margin-left: 2px;
-  color: var(--accent-cyan);
+  color: var(--accent-mid);
 }
 
 /* Encrypted text — JS hook for Sneakers decrypt effect */
@@ -317,7 +315,7 @@
 }
 
 .vengeance-border {
-  border: 1px solid var(--border-red);
+  border: 1px solid var(--border-dim);
   box-shadow: 0 0 10px rgba(75, 75, 75, 0.3), inset 0 0 10px rgba(75, 75, 75, 0.2);
   clip-path: polygon(
     0 5px, 
@@ -334,8 +332,8 @@
 .vengeance-button {
   @apply transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   background: rgba(75, 75, 75, 0.2);
-  border: 1px solid var(--border-red);
-  color: var(--accent-red);
+  border: 1px solid var(--border-dim);
+  color: var(--accent-mid);
   text-transform: uppercase;
   font-weight: bold;
   letter-spacing: 0.1em;
@@ -347,13 +345,8 @@
   color: var(--palette-white);
 }
 
-.text-cyan {
-  color: var(--accent-cyan);
-  text-shadow: 0 0 5px rgba(176, 176, 176, 0.5);
-}
-
-.text-red {
-  color: var(--accent-red);
+.text-mid {
+  color: var(--accent-mid);
   text-shadow: 0 0 5px rgba(176, 176, 176, 0.5);
 }
 
@@ -401,7 +394,7 @@
 
 *::-webkit-scrollbar-thumb {
   background: var(--palette-muted);
-  border: 1px solid var(--border-red);
+  border: 1px solid var(--border-dim);
   border-radius: 0;
 }
 

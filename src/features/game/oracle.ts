@@ -22,33 +22,33 @@ export function consultOracle(question: string, currentSurgeCount: number): Orac
     if (modifiedRoll >= 96) {
         answer = "Yes";
         qualifier = "unexpectedly";
-        resultString = "Yes, and unexpectedly...";
+        resultString = "The void screams affirmation, and unexpectedly...";
     } else if (modifiedRoll >= 86) {
         answer = "Yes";
         qualifier = "but";
-        resultString = "Yes, but...";
+        resultString = "The void whispers yes, but...";
     } else if (modifiedRoll >= 81) {
         answer = "Yes";
         qualifier = "and";
-        resultString = "Yes, and...";
+        resultString = "The void answers yes, and...";
     } else if (modifiedRoll >= 51) {
         answer = "Yes";
-        resultString = "Yes.";
+        resultString = "The void whispers affirmation.";
     } else if (modifiedRoll >= 21) {
         answer = "No";
-        resultString = "No.";
+        resultString = "The void remains silent.";
     } else if (modifiedRoll >= 16) {
         answer = "No";
         qualifier = "and";
-        resultString = "No, and...";
+        resultString = "The void rejects your query, and...";
     } else if (modifiedRoll >= 6) {
         answer = "No";
         qualifier = "but";
-        resultString = "No, but...";
+        resultString = "The void is silent, but...";
     } else {
         answer = "No";
         qualifier = "unexpectedly";
-        resultString = "No, and unexpectedly...";
+        resultString = "The void recoils, and unexpectedly...";
     }
 
     let description = resultString;

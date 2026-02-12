@@ -16,7 +16,7 @@ import {
   askOracle,
   addLog,
   scanSector,
-  communeWithVoid,
+  queryOracle,
   engageHostiles,
   respawnPlayer,
   selectSpell,
@@ -46,8 +46,10 @@ import {
   selectActiveMerchantId,
   selectServitorPanelOpen,
   toggleServitorPanel,
+  selectCraftingPanelOpen,
+  toggleCraftingPanel,
 } from "@/features/core/ui/slice/uiSlice";
-import { usePlayButtonSound } from "@/features/audio";
+import { playButtonSound } from "@/features/audio";
 import {
   selectThreads,
   selectMainThreadId,
@@ -67,11 +69,11 @@ import { GameScreenHeader } from "./GameScreenHeader";
 import { GameScreenMain } from "./GameScreenMain";
 import { GameScreenFooter } from "./GameScreenFooter";
 import { GameScreenOverlays } from "./GameScreenOverlays";
+import { ClassSelectionScreen } from "../ClassSelectionScreen";
 import type { VignetteStage } from "@/features/game/types";
 
 export function GameScreen() {
   const dispatch = useAppDispatch();
-  const playSound = usePlayButtonSound();
   const player = useAppSelector(selectPlayer);
   const currentRoom = useAppSelector(selectCurrentRoom);
   const exploredRooms = useAppSelector(selectExploredRooms);
@@ -96,14 +98,19 @@ export function GameScreen() {
   const activeQuests = useAppSelector(selectActiveQuests);
   const sessionScore = useAppSelector(selectSessionScore);
   const sessionComplete = useAppSelector(selectSessionComplete);
+  const craftingPanelOpen = useAppSelector(selectCraftingPanelOpen);
+  const isLoading = useAppSelector((state) => state.game.isLoading);
 
   if (!isInitialized) {
-    return (
-      <LoadingOverlay
-        message="INITIALIZING..."
-        onRetry={() => dispatch(retryInitialize)}
-      />
-    );
+    if (isLoading) {
+      return (
+        <LoadingOverlay
+          message="INITIALIZING..."
+          onRetry={() => dispatch(retryInitialize)}
+        />
+      );
+    }
+    return <ClassSelectionScreen />;
   }
 
   if (!player || !currentRoom) {
@@ -167,14 +174,14 @@ export function GameScreen() {
         onMapClick={() => dispatch(toggleShowMap())}
         onScan={() => dispatch(scanSector())}
         onEngage={() => dispatch(engageHostiles())}
-        onCommune={() => dispatch(communeWithVoid())}
+        onCommune={() => dispatch(queryOracle())}
         onOpenInventory={() => dispatch(toggleInventory())}
         onOpenSpells={() => dispatch(toggleSpellsPanel())}
         onOpenSkills={() => dispatch(toggleSkillsPanel())}
         onOpenServitor={() => dispatch(toggleServitorPanel())}
         autoPlay={autoPlay}
         onToggleAutoPlay={() => {
-          playSound();
+          dispatch(playButtonSound());
           dispatch(toggleAutoPlay());
         }}
       />
@@ -197,6 +204,8 @@ export function GameScreen() {
         onCloseTrade={() => dispatch(closeTrade())}
         onSelectSpell={(id) => dispatch(selectSpell(id))}
         onSacrificeItem={(id) => dispatch(sacrificeItem({ itemId: id }))}
+        craftingPanelOpen={craftingPanelOpen}
+        onCloseCrafting={() => dispatch(toggleCraftingPanel(false))}
       />
     </div>
   );

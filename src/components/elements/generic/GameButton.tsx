@@ -10,7 +10,7 @@ export function GameButton({
 }: {
   children?: React.ReactNode;
   onClick?: () => void;
-  variant?: "default" | "danger" | "magic";
+  variant?: "default" | "danger" | "magic" | "bright";
   icon?: React.ReactNode;
 } & React.ComponentPropsWithoutRef<"button">) {
   return (
@@ -21,8 +21,9 @@ export function GameButton({
       className={cn(
         "h-6 sm:h-7 px-1.5 sm:px-2 border transition-all duration-300 flex items-center justify-center gap-1 font-bold tracking-wider uppercase leading-tight group w-auto shrink-0 touch-manipulation",
         variant === "default" && "border-palette-border bg-palette-bg-mid text-palette-muted-light hover:bg-palette-panel hover:border-palette-muted",
-        variant === "danger" && "border-palette-border-red/50 bg-palette-border-red/20 text-palette-accent-red hover:bg-palette-border-red/40 hover:border-palette-accent-red",
-        variant === "magic" && "border-palette-accent-magic/50 bg-palette-accent-magic/20 text-palette-accent-cyan hover:bg-palette-accent-magic/40 hover:border-palette-accent-cyan",
+        variant === "danger" && "border-palette-border-dim/50 bg-palette-border-dim/20 text-palette-accent-mid hover:bg-palette-border-dim/40 hover:border-palette-accent-mid",
+        variant === "magic" && "border-palette-accent-soft/50 bg-palette-accent-soft/20 text-palette-accent-mid hover:bg-palette-accent-soft/40 hover:border-palette-accent-mid",
+        variant === "bright" && "border-palette-accent-bright/50 bg-palette-accent-bright/10 text-palette-accent-bright hover:bg-palette-accent-bright/20 hover:border-palette-accent-bright",
         className
       )}
     >

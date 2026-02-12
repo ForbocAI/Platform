@@ -9,7 +9,7 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
   return (
     <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
       <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border bg-palette-bg-mid/20 shrink-0">
-        <Terminal className="app-icon text-palette-accent-cyan shrink-0 animate-ambient-breathe" />
+        <Terminal className="app-icon text-palette-accent-mid shrink-0 animate-ambient-breathe" />
         <span className="font-bold tracking-widest text-palette-muted uppercase leading-tight" data-macro-scramble>Neural Log</span>
         <RuneSigil className="ml-auto" />
       </div>
@@ -21,9 +21,9 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
             <p
               className={cn(
                 "leading-relaxed pl-1.5 border-l-2 wrap-break-word",
-                log.type === "combat" && "text-palette-accent-red border-palette-border-red",
-                log.type === "system" && "text-palette-accent-cyan border-palette-border",
-                log.type === "oracle" && "text-palette-accent-magic border-palette-border bg-palette-accent-magic/10 p-1 italic",
+                log.type === "combat" && "text-palette-accent-mid border-palette-border-dim",
+                log.type === "system" && "text-palette-accent-mid border-palette-border",
+                log.type === "oracle" && "text-palette-accent-soft border-palette-border bg-palette-accent-soft/10 p-1 italic",
                 log.type === "exploration" && "text-palette-muted-light border-palette-border"
               )}
             >

@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { usePlayButtonSound } from "@/features/audio";
+import { useAppDispatch } from "@/features/core/store";
+import { playButtonSound } from "@/features/audio";
 
 export function NavButton({
   dir,
@@ -13,14 +14,14 @@ export function NavButton({
   onClick: () => void;
   active: boolean;
 } & React.ComponentPropsWithoutRef<"button">) {
-  const playSound = usePlayButtonSound();
+  const dispatch = useAppDispatch();
   return (
     <button
       type="button"
       disabled={!active}
       onClick={() => {
         if (active) {
-          playSound();
+          dispatch(playButtonSound());
           onClick();
         }
       }}
@@ -28,7 +29,7 @@ export function NavButton({
       className={cn(
         "size-full min-w-0 min-h-0 border transition-all duration-300 flex items-center justify-center font-bold rounded-sm touch-manipulation leading-tight",
         active
-          ? "border-palette-accent-cyan/50 bg-palette-bg-dark/20 text-palette-accent-cyan active:bg-palette-accent-cyan active:text-palette-bg-dark lg:hover:bg-palette-accent-cyan lg:hover:text-palette-bg-dark lg:hover:shadow-[0_0_10px_rgba(127,191,255,0.5)]"
+          ? "border-palette-accent-mid/50 bg-palette-bg-dark/20 text-palette-accent-mid active:bg-palette-accent-mid active:text-palette-bg-dark lg:hover:bg-palette-accent-mid lg:hover:text-palette-bg-dark lg:hover:shadow-[0_0_10px_rgba(127,191,255,0.5)]"
           : "border-palette-border/50 bg-palette-bg-dark/50 text-palette-border cursor-not-allowed"
       )}
     >

@@ -23,6 +23,17 @@ export function calculateEffectiveStats(player: Player): Stats {
         }
     }
 
+    if (player.activeEffects) {
+        for (const effect of player.activeEffects) {
+            if (effect.statModifiers) {
+                stats.maxHp += effect.statModifiers.maxHp || 0;
+                stats.maxStress += effect.statModifiers.maxStress || 0;
+                stats.ac = (stats.ac ?? 0) + (effect.statModifiers.ac || 0);
+                // Can add more stats here like damage bonus if Stats interface supports it
+            }
+        }
+    }
+
     return stats;
 }
 

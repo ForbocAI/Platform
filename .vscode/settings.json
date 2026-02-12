@@ -1,3 +1,7 @@
 {
-  "css.lint.unknownAtRules": "ignore"
+  "css.lint.unknownAtRules": "ignore",
+  "terminal.integrated.fontFamily": "'Dank Mono', 'VictorMono Nerd Font Mono', 'JetBrainsMono Nerd Font Mono', monospace",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.lineHeight": 1.2,
+  "editor.fontLigatures": true
 }

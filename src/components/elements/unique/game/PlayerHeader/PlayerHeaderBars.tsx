@@ -8,7 +8,7 @@ export function PlayerHeaderBars({ player }: { player: Player }) {
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
-              className="h-full bg-palette-accent-red transition-all duration-500"
+              className="h-full bg-palette-accent-mid transition-all duration-500"
               style={{ width: `${(player.hp / player.maxHp) * 100}%` }}
             />
           </div>
@@ -22,7 +22,7 @@ export function PlayerHeaderBars({ player }: { player: Player }) {
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
-              className="h-full bg-palette-accent-cyan transition-all duration-500"
+              className="h-full bg-palette-accent-mid transition-all duration-500"
               style={{ width: `${(player.stress / player.maxStress) * 100}%` }}
             />
           </div>
@@ -36,7 +36,7 @@ export function PlayerHeaderBars({ player }: { player: Player }) {
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
-              className="h-full bg-palette-accent-gold transition-all duration-500"
+              className="h-full bg-palette-accent-bright transition-all duration-500"
               style={{ width: `${(player.xp / player.maxXp) * 100}%` }}
             />
           </div>
@@ -49,7 +49,7 @@ export function PlayerHeaderBars({ player }: { player: Player }) {
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Spirit</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
-            <div className="h-full bg-palette-accent-cyan transition-all duration-500 min-w-[2px]" style={{ width: (player.spirit ?? 0) > 0 ? "100%" : "0%" }} />
+            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.spirit ?? 0) > 0 ? "100%" : "0%" }} />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
@@ -60,7 +60,7 @@ export function PlayerHeaderBars({ player }: { player: Player }) {
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Blood</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
-            <div className="h-full bg-palette-accent-red transition-all duration-500 min-w-[2px]" style={{ width: (player.blood ?? 0) > 0 ? "100%" : "0%" }} />
+            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.blood ?? 0) > 0 ? "100%" : "0%" }} />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">

@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
 import gameReducer from '@/features/game/slice/gameSlice';
-import uiReducer, { clearVignetteThemeInput } from '@/features/core/ui/slice/uiSlice';
+import uiReducer, { clearVignetteThemeInput, toggleCraftingPanel } from '@/features/core/ui/slice/uiSlice';
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';
 import { baseApi } from '@/features/core/api/baseApi';
@@ -40,11 +40,17 @@ registerAudioListeners(startAppListening);
 registerGameListeners(startAppListening);
 
 // Flush TTS queue on user click so speechSynthesis.speak() runs with a user gesture (Chrome requirement).
+// Register open_crafting DOM event so Redux can open the crafting panel (no useEffect in components).
 startAppListening({
   predicate: (action) => action.type === 'app/bootstrap',
   effect: (_, listenerApi) => {
     if (typeof document !== 'undefined') {
       document.addEventListener('click', () => flushTtsQueue(), true);
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('open_crafting', () => {
+        listenerApi.dispatch(toggleCraftingPanel(true));
+      });
     }
     listenerApi.cancel();
   },

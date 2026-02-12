@@ -1,8 +1,9 @@
 import { isAnyOf } from "@reduxjs/toolkit";
 import type { TypedStartListening } from "@reduxjs/toolkit";
 import type { RootState, AppDispatch } from "@/features/core/store";
-import { startMusic as startMusicAction, stopMusic as stopMusicAction } from "./slice/audioSlice";
-import { selectMusicVolume, selectMusicPlaying } from "./slice/audioSlice";
+import { startMusic as startMusicAction, stopMusic as stopMusicAction, playButtonSound as playButtonSoundAction } from "./slice/audioSlice";
+import { selectMusicVolume, selectMusicPlaying, selectMasterVolume } from "./slice/audioSlice";
+import { playButtonClick } from "./audioSystem";
 import { selectTextToSpeech } from "@/features/core/ui/slice/uiSlice";
 
 import {
@@ -45,6 +46,15 @@ export function registerAudioListeners(
       } else {
         stopMusicLoop();
       }
+    },
+  });
+
+  startListening({
+    predicate: (action) => action.type === playButtonSoundAction.type,
+    effect: (_action, listenerApi) => {
+      const state = listenerApi.getState();
+      const masterVolume = selectMasterVolume(state);
+      playButtonClick(masterVolume);
     },
   });
 

@@ -13,11 +13,11 @@ export function ServitorPanel({ player, onClose }: ServitorPanelProps) {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "Warrior":
-        return <Sword className="w-4 h-4 text-palette-accent-warm" />;
+        return <Sword className="w-4 h-4 text-palette-accent-dim" />;
       case "Scout":
-        return <Eye className="w-4 h-4 text-palette-accent-cyan" />;
+        return <Eye className="w-4 h-4 text-palette-accent-mid" />;
       case "Mystic":
-        return <Shield className="w-4 h-4 text-palette-accent-magic" />;
+        return <Shield className="w-4 h-4 text-palette-accent-soft" />;
       default:
         return <Users className="w-4 h-4 text-palette-muted" />;
     }
@@ -55,7 +55,7 @@ export function ServitorPanel({ player, onClose }: ServitorPanelProps) {
                 </div>
                 <div className="h-1.5 w-full bg-palette-bg-dark rounded-full overflow-hidden border border-palette-border/50">
                   <div
-                    className="h-full bg-palette-accent-warm transition-all duration-300"
+                    className="h-full bg-palette-accent-dim transition-all duration-300"
                     style={{ width: `${Math.max(0, Math.min(100, (comp.hp / comp.maxHp) * 100))}%` }}
                   />
                 </div>

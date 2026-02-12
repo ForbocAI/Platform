@@ -4,7 +4,7 @@ import { ShoppingBag, Coins } from "lucide-react";
 import type { Player, Merchant, Item } from "@/features/game/types";
 import { useAppDispatch } from "@/features/core/store";
 import { tradeBuy, tradeSell } from "@/features/game/slice/gameSlice";
-import { usePlayButtonSound } from "@/features/audio";
+import { playButtonSound } from "@/features/audio";
 import { Modal, GameButton } from "@/components/elements/generic";
 
 interface TradePanelProps {
@@ -15,15 +15,14 @@ interface TradePanelProps {
 
 export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
   const dispatch = useAppDispatch();
-  const playSound = usePlayButtonSound();
 
   const handleBuy = (item: Item) => {
-    playSound();
+    dispatch(playButtonSound());
     dispatch(tradeBuy({ merchantId: merchant.id, itemId: item.id }));
   };
 
   const handleSell = (item: Item) => {
-    playSound();
+    dispatch(playButtonSound());
     dispatch(tradeSell({ itemId: item.id }));
   };
 
@@ -57,13 +56,13 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>
                   <div className="text-right text-xs">
-                    <div className="text-palette-accent-cyan">{item.cost?.spirit ?? 0} Spirit</div>
-                    {item.cost?.blood ? <div className="text-palette-accent-red">{item.cost.blood} Blood</div> : null}
+                    <div className="text-palette-accent-mid">{item.cost?.spirit ?? 0} Spirit</div>
+                    {item.cost?.blood ? <div className="text-palette-accent-mid">{item.cost.blood} Blood</div> : null}
                   </div>
                 </div>
                 <p className="text-xs text-palette-text-muted italic">{item.description}</p>
                 {item.bonus && (
-                  <p className="text-xs text-palette-accent-magic">
+                  <p className="text-xs text-palette-accent-soft">
                     {Object.entries(item.bonus).map(([k, v]) => `${k}: ${v}`).join(", ")}
                   </p>
                 )}
@@ -87,10 +86,10 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
             <Coins className="w-4 h-4" /> Your Inventory
           </h3>
           <div className="mb-2 text-sm flex gap-4">
-            <div className="flex items-center gap-1 text-palette-accent-cyan font-bold">
+            <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
               <span>Spirit:</span> {player.spirit ?? 0}
             </div>
-            <div className="flex items-center gap-1 text-palette-accent-red font-bold">
+            <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
               <span>Blood:</span> {player.blood ?? 0}
             </div>
           </div>
@@ -99,12 +98,12 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
               <div key={item.id} className="p-2 border border-palette-border/50 bg-palette-bg-mid/20 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>
-                  <span className="text-xs text-palette-accent-cyan">Sell: {getSellValue(item)} Spirit</span>
+                  <span className="text-xs text-palette-accent-mid">Sell: {getSellValue(item)} Spirit</span>
                 </div>
                 <p className="text-xs text-palette-text-muted italic">{item.description}</p>
                 <GameButton
                   onClick={() => handleSell(item)}
-                  className="mt-1 w-full border-palette-accent-gold/50 text-palette-accent-gold hover:bg-palette-accent-gold/10"
+                  className="mt-1 w-full border-palette-accent-bright/50 text-palette-accent-bright hover:bg-palette-accent-bright/10"
                   data-testid={`trade-sell-${item.id}`}
                 >
                   Sell
