@@ -9,5 +9,8 @@ export function addDeathReducers(builder: ActionReducerMapBuilder<GameState>): v
         state.player.stress = 0;
         state.currentRoom.enemies = [];
         state.sessionComplete = null;
+        // Mark that player just respawned - this will be used by behavior tree
+        // to prioritize preparation before exploration
+        (state.player as any).justRespawned = true;
     });
 }

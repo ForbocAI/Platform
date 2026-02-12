@@ -26,8 +26,11 @@ import type { GameState } from '../types';
 import type { Item, Enemy } from '@/features/game/types';
 import { computeAwareness } from '@/features/game/mechanics/ai/awareness';
 import { runBehaviorTree, AUTOPLAY_CONFIG } from '@/features/game/mechanics/ai/behaviorTree';
-import type { AgentAction } from '@/features/game/mechanics/ai/types';
+import type { AgentAction, AgentActionType } from '@/features/game/mechanics/ai/types';
 import { getSDKDirective } from '@/lib/sdk-placeholder';
+
+// Track last action for cooldown/loop prevention
+let lastActionType: AgentActionType | null = null;
 
 // ── Utility helpers (used by actuator for specific decisions) ──
 
@@ -263,8 +266,8 @@ export const runAutoplayTick = createAsyncThunk(
 
     if (!room || !player) return;
 
-    // 1. Perceive — gather awareness of the environment
-    const awareness = computeAwareness(state.game);
+    // 1. Perceive — gather awareness of the environment (with last action for cooldown tracking)
+    const awareness = computeAwareness(state.game, lastActionType);
 
     // 2. SDK Directive — mock cortex processes observation & generates directive
     //    When real SDK is integrated, replace getSDKDirective() with:
@@ -277,7 +280,10 @@ export const runAutoplayTick = createAsyncThunk(
     // 3. Decide — run the shared behavior tree with SDK directive as Node 0
     const action = runBehaviorTree(AUTOPLAY_CONFIG, state.game, awareness, cortexDirective);
 
-    // 3. Act — execute the chosen action via Redux dispatches
+    // 4. Act — execute the chosen action via Redux dispatches
     await actuate(action, state, dispatch, getState);
+    
+    // 5. Track last action for next tick's cooldown checks
+    lastActionType = action.type;
   }
 );

@@ -1,11 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getEnemyLoot } from '@/features/game/engine';
 import { resolveDuel, resolveEnemyAttack, resolveSpellDuel, resolveServitorAttack, resolveEnemyAttackOnServitor } from '@/features/game/combat';
-import { SPELLS } from '@/features/game/mechanics';
+import { SPELLS } from '@/features/game/mechanics/spells';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog, selectSpell } from '../actions';
 import { handleVignetteProgression } from '../constants';
 import type { GameState } from '../types';
+import { parseSpellEffect, createPlayerStatusUpdate, createEnemyStatusEffects } from './combat/helpers';
 
 export const castSpell = createAsyncThunk(
   'game/castSpell',
@@ -22,52 +23,15 @@ export const castSpell = createAsyncThunk(
 
     // Effect Parsing
     const effectStr = spell.effect(player, { ...player, hp: 0, maxHp: 0, maxStress: 0, stress: 0, ac: 0 });
-    const isAoE = effectStr.toLowerCase().includes("aoe");
-    const isBuff = effectStr.toLowerCase().includes("buff") || effectStr.toLowerCase().includes("aura") || effectStr.toLowerCase().includes("defense") || effectStr.toLowerCase().includes("evasion");
-    const isInvuln = effectStr.toLowerCase().includes("invulnerability");
-    const isHeal = effectStr.toLowerCase().includes("regeneration") || effectStr.toLowerCase().includes("heal");
-    const isLifeSteal = effectStr.toLowerCase().includes("life steal");
-    const isSummon = effectStr.toLowerCase().includes("summon");
-    const isImmobilize = effectStr.toLowerCase().includes("immobilize");
-    const isStun = effectStr.toLowerCase().includes("stun");
-    const isConfuse = effectStr.toLowerCase().includes("confuse");
-    const isFear = effectStr.toLowerCase().includes("fear");
-    const isBurn = effectStr.toLowerCase().includes("burn");
-    const isBuffDamage = effectStr.toLowerCase().includes("buff damage");
+    const flags = parseSpellEffect(effectStr);
+    const { isAoE, isBuff, isInvuln, isHeal, isLifeSteal, isSummon } = flags;
 
     const playerStatusUpdates: any[] = [];
     let playerHeal = 0;
 
     // 1. Buffs / Healing / Self-Target
     if (isBuff || isInvuln) {
-      if (effectStr.toLowerCase().includes("evasion")) {
-        playerStatusUpdates.push({
-          id: "evasion_buff",
-          name: "Shadowmeld",
-          type: "buff",
-          statModifiers: { ac: 5 }, // +5 AC
-          duration: 3,
-          description: "Harder to hit."
-        });
-      } else if (effectStr.toLowerCase().includes("defense")) {
-        playerStatusUpdates.push({
-          id: "defense_buff",
-          name: "Defensive Stance",
-          type: "buff",
-          statModifiers: { ac: 2 },
-          duration: 3,
-          description: "Braced for impact."
-        });
-      } else if (isBuffDamage) {
-        playerStatusUpdates.push({
-          id: "damage_buff",
-          name: "Inferno Overdrive",
-          type: "buff",
-          damageBonus: 5,
-          duration: 3,
-          description: "Attacks deal +5 damage."
-        });
-      }
+      playerStatusUpdates.push(...createPlayerStatusUpdate(effectStr));
       dispatch(addLog({ message: `You cast ${spell.name}. ${effectStr}!`, type: 'combat' }));
     }
 
@@ -114,25 +78,7 @@ export const castSpell = createAsyncThunk(
       }
 
       const defeated = (e.hp - damage) <= 0;
-
-      const statusEffects: any[] = [];
-      if (result.hit) {
-        if (isImmobilize) {
-          statusEffects.push({ id: "immobilized", name: "Immobilized", type: "debuff", duration: 2, description: "Cannot move or attack." });
-        }
-        if (isStun) {
-          statusEffects.push({ id: "stun", name: "Stunned", type: "debuff", duration: 2, description: "Cannot act." });
-        }
-        if (isBurn) {
-          statusEffects.push({ id: "burn", name: "Burn", type: "debuff", duration: 3, description: "Takes fire damage.", damagePerTurn: 3 });
-        }
-        if (isConfuse) {
-          statusEffects.push({ id: "confused", name: "Confused", type: "debuff", duration: 2, description: "Chance to attack allies." });
-        }
-        if (isFear) {
-          statusEffects.push({ id: "fear", name: "Fear", type: "debuff", duration: 2, description: "Reduced accuracy." });
-        }
-      }
+      const statusEffects = result.hit ? createEnemyStatusEffects(flags) : [];
 
       return { enemyId: e.id, damage, defeated, statusEffects };
     });
@@ -145,7 +91,7 @@ export const castSpell = createAsyncThunk(
         let msg = `You cast ${spell.name}! It hits for ${primaryUpdate.damage} damage.`;
         if (updates.length > 1) msg += ` (And ${updates.length - 1} others)`;
         dispatch(addLog({ message: msg, type: 'combat' }));
-        if (isLifeSteal) dispatch(addLog({ message: `You drain life from ${enemy.name}!`, type: 'combat' }));
+        if (flags.isLifeSteal) dispatch(addLog({ message: `You drain life from ${enemy.name}!`, type: 'combat' }));
       } else {
         dispatch(addLog({ message: `You cast ${spell.name} but ${enemy.name} resists!`, type: 'combat' }));
       }

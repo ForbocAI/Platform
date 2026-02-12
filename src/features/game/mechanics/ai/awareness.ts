@@ -6,16 +6,21 @@
  */
 
 import type { GameState } from '../../slice/types';
-import type { AwarenessResult } from './types';
+import type { AwarenessResult, AgentActionType } from './types';
+import type { ActiveQuest } from '../../types';
 
 const DIRECTIONS = ['North', 'South', 'East', 'West'] as const;
+const DANGEROUS_HAZARDS = ['Toxic Air', 'Radioactive Decay', 'Void Instability', 'Extreme Cold', 'Scorching Heat'];
 
 /**
  * Compute awareness of the current game environment.
  * This is a pure function: no side effects, no dispatching.
+ * 
+ * @param state - Current game state
+ * @param lastAction - Last action taken (for cooldown tracking)
  */
-export function computeAwareness(state: GameState): AwarenessResult {
-    const { currentRoom: room, player, logs, exploredRooms } = state;
+export function computeAwareness(state: GameState, lastAction: AgentActionType | null = null): AwarenessResult {
+    const { currentRoom: room, player, logs, exploredRooms, activeQuests } = state;
 
     if (!room || !player) {
         return {
@@ -29,6 +34,8 @@ export function computeAwareness(state: GameState): AwarenessResult {
             isBaseCamp: false,
             availableExits: [],
             unvisitedExits: [],
+            safeExits: [],
+            baseCampExits: [],
             recentlyScanned: false,
             inCombat: false,
             recentDamage: 0,
@@ -44,6 +51,11 @@ export function computeAwareness(state: GameState): AwarenessResult {
             shouldSellExcess: false,
             spiritBalance: 0,
             bloodBalance: 0,
+            justRespawned: false,
+            lastActionType: null,
+            actionHistory: [],
+            incompleteQuests: [],
+            questProgress: {},
         };
     }
 
@@ -93,11 +105,64 @@ export function computeAwareness(state: GameState): AwarenessResult {
         .filter(d => room.exits[d] === 'new-room' || (room.exits[d] && !exploredRoomIds.includes(room.exits[d]!)))
         .map(String);
 
+    // ── Proactive Pathfinding: Evaluate adjacent rooms for safety ──
+    // When compromised (low HP), avoid entering rooms with dangerous hazards
+    const isCompromised = hpRatio < 0.5; // Consider compromised when HP is below 50%
+    const safeExits: string[] = [];
+    const baseCampExits: string[] = []; // Exits leading to base camp (safest option when compromised)
+    
+    if (isCompromised && exploredRooms) {
+        // Check each exit to see if the destination room is safe
+        for (const direction of DIRECTIONS) {
+            const exitRoomId = room.exits[direction];
+            if (!exitRoomId) continue; // No exit in this direction
+            
+            // When compromised, NEVER enter unexplored rooms - we can't know if they're safe
+            if (!exploredRoomIds.includes(exitRoomId)) continue;
+            
+            const adjacentRoom = exploredRooms[exitRoomId];
+            if (!adjacentRoom) continue;
+            
+            // Base camp is always safe - prioritize it when compromised
+            if (adjacentRoom.isBaseCamp) {
+                baseCampExits.push(String(direction));
+                safeExits.push(String(direction)); // Also add to safe exits
+                continue;
+            }
+            
+            // Check if the adjacent room has dangerous hazards
+            const hasDangerousHazards = (adjacentRoom.hazards || []).some(h => DANGEROUS_HAZARDS.includes(h));
+            
+            // Also check if the room has enemies (additional danger)
+            const hasEnemies = (adjacentRoom.enemies || []).length > 0;
+            
+            // Consider safe if no dangerous hazards and no enemies
+            if (!hasDangerousHazards && !hasEnemies) {
+                safeExits.push(String(direction));
+            }
+        }
+    } else {
+        // When not compromised, all exits are considered safe (no filtering needed)
+        safeExits.push(...availableExits);
+    }
+
     // ── Scan status ──
     const recentLogs = (logs || []).slice(-5);
     const recentlyScanned = recentLogs.some(
         l => l.message.includes('[SCAN RESULT]') && l.message.includes(room.title)
     );
+
+    // ── Respawn detection ──
+    // Check if player just respawned (within last 3 log entries)
+    const veryRecentLogs = (logs || []).slice(-3);
+    const justRespawned = veryRecentLogs.some(
+        l => l.message.includes('Resurrecting') || l.message.includes('void releases you')
+    ) || (player as any).justRespawned === true;
+    
+    // Clear the flag after detection (one-time check)
+    if ((player as any).justRespawned === true) {
+        (player as any).justRespawned = false;
+    }
 
     // ── Combat detection ──
     const combatLogs = (logs || []).slice(-8);
@@ -116,13 +181,48 @@ export function computeAwareness(state: GameState): AwarenessResult {
     // ── Hazard detection ──
     const hazards = room.hazards || [];
     const roomHazardCount = hazards.length;
-    const dangerousHazards = ['Toxic Air', 'Radioactive Decay', 'Void Instability', 'Extreme Cold', 'Scorching Heat'];
-    const isDangerousRoom = hazards.some(h => dangerousHazards.includes(h));
+    const isDangerousRoom = hazards.some(h => DANGEROUS_HAZARDS.includes(h));
 
     // ── Trade ──
     const hasMerchants = !!(room.merchants && room.merchants.length > 0);
     const canAffordTrade = hasMerchants && spirit >= 5;
     const shouldSellExcess = inventory.length > 6 || (spirit < 15 && inventory.length > 2);
+
+    // ── Action History Tracking ──
+    // Extract action history from recent logs (last 10 actions)
+    const actionHistory: Array<{ type: AgentActionType; timestamp: number }> = [];
+    const recentActionLogs = (logs || []).slice(-20); // Check last 20 logs for actions
+    
+    for (const log of recentActionLogs) {
+        const msg = log.message.toLowerCase();
+        let actionType: AgentActionType | null = null;
+        
+        if (msg.includes('moved') || msg.includes('moving')) actionType = 'move';
+        else if (msg.includes('scanning') || msg.includes('[scan result]')) actionType = 'scan';
+        else if (msg.includes('purchased') || msg.includes('bought')) actionType = 'buy';
+        else if (msg.includes('sold')) actionType = 'sell';
+        else if (msg.includes('cast') || msg.includes('casting')) actionType = 'cast_spell';
+        else if (msg.includes('engaged') || msg.includes('engaging')) actionType = 'engage';
+        else if (msg.includes('picked up') || msg.includes('loot')) actionType = 'loot';
+        else if (msg.includes('heal') || msg.includes('healing')) actionType = 'heal';
+        else if (msg.includes('commune') || msg.includes('oracle')) actionType = msg.includes('commune') ? 'commune' : 'ask_oracle';
+        else if (msg.includes('equipped')) actionType = msg.includes('weapon') ? 'equip_weapon' : 'equip_armor';
+        
+        if (actionType) {
+            actionHistory.push({ type: actionType, timestamp: log.timestamp });
+        }
+    }
+    
+    // Keep only last 10 actions
+    const trimmedHistory = actionHistory.slice(-10);
+    const lastActionType = lastAction || (trimmedHistory.length > 0 ? trimmedHistory[trimmedHistory.length - 1].type : null);
+
+    // ── Quest Awareness ──
+    const incompleteQuests = (activeQuests || []).filter(q => !q.complete);
+    const questProgress: Record<string, number> = {};
+    for (const quest of incompleteQuests) {
+        questProgress[quest.id] = quest.target > 0 ? quest.progress / quest.target : 0;
+    }
 
     return {
         hasEnemies: enemies.length > 0,
@@ -135,6 +235,8 @@ export function computeAwareness(state: GameState): AwarenessResult {
         isBaseCamp,
         availableExits,
         unvisitedExits,
+        safeExits,
+        baseCampExits,
         recentlyScanned,
         inCombat,
         recentDamage,
@@ -150,5 +252,10 @@ export function computeAwareness(state: GameState): AwarenessResult {
         shouldSellExcess,
         spiritBalance: spirit,
         bloodBalance: blood,
+        justRespawned,
+        lastActionType,
+        actionHistory: trimmedHistory,
+        incompleteQuests,
+        questProgress,
     };
 }

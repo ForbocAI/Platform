@@ -6,7 +6,7 @@
  * once integrated (see system-todo.md §1.2, Priority Node 0).
  */
 
-import type { Player, Enemy, Room, Item, Servitor } from '../../types';
+import type { Player, Enemy, Room, Item, Servitor, ActiveQuest } from '../../types';
 
 // ── Capabilities ──
 
@@ -61,6 +61,8 @@ export interface AwarenessResult {
     isBaseCamp: boolean;
     availableExits: string[];     // Direction names
     unvisitedExits: string[];     // Exits leading to unexplored rooms
+    safeExits: string[];           // Exits leading to safe rooms (no dangerous hazards when compromised)
+    baseCampExits: string[];       // Exits leading to base camp (prioritized when compromised)
     recentlyScanned: boolean;     // Was current room scanned recently?
     inCombat: boolean;            // Are we mid-fight? (looked at recent combat logs)
     recentDamage: number;         // Total damage taken from recent log entries
@@ -76,6 +78,13 @@ export interface AwarenessResult {
     shouldSellExcess: boolean;
     spiritBalance: number;
     bloodBalance: number;
+    justRespawned: boolean;        // Player just respawned - needs preparation before exploring
+    // Action history tracking (for cooldowns and loop prevention)
+    lastActionType: AgentActionType | null;  // Last action taken
+    actionHistory: Array<{ type: AgentActionType; timestamp: number }>;  // Recent action history (last 10 actions)
+    // Quest awareness
+    incompleteQuests: ActiveQuest[];  // Quests that are not yet complete
+    questProgress: Record<string, number>;  // Quest ID -> progress ratio (0-1)
 }
 
 // ── Actions ──
