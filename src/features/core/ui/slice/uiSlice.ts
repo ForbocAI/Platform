@@ -3,11 +3,21 @@ import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 
 const DEFAULT_SELECTED_CLASS: CharacterClass = 'Ashwalker';
 
+/** Payload for scheduling next autoplay tick (reducer-only scheduling). */
+export interface AutoplaySchedulePayload {
+  nextTickAt: number | null;
+  nextDelayMs?: number;
+}
+
 interface UIState {
   oracleInput: string;
   showMap: boolean;
   stageOfScene: StageOfScene;
   autoPlay: boolean;
+  /** When to run next autoplay tick (timestamp). Set by reducers only; poll dispatches tick when due. */
+  autoplayNextTickAt: number | null;
+  /** Current delay between ticks (ms). Updated by runAutoplayTick.fulfilled reducer. */
+  autoplayDelayMs: number;
   textToSpeech: boolean;
   factsPanelOpen: boolean;
   vignetteThemeInput: string;
@@ -28,6 +38,8 @@ const initialState: UIState = {
   showMap: false,
   stageOfScene: "To Knowledge",
   autoPlay: false,
+  autoplayNextTickAt: null,
+  autoplayDelayMs: 2800,
   textToSpeech: true,
   factsPanelOpen: false,
   vignetteThemeInput: "",
@@ -59,6 +71,12 @@ export const uiSlice = createSlice({
     },
     toggleAutoPlay: (state) => {
       state.autoPlay = !state.autoPlay;
+      if (!state.autoPlay) state.autoplayNextTickAt = null;
+    },
+    /** Set when next autoplay tick should run (and optionally delay for next). Pure reducer; called by listeners when toggling on or after concession. */
+    setAutoplaySchedule: (state, action: PayloadAction<AutoplaySchedulePayload>) => {
+      state.autoplayNextTickAt = action.payload.nextTickAt;
+      if (action.payload.nextDelayMs !== undefined) state.autoplayDelayMs = action.payload.nextDelayMs;
     },
     toggleTextToSpeech: (state) => {
       state.textToSpeech = !state.textToSpeech;
@@ -104,10 +122,20 @@ export const uiSlice = createSlice({
         state.clientHydrated = true;
       }
     );
+    builder.addMatcher(
+      (action): action is PayloadAction<{ nextTickAt?: number; nextDelayMs?: number } | undefined> =>
+        action.type === 'game/runAutoplayTick/fulfilled',
+      (state, action) => {
+        const payload = action.payload;
+        if (!state.autoPlay || payload?.nextTickAt == null) return;
+        state.autoplayNextTickAt = payload.nextTickAt;
+        if (payload.nextDelayMs !== undefined) state.autoplayDelayMs = payload.nextDelayMs;
+      }
+    );
   },
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;
@@ -130,6 +158,16 @@ export const selectStageOfScene = createSelector(
 export const selectAutoPlay = createSelector(
   [selectUIState],
   (ui) => ui.autoPlay
+);
+
+export const selectAutoplayNextTickAt = createSelector(
+  [selectUIState],
+  (ui) => ui.autoplayNextTickAt
+);
+
+export const selectAutoplayDelayMs = createSelector(
+  [selectUIState],
+  (ui) => ui.autoplayDelayMs
 );
 
 export const selectTextToSpeech = createSelector(

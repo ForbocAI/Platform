@@ -27,6 +27,19 @@ export function getTickInterval(speed: AutoSpeedMode): number {
     }
 }
 
+/** Min delay (ms) per speed; decay factor for next delay. Used by reducer-driven autoplay scheduling. */
+const AUTOPLAY_DELAY = {
+    fast: { min: 200, decay: 0.9 },
+    slow: { min: 500, decay: 0.98 },
+    normal: { min: 200, decay: 0.95 },
+} as const;
+
+/** Compute next delay (ms) from current delay and speed. Pure. */
+export function getNextAutoplayDelayMs(currentDelayMs: number, speed: AutoSpeedMode): number {
+    const { min, decay } = AUTOPLAY_DELAY[speed] ?? AUTOPLAY_DELAY.normal;
+    return Math.max(min, Math.floor(currentDelayMs * decay));
+}
+
 /**
  * Focus → Action Mapping
  */

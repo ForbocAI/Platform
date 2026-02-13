@@ -29,9 +29,9 @@ export function nodeSurvival(
 
     if (!player || !room) return null;
 
-    if (player.hp <= 0) {
-        return { type: 'respawn', reason: 'Dead — must respawn' };
-    }
+    // When dead, do not return respawn here — concession listener (autoplay) or UI (manual) dispatches
+    // respawnPlayer. Returning respawn from the tree would double-dispatch and block the loop.
+    if (player.hp <= 0) return null;
 
     // ── Post-Respawn Preparation ──
     if (awareness.justRespawned) {

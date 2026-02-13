@@ -76,6 +76,7 @@ The header **auto-play** button (`auto-play-toggle`, aria-label "Start auto-play
 -   Auto-play runs via Redux listener middleware (no component `useEffect`).
 -   **SDK Pipeline (Mock):** Each tick calls `getSDKDirective(gameState)` which simulates `Observe → Reason → Act`. The directive (if any) is injected into the behavior tree as Node 0 (highest priority). URL `?autoFocus` controls which domain the mock SDK focuses on.
 -   **URL-driven automation:** Use `?autoStart=1&autoFocus=combat&autoSpeed=fast` for fully hands-free testing.
+-   **Concession auto-respawn:** When autoplay is on and the player dies (concession modal would open), the store listener auto-dispatches respawn so soak tests run unattended without manual "Reject (Die and Respawn)" click.
 
 Use auto-play for soak testing or to quickly generate log/facts state for manual checks.
 
@@ -83,7 +84,9 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 
 ## Test coverage (single-player)
 
-**Last playtest:** 2026-02-09. App: Forboc.AI/Platform at `http://localhost:3000`.
+**Last playtest:** 2026-02-13. App: Forboc.AI/Platform at `http://localhost:3000`.
+
+**Autoplay-driven verification (2026-02-13):** Soak test with `?deterministic=1&autoStart=1&autoSpeed=fast`: init completed, autoplay started ~1.5s after load; bot moved (N/S/E/W), scanned, fought (Gravewalker), picked up loot, hit hazards (Toxic spores). Concession test with `?deterministic=1&lowHp=1&forceEnemy=1&autoStart=1&autoSpeed=fast`: player died; log showed "Resurrecting..." and "You gasp for breath as the void releases you"; autoplay continued without manual "Reject (Die and Respawn)" click — **concession auto-respawn** verified. **Phase 2 refactor (same day):** Autoplay helpers extracted to `autoplayHelpers.ts`; build passed. **Phase 3 (same day):** `?autoFocus=explore` — Neural Log [SCAN RESULT], Facts (1). `?forceMerchant=1&autoStart=1` — log "Purchased Obsidian Dagger from Captain 46", Trade 1/2, combat/loot/XP; Trading and SCAN/ENGAGE verified. **Phase 3 remaining (same day):** `?autoFocus=baseCamp` — Recon Base Camp // STORE ROOM, log "Harvested Ember Puffball", "Harvested Static Lichen", "Harvested Glowing Mushroom"; Crafting & Farming (harvest) verified. Full autoplay (`?autoStart=1`) — init, scan, equip, move, combat (Aether Spirit vanquished), loot, XP; Quests panel tracks progress; Quests & Session scoring verified. `?forceMerchant=1&forceEnemy=1` — merchant + enemy present (SCAN: trade signatures, Magma Leviathan); autoplay engaged first; Servitors flow (buy contract → Use → Engage) manual or future autoplay improvement.
 
 **Re-verification (2026-02-09):** Init (Retry → Connection Stable), header (Spirit 20, Blood 0, HP 120/120, LVL 12 Ashwalker), Quests (Scan 5, Find Fellow Ranger, Defeat 3 hostiles, Trade 2 merchants), SCAN (Neural Log [SCAN RESULT] with Location, Biome, Hazards, Hostiles, Allies, Exits; [Keen Senses]; quest 1/5). **Deterministic param fix:** `getInitOptions` now reads from `window.location.search` when available so `?deterministic=1` applies on first load (avoids useSearchParams hydration timing). Use `?deterministic=1` for Store Room, no merchants.
 
@@ -110,6 +113,7 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 | **Fade out scene** | With a current scene, click "Fade out" in footer | ✅ (Scene id present when room + thread established) |
 | **Loading / Retry** | Load `?simulateInitError=1` | ✅ "Simulated init failure." + "Retry initialization" (aria-label); Retry re-runs init (fails again while param set) |
 | **Concession** | `?lowHp=1&forceEnemy=1`, ENGAGE until enemy hit would take player out | ✅ **Death implemented:** Rejecting concession at 0 HP logs death, clears room enemies, and respawns player (full HP). |
+| **Concession auto-respawn (autoplay)** | `?deterministic=1&lowHp=1&forceEnemy=1&autoStart=1&autoSpeed=fast` | ✅ **2026-02-13:** When autoplay is on and player dies, store listener auto-dispatches respawn; log shows "Resurrecting..." and "You gasp for breath as the void releases you"; autoplay continues unattended. |
 | **Level generation** | Move to new rooms (N/S/E/W); SCAN in each | ✅ Biomes: Quadar Tower (start), Ethereal Marshlands, Toxic Wastes, Haunted Chapel, Obsidian Spire. Room titles vary by biome (e.g. Acid Pit, Ghost Swamp). ~30% chance of one hostile per room; exits random. |
 | **Hazards** | SCAN in rooms; or COMMUNE until Loom returns "unexpectedly" + **Entering the Red** | ✅ **Fully Implemented:** Toxic Air (generation); **Entering the Red** spawns Random Enemy and adds "Threat Imminent" hazard. |
 | **NPCs (Fellow Ranger)** | Start room has 40% chance; or COMMUNE until "unexpectedly" + **Enter Stage Left** | ✅ **Start:** `generateStartRoom()` adds Fellow Ranger 40% of the time. **Enter Stage Left:** Confirmed spawns a Merchant and Fellow Ranger ally. |
@@ -134,6 +138,16 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 7. **Currency / Trade:** Header shows Spirit and Blood. TradePanel shows current Spirit/Blood and per-ware cost (e.g. "5 spirit" or "5 spirit, 3 blood"). Buy is disabled when cost exceeds available spirit or blood. Use `trade-buy-{itemId}` only when player can afford.
 8. **Sacrifice:** Open Inventory; items with value show a "Sacrifice" button (`inventory-sacrifice-{itemId}`). Click to remove item and gain spirit; log shows "Sacrificed X for Y spirit."
 9. **Quests:** After init, sidebar shows Quests panel (`data-testid="quests-panel"`) with "Scan 5 sectors: 0/5" and "Find a Fellow Ranger: 0/1". SCAN in 5 different rooms (or same room 5 times) completes recon; move into a room with a Fellow Ranger (e.g. after Enter Stage Left) completes rescue. When both complete, "Session complete" and score line appear.
+
+**Autoplay reproduction (task.md Phase 3 remaining):**
+
+| Area | Steps |
+|------|--------|
+| SCAN, ENGAGE, COMMUNE, Oracle, Facts | Load `?deterministic=1&autoStart=1&autoFocus=explore` — verify Neural Log has [SCAN RESULT]. Then `?autoFocus=combat` — verify ENGAGE in log. Then `?autoFocus=oracle` — verify commune/ask_oracle; open Facts panel. |
+| Trading, Inventory, Currency | Load `?deterministic=1&forceMerchant=1&autoStart=1` or `?autoFocus=trade` — run autoplay; verify buy/sell in log, header Spirit/Blood change. |
+| Crafting & Farming | Load `?autoStart=1&autoFocus=baseCamp` — run autoplay until in base camp; verify harvest/craft in log. |
+| Quests & Session scoring | Load `?autoStart=1&autoSpeed=fast` — run autoplay until Quests panel shows progress (Scan 5, Defeat 3, Trade 2, Find Ranger); optionally until "Session complete". |
+| Servitors | Load `?deterministic=1&forceMerchant=1&forceEnemy=1` — manually or autoplay: Trade → buy Contract → Inventory → Use/Sign → Engage; verify servitor in combat log and Servitors panel. |
 
 ### Known issues / notes
 
@@ -172,7 +186,7 @@ See `trade-panel`, `trade-merchant-*`, `trade-buy-*`, `trade-sell-*`.
 
 **Base Camp:** Init verified. "Recon Base Camp" safe zone (no enemies). Hydroponics plot grows 20%/tick. Harvest button appears at 100%. "Harvest" grants "Glowing Mushroom" (consumable). Autoplay automatically harvests when ready and uses mushroom when HP < 40%. **Auto-Crafting:** implemented for base camp; bot crafts potions if ingredients available.
 **Accelerated Autoplay:** Verified loop speed starts at 800ms and accelerates by 5% per tick down to 200ms. Bot behavior is significantly faster and smoother. Smart logic handles exploration (unvisited rooms priority), combat (spell usage), and economy (buy/sell).
-**Known Issue:** Death/Respawn modal interrupts autoplay; requires manual click "Reject (Die and Respawn)" to continue. Survival logic enhanced to flee if HP < 20% and enemies present.
+**Resolved:** Death/Respawn during autoplay now auto-respawns (store listener dispatches `respawnPlayer` when `ui.autoPlay` and `player.hp <= 0`), so soak tests run unattended. Survival logic enhanced to flee if HP < 20% and enemies present. **2026-02-13 fix:** Autoplay was stopping after respawn (duplicate "Resurrecting..." from double dispatch + 1s delay in thunk). Concession listener now runs only on `runAutoplayTick/fulfilled`; behavior tree returns null when dead (no respawn from tree); `respawnPlayer` thunk has no delay so state updates immediately and autoplay continues (post-respawn equip/scan/flee runs).
 **Visual Feedback:** Combat animations verified. Enemy flashes on attack (`animate-enemy-attack`) and double-flashes on taking damage (`animate-enemy-damage`).
 **Combat Logic:** Enemy spellcasting verified. Enemies now use their specific class spells (e.g. Storm Titan casts Electrical Charge/Thunderous Slam) alongside basic attacks, with correct damage and effect logs.
 **Browser playtest (continued):** With `?deterministic=1&forceEnemy=1&lowHp=1`: Start vignette (e.g. "The Machine God" · Exposition), open Trade with merchant, complete a purchase → log "Purchased [item] from [merchant]"; vignette advances to "Rising Action" (button becomes "Advance to Climax"); Quests panel shows "Trade with 2 merchants: 1/2". Init, four quests, SCAN progress (1/5), trade panel, combat (ENGAGE) and vignette Start/Advance/End all verified. Session end on death and vignette advance on enemy defeat appear after respawn or kill in play.

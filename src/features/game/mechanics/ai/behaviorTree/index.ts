@@ -22,6 +22,7 @@ import {
     nodeEconomy,
     nodeRecon,
     nodeExploration,
+    nodeServitorPrep,
 } from './nodesAction';
 import { nodeQuest } from './nodesQuest';
 
@@ -53,6 +54,7 @@ export function runBehaviorTree(
         nodeSurvival(config, state, awareness) ||
         nodeBaseCamp(config, state, awareness) ||
         nodeEquipment(config, state, awareness) ||
+        nodeServitorPrep(config, awareness) ||
         nodeCombat(config, state, awareness) ||
         nodeLoot(config, awareness) ||
         nodeEconomy(config, awareness) ||

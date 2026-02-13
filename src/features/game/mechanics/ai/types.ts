@@ -78,6 +78,12 @@ export interface AwarenessResult {
     shouldSellExcess: boolean;
     spiritBalance: number;
     bloodBalance: number;
+    /** Player has at least one signed servitor (player.servitors?.length > 0) */
+    hasSignedServitor: boolean;
+    /** At least one merchant in the room sells a contract item */
+    merchantHasContract: boolean;
+    /** Can afford the cheapest contract in the room's merchant wares */
+    canAffordContract: boolean;
     justRespawned: boolean;        // Player just respawned - needs preparation before exploring
     // Action history tracking (for cooldowns and loop prevention)
     lastActionType: AgentActionType | null;  // Last action taken

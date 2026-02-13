@@ -1,9 +1,9 @@
 import type { TypedStartListening } from '@reduxjs/toolkit';
 import { getInitOptionsFromUrl } from '@/lib/getInitOptions';
-import { initializeGame, clearPendingQuestFacts } from '@/features/game/slice/gameSlice';
+import { initializeGame, clearPendingQuestFacts, respawnPlayer } from '@/features/game/slice/gameSlice';
 import { normalizeClassIdFromParam } from '@/features/game/mechanics/classes';
 import { addThread, setMainThread, addFact } from '@/features/narrative/slice/narrativeSlice';
-import { toggleAutoPlay, setSelectedClassId } from '@/features/core/ui/slice/uiSlice';
+import { toggleAutoPlay, setSelectedClassId, setAutoplaySchedule } from '@/features/core/ui/slice/uiSlice';
 import type { RootState, AppDispatch } from './index';
 
 export const retryInitialize = { type: 'app/retryInitialize' as const };
@@ -85,6 +85,20 @@ export function registerGameListeners(
       const { threads, mainThreadId } = state.narrative;
       if (threads.length !== 1 || mainThreadId) return;
       listenerApi.dispatch(setMainThread(threads[0].id));
+    },
+  });
+
+  // Autoplay concession auto-respawn: when autoplay is on and player is dead (concession modal open),
+  // auto-dispatch respawn once so soak tests run unattended. Then set next tick to now so the poll dispatches a tick.
+  startAppListening({
+    predicate: (action) => action.type === 'game/runAutoplayTick/fulfilled',
+    effect: async (_, listenerApi) => {
+      const state = listenerApi.getState();
+      if (!state.ui.autoPlay) return;
+      const player = state.game.player;
+      if (!player || player.hp > 0) return;
+      await listenerApi.dispatch(respawnPlayer());
+      listenerApi.dispatch(setAutoplaySchedule({ nextTickAt: Date.now() }));
     },
   });
 }

@@ -13,5 +13,5 @@ export const SDK = {
 };
 
 // Mock Cortex Directive pipeline (SDK integration point)
-export { getSDKDirective, getAutoplayConfig, getTickInterval } from './cortexDirective';
+export { getSDKDirective, getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from './cortexDirective';
 export type { AutoFocusMode, AutoSpeedMode, AutoplayURLConfig } from './cortexDirective';

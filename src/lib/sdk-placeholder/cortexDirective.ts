@@ -31,7 +31,7 @@ import { mockGenerateDirective } from './directiveGeneration';
 
 // Re-export types and utilities for convenience
 export type { Observation, Directive, SDKAgentAction, AutoFocusMode, AutoSpeedMode, AutoplayURLConfig } from './types';
-export { getAutoplayConfig, getTickInterval } from './config';
+export { getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from './config';
 export { mockProcessObservation } from './observation';
 export { getClassModifiers } from './classModifiers';
 

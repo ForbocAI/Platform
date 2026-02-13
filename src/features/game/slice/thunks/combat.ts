@@ -256,7 +256,6 @@ export const engageHostiles = createAsyncThunk(
 
 export const respawnPlayer = createAsyncThunk('game/respawn', async (_, { dispatch }) => {
   dispatch(addLog({ message: 'Resurrecting...', type: 'system' }));
-  await new Promise((r) => setTimeout(r, 1000));
   dispatch(addLog({ message: 'You gasp for breath as the void releases you.', type: 'system' }));
   dispatch(addFact({ text: 'Died and returned from the void.', questionKind: 'respawn', isFollowUp: false }));
 });

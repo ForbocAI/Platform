@@ -1,42 +1,48 @@
-import { toggleAutoPlay } from '@/features/core/ui/slice/uiSlice';
+/**
+ * Autoplay: reducer-only scheduling. When to run the next tick lives in Redux state
+ * (autoplayNextTickAt, autoplayDelayMs); reducers set them on toggle and on
+ * runAutoplayTick/fulfilled. This module only: (1) poll — dispatch tick when due,
+ * (2) on toggle ON — set first schedule so the poll will fire.
+ */
+
+import { setAutoplaySchedule, toggleAutoPlay } from '@/features/core/ui/slice/uiSlice';
 import { runAutoplayTick } from '@/features/game/slice/gameSlice';
 import type { TypedStartListening } from '@reduxjs/toolkit';
 import type { RootState, AppDispatch } from '@/features/core/store';
 import { getAutoplayConfig, getTickInterval } from '@/lib/sdk-placeholder';
 
+const POLL_MS = 100;
+
 export const autoplayListener = {
-    startListening: (startListening: TypedStartListening<RootState, AppDispatch>) => {
-        // ── Main autoplay loop listener ──
-        startListening({
-            predicate: (action) => action.type === toggleAutoPlay.type,
-            effect: async (action, listenerApi) => {
-                if (action.type !== toggleAutoPlay.type) return;
+  startListening: (startListening: TypedStartListening<RootState, AppDispatch>) => {
+    // Single poll: when autoplay is on and next tick time is due, dispatch tick and clear schedule (reducer sets next on fulfilled)
+    startListening({
+      predicate: (action) => action.type === 'app/bootstrap',
+      effect: (_, listenerApi) => {
+        setInterval(() => {
+          const state = listenerApi.getState();
+          if (!state.ui.autoPlay || state.ui.autoplayNextTickAt == null) return;
+          if (Date.now() < state.ui.autoplayNextTickAt) return;
+          listenerApi.dispatch(setAutoplaySchedule({ nextTickAt: null }));
+          listenerApi.dispatch(runAutoplayTick());
+        }, POLL_MS);
+      },
+    });
 
-                const state = listenerApi.getState();
-                if (!state.ui.autoPlay) return;
-
-                // Read URL-driven speed config
-                const config = getAutoplayConfig();
-                const baseDelay = getTickInterval(config.speed);
-
-                // Acceleration settings based on speed mode
-                const minDelay = config.speed === 'fast' ? 200 : config.speed === 'slow' ? 500 : 200;
-                const decay = config.speed === 'fast' ? 0.90 : config.speed === 'slow' ? 0.98 : 0.95;
-
-                let delay = baseDelay;
-
-                while (true) {
-                    await listenerApi.delay(delay);
-
-                    // Accelerate
-                    delay = Math.max(minDelay, Math.floor(delay * decay));
-
-                    const current = listenerApi.getState();
-                    if (!current.ui.autoPlay) break;
-
-                    await listenerApi.dispatch(runAutoplayTick());
-                }
-            },
-        });
-    }
+    // When autoplay is turned ON, set first schedule so the poll will run the first tick
+    startListening({
+      predicate: (action) => action.type === toggleAutoPlay.type,
+      effect: (action, listenerApi) => {
+        if (action.type !== toggleAutoPlay.type) return;
+        const state = listenerApi.getState();
+        if (!state.ui.autoPlay) return;
+        const config = getAutoplayConfig();
+        const speed = config.speed ?? 'normal';
+        const delayMs = getTickInterval(speed);
+        listenerApi.dispatch(
+          setAutoplaySchedule({ nextTickAt: Date.now() + delayMs, nextDelayMs: delayMs })
+        );
+      },
+    });
+  },
 };

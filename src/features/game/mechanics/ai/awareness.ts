@@ -51,6 +51,9 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
             shouldSellExcess: false,
             spiritBalance: 0,
             bloodBalance: 0,
+            hasSignedServitor: false,
+            merchantHasContract: false,
+            canAffordContract: false,
             justRespawned: false,
             lastActionType: null,
             actionHistory: [],
@@ -77,7 +80,7 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
         i => i.type === 'consumable' && healingNames.some(n => i.name.includes(n))
     );
 
-    const stressNames = ['Calm', 'Tonic', 'Serenity'];
+    const stressNames = ['Calm', 'Tonic', 'Serenity', 'Spore Clump'];
     const hasStressItem = inventory.some(
         i => i.type === 'consumable' && stressNames.some(n => i.name.includes(n))
     );
@@ -185,8 +188,27 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
 
     // ── Trade ──
     const hasMerchants = !!(room.merchants && room.merchants.length > 0);
-    const canAffordTrade = hasMerchants && spirit >= 5;
+    const canAffordTrade = hasMerchants && spirit >= 4;
     const shouldSellExcess = inventory.length > 6 || (spirit < 15 && inventory.length > 2);
+
+    // ── Servitors: contract availability and affordability ──
+    const hasSignedServitor = !!(player.servitors && player.servitors.length > 0);
+    let merchantHasContract = false;
+    let canAffordContract = false;
+    if (hasMerchants && room.merchants) {
+        for (const m of room.merchants) {
+            const contractWares = (m.wares || []).filter((w: { type?: string }) => w.type === 'contract');
+            if (contractWares.length > 0) merchantHasContract = true;
+            for (const w of contractWares) {
+                const cost = (w as { cost?: { spirit?: number; blood?: number } }).cost || {};
+                if (spirit >= (cost.spirit ?? 0) && blood >= (cost.blood ?? 0)) {
+                    canAffordContract = true;
+                    break;
+                }
+            }
+            if (canAffordContract) break;
+        }
+    }
 
     // ── Action History Tracking ──
     // Extract action history from recent logs (last 10 actions)
@@ -252,6 +274,9 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
         shouldSellExcess,
         spiritBalance: spirit,
         bloodBalance: blood,
+        hasSignedServitor,
+        merchantHasContract,
+        canAffordContract,
         justRespawned,
         lastActionType,
         actionHistory: trimmedHistory,

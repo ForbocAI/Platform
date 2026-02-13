@@ -33,6 +33,21 @@ export function nodeCombat(
 }
 
 /**
+ * Node 4b: Servitor prep — when merchant + enemy present and no signed servitor, buy contract before engaging
+ */
+export function nodeServitorPrep(
+    config: AgentConfig,
+    awareness: AwarenessResult,
+): AgentAction | null {
+    const has = (cap: string) => config.capabilities.includes(cap as any);
+    if (!has('trade') || !awareness.hasMerchants || !awareness.hasEnemies) return null;
+    if (awareness.hasSignedServitor) return null;
+    if (!awareness.merchantHasContract || !awareness.canAffordContract) return null;
+    if (isActionOnCooldown('buy', awareness)) return null;
+    return { type: 'buy', reason: 'Strategic: Buying servitor contract before combat' };
+}
+
+/**
  * Node 5: Loot (Pick Up Items)
  */
 export function nodeLoot(
@@ -116,8 +131,8 @@ export function nodeRecon(
             return null; // Break the loop
         }
 
-        // Reduced frequency based on mysticism trait, with cooldown checks
-        const oracleChance = config.traits.mysticism * 0.2; // Reduced from 0.3
+        // Frequency based on mysticism trait (enough to populate Facts during autoplay), with cooldown checks
+        const oracleChance = config.traits.mysticism * 0.28;
         if (Math.random() < oracleChance) {
             if (Math.random() < 0.5) {
                 if (!isActionOnCooldown('commune', awareness)) {
