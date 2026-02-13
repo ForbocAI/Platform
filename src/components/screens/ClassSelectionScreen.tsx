@@ -20,7 +20,7 @@ export function ClassSelectionScreen() {
   const template = CLASS_TEMPLATES[selectedId];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-palette-bg-dark text-palette-white p-4">
+    <div className="flex flex-col items-center min-h-screen bg-palette-bg-dark text-palette-white p-4 py-8">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-3 gap-6 h-full lg:h-[80vh]">
         {/* List */}
         <div className="lg:col-span-1 bg-palette-bg-mid/20 border border-palette-border rounded p-4 overflow-y-auto space-y-2">
@@ -103,6 +103,7 @@ export function ClassSelectionScreen() {
               onClick={handleStart}
               disabled={isLoading}
               className="px-8 py-4 text-lg"
+              showLabel={true}
             >
               {isLoading ? "Initializing..." : "Embark"}
             </GameButton>

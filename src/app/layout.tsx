@@ -82,7 +82,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-D999WBQEXY');`}
       </Script>
-      <body className="font-sans antialiased overflow-hidden bg-palette-bg-dark">
+      <body className="font-sans antialiased bg-palette-bg-dark">
         <StoreProvider>
           <BootstrapGate>{children}</BootstrapGate>
         </StoreProvider>

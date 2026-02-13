@@ -6,12 +6,14 @@ export function GameButton({
   variant = "default",
   icon,
   className,
+  showLabel = false,
   ...rest
 }: {
   children?: React.ReactNode;
   onClick?: () => void;
   variant?: "default" | "danger" | "magic" | "bright";
   icon?: React.ReactNode;
+  showLabel?: boolean;
 } & React.ComponentPropsWithoutRef<"button">) {
   return (
     <button
@@ -28,7 +30,14 @@ export function GameButton({
       )}
     >
       {icon}
-      {children != null && <span className="hidden sm:inline group-hover:translate-x-1 transition-transform">{children}</span>}
+      {children != null && (
+        <span className={cn(
+          "group-hover:translate-x-1 transition-transform",
+          !showLabel && "hidden sm:inline"
+        )}>
+          {children}
+        </span>
+      )}
     </button>
   );
 }
