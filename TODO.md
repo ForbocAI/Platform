@@ -34,7 +34,8 @@ This log tracks the engineering requirements for the flagship Forboc AI consumer
 *Objective: Ensure memories endure the void.*
 
 - [ ] **IndexedDB Vector Sync**: Configure SDK to persist LanceDB memories to `IndexedDB`.
-- [ ] **Soul Re-hydration**: Support loading NPC personas and memories from IPFS CIDs.
+- [ ] **Soul Re-hydration**: Support loading NPC personas and memories from Arweave Transaction IDs (migrating from IPFS CIDs).
+- [ ] **SDK Replacement**: Replace `src/lib/sdk-placeholder` with real `forbocai` SDK when v1.0 is ready.
 
 ## 5. Qua'dar System Implementation (The Law of the Spire) ᛒ
 *Objective: Instantiate the grimdark TTRPG rules within the digital engine.*
