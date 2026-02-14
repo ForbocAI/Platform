@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { SDK } from '@/lib/sdk-placeholder';
 import { getKeenSensesScanExtra } from '@/features/game/skills';
-import { addLog } from '../actions';
+import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
 
 export const movePlayer = createAsyncThunk(

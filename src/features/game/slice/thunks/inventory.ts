@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
-import { addLog } from '../actions';
+import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
 
 export const pickUpGroundLoot = createAsyncThunk(

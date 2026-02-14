@@ -4,7 +4,7 @@ import { getSkillsForLevels } from '@/features/game/mechanics';
 import { getKeenSensesScanExtra } from '@/features/game/skills';
 import { SDK } from '@/lib/sdk-placeholder';
 import { startVignette } from '@/features/narrative/slice/narrativeSlice';
-import { addLog } from '../actions';
+import { addLog } from '../gameSlice';
 import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
 import type { GameState, InitializeGameOptions } from '../types';
 

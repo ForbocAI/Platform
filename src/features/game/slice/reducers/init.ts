@@ -2,27 +2,11 @@ import type { ActionReducerMapBuilder } from '@reduxjs/toolkit';
 import { generateRandomEnemy, generateRandomMerchant } from '@/features/game/engine';
 import { resolveUnexpectedlyEffect } from '@/features/narrative/helpers';
 import { checkSurgeEvent } from '@/features/game/mechanics/surgeEvents';
-import * as actions from '../actions';
 import { initialSessionScore, seedQuests } from '../constants';
 import * as thunks from '../thunks';
 import type { GameState } from '../types';
 
 export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): void {
-    builder.addCase(actions.addLog, (state, action) => {
-        state.logs.push({
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            timestamp: Date.now(),
-            message: action.payload.message,
-            type: action.payload.type,
-        });
-    });
-    builder.addCase(actions.selectSpell, (state, action) => {
-        state.selectedSpellId = action.payload;
-    });
-    builder.addCase(actions.clearPendingQuestFacts, (state) => {
-        state.pendingQuestFacts = [];
-    });
-
     builder.addCase(thunks.initializeGame.pending, (state) => {
         state.isLoading = true;
     });

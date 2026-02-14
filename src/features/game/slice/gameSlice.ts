@@ -1,10 +1,38 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector, type PayloadAction } from '@reduxjs/toolkit';
 import { initialState } from './constants';
 import { addAllReducers } from './reducers';
 import type { GameState } from './types';
+import type { GameLogEntry } from '@/features/game/types';
+import type { RootState } from '@/features/core/store';
 
 export type { RoomCoordinates, InitializeGameOptions } from './types';
-export { addLog, selectSpell, clearPendingQuestFacts } from './actions';
+
+export const gameSlice = createSlice({
+    name: 'game',
+    initialState,
+    reducers: {
+        addLog: (state, action: PayloadAction<{ message: string; type: GameLogEntry['type'] }>) => {
+            state.logs.push({
+                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                timestamp: Date.now(),
+                message: action.payload.message,
+                type: action.payload.type,
+            });
+        },
+        selectSpell: (state, action: PayloadAction<string | null>) => {
+            state.selectedSpellId = action.payload;
+        },
+        clearPendingQuestFacts: (state) => {
+            state.pendingQuestFacts = [];
+        },
+    },
+    extraReducers: (builder) => {
+        addAllReducers(builder);
+    },
+});
+
+export const { addLog, selectSpell, clearPendingQuestFacts } = gameSlice.actions;
+
 export {
     initializeGame,
     askOracle,
@@ -26,27 +54,56 @@ export {
     runAutoplayTick,
 } from './thunks';
 
-export const gameSlice = createSlice({
-    name: 'game',
-    initialState,
-    reducers: {},
-    extraReducers: (builder) => {
-        addAllReducers(builder);
-    },
-});
+// Selectors (memoized for stable references)
+const selectGameState = (state: RootState) => state.game;
 
-// Selectors
-export const selectPlayer = (state: { game: GameState }) => state.game.player;
-export const selectCurrentRoom = (state: { game: GameState }) => state.game.currentRoom;
-export const selectExploredRooms = (state: { game: GameState }) => state.game.exploredRooms;
-export const selectRoomCoordinates = (state: { game: GameState }) => state.game.roomCoordinates;
-export const selectLogs = (state: { game: GameState }) => state.game.logs;
-export const selectIsInitialized = (state: { game: GameState }) => state.game.isInitialized;
-export const selectIsLoading = (state: { game: GameState }) => state.game.isLoading;
-export const selectSelectedSpellId = (state: { game: GameState }) => state.game.selectedSpellId;
-export const selectActiveQuests = (state: { game: GameState }) => state.game.activeQuests;
-export const selectSessionScore = (state: { game: GameState }) => state.game.sessionScore;
-export const selectSessionComplete = (state: { game: GameState }) => state.game.sessionComplete;
-export const selectPendingQuestFacts = (state: { game: GameState }) => state.game.pendingQuestFacts;
+export const selectPlayer = createSelector(
+  [selectGameState],
+  (game) => game.player
+);
+export const selectCurrentRoom = createSelector(
+  [selectGameState],
+  (game) => game.currentRoom
+);
+export const selectExploredRooms = createSelector(
+  [selectGameState],
+  (game) => game.exploredRooms
+);
+export const selectRoomCoordinates = createSelector(
+  [selectGameState],
+  (game) => game.roomCoordinates
+);
+export const selectLogs = createSelector(
+  [selectGameState],
+  (game) => game.logs
+);
+export const selectIsInitialized = createSelector(
+  [selectGameState],
+  (game) => game.isInitialized
+);
+export const selectIsLoading = createSelector(
+  [selectGameState],
+  (game) => game.isLoading
+);
+export const selectSelectedSpellId = createSelector(
+  [selectGameState],
+  (game) => game.selectedSpellId
+);
+export const selectActiveQuests = createSelector(
+  [selectGameState],
+  (game) => game.activeQuests
+);
+export const selectSessionScore = createSelector(
+  [selectGameState],
+  (game) => game.sessionScore
+);
+export const selectSessionComplete = createSelector(
+  [selectGameState],
+  (game) => game.sessionComplete
+);
+export const selectPendingQuestFacts = createSelector(
+  [selectGameState],
+  (game) => game.pendingQuestFacts
+);
 
 export default gameSlice.reducer;

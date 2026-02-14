@@ -3,7 +3,7 @@ import { getEnemyLoot } from '@/features/game/engine';
 import { resolveDuel, resolveEnemyAttack, resolveSpellDuel, resolveServitorAttack, resolveEnemyAttackOnServitor } from '@/features/game/combat';
 import { SPELLS } from '@/features/game/mechanics/spells';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
-import { addLog, selectSpell } from '../actions';
+import { addLog, selectSpell } from '../gameSlice';
 import { handleVignetteProgression } from '../constants';
 import type { GameState } from '../types';
 import { parseSpellEffect, createPlayerStatusUpdate, createEnemyStatusEffects } from './combat/helpers';

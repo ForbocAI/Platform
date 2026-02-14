@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { Item } from '@/features/game/types';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
-import { addLog } from '../actions';
+import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
 
 /** Weighted mushroom pool for farming harvests. New types (Spore Clump, Rust Spindle) add variety and distinct effects/flavor. */

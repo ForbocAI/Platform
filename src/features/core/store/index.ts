@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
 import gameReducer from '@/features/game/slice/gameSlice';
 import uiReducer, { clearVignetteThemeInput, toggleCraftingPanel } from '@/features/core/ui/slice/uiSlice';
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
@@ -33,6 +34,8 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export { useAppDispatch, useAppSelector } from './hooks';
+
+setupListeners(store.dispatch);
 
 const startAppListening = listenerMiddleware.startListening as TypedStartListening<RootState, AppDispatch>;
 
