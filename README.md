@@ -41,3 +41,6 @@ Strict adherence to the [Style Guide](./style-guide.md) is expected.
 ---
 *SYS_LOAD_COMPLETE // VOID_STABLE*
 
+## License
+All rights reserved. © 2026 ForbocAI. See [LICENSE](./LICENSE) for full details.
+
