@@ -10,60 +10,27 @@
 
 import type { AgentConfig, AgentAction, AwarenessResult, CortexDirective } from '../types';
 import type { GameState } from '../../../slice/types';
-import {
-    nodeSDKDirective,
-    nodeSurvival,
-    nodeBaseCamp,
-    nodeEquipment,
-} from './nodesSurvival';
-import {
-    nodeCombat,
-    nodeLoot,
-    nodeEconomy,
-    nodeRecon,
-    nodeExploration,
-    nodeServitorPrep,
-} from './nodesAction';
-import { nodeQuest } from './nodesQuest';
+import { nodeRival } from './nodesRival';
 
-/**
- * Execute the behavior tree for a given agent.
- * Returns the single best action to take this tick.
- *
- * @param config  - Agent configuration (capabilities, traits)
- * @param state   - Current game state
- * @param awareness - Pre-computed awareness result
- * @param cortexDirective - Optional SDK directive (Priority Node 0)
- */
-export function runBehaviorTree(
-    config: AgentConfig,
-    state: GameState,
-    awareness: AwarenessResult,
-    cortexDirective?: CortexDirective | null,
-): AgentAction {
-    const player = state.player;
-    const room = state.currentRoom;
+// ... (existing imports)
 
-    if (!player || !room) {
-        return { type: 'idle', reason: 'No player or room state' };
-    }
+// Execute nodes in priority order
+const action =
+    nodeSDKDirective(cortexDirective) ||
+    nodeRival(config, state, awareness) || // Priority 1.5: Rival/Strategic Overrides
+    nodeSurvival(config, state, awareness) ||
+    nodeBaseCamp(config, state, awareness) ||
+    nodeEquipment(config, state, awareness) ||
+    nodeServitorPrep(config, awareness) ||
+    nodeCombat(config, state, awareness) ||
+    nodeLoot(config, awareness) ||
+    nodeEconomy(config, awareness) ||
+    nodeQuest(config, state, awareness) ||
+    nodeRecon(config, awareness) ||
+    nodeExploration(config, state, awareness);
 
-    // Execute nodes in priority order
-    const action =
-        nodeSDKDirective(cortexDirective) ||
-        nodeSurvival(config, state, awareness) ||
-        nodeBaseCamp(config, state, awareness) ||
-        nodeEquipment(config, state, awareness) ||
-        nodeServitorPrep(config, awareness) ||
-        nodeCombat(config, state, awareness) ||
-        nodeLoot(config, awareness) ||
-        nodeEconomy(config, awareness) ||
-        nodeQuest(config, state, awareness) ||
-        nodeRecon(config, awareness) ||
-        nodeExploration(config, state, awareness);
-
-    // Default: Idle/Patrol
-    return action || { type: 'idle', reason: 'Nothing to do — idling' };
+// Default: Idle/Patrol
+return action || { type: 'idle', reason: 'Nothing to do — idling' };
 }
 
 // ── Preset Configs ──

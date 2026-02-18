@@ -43,6 +43,28 @@ import {
 
 // Track last action for cooldown/loop prevention
 let lastActionType: AgentActionType | null = null;
+let lastRoomId: string | null = null;
+let stuckCounter = 0;
+
+/**
+ * Check for "Abstract Stuck" state:
+ * - Bot tries to move/explore but Room ID stays same.
+ */
+function checkStuckState(currentRoomId: string, actionType: AgentActionType | null | undefined): boolean {
+  if (actionType === 'move' || actionType === 'explore') {
+    if (currentRoomId === lastRoomId) {
+      stuckCounter++;
+    } else {
+      stuckCounter = 0;
+    }
+  } else {
+    // Actions other than move might reset stuck counter if successful? 
+    // Or we just decay it.
+    stuckCounter = Math.max(0, stuckCounter - 1);
+  }
+  lastRoomId = currentRoomId;
+  return stuckCounter > 5;
+}
 
 // ── Actuator: translates AgentAction into Redux dispatches ──
 
@@ -203,7 +225,23 @@ export const runAutoplayTick = createAsyncThunk(
     const cortexDirective = getSDKDirective(state.game);
 
     // 3. Decide — run the shared behavior tree with SDK directive as Node 0
-    const action = runBehaviorTree(AUTOPLAY_CONFIG, state.game, awareness, cortexDirective);
+    let action = runBehaviorTree(AUTOPLAY_CONFIG, state.game, awareness, cortexDirective);
+
+    // 3.5 Stuck Recovery Override
+    const isStuck = checkStuckState(room.id, lastActionType); // Check result of PREVIOUS action
+    if (isStuck) {
+      // Force a random move to a random exit to unstick
+      const exits = (Object.keys(room.exits) as import('../types').Direction[]).filter(k => room.exits[k]);
+      if (exits.length > 0) {
+        const randomExit = exits[Math.floor(Math.random() * exits.length)];
+        action = {
+          type: 'move',
+          payload: { direction: randomExit },
+          reason: 'Stuck Recovery (Abstract): Forcing move to random exit'
+        };
+        stuckCounter = 0; // Reset
+      }
+    }
 
     // 4. Act — execute the chosen action via Redux dispatches
     await actuate(action, state, dispatch, getState);
