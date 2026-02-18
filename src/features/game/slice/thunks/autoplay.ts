@@ -223,7 +223,7 @@ export const runAutoplayTick = createAsyncThunk(
     // 2. SDK Directive — Call real ForbocAI SDK
     let cortexDirective: CortexDirective | null = null;
     try {
-      const agent = sdkService.getAgent();
+      const agent = await sdkService.getAgent();
       const observation = toObservation(state.game);
 
       const response = await agent.process(observation.content, state.game as any);

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { SDK } from '@/lib/sdk-placeholder';
+import { sdkService } from '@/lib/sdk/cortexService';
 import { getKeenSensesScanExtra } from '@/features/game/skills';
 import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
@@ -10,7 +10,7 @@ export const movePlayer = createAsyncThunk(
     const state = getState() as { game: GameState };
     if (!state.game.currentRoom) throw new Error('No room');
 
-    const isValid = await SDK.Bridge.validateMove(state.game.currentRoom, direction);
+    const isValid = await sdkService.validateMove(state.game.currentRoom, direction);
     if (!isValid) {
       dispatch(addLog({ message: 'Path blocked or invalid vector.', type: 'system' }));
       throw new Error('Invalid move');
@@ -18,7 +18,7 @@ export const movePlayer = createAsyncThunk(
 
     const roomsExplored = state.game.sessionScore?.roomsExplored ?? 0;
     const playerLevel = state.game.player?.level ?? 1;
-    const newRoom = await SDK.Cortex.generateRoom(undefined, undefined, {
+    const newRoom = await sdkService.generateRoom(undefined, undefined, {
       context: {
         previousRoom: state.game.currentRoom,
         direction,

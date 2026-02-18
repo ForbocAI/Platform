@@ -29,7 +29,7 @@ export const runAgentTick = createAsyncThunk(
 
         try {
             const agentPersona = persona || (type === 'npc' ? 'Hostile Entity' : 'Loyal Servitor');
-            const agent = sdkService.getAgent(agentId, agentPersona);
+            const agent = await sdkService.getAgent(agentId, agentPersona);
 
             // Map state to agent-specific observation
             const observation = toObservation(rootState.game);

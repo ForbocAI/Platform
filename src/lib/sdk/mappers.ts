@@ -1,4 +1,4 @@
-import type { Observation, AgentAction } from 'forbocai';
+import type { Observation, AgentAction } from '@forbocai/core';
 import type { GameState } from '@/features/game/slice/types';
 import type { CortexDirective } from '@/features/game/mechanics/ai/types';
 

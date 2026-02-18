@@ -1,5 +1,6 @@
 import type { AgentConfig, AgentAction, AwarenessResult } from '../types';
-import type { GameState, Enemy } from '../../../slice/types';
+import type { GameState } from '../../../slice/types';
+import type { Enemy } from '../../../types';
 
 /**
  * Rival Bot Logic extensions

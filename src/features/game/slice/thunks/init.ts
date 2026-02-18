@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { initializePlayer } from '@/features/game/engine';
 import { getSkillsForLevels } from '@/features/game/mechanics';
 import { getKeenSensesScanExtra } from '@/features/game/skills';
-import { SDK } from '@/lib/sdk-placeholder';
+import { sdkService } from '@/lib/sdk/cortexService';
 import { startVignette } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../gameSlice';
 import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
@@ -30,7 +30,7 @@ export const initializeGame = createAsyncThunk(
         description: "A seasoned warrior hired for testing."
       }];
     }
-    const initialRoom = await SDK.Cortex.generateStartRoom({
+    const initialRoom = await sdkService.generateStartRoom({
       deterministic: options?.deterministic,
       forceMerchant: options?.forceMerchant,
       forceEnemy: options?.forceEnemy === true || typeof options?.forceEnemy === 'string',
@@ -40,7 +40,7 @@ export const initializeGame = createAsyncThunk(
     dispatch(startVignette({ theme }));
 
     // Auto-scan initial room
-    const enemies = initialRoom.enemies?.length > 0 ? initialRoom.enemies.map(e => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
+    const enemies = (initialRoom.enemies || []).length > 0 ? initialRoom.enemies.map(e => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
     const allies = initialRoom.allies ? initialRoom.allies.map(a => a.name).join(', ') : 'None';
     const extra = player.skills?.includes('keen_senses') ? getKeenSensesScanExtra(initialRoom) : '';
     const message = `[SCAN RESULT] ${initialRoom.title}: Enemies: ${enemies}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;

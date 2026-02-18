@@ -20,7 +20,11 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-redux": "^9.2.0",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "4.0.12",
+    "@forbocai/core": "^0.4.10",
+    "@forbocai/node": "^0.4.10",
+    "@forbocai/browser": "^0.4.10"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

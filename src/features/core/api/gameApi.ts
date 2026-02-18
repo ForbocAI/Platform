@@ -1,14 +1,12 @@
 import { baseApi } from './baseApi';
-
-import { SDK } from '@/lib/sdk-placeholder';
+import { sdkService } from '@/lib/sdk/cortexService';
 import type { Room, OracleResult, StageOfScene } from '@/features/game/types';
 
 export const gameApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getStartRoom: build.query<Room, { deterministic?: boolean } | void>({
       async queryFn(arg) {
-        const deterministic = arg?.deterministic ?? false;
-        const room = await SDK.Cortex.generateStartRoom({ deterministic });
+        const room = await sdkService.generateStartRoom(arg || undefined);
         return { data: room };
       },
       keepUnusedDataFor: 0,
@@ -18,7 +16,7 @@ export const gameApi = baseApi.injectEndpoints({
       { question: string; surgeCount: number; stage: StageOfScene }
     >({
       async queryFn({ question, surgeCount, stage }) {
-        const result = await SDK.Cortex.consultOracle(
+        const result = await sdkService.consultOracle(
           question,
           surgeCount,
           stage
@@ -32,11 +30,11 @@ export const gameApi = baseApi.injectEndpoints({
       { direction: string; currentRoom: Room; playerLevel?: number; roomsExplored?: number }
     >({
       async queryFn({ direction, currentRoom, playerLevel = 1, roomsExplored = 0 }) {
-        const isValid = await SDK.Bridge.validateMove(currentRoom, direction);
+        const isValid = await sdkService.validateMove(currentRoom, direction);
         if (!isValid) {
           return { error: { status: 400, data: 'Invalid move' } };
         }
-        const newRoom = await SDK.Cortex.generateRoom(undefined, undefined, {
+        const newRoom = await sdkService.generateRoom(undefined, undefined, {
           context: { previousRoom: currentRoom, direction, playerLevel, roomsExplored },
         });
         return { data: { newRoom } };

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { SDK } from '@/lib/sdk-placeholder';
+import { sdkService } from '@/lib/sdk/cortexService';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
@@ -12,7 +12,7 @@ export const askOracle = createAsyncThunk(
 
     dispatch(addLog({ message: `Your Question: "${question}"`, type: 'system' }));
 
-    const result = await SDK.Cortex.consultOracle(question, state.game.player.surgeCount);
+    const result = await sdkService.consultOracle(question, state.game.player.surgeCount);
 
     dispatch(
       addFact({
@@ -36,7 +36,7 @@ export const queryOracle = createAsyncThunk(
 
     dispatch(addLog({ message: 'You attempt to commune with the void...', type: 'system' }));
 
-    const result = await SDK.Cortex.consultOracle('Commune', state.game.player.surgeCount);
+    const result = await sdkService.consultOracle('Commune', state.game.player.surgeCount);
 
     dispatch(addLog({ message: `Oracle: ${result.description}`, type: 'oracle' }));
     dispatch(
