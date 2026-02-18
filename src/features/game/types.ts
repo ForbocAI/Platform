@@ -165,7 +165,7 @@ export interface GameLogEntry {
     id: string;
     timestamp: number;
     message: string;
-    type: "combat" | "exploration" | "system" | "oracle";
+    type: "combat" | "exploration" | "system" | "oracle" | "dialogue";
 }
 
 /** Quest kinds from playtest scope: reconnaissance, rescue, hostiles, merchant. */

@@ -31,8 +31,11 @@ import { handleVignetteProgression } from '../constants';
 import type { GameState } from '../types';
 import { computeAwareness } from '@/features/game/mechanics/ai/awareness';
 import { runBehaviorTree, AUTOPLAY_CONFIG } from '@/features/game/mechanics/ai/behaviorTree';
-import type { AgentAction, AgentActionType } from '@/features/game/mechanics/ai/types';
-import { getSDKDirective, getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from '@/lib/sdk-placeholder';
+import type { AgentAction, AgentActionType, CortexDirective } from '@/features/game/mechanics/ai/types';
+import { getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from '@/lib/sdk/config';
+import { sdkService } from '@/lib/sdk/cortexService';
+import { toObservation, toCortexDirective } from '@/lib/sdk/mappers';
+import { addLog } from '@/features/game/slice/gameSlice';
 import {
   pickBestPurchase,
   pickWorstItem,
@@ -51,7 +54,7 @@ let stuckCounter = 0;
  * - Bot tries to move/explore but Room ID stays same.
  */
 function checkStuckState(currentRoomId: string, actionType: AgentActionType | null | undefined): boolean {
-  if (actionType === 'move' || actionType === 'explore') {
+  if (actionType === ('move' as any) || actionType === ('explore' as any)) {
     if (currentRoomId === lastRoomId) {
       stuckCounter++;
     } else {
@@ -216,13 +219,24 @@ export const runAutoplayTick = createAsyncThunk(
     // 1. Perceive — gather awareness of the environment (with last action for cooldown tracking)
     const awareness = computeAwareness(state.game, lastActionType);
 
-    // 2. SDK Directive — mock cortex processes observation & generates directive
-    //    When real SDK is integrated, replace getSDKDirective() with:
-    //      const obs = cortexMapper.toObservation(state.game);
-    //      const directive = await SDK.Cortex.processObservation(obs);
-    //      const sdkAction = await SDK.Cortex.generateAction(directive);
-    //      const cortexDirective = cortexMapper.toCortexDirective(sdkAction);
-    const cortexDirective = getSDKDirective(state.game);
+    // 2. SDK Directive — Call real ForbocAI SDK
+    let cortexDirective: CortexDirective | null = null;
+    try {
+      const agent = sdkService.getAgent();
+      const observation = toObservation(state.game);
+
+      const response = await agent.process(observation.content, state.game as any);
+
+      if (response.dialogue) {
+        dispatch(addLog({ message: response.dialogue, type: 'dialogue' }));
+      }
+
+      if (response.action) {
+        cortexDirective = toCortexDirective(response.action);
+      }
+    } catch (e) {
+      console.warn('SDK Decision failed, falling back to pure Behavior Tree:', e);
+    }
 
     // 3. Decide — run the shared behavior tree with SDK directive as Node 0
     let action = runBehaviorTree(AUTOPLAY_CONFIG, state.game, awareness, cortexDirective);
@@ -231,7 +245,7 @@ export const runAutoplayTick = createAsyncThunk(
     const isStuck = checkStuckState(room.id, lastActionType); // Check result of PREVIOUS action
     if (isStuck) {
       // Force a random move to a random exit to unstick
-      const exits = (Object.keys(room.exits) as import('../types').Direction[]).filter(k => room.exits[k]);
+      const exits = (Object.keys(room.exits) as import('@/features/game/types').Direction[]).filter(k => room.exits[k as import('@/features/game/types').Direction]);
       if (exits.length > 0) {
         const randomExit = exits[Math.floor(Math.random() * exits.length)];
         action = {

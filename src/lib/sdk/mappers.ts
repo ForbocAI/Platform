@@ -1,12 +1,11 @@
-import type { Observation } from './types';
+import type { Observation, AgentAction } from 'forbocai';
 import type { GameState } from '@/features/game/slice/types';
+import type { CortexDirective } from '@/features/game/mechanics/ai/types';
 
 /**
- * Mock processObservation: Converts game state into an SDK Observation.
- * When the real SDK is integrated, this becomes:
- *   SDK.Cortex.processObservation(observation) → Directive
+ * Maps Qua'dar GameState to ForbocAI SDK Observation
  */
-export function mockProcessObservation(gameState: GameState): Observation {
+export function toObservation(gameState: GameState): Observation {
     const { player, currentRoom } = gameState;
 
     const parts: string[] = [];
@@ -37,5 +36,17 @@ export function mockProcessObservation(gameState: GameState): Observation {
             roomTitle: currentRoom?.title,
             isBaseCamp: currentRoom?.isBaseCamp,
         },
+    };
+}
+
+/**
+ * Maps ForbocAI SDK AgentAction back to Qua'dar CortexDirective
+ */
+export function toCortexDirective(action: AgentAction): CortexDirective {
+    return {
+        type: action.type as any, // Cast to the game's directive types
+        payload: action.payload,
+        priority: 1, // Default priority for SDK directives
+        source: 'sdk'
     };
 }

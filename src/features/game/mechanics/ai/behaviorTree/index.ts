@@ -12,25 +12,43 @@ import type { AgentConfig, AgentAction, AwarenessResult, CortexDirective } from 
 import type { GameState } from '../../../slice/types';
 import { nodeRival } from './nodesRival';
 
-// ... (existing imports)
+import { nodeSDKDirective, nodeSurvival, nodeBaseCamp, nodeEquipment } from './nodesSurvival';
+import {
+    nodeCombat,
+    nodeServitorPrep,
+    nodeLoot,
+    nodeEconomy,
+    nodeRecon,
+    nodeExploration
+} from './nodesAction';
+import { nodeQuest } from './nodesQuest';
 
-// Execute nodes in priority order
-const action =
-    nodeSDKDirective(cortexDirective) ||
-    nodeRival(config, state, awareness) || // Priority 1.5: Rival/Strategic Overrides
-    nodeSurvival(config, state, awareness) ||
-    nodeBaseCamp(config, state, awareness) ||
-    nodeEquipment(config, state, awareness) ||
-    nodeServitorPrep(config, awareness) ||
-    nodeCombat(config, state, awareness) ||
-    nodeLoot(config, awareness) ||
-    nodeEconomy(config, awareness) ||
-    nodeQuest(config, state, awareness) ||
-    nodeRecon(config, awareness) ||
-    nodeExploration(config, state, awareness);
+/**
+ * Main entry point for the behavior tree
+ */
+export function runBehaviorTree(
+    config: AgentConfig,
+    state: GameState,
+    awareness: AwarenessResult,
+    cortexDirective: CortexDirective | null
+): AgentAction {
+    // Execute nodes in priority order
+    const action =
+        nodeSDKDirective(cortexDirective) ||
+        nodeRival(config, state, awareness) || // Priority 1.5: Rival/Strategic Overrides
+        nodeSurvival(config, state, awareness) ||
+        nodeBaseCamp(config, state, awareness) ||
+        nodeEquipment(config, state, awareness) ||
+        nodeServitorPrep(config, awareness) ||
+        nodeCombat(config, state, awareness) ||
+        nodeLoot(config, awareness) ||
+        nodeEconomy(config, awareness) ||
+        nodeQuest(config, state, awareness) ||
+        nodeRecon(config, awareness) ||
+        nodeExploration(config, state, awareness);
 
-// Default: Idle/Patrol
-return action || { type: 'idle', reason: 'Nothing to do — idling' };
+    // Default: Idle/Patrol
+    return action || { type: 'idle', reason: 'Nothing to do — idling' };
 }
 
 // ── Preset Configs ──

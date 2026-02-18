@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import type { GameLogEntry } from "@/features/game/types";
 import { RuneSigil } from "../shared/Runes";
 
+import { TypewriterText } from "../../shared/TypewriterText";
+
 export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; children?: React.ReactNode }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +29,7 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 sm:p-2 flex flex-col gap-1.5 sm:gap-2 scrollbar-thin scrollbar-thumb-palette-border scrollbar-track-transparent min-h-0 min-w-0"
       >
-        {logs.map((log) => (
+        {logs.map((log, index) => (
           <div key={log.id} className="min-w-0 wrap-break-word shrink-0">
             <p
               className={cn(
@@ -35,7 +37,8 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
                 log.type === "combat" && "text-palette-accent-mid border-palette-border-dim",
                 log.type === "system" && "text-palette-accent-mid border-palette-border",
                 log.type === "oracle" && "text-palette-accent-soft border-palette-border bg-palette-accent-soft/10 p-1 italic",
-                log.type === "exploration" && "text-palette-muted-light border-palette-border"
+                log.type === "exploration" && "text-palette-muted-light border-palette-border",
+                log.type === "dialogue" && "text-palette-accent-bright border-palette-accent-mid bg-palette-accent-mid/5 p-1.5 rounded-sm font-medium"
               )}
             >
               <span className="opacity-50 mr-2 shrink-0">
@@ -44,7 +47,13 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
                   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`;
                 })()}]
               </span>
-              <span className="wrap-break-word">{log.message}</span>
+              <span className="wrap-break-word">
+                {log.type === "dialogue" && index === logs.length - 1 ? (
+                  <TypewriterText text={log.message} speed={25} />
+                ) : (
+                  log.message
+                )}
+              </span>
             </p>
           </div>
         ))}
