@@ -6,3 +6,4 @@ export { tradeBuy, tradeSell } from './trade';
 export { pickUpGroundLoot, useItem, equipItem, unequipItem, sacrificeItem } from './inventory';
 export { harvestCrop, craftItem } from './baseCamp';
 export { runAutoplayTick } from './autoplay';
+export { runAgentTick } from './agency';

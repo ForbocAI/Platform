@@ -30,10 +30,19 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
         className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 sm:p-2 flex flex-col gap-1.5 sm:gap-2 scrollbar-thin scrollbar-thumb-palette-border scrollbar-track-transparent min-h-0 min-w-0"
       >
         {logs.map((log, index) => (
-          <div key={log.id} className="min-w-0 wrap-break-word shrink-0">
+          <div key={log.id} className="min-w-0 wrap-break-word shrink-0 flex gap-2">
+            {log.type === "dialogue" && log.portraitUrl && (
+              <div className="shrink-0 mt-1">
+                <img
+                  src={log.portraitUrl}
+                  alt="Agent Portrait"
+                  className="w-10 h-10 rounded-sm border border-palette-border object-cover opacity-80"
+                />
+              </div>
+            )}
             <p
               className={cn(
-                "leading-relaxed pl-1.5 border-l-2 wrap-break-word",
+                "leading-relaxed pl-1.5 border-l-2 wrap-break-word flex-1",
                 log.type === "combat" && "text-palette-accent-mid border-palette-border-dim",
                 log.type === "system" && "text-palette-accent-mid border-palette-border",
                 log.type === "oracle" && "text-palette-accent-soft border-palette-border bg-palette-accent-soft/10 p-1 italic",

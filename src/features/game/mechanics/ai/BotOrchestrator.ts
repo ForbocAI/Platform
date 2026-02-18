@@ -1,6 +1,6 @@
 import { AppDispatch, RootState } from '@/features/core/store';
-import { runAutoplayTick } from '@/features/game/slice/gameSlice';
-import { setAutoplaySchedule } from '@/features/core/ui/slice/uiSlice';
+import { runAutoplayTick, runAgentTick } from '@/features/game/slice/thunks';
+import { setAutoplaySchedule, setAgentSchedule } from '@/features/core/ui/slice/uiSlice';
 
 /**
  * BotOrchestrator — Centralized AI management service.
@@ -45,8 +45,9 @@ class BotOrchestrator {
             this.orchestratePlayer(state);
         }
 
-        // 2. NPC / Servitor Orchestration (Future expansion)
-        // iterate over state.game.currentRoom.enemies and state.game.player.servitors
+        // 2. NPC / Servitor Orchestration
+        this.orchestrateNPCs(state);
+        this.orchestrateServitors(state);
     }
 
     private orchestratePlayer(state: RootState) {
@@ -58,6 +59,39 @@ class BotOrchestrator {
 
             // Step 2: Trigger the 7-step protocol thunk
             this.dispatch!(runAutoplayTick());
+        }
+    }
+
+    private orchestrateNPCs(state: RootState) {
+        const enemies = state.game.currentRoom?.enemies || [];
+        for (const enemy of enemies) {
+            this.checkAndTickAgent(state, enemy.id, 'npc', enemy.name);
+        }
+    }
+
+    private orchestrateServitors(state: RootState) {
+        const servitors = state.game.player?.servitors || [];
+        for (const servitor of servitors) {
+            this.checkAndTickAgent(state, servitor.id, 'servitor', servitor.name);
+        }
+    }
+
+    private checkAndTickAgent(state: RootState, agentId: string, type: 'npc' | 'servitor', persona?: string) {
+        const nextTickAt = state.ui.agentTickSchedule[agentId];
+
+        // If no schedule exists, initialize it with a small random offset to stagger starts
+        if (nextTickAt === undefined) {
+            const initialDelay = 1000 + Math.random() * 3000;
+            this.dispatch!(setAgentSchedule({ agentId, nextTickAt: Date.now() + initialDelay }));
+            return;
+        }
+
+        if (nextTickAt !== null && Date.now() >= nextTickAt) {
+            // Step 1: Clear schedule
+            this.dispatch!(setAgentSchedule({ agentId, nextTickAt: null }));
+
+            // Step 2: Dispatch generic agent tick
+            this.dispatch!(runAgentTick({ agentId, type, persona }));
         }
     }
 }

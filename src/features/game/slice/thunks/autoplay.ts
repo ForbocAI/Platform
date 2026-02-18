@@ -36,6 +36,7 @@ import { getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from '@/li
 import { sdkService } from '@/lib/sdk/cortexService';
 import { toObservation, toCortexDirective } from '@/lib/sdk/mappers';
 import { addLog } from '@/features/game/slice/gameSlice';
+import { getPortraitForAgent } from '@/lib/sdk/portraits';
 import {
   pickBestPurchase,
   pickWorstItem,
@@ -228,7 +229,8 @@ export const runAutoplayTick = createAsyncThunk(
       const response = await agent.process(observation.content, state.game as any);
 
       if (response.dialogue) {
-        dispatch(addLog({ message: response.dialogue, type: 'dialogue' }));
+        const portraitUrl = getPortraitForAgent('player', "Qua'dar Adventurer");
+        dispatch(addLog({ message: response.dialogue, type: 'dialogue', portraitUrl }));
       }
 
       if (response.action) {

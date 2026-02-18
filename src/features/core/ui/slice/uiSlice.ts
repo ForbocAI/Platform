@@ -25,6 +25,8 @@ interface UIState {
   spellsPanelOpen: boolean;
   skillsPanelOpen: boolean;
   servitorPanelOpen: boolean;
+  /** Map of agentId -> timestamp for next tick. Managed by BotOrchestrator and agentTick thunks. */
+  agentTickSchedule: Record<string, number | null>;
   /** Set true when app/bootstrap runs (client); used to avoid hydration mismatch (e.g. runes). */
   clientHydrated: boolean;
   activeMerchantId: string | null;
@@ -47,6 +49,7 @@ const initialState: UIState = {
   spellsPanelOpen: false,
   skillsPanelOpen: false,
   servitorPanelOpen: false,
+  agentTickSchedule: {},
   clientHydrated: false,
   activeMerchantId: null,
   craftingPanelOpen: false,
@@ -71,12 +74,19 @@ export const uiSlice = createSlice({
     },
     toggleAutoPlay: (state) => {
       state.autoPlay = !state.autoPlay;
-      if (!state.autoPlay) state.autoplayNextTickAt = null;
+      if (!state.autoPlay) {
+        state.autoplayNextTickAt = null;
+        state.agentTickSchedule = {};
+      }
     },
     /** Set when next autoplay tick should run (and optionally delay for next). Pure reducer; called by listeners when toggling on or after concession. */
     setAutoplaySchedule: (state, action: PayloadAction<AutoplaySchedulePayload>) => {
       state.autoplayNextTickAt = action.payload.nextTickAt;
       if (action.payload.nextDelayMs !== undefined) state.autoplayDelayMs = action.payload.nextDelayMs;
+    },
+    /** Set next tick for a specific agent. */
+    setAgentSchedule: (state, action: PayloadAction<{ agentId: string; nextTickAt: number | null }>) => {
+      state.agentTickSchedule[action.payload.agentId] = action.payload.nextTickAt;
     },
     toggleTextToSpeech: (state) => {
       state.textToSpeech = !state.textToSpeech;
@@ -132,10 +142,20 @@ export const uiSlice = createSlice({
         if (payload.nextDelayMs !== undefined) state.autoplayDelayMs = payload.nextDelayMs;
       }
     );
+    builder.addMatcher(
+      (action): action is PayloadAction<{ agentId: string; nextTickAt: number } | undefined> =>
+        action.type === 'game/runAgentTick/fulfilled',
+      (state, action) => {
+        const payload = action.payload;
+        if (payload?.agentId && payload.nextTickAt) {
+          state.agentTickSchedule[payload.agentId] = payload.nextTickAt;
+        }
+      }
+    );
   },
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, setAgentSchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: { ui: UIState }) => state.ui;

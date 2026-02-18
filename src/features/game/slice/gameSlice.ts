@@ -8,50 +8,51 @@ import type { RootState } from '@/features/core/store';
 export type { RoomCoordinates, InitializeGameOptions } from './types';
 
 export const gameSlice = createSlice({
-    name: 'game',
-    initialState,
-    reducers: {
-        addLog: (state, action: PayloadAction<{ message: string; type: GameLogEntry['type'] }>) => {
-            state.logs.push({
-                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                timestamp: Date.now(),
-                message: action.payload.message,
-                type: action.payload.type,
-            });
-        },
-        selectSpell: (state, action: PayloadAction<string | null>) => {
-            state.selectedSpellId = action.payload;
-        },
-        clearPendingQuestFacts: (state) => {
-            state.pendingQuestFacts = [];
-        },
+  name: 'game',
+  initialState,
+  reducers: {
+    addLog: (state, action: PayloadAction<{ message: string; type: GameLogEntry['type']; portraitUrl?: string }>) => {
+      state.logs.push({
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: Date.now(),
+        message: action.payload.message,
+        type: action.payload.type,
+        portraitUrl: action.payload.portraitUrl,
+      });
     },
-    extraReducers: (builder) => {
-        addAllReducers(builder);
+    selectSpell: (state, action: PayloadAction<string | null>) => {
+      state.selectedSpellId = action.payload;
     },
+    clearPendingQuestFacts: (state) => {
+      state.pendingQuestFacts = [];
+    },
+  },
+  extraReducers: (builder) => {
+    addAllReducers(builder);
+  },
 });
 
 export const { addLog, selectSpell, clearPendingQuestFacts } = gameSlice.actions;
 
 export {
-    initializeGame,
-    askOracle,
-    queryOracle,
-    movePlayer,
-    scanSector,
-    castSpell,
-    engageHostiles,
-    respawnPlayer,
-    tradeBuy,
-    tradeSell,
-    pickUpGroundLoot,
-    useItem,
-    sacrificeItem,
-    equipItem,
-    unequipItem,
-    harvestCrop,
-    craftItem,
-    runAutoplayTick,
+  initializeGame,
+  askOracle,
+  queryOracle,
+  movePlayer,
+  scanSector,
+  castSpell,
+  engageHostiles,
+  respawnPlayer,
+  tradeBuy,
+  tradeSell,
+  pickUpGroundLoot,
+  useItem,
+  sacrificeItem,
+  equipItem,
+  unequipItem,
+  harvestCrop,
+  craftItem,
+  runAutoplayTick,
 } from './thunks';
 
 // Selectors (memoized for stable references)
