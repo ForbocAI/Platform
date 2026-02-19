@@ -11,23 +11,23 @@ export const tradeBuy = createAsyncThunk(
     { getState, dispatch }
   ) => {
     const state = getState() as { game: GameState };
-    const { currentRoom, player } = state.game;
-    if (!currentRoom || !player) return;
-    const merchant = currentRoom.merchants?.find((m) => m.id === merchantId);
-    if (!merchant) return;
-    const item = merchant.wares.find((i) => i.id === itemId);
+    const { currentArea, player } = state.game;
+    if (!currentArea || !player) return;
+    const vendor = currentArea.vendors?.find((v) => v.id === merchantId);
+    if (!vendor) return;
+    const item = vendor.wares.find((i) => i.id === itemId);
     if (!item) return;
-    const cost = item.cost || { spirit: 0 };
-    const spiritCost = cost.spirit || 0;
-    const bloodCost = cost.blood || 0;
-    if ((player.spirit || 0) < spiritCost || (player.blood || 0) < bloodCost) {
-      dispatch(addLog({ message: 'Insufficent currency.', type: 'system' }));
+    const cost = item.cost || { primary: 0 };
+    const primaryCost = cost.primary || 0;
+    const secondaryCost = cost.secondary || 0;
+    if ((player.resourcePrimary || 0) < primaryCost || (player.resourceSecondary || 0) < secondaryCost) {
+      dispatch(addLog({ message: 'Insufficient currency.', type: 'system' }));
       return;
     }
-    dispatch(addLog({ message: `Purchased ${item.name} from ${merchant.name}.`, type: 'system' }));
-    dispatch(addFact({ text: `Purchased ${item.name} from ${merchant.name}.`, questionKind: 'trade', isFollowUp: false }));
+    dispatch(addLog({ message: `Purchased ${item.name} from ${vendor.name}.`, type: 'system' }));
+    dispatch(addFact({ text: `Purchased ${item.name} from ${vendor.name}.`, questionKind: 'trade', isFollowUp: false }));
     handleVignetteProgression(dispatch, getState);
-    return { item, spiritCost, bloodCost };
+    return { item, primaryCost, secondaryCost };
   }
 );
 
@@ -40,8 +40,8 @@ export const tradeSell = createAsyncThunk(
     const itemIndex = player.inventory.findIndex((i) => i.id === itemId);
     if (itemIndex === -1) return;
     const item = player.inventory[itemIndex];
-    const cost = item.cost || { spirit: 10 };
-    const value = Math.max(1, Math.floor((cost.spirit || 0) / 2));
+    const cost = item.cost || { primary: 10 };
+    const value = Math.max(1, Math.floor((cost.primary || 0) / 2));
     dispatch(addLog({ message: `Sold ${item.name} for ${value} Spirit.`, type: 'system' }));
     dispatch(addFact({ text: `Sold ${item.name}.`, questionKind: 'trade', isFollowUp: false }));
     handleVignetteProgression(dispatch, getState);

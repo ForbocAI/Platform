@@ -1,7 +1,7 @@
-import { Stats, Enemy, Player, Spell } from "./types";
+import { Stats, AgentNPC, AgentPlayer, Capability } from "./types";
 import { calculateEffectiveStats } from "./items";
 import { parseDiceString } from "./dice";
-import { SPELLS } from "./mechanics";
+import { CAPABILITIES } from "./mechanics";
 
 export interface CombatResult {
     hit: boolean;
@@ -10,7 +10,7 @@ export interface CombatResult {
     message: string;
 }
 
-/** Group Score modifier for crowd/ally support (Familiar: "special abilities affecting a crowd contribute to Group Score"). */
+/** Group Score modifier for crowd/ally support (Companion: "special abilities affecting a crowd contribute to Group Score"). */
 export interface GroupScoreModifier {
     attackerBonus?: number;
     defenderBonus?: number;
@@ -23,13 +23,13 @@ function rollCombatTotal(modifier = 0): number {
 }
 
 export function resolveDuel(
-    attacker: Player,
-    defender: Enemy,
-    spellModifier = 0,
+    attacker: AgentPlayer,
+    defender: AgentNPC,
+    capabilityModifier = 0,
     groupScore?: GroupScoreModifier
 ): CombatResult {
     // Attacker roll
-    let attackerTotal = rollCombatTotal(spellModifier);
+    let attackerTotal = rollCombatTotal(capabilityModifier);
     attackerTotal += groupScore?.attackerBonus ?? 0;
 
     // Defender roll
@@ -47,7 +47,7 @@ export function resolveDuel(
         damage = Math.max(1, damageRoll);
         message = `You land a heavy blow on ${defender.name} for ${damage} damage. (${attackerTotal} vs ${defenderTotal})`;
     } else {
-        message = `You swing at ${defender.name} but the Shadows guide their movement. Miss! (${attackerTotal} vs ${defenderTotal})`;
+        message = `You strike at ${defender.name} but they evade. Miss! (${attackerTotal} vs ${defenderTotal})`;
     }
 
     return {
@@ -58,20 +58,20 @@ export function resolveDuel(
     };
 }
 
-/** Enemy attacks the player. Shadows of Fate: both roll d20 + Str + Agi + Arcane, higher wins. */
-export function resolveEnemyAttack(
-    attacker: Enemy,
-    defender: Player,
+/** NPC attacks the player. Shadows of Fate: both roll d20 + Str + Agi + Arcane, higher wins. */
+export function resolveNPCAttack(
+    attacker: AgentNPC,
+    defender: AgentPlayer,
     groupScore?: GroupScoreModifier
 ): CombatResult {
     const effectiveDefender = calculateEffectiveStats(defender);
 
     // AI Logic: Simple decision making
-    // 60% chance to use ability if available
-    let spell: Spell | undefined;
-    if (attacker.spells && attacker.spells.length > 0 && Math.random() < 0.6) {
-        const spellId = attacker.spells[Math.floor(Math.random() * attacker.spells.length)];
-        spell = SPELLS[spellId];
+    // 60% chance to use capability if available
+    let capability: Capability | undefined;
+    if (attacker.capabilities && attacker.capabilities.length > 0 && Math.random() < 0.6) {
+        const capabilityId = attacker.capabilities[Math.floor(Math.random() * attacker.capabilities.length)];
+        capability = CAPABILITIES[capabilityId];
     }
 
     // Roll Combat Total
@@ -89,22 +89,22 @@ export function resolveEnemyAttack(
     let message = "";
 
     if (isHit) {
-        if (spell) {
-            // Spell Attack
-            if (spell.damage) {
-                damage = parseDiceString(spell.damage);
+        if (capability) {
+            // Capability Attack
+            if (capability.magnitude) {
+                damage = parseDiceString(capability.magnitude);
             } else {
-                // Fallback for utility spells or un-stat-ed spells
+                // Fallback for utility capabilities or un-stat-ed capabilities
                 const diff = attackerTotal - defenderTotal;
                 damage = Math.floor(diff / 3) + 1;
             }
             damage = Math.max(1, damage);
 
             let effectMsg = "";
-            if (spell.effect) {
-                effectMsg = spell.effect(attacker, effectiveDefender);
+            if (capability.effect) {
+                effectMsg = capability.effect(attacker, effectiveDefender);
             }
-            message = `${attacker.name} casts ${spell.name}! It hits you for ${damage} damage! ${effectMsg ? `(${effectMsg})` : ""}`;
+            message = `${attacker.name} activates ${capability.name}! It hits you for ${damage} damage! ${effectMsg ? `(${effectMsg})` : ""}`;
         } else {
             // Basic Attack
             const diff = attackerTotal - defenderTotal;
@@ -112,8 +112,8 @@ export function resolveEnemyAttack(
             message = `${attacker.name} strikes you for ${damage} damage!`;
         }
     } else {
-        if (spell) {
-            message = `${attacker.name} tries to cast ${spell.name}, but you evade the effect!`;
+        if (capability) {
+            message = `${attacker.name} tries to activate ${capability.name}, but you evade the effect!`;
         } else {
             message = `${attacker.name} attacks but you evade/block. Miss!`;
         }
@@ -127,10 +127,10 @@ export function resolveEnemyAttack(
     };
 }
 
-export function resolveSpellDuel(
-    attacker: Player,
-    defender: Enemy,
-    spell: Spell,
+export function resolveCapabilityDuel(
+    attacker: AgentPlayer,
+    defender: AgentNPC,
+    capability: Capability,
     groupScore?: GroupScoreModifier
 ): CombatResult {
     const effectiveAttacker = calculateEffectiveStats(attacker);
@@ -147,11 +147,11 @@ export function resolveSpellDuel(
     let message = "";
 
     if (isHit) {
-        // Calculate spell damage
-        if (spell.damage) {
-            damage = parseDiceString(spell.damage);
+        // Calculate capability damage
+        if (capability.magnitude) {
+            damage = parseDiceString(capability.magnitude);
         } else {
-            // Default if no damage string provided (e.g. basic magic missle equivalent)
+            // Default if no damage string provided
             const diff = attackerTotal - defenderTotal;
             damage = Math.floor(diff / 3) + 1;
         }
@@ -160,14 +160,14 @@ export function resolveSpellDuel(
         damage = Math.max(1, damage);
 
         let effectMsg = "";
-        if (spell.effect) {
-            effectMsg = spell.effect(effectiveAttacker, defender);
+        if (capability.effect) {
+            effectMsg = capability.effect(effectiveAttacker, defender);
         }
 
-        message = `You cast ${spell.name}! It hits for ${damage} damage. ${effectMsg ? `(${effectMsg})` : ""}`;
+        message = `You activate ${capability.name}! It hits for ${damage} damage. ${effectMsg ? `(${effectMsg})` : ""}`;
 
     } else {
-        message = `You cast ${spell.name} but ${defender.name} resists! Miss! (${attackerTotal} vs ${defenderTotal})`;
+        message = `You activate ${capability.name} but ${defender.name} resists! Miss! (${attackerTotal} vs ${defenderTotal})`;
     }
 
     return {
@@ -178,9 +178,9 @@ export function resolveSpellDuel(
     };
 }
 
-export function resolveServitorAttack(
-    servitor: { name: string },
-    defender: Enemy,
+export function resolveCompanionAttack(
+    companion: { name: string },
+    defender: AgentNPC,
     groupScore?: GroupScoreModifier
 ): CombatResult {
     let attackerTotal = rollCombatTotal(0);
@@ -196,16 +196,16 @@ export function resolveServitorAttack(
     if (isHit) {
         const diff = attackerTotal - defenderTotal;
         damage = Math.max(1, Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1);
-        message = `${servitor.name} attacks ${defender.name} for ${damage} damage!`;
+        message = `${companion.name} attacks ${defender.name} for ${damage} damage!`;
     } else {
-        message = `${servitor.name} attacks ${defender.name} but misses.`;
+        message = `${companion.name} attacks ${defender.name} but misses.`;
     }
 
     return { hit: isHit, damage, roll: attackerTotal, message };
 }
 
-export function resolveEnemyAttackOnServitor(
-    attacker: Enemy,
+export function resolveNPCAttackOnCompanion(
+    attacker: AgentNPC,
     defender: { name: string; ac?: number },
     groupScore?: GroupScoreModifier
 ): CombatResult {
@@ -214,7 +214,7 @@ export function resolveEnemyAttackOnServitor(
 
     let defenderTotal = rollCombatTotal(0);
     defenderTotal += groupScore?.defenderBonus ?? 0;
-    // Servitors don't usually have AC yet, but if they do, add it
+    // Companions don't usually have AC yet, but if they do, add it
     defenderTotal += defender.ac ?? 0;
     const isHit = attackerTotal > defenderTotal;
     let damage = 0;

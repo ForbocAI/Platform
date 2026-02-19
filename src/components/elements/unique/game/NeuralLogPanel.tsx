@@ -2,7 +2,7 @@
 
 import { Terminal } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/features/core/utils";
 import type { GameLogEntry } from "@/features/game/types";
 import { RuneSigil } from "../shared/Runes";
 

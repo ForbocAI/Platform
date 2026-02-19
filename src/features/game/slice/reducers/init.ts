@@ -1,32 +1,37 @@
-import type { ActionReducerMapBuilder } from '@reduxjs/toolkit';
-import { generateRandomEnemy, generateRandomMerchant } from '@/features/game/engine';
-import { resolveUnexpectedlyEffect } from '@/features/narrative/helpers';
-import { checkSurgeEvent } from '@/features/game/mechanics/surgeEvents';
+import type { ActionReducerMapBuilder, PayloadAction } from '@reduxjs/toolkit';
+import { createAction } from '@reduxjs/toolkit';
 import { initialSessionScore, seedQuests } from '../constants';
 import * as thunks from '../thunks';
 import type { GameState } from '../types';
+import type { AgentPlayer, Area } from '@/features/game/types';
+import { resolveUnexpectedlyEffect } from '@/features/narrative/helpers';
+import { checkSurgeEvent } from '@/features/game/mechanics/surgeEvents';
+import { generateRandomAgentNPC, generateRandomVendor } from '@/features/game/engine';
+
+export const resetGame = createAction('game/reset');
 
 export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.initializeGame.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
     });
-    builder.addCase(thunks.initializeGame.fulfilled, (state, action) => {
+    builder.addCase(thunks.initializeGame.fulfilled, (state, action: PayloadAction<{ player: AgentPlayer; initialArea: Area }>) => {
         state.isLoading = false;
         state.isInitialized = true;
         state.player = action.payload.player;
-        const initialRoom = action.payload.initialRoom;
-        state.currentRoom = initialRoom;
-        state.exploredRooms = { [initialRoom.id]: initialRoom };
-        state.roomCoordinates = { [initialRoom.id]: { x: 0, y: 0 } };
+        const initialArea = action.payload.initialArea;
+        state.currentArea = initialArea;
+        state.exploredAreas = { [initialArea.id]: initialArea };
+        state.areaCoordinates = { [initialArea.id]: { x: 0, y: 0 } };
         state.activeQuests = seedQuests();
         state.sessionScore = {
             ...initialSessionScore(),
-            spiritEarned: action.payload.player.spirit ?? 0,
+            resourcesEarned: action.payload.player.resourcePrimary ?? 0,
         };
         state.sessionComplete = null;
         state.pendingQuestFacts = [];
         state.logs.push({
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `${Date.now()} -${Math.random().toString(36).substr(2, 9)} `,
             timestamp: Date.now(),
             message: "SYSTEM: Connection Stable. Welcome to Quadar Tower, Ranger.",
             type: "system"
@@ -44,20 +49,20 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
 
         if (result.unexpectedRoll) {
             const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
-            if (effect.applyEnteringRed && state.currentRoom) {
-                state.currentRoom.enemies.push(generateRandomEnemy());
-                state.currentRoom.hazards.push("Threat Imminent");
+            if (effect.applyEnteringRed && state.currentArea) {
+                state.currentArea.npcs.push(generateRandomAgentNPC());
+                state.currentArea.hazards.push("Threat Imminent");
             }
-            if (effect.applyEnterStageLeft && state.currentRoom) {
-                if (!state.currentRoom.merchants) state.currentRoom.merchants = [];
-                state.currentRoom.merchants.push(generateRandomMerchant());
-                if (!state.currentRoom.allies) state.currentRoom.allies = [];
-                state.currentRoom.allies.push({ id: Date.now().toString(), name: "Fellow Ranger" });
+            if (effect.applyEnterStageLeft && state.currentArea) {
+                if (!state.currentArea.vendors) state.currentArea.vendors = [];
+                state.currentArea.vendors.push(generateRandomVendor());
+                if (!state.currentArea.allies) state.currentArea.allies = [];
+                state.currentArea.allies.push({ id: Date.now().toString(), name: "Fellow Ranger" });
             }
         }
 
         state.logs.push({
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `${Date.now()} -${Math.random().toString(36).substr(2, 9)} `,
             timestamp: Date.now(),
             message: `Oracle: ${result.description} (Roll: ${result.roll}, Surge: ${newSurge})`,
             type: "oracle"
@@ -80,16 +85,16 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
                     }
                     break;
                 case "enemy_empower":
-                    if (state.currentRoom) {
-                        for (const enemy of state.currentRoom.enemies) {
-                            enemy.hp += surgeEvent.magnitude;
-                            enemy.maxHp = (enemy.maxHp || enemy.hp) + surgeEvent.magnitude;
+                    if (state.currentArea) {
+                        for (const npc of state.currentArea.npcs) {
+                            npc.hp += surgeEvent.magnitude;
+                            npc.maxHp = (npc.maxHp || npc.hp) + surgeEvent.magnitude;
                         }
                     }
                     break;
                 case "hazard_spawn":
-                    if (state.currentRoom) {
-                        state.currentRoom.hazards.push("Surge Rift");
+                    if (state.currentArea) {
+                        state.currentArea.hazards.push("Anomalous Surge");
                     }
                     break;
                 case "oracle_lockout":
@@ -97,9 +102,9 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
                     break;
             }
             state.logs.push({
-                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: `${Date.now()} -${Math.random().toString(36).substr(2, 9)} `,
                 timestamp: Date.now(),
-                message: `⚡ SURGE EVENT: ${surgeEvent.name} — ${surgeEvent.description}`,
+                message: `⚡ SURGE EVENT: ${surgeEvent.name} — ${surgeEvent.description} `,
                 type: "system"
             });
         }
@@ -116,15 +121,15 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
 
         if (result.unexpectedRoll) {
             const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
-            if (effect.applyEnteringRed && state.currentRoom) {
-                state.currentRoom.enemies.push(generateRandomEnemy());
-                state.currentRoom.hazards.push("Threat Imminent");
+            if (effect.applyEnteringRed && state.currentArea) {
+                state.currentArea.npcs.push(generateRandomAgentNPC());
+                state.currentArea.hazards.push("Threat Imminent");
             }
-            if (effect.applyEnterStageLeft && state.currentRoom) {
-                if (!state.currentRoom.merchants) state.currentRoom.merchants = [];
-                state.currentRoom.merchants.push(generateRandomMerchant());
-                if (!state.currentRoom.allies) state.currentRoom.allies = [];
-                state.currentRoom.allies.push({ id: Date.now().toString(), name: "Fellow Ranger" });
+            if (effect.applyEnterStageLeft && state.currentArea) {
+                if (!state.currentArea.vendors) state.currentArea.vendors = [];
+                state.currentArea.vendors.push(generateRandomVendor());
+                if (!state.currentArea.allies) state.currentArea.allies = [];
+                state.currentArea.allies.push({ id: Date.now().toString(), name: "Fellow Ranger" });
             }
         }
 
@@ -145,25 +150,25 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
                     }
                     break;
                 case "enemy_empower":
-                    if (state.currentRoom) {
-                        for (const enemy of state.currentRoom.enemies) {
-                            enemy.hp += surgeEvent.magnitude;
-                            enemy.maxHp = (enemy.maxHp || enemy.hp) + surgeEvent.magnitude;
+                    if (state.currentArea) {
+                        for (const npc of state.currentArea.npcs) {
+                            npc.hp += surgeEvent.magnitude;
+                            npc.maxHp = (npc.maxHp || npc.hp) + surgeEvent.magnitude;
                         }
                     }
                     break;
                 case "hazard_spawn":
-                    if (state.currentRoom) {
-                        state.currentRoom.hazards.push("Surge Rift");
+                    if (state.currentArea) {
+                        state.currentArea.hazards.push("Anomalous Surge");
                     }
                     break;
                 case "oracle_lockout":
                     break;
             }
             state.logs.push({
-                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: `${Date.now()} -${Math.random().toString(36).substr(2, 9)} `,
                 timestamp: Date.now(),
-                message: `⚡ SURGE EVENT: ${surgeEvent.name} — ${surgeEvent.description}`,
+                message: `⚡ SURGE EVENT: ${surgeEvent.name} — ${surgeEvent.description} `,
                 type: "system"
             });
         }

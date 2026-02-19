@@ -6,11 +6,11 @@ import { setAutoplaySchedule, setAgentSchedule } from '@/features/core/ui/slice/
  * BotOrchestrator — Centralized AI management service.
  * 
  * Replaces simple setIntervals with a deterministic tick cycle
- * that can manage multiple agents (Player, NPCs, Servitors).
+ * that can manage multiple agents (Player, NPCs, Companions).
  */
 export interface BotRegistration {
     id: string;
-    type: 'player' | 'npc' | 'servitor';
+    type: 'player' | 'npc' | 'companion';
 }
 
 class BotOrchestrator {
@@ -45,9 +45,9 @@ class BotOrchestrator {
             this.orchestratePlayer(state);
         }
 
-        // 2. NPC / Servitor Orchestration
+        // 2. NPC / Companion Orchestration
         this.orchestrateNPCs(state);
-        this.orchestrateServitors(state);
+        this.orchestrateCompanions(state);
     }
 
     private orchestratePlayer(state: RootState) {
@@ -63,20 +63,20 @@ class BotOrchestrator {
     }
 
     private orchestrateNPCs(state: RootState) {
-        const enemies = state.game.currentRoom?.enemies || [];
-        for (const enemy of enemies) {
-            this.checkAndTickAgent(state, enemy.id, 'npc', enemy.name);
+        const npcs = state.game.currentArea?.npcs || [];
+        for (const npc of npcs) {
+            this.checkAndTickAgent(state, npc.id, 'npc', npc.name, npc.soulId);
         }
     }
 
-    private orchestrateServitors(state: RootState) {
-        const servitors = state.game.player?.servitors || [];
-        for (const servitor of servitors) {
-            this.checkAndTickAgent(state, servitor.id, 'servitor', servitor.name);
+    private orchestrateCompanions(state: RootState) {
+        const companions = state.game.player?.companions || [];
+        for (const companion of companions) {
+            this.checkAndTickAgent(state, companion.id, 'companion', companion.name, companion.soulId);
         }
     }
 
-    private checkAndTickAgent(state: RootState, agentId: string, type: 'npc' | 'servitor', persona?: string) {
+    private checkAndTickAgent(state: RootState, agentId: string, type: 'npc' | 'companion', persona?: string, soulId?: string) {
         const nextTickAt = state.ui.agentTickSchedule[agentId];
 
         // If no schedule exists, initialize it with a small random offset to stagger starts
@@ -91,7 +91,7 @@ class BotOrchestrator {
             this.dispatch!(setAgentSchedule({ agentId, nextTickAt: null }));
 
             // Step 2: Dispatch generic agent tick
-            this.dispatch!(runAgentTick({ agentId, type, persona }));
+            this.dispatch!(runAgentTick({ agentId, type, persona, soulId }));
         }
     }
 }

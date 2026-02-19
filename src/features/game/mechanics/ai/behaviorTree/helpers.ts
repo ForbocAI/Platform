@@ -2,27 +2,27 @@ import type { GameState } from '../../../slice/types';
 import type { AwarenessResult } from '../types';
 
 /**
- * Spell selection helper
+ * Capability selection helper
  */
-export function pickBestSpell(
+export function pickBestCapability(
     state: GameState,
     awareness: AwarenessResult,
 ): string | null {
     const player = state.player;
     if (!player) return null;
 
-    const spellIds = player.spells || [];
-    if (spellIds.length === 0) return null;
+    const capabilityIds = player.capabilities || [];
+    if (capabilityIds.length === 0) return null;
 
-    // Simple heuristic: prefer higher-damage spells when enemies are tough
+    // Simple heuristic: prefer higher-magnitude capabilities when NPCs are tough
     // This will be replaced by SDK reasoning later
     let best: { id: string; score: number } | null = null;
 
-    for (const id of spellIds) {
+    for (const id of capabilityIds) {
         let score = 5; // baseline
-        // Prefer spells when multiple enemies (AoE value)
-        if (awareness.enemyCount > 1) score += 3;
-        // Prefer spells when HP is high (aggressive stance)
+        // Prefer capabilities when multiple NPCs (AoE value)
+        if (awareness.npcCount > 1) score += 3;
+        // Prefer capabilities when HP is high (aggressive stance)
         if (awareness.hpRatio > 0.7) score += 2;
         // Add some variety
         score += Math.random() * 3;

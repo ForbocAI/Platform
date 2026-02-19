@@ -1,35 +1,35 @@
 "use client";
 
-import type { Player, Room } from "@/features/game/types";
+import type { AgentPlayer, Area } from "@/features/game/types";
 import { ActionButtons } from "./ActionButtons";
 import { DeckToggles } from "./DeckToggles";
 
 export function ActionDeck({
   player,
-  currentRoom,
+  currentArea,
   onMove,
   onMapClick,
   onScan,
   onEngage,
   onCommune,
   onOpenInventory,
-  onOpenSpells,
+  onOpenCapabilities,
   onOpenSkills,
-  onOpenServitor,
+  onOpenCompanion,
   autoPlay,
   onToggleAutoPlay,
 }: {
-  player: Player;
-  currentRoom: Room;
+  player: AgentPlayer;
+  currentArea: Area;
   onMove: (direction: string) => void;
   onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;
   onCommune: () => void;
   onOpenInventory?: () => void;
-  onOpenSpells?: () => void;
+  onOpenCapabilities?: () => void;
   onOpenSkills?: () => void;
-  onOpenServitor?: () => void;
+  onOpenCompanion?: () => void;
   autoPlay?: boolean;
   onToggleAutoPlay?: () => void;
 }) {
@@ -39,7 +39,7 @@ export function ActionDeck({
       style={{ WebkitOverflowScrolling: "touch" }}
     >
       <ActionButtons
-        currentRoom={currentRoom}
+        currentArea={currentArea}
         onMove={onMove}
         onMapClick={onMapClick}
         onScan={onScan}
@@ -50,10 +50,10 @@ export function ActionDeck({
       />
       <DeckToggles
         player={player}
-        onOpenSpells={onOpenSpells}
+        onOpenCapabilities={onOpenCapabilities}
         onOpenSkills={onOpenSkills}
         onOpenInventory={onOpenInventory}
-        onOpenServitor={onOpenServitor}
+        onOpenCompanion={onOpenCompanion}
       />
     </footer>
   );

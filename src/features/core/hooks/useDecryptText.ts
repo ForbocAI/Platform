@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { decryptText } from "@/lib/sneakers";
+import { decryptText } from "@/features/core/effects/sneakers";
 
 export type UseDecryptTextOptions = {
   text: string;

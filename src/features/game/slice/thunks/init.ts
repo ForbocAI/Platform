@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { initializePlayer } from '@/features/game/engine';
 import { getSkillsForLevels } from '@/features/game/mechanics';
 import { getKeenSensesScanExtra } from '@/features/game/skills';
-import { sdkService } from '@/lib/sdk/cortexService';
+import { sdkService } from '@/features/game/sdk/cortexService';
 import { startVignette } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../gameSlice';
 import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
@@ -14,40 +14,40 @@ export const initializeGame = createAsyncThunk(
     dispatch(addLog({ message: 'SYSTEM: Establishing Neural Link...', type: 'system' }));
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const player = initializePlayer(options?.classId);
-    player.skills = getSkillsForLevels(player.characterClass, player.level);
+    const player = initializePlayer(options?.classId) as any;
+    player.capabilities = getSkillsForLevels(player.agentClass, player.level);
     if (options?.lowHp) {
       player.hp = 5;
     }
-    if (options?.forceServitor) {
-      const servitorHp = options.lowServitorHp ? 1 : 100;
-      player.servitors = [{
-        id: "test_servitor_1",
-        name: "Doomguard Veteran",
+    if (options?.forceCompanion) {
+      const companionHp = options.lowCompanionHp ? 1 : 100;
+      player.companions = [{
+        id: "test_companion_1",
+        name: "Standard Unit",
         role: "Warrior",
-        hp: servitorHp,
-        maxHp: servitorHp,
-        description: "A seasoned warrior hired for testing."
+        hp: companionHp,
+        maxHp: companionHp,
+        description: "A seasoned unit recruited for testing."
       }];
     }
-    const initialRoom = await sdkService.generateStartRoom({
+    const initialArea = await sdkService.generateStartArea({
       deterministic: options?.deterministic,
-      forceMerchant: options?.forceMerchant,
-      forceEnemy: options?.forceEnemy === true || typeof options?.forceEnemy === 'string',
+      forceVendor: options?.forceVendor,
+      forceNPC: options?.forceNPC === true || typeof options?.forceNPC === 'string',
     });
 
     const theme = VIGNETTE_THEMES[Math.floor(Math.random() * VIGNETTE_THEMES.length)];
     dispatch(startVignette({ theme }));
 
-    // Auto-scan initial room
-    const enemies = (initialRoom.enemies || []).length > 0 ? initialRoom.enemies.map(e => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
-    const allies = initialRoom.allies ? initialRoom.allies.map(a => a.name).join(', ') : 'None';
-    const extra = player.skills?.includes('keen_senses') ? getKeenSensesScanExtra(initialRoom) : '';
-    const message = `[SCAN RESULT] ${initialRoom.title}: Enemies: ${enemies}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
+    // Auto-scan initial area
+    const npcs = (initialArea.npcs || []).length > 0 ? initialArea.npcs.map(e => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
+    const allies = initialArea.allies ? initialArea.allies.map(a => a.name).join(', ') : 'None';
+    const extra = player.capabilities?.includes('keen_senses') ? getKeenSensesScanExtra(initialArea as any) : '';
+    const message = `[SCAN RESULT] ${initialArea.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
 
     dispatch(addLog({ message: 'Scanning sector...', type: 'system' }));
     dispatch(addLog({ message, type: 'exploration' }));
 
-    return { player, initialRoom };
+    return { player, initialArea };
   }
 );

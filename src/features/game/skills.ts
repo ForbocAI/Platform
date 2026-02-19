@@ -1,4 +1,4 @@
-import type { Room } from "./types";
+import type { Area } from "./types";
 
 /** Bonus damage dealt to enemies when player has battle_fervor. */
 const BATTLE_FERVOR_BONUS = 2;
@@ -41,15 +41,15 @@ export function applyDamageTakenReduction(skills: string[], damage: number): num
 /**
  * Extra scan line when player has keen_senses. Reveals a hidden detail about the room.
  */
-export function getKeenSensesScanExtra(room: Room): string {
+export function getKeenSensesScanExtra(room: Area): string {
     const parts: string[] = [];
     if (room.hazards.length > 0) {
         parts.push(`Hazard intensity: heightened in this sector.`);
     }
-    if (room.enemies.length > 0) {
-        parts.push(`You sense the combat readiness of ${room.enemies.length} hostile(s).`);
+    if (room.npcs.length > 0) {
+        parts.push(`You sense the combat readiness of ${room.npcs.length} hostile(s).`);
     }
-    if (room.merchants && room.merchants.length > 0) {
+    if (room.vendors && room.vendors.length > 0) {
         parts.push(`Faint trade signatures detected.`);
     }
     if (room.allies && room.allies.length > 0) {

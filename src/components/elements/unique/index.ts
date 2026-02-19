@@ -1,6 +1,6 @@
 export { StageSelector } from "./narrative/StageSelector";
 export { PlayerHeader } from "./game/PlayerHeader/index";
-export { RoomViewport } from "./game/RoomViewport";
+export { AreaViewport } from "./game/AreaViewport";
 export { MapView } from "./game/MapView";
 export { NeuralLogPanel } from "./game/NeuralLogPanel";
 export { OracleForm } from "./narrative/OracleForm";
@@ -13,8 +13,8 @@ export { VignetteControls } from "./narrative/VignetteControls";
 export { VolumeControls } from "./shared/VolumeControls";
 export { TradePanel } from "./game/TradePanel";
 export { InventoryPanel } from "./game/InventoryPanel";
-export { SpellsPanel } from "./game/SpellsPanel";
+export { CapabilitiesPanel } from "./game/CapabilitiesPanel";
 export { SkillsPanel } from "./game/SkillsPanel";
-export { ServitorPanel } from "./game/ServitorPanel";
+export { CompanionPanel } from "./game/CompanionPanel";
 export { QuestsPanel } from "./game/QuestsPanel";
 export { CraftingPanel } from "./game/CraftingPanel";

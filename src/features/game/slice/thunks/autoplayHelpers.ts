@@ -1,11 +1,11 @@
 /**
  * Autoplay helpers — pure utilities for pick-best-purchase, pick-worst-sell,
- * pick-best-spell, and oracle prompt themes. Extracted from autoplay.ts for
+ * pick-best-capability, and oracle prompt themes. Extracted from autoplay.ts for
  * refactor-by-line-count; no public API change.
  */
 
-import { SPELLS } from '@/features/game/mechanics/spells';
-import type { Item, Enemy } from '@/features/game/types';
+import { CAPABILITIES } from '@/features/game/mechanics/capabilities';
+import type { Item, AgentNPC } from '@/features/game/types';
 
 export const HEALING_ITEM_NAMES = [
   'Healing', 'Potion', 'Mushroom', 'Salve', 'Puffball', 'Cap', 'Morel', 'Truffle', 'Lichen',
@@ -21,17 +21,17 @@ export const ORACLE_THEMES = [
   'Is the void shifting nearby?',
 ];
 
-/** Find best item to buy from a merchant. When preferContract is true (e.g. servitor prep), pick a contract if affordable. */
+/** Find best item to buy from a vendor. When preferContract is true (e.g. companion prep), pick a contract if affordable. */
 export function pickBestPurchase(
   wares: Item[],
-  spirit: number,
-  blood: number,
+  resourcePrimary: number,
+  resourceSecondary: number,
   playerInventory: Item[],
   preferContract = false,
 ): Item | null {
   const affordable = wares.filter(w => {
-    const cost = w.cost || { spirit: 0 };
-    return (spirit >= (cost.spirit || 0)) && (blood >= (cost.blood || 0));
+    const cost = w.cost || { primary: 0 };
+    return (resourcePrimary >= (cost.primary || 0)) && (resourceSecondary >= (cost.secondary || 0));
   });
   if (affordable.length === 0) return null;
 
@@ -81,24 +81,24 @@ export function pickWorstItem(inventory: Item[]): Item | null {
   )[0] ?? null;
 }
 
-/** Pick the best spell to cast based on situation (detailed heuristic) */
-export function pickBestSpell(spellIds: string[], enemies: Enemy[]): string | null {
-  if (!spellIds || spellIds.length === 0) return null;
+/** Pick the best capability to use based on situation (detailed heuristic) */
+export function pickBestCapability(capabilityIds: string[], npcs: AgentNPC[]): string | null {
+  if (!capabilityIds || capabilityIds.length === 0) return null;
 
   let best: { id: string; score: number } | null = null;
-  for (const id of spellIds) {
-    const spell = SPELLS[id];
-    if (!spell) continue;
+  for (const id of capabilityIds) {
+    const capability = CAPABILITIES[id];
+    if (!capability) continue;
 
     let score = 3;
-    if (spell.damage) {
-      const match = spell.damage.match(/(\d+)d(\d+)/);
+    if (capability.magnitude) {
+      const match = capability.magnitude.match(/(\d+)d(\d+)/);
       if (match) score = Number(match[1]) * (Number(match[2]) + 1) / 2;
     }
-    if (enemies.length > 0 && enemies[0].hp > 30) score *= 1.5;
-    const effectStr = typeof spell.effect === 'function' ? spell.effect({} as never, {} as never) : '';
+    if (npcs.length > 0 && npcs[0].hp > 30) score *= 1.5;
+    const effectStr = typeof capability.effect === 'function' ? capability.effect({} as never, {} as never) : '';
     if (effectStr.includes('DoT') || effectStr.includes('Debuff')) score += 2;
     if (!best || score > best.score) best = { id, score };
   }
-  return best?.id ?? spellIds[0];
+  return best?.id ?? capabilityIds[0];
 }

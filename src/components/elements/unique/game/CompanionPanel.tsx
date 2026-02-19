@@ -1,14 +1,14 @@
 import { Users, Sword, Shield, Eye } from "lucide-react";
-import type { Player } from "@/features/game/types";
+import type { AgentPlayer } from "@/features/game/types";
 import { Modal } from "@/components/elements/generic";
 
-interface ServitorPanelProps {
-  player: Player;
+interface CompanionPanelProps {
+  player: AgentPlayer;
   onClose: () => void;
 }
 
-export function ServitorPanel({ player, onClose }: ServitorPanelProps) {
-  const servitors = player.servitors || [];
+export function CompanionPanel({ player, onClose }: CompanionPanelProps) {
+  const companions = player.companions || [];
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -25,21 +25,21 @@ export function ServitorPanel({ player, onClose }: ServitorPanelProps) {
 
   return (
     <Modal
-      title="Servitors"
+      title="Companions"
       titleIcon={<Users className="w-5 h-5 text-palette-accent-lime" />}
       onClose={onClose}
       maxWidth="2xl"
-      data-testid="servitor-panel"
+      data-testid="companion-panel"
     >
       <div className="space-y-4">
-        {servitors.length === 0 ? (
+        {companions.length === 0 ? (
           <div className="text-center p-8 border border-dashed border-palette-border rounded text-palette-muted">
-            <p>You have no servitors.</p>
+            <p>You have no companions.</p>
             <p className="text-xs mt-2">Hire mercenaries from Captains in the tower.</p>
           </div>
         ) : (
           <div className="grid gap-3">
-            {servitors.map((comp) => (
+            {companions.map((comp) => (
               <div key={comp.id} className="p-3 border border-palette-border bg-palette-bg-mid/10 rounded flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

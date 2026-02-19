@@ -18,47 +18,46 @@ export interface StatusEffect {
     damageBonus?: number;
 }
 
-export type CharacterClass =
+export type AgentClass =
+    | "Ashwalker"
     | "Obsidian Warden"
     | "Doomguard"
-    | "Ashwalker" // Rogue/Ranger
     | "Iron Armored Guardian"
     | "Aether Spirit"
     | "Thunder Trooper"
-    | "Voidwraith"
     | "Cyberflux Guardian"
-    | "Byssalspawn"
-    | "Twilight Weaver"
+    | "Voidwraith"
     | "Storm Titan"
-    | "Aksov Hexe-Spinne"
     | "Flame Corps"
+    | "Byssalspawn"
+    | "Aksov Hexe-Spinne"
+    | "Twilight Weaver"
     | "Gravewalker"
     | "Shadowhorn Juggernaut"
     | "Magma Leviathan"
     | "Abyssal Overfiend"
     | "Aetherwing Herald";
 
-export interface Player extends Stats {
+export interface AgentPlayer extends Stats {
     id: string;
     name: string;
     level: number;
-    characterClass: CharacterClass;
+    agentClass: AgentClass;
     inventory: Item[];
-    spells: string[]; // IDs of learned spells
-    skills?: string[]; // IDs of unlocked skills (passive/active)
-    surgeCount: number; // For yes/no oracle
-    ac?: number;
-    equipment?: Partial<Record<EquipmentSlot, Item | null>>;
-    spirit?: number;
-    blood?: number;
+    capabilities: string[]; // IDs of learned capabilities
+    resourcePrimary: number;
+    resourceSecondary: number;
     xp: number;
     maxXp: number;
-    recipes: Recipe[];
-    servitors?: Servitor[];
+    blueprints: CraftingFormula[];
+    companions?: Companion[];
+    equipment?: Partial<Record<EquipmentSlot, Item>>;
+    surgeCount: number;
 }
 
-export interface Servitor {
+export interface Companion {
     id: string;
+    soulId?: string; // Neural signature record
     name: string;
     role: "Warrior" | "Scout" | "Mystic";
     hp: number;
@@ -66,21 +65,22 @@ export interface Servitor {
     description: string;
 }
 
-export interface Recipe {
+export interface CraftingFormula {
     id: string;
     ingredients: { name: string; quantity: number }[];
     produces: Item;
 }
 
-export interface Enemy extends Stats {
+export interface AgentNPC extends Stats {
     id: string;
+    soulId?: string; // Neural signature record
     name: string;
-    characterClass: CharacterClass;
+    agentClass: string; // Keep as string for variety in NPCs
     ac: number;
     description: string;
-    spells: string[];
-    lastAttackTime?: number; // Timestamp of last attack action
-    lastDamageTime?: number; // Timestamp of last damage taken
+    capabilities: string[];
+    lastActionTime?: number;
+    lastDamageTime?: number;
 }
 
 export type EquipmentSlot = "mainHand" | "armor" | "relic";
@@ -92,44 +92,22 @@ export interface Item {
     type: "weapon" | "armor" | "consumable" | "relic" | "resource" | "contract";
     bonus?: Partial<Stats> & { ac?: number };
     effect?: string;
-    cost?: { spirit: number; blood?: number };
+    cost?: { primary: number; secondary?: number };
     contractDetails?: {
-        servitorName: string;
+        targetName: string;
         role: "Warrior" | "Scout" | "Mystic";
         description: string;
         maxHp: number;
     };
 }
 
-export interface Merchant {
+export interface Vendor {
     id: string;
     name: string;
     description?: string;
-    specialty?: "Weaponsmith" | "Alchemist" | "Relic Hunter" | string;
+    specialty?: string;
     wares: Item[];
 }
-
-export interface Room {
-    id: string;
-    title: string;
-    description: string;
-    biome: Biome;
-    hazards: string[];
-    exits: Record<Direction, string | null>; // Maps direction to room ID
-    enemies: Enemy[];
-    allies?: { id: string; name: string }[];
-    merchants?: Merchant[];
-    /** Materials and items scattered on the ground; player can pick up. */
-    groundLoot?: Item[];
-    isBaseCamp?: boolean;
-    features?: RoomFeature[];
-    isMarketplace?: boolean;
-}
-
-export type RoomFeature =
-    | { type: "farming_plot"; crop?: "mushroom"; progress: number; ready: boolean }
-    | { type: "crafting_station"; kind: "alchemy" | "smithing" };
-
 export type Biome =
     | "Ethereal Marshlands"
     | "Toxic Wastes"
@@ -150,14 +128,56 @@ export type Biome =
     | "Dimensional Nexus"
     | "Cavernous Abyss"
     | "The Sterile Chamber";
+
+export interface Area {
+    id: string;
+    title: string;
+    description: string;
+    biome: Biome;
+    regionalType: string;
+    hazards: string[];
+    exits: Record<Direction, string | null>;
+    npcs: AgentNPC[];
+    allies?: { id: string; name: string }[];
+    vendors?: Vendor[];
+    groundLoot?: Item[];
+    isBaseCamp?: boolean;
+    features?: AreaFeature[];
+    isMarketplace?: boolean;
+}
+
+export type AreaFeature =
+    | { type: "resource_plot"; resourceId?: string; progress: number; ready: boolean }
+    | { type: "work_station"; kind: string };
+
+export type RegionalType =
+    | "Marshlands"
+    | "Toxic Wastes"
+    | "Chapel"
+    | "Spire"
+    | "Tower"
+    | "Installation"
+    | "Fortress"
+    | "Dungeon"
+    | "Metal Fungi"
+    | "Depths"
+    | "Static Sea"
+    | "Alchemy Haven"
+    | "Lore Abyss"
+    | "Shadowlands"
+    | "Temple"
+    | "Ruins"
+    | "Nexus"
+    | "Abyss"
+    | "Chamber";
 export type Direction = "North" | "South" | "East" | "West";
 
-export interface Spell {
+export interface Capability {
     id: string;
     name: string;
     description: string;
-    class: CharacterClass;
-    damage?: string; // e.g. "2d6"
+    agentClass: AgentClass;
+    magnitude?: string; // e.g. "2d6"
     effect: (attacker: Stats, defender: Stats) => string;
 }
 
@@ -170,7 +190,7 @@ export interface GameLogEntry {
 }
 
 /** Quest kinds from playtest scope: reconnaissance, rescue, hostiles, merchant. */
-export type QuestKind = "reconnaissance" | "rescue" | "hostiles" | "merchant";
+export type QuestKind = "reconnaissance" | "rescue" | "hostiles" | "vendor";
 
 export interface ActiveQuest {
     id: string;
@@ -186,12 +206,12 @@ export interface ActiveQuest {
 }
 
 export interface SessionScore {
-    roomsExplored: number;
-    roomsScanned: number;
-    enemiesDefeated: number;
-    merchantTrades: number;
+    areasExplored: number;
+    areasScanned: number;
+    npcsDefeated: number;
+    vendorTrades: number;
     questsCompleted: number;
-    spiritEarned: number;
+    resourcesEarned: number;
     startTime: number;
     endTime: number | null;
 }
@@ -260,7 +280,7 @@ export interface Thread {
 
 export interface SceneRecord {
     id: string;
-    locationRoomId: string;
+    locationAreaId: string;
     mainThreadId: string;
     stageOfScene: StageOfScene;
     participantIds: string[];

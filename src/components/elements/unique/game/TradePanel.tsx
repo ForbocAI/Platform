@@ -1,24 +1,24 @@
 "use client";
 
 import { ShoppingBag, Coins } from "lucide-react";
-import type { Player, Merchant, Item } from "@/features/game/types";
+import type { AgentPlayer, Vendor, Item } from "@/features/game/types";
 import { useAppDispatch } from "@/features/core/store";
 import { tradeBuy, tradeSell } from "@/features/game/slice/gameSlice";
 import { playButtonSound } from "@/features/audio";
 import { Modal, GameButton } from "@/components/elements/generic";
 
 interface TradePanelProps {
-  player: Player;
-  merchant: Merchant;
+  player: AgentPlayer;
+  vendor: Vendor;
   onClose: () => void;
 }
 
-export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
+export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
   const dispatch = useAppDispatch();
 
   const handleBuy = (item: Item) => {
     dispatch(playButtonSound());
-    dispatch(tradeBuy({ merchantId: merchant.id, itemId: item.id }));
+    dispatch(tradeBuy({ merchantId: vendor.id, itemId: item.id }));
   };
 
   const handleSell = (item: Item) => {
@@ -26,20 +26,20 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
     dispatch(tradeSell({ itemId: item.id }));
   };
 
-  const canAfford = (cost: { spirit?: number; blood?: number } = {}) => {
-    const spirit = cost.spirit ?? 0;
-    const blood = cost.blood ?? 0;
-    return (player.spirit ?? 0) >= spirit && (player.blood ?? 0) >= blood;
+  const canAfford = (cost: { primary?: number; secondary?: number } = {}) => {
+    const primary = cost.primary ?? 0;
+    const secondary = cost.secondary ?? 0;
+    return (player.resourcePrimary ?? 0) >= primary && (player.resourceSecondary ?? 0) >= secondary;
   };
 
   const getSellValue = (item: Item) => {
-    const spirit = item.cost?.spirit ?? 10;
-    return Math.floor(spirit / 2);
+    const primary = item.cost?.primary ?? 10;
+    return Math.floor(primary / 2);
   };
 
   return (
     <Modal
-      title={`${merchant.name} — Trade`}
+      title={`${vendor.name} — Trade`}
       titleIcon={<ShoppingBag className="w-5 h-5" />}
       onClose={onClose}
       maxWidth="4xl"
@@ -51,13 +51,13 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
             <ShoppingBag className="w-4 h-4" /> Wares
           </h3>
           <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-palette-border min-h-0">
-            {merchant.wares.map((item) => (
+            {vendor.wares.map((item) => (
               <div key={item.id} className="p-2 border border-palette-border/50 bg-palette-bg-mid/20 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>
                   <div className="text-right text-xs">
-                    <div className="text-palette-accent-mid">{item.cost?.spirit ?? 0} Spirit</div>
-                    {item.cost?.blood ? <div className="text-palette-accent-mid">{item.cost.blood} Blood</div> : null}
+                    <div className="text-palette-accent-mid">{item.cost?.primary ?? 0} Primary</div>
+                    {item.cost?.secondary ? <div className="text-palette-accent-mid">{item.cost.secondary} Secondary</div> : null}
                   </div>
                 </div>
                 <p className="text-xs text-palette-text-muted italic">{item.description}</p>
@@ -77,7 +77,7 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
                 </GameButton>
               </div>
             ))}
-            {merchant.wares.length === 0 && <p className="text-palette-text-muted italic">No wares available.</p>}
+            {vendor.wares.length === 0 && <p className="text-palette-text-muted italic">No wares available.</p>}
           </div>
         </div>
 
@@ -87,10 +87,10 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
           </h3>
           <div className="mb-2 text-sm flex gap-4">
             <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
-              <span>Spirit:</span> {player.spirit ?? 0}
+              <span>Primary:</span> {player.resourcePrimary ?? 0}
             </div>
             <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
-              <span>Blood:</span> {player.blood ?? 0}
+              <span>Secondary:</span> {player.resourceSecondary ?? 0}
             </div>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-palette-border min-h-0">
@@ -98,7 +98,7 @@ export function TradePanel({ player, merchant, onClose }: TradePanelProps) {
               <div key={item.id} className="p-2 border border-palette-border/50 bg-palette-bg-mid/20 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>
-                  <span className="text-xs text-palette-accent-mid">Sell: {getSellValue(item)} Spirit</span>
+                  <span className="text-xs text-palette-accent-mid">Sell: {getSellValue(item)} Primary</span>
                 </div>
                 <p className="text-xs text-palette-text-muted italic">{item.description}</p>
                 <GameButton

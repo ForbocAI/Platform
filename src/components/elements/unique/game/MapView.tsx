@@ -1,21 +1,21 @@
-import type { Room } from "@/features/game/types";
-import type { RoomCoordinates } from "@/features/game/slice/gameSlice";
+import type { Area } from "@/features/game/types";
+import type { AreaCoordinates } from "@/features/game/slice/gameSlice";
 import { Map as MapIcon } from "lucide-react";
 
 export interface ExploredMapViewProps {
-  /** All rooms visited this session; map grows through play. */
-  exploredRooms: Record<string, Room>;
-  /** Grid position per room (start at 0,0). */
-  roomCoordinates: Record<string, RoomCoordinates>;
-  /** Current room id to highlight "You are here". */
-  currentRoomId: string | null;
+  /** All areas visited this session; map grows through play. */
+  exploredAreas: Record<string, Area>;
+  /** Grid position per area (start at 0,0). */
+  areaCoordinates: Record<string, AreaCoordinates>;
+  /** Current area id to highlight "You are here". */
+  currentAreaId: string | null;
 }
 
 const CELL_W = 7;
 const CELL_H = 4;
 
-function getGridBounds(roomCoordinates: Record<string, RoomCoordinates>) {
-  const entries = Object.entries(roomCoordinates);
+function getGridBounds(areaCoordinates: Record<string, AreaCoordinates>) {
+  const entries = Object.entries(areaCoordinates);
   if (entries.length === 0) return { minX: 0, maxX: -1, minY: 0, maxY: -1 };
   const xs = entries.map(([, c]) => c.x);
   const ys = entries.map(([, c]) => c.y);
@@ -29,14 +29,14 @@ function getGridBounds(roomCoordinates: Record<string, RoomCoordinates>) {
 
 /** Map of all areas explored so far; grows as the player moves. */
 export function MapView({
-  exploredRooms,
-  roomCoordinates,
-  currentRoomId,
+  exploredAreas,
+  areaCoordinates,
+  currentAreaId,
 }: ExploredMapViewProps) {
-  const bounds = getGridBounds(roomCoordinates);
+  const bounds = getGridBounds(areaCoordinates);
   const width = bounds.maxX - bounds.minX + 1;
   const height = bounds.maxY - bounds.minY + 1;
-  const roomByCoord = Object.entries(roomCoordinates).reduce(
+  const areaByCoord = Object.entries(areaCoordinates).reduce(
     (acc, [id, c]) => {
       acc[`${c.x},${c.y}`] = id;
       return acc;
@@ -75,32 +75,31 @@ export function MapView({
               const dx = i % width;
               const x = bounds.minX + dx;
               const y = bounds.minY + dy;
-              const roomId = roomByCoord[`${x},${y}`];
-              const room = roomId ? exploredRooms[roomId] : null;
-              const isCurrent = roomId === currentRoomId;
+              const areaId = areaByCoord[`${x},${y}`];
+              const area = areaId ? exploredAreas[areaId] : null;
+              const isCurrent = areaId === currentAreaId;
               return (
                 <div
                   key={`${x},${y}`}
-                  className={`flex flex-col items-center justify-center p-1 sm:p-1.5 text-center min-w-0 ${
-                    room
-                      ? isCurrent
-                        ? "bg-palette-accent-mid/20 border-2 border-palette-accent-mid text-palette-accent-mid"
-                        : "bg-palette-bg-dark/80 text-palette-muted-light border border-palette-border"
-                      : "bg-palette-bg-dark/40 border border-palette-border/50"
-                  }`}
+                  className={`flex flex-col items-center justify-center p-1 sm:p-1.5 text-center min-w-0 ${area
+                    ? isCurrent
+                      ? "bg-palette-accent-mid/20 border-2 border-palette-accent-mid text-palette-accent-mid"
+                      : "bg-palette-bg-dark/80 text-palette-muted-light border border-palette-border"
+                    : "bg-palette-bg-dark/40 border border-palette-border/50"
+                    }`}
                 >
-                  {room ? (
+                  {area ? (
                     <>
                       {isCurrent && (
                         <span className="text-[0.6rem] uppercase text-palette-accent-mid font-bold mb-0.5">
                           You are here
                         </span>
                       )}
-                      <span className="font-bold uppercase leading-tight text-xs break-words line-clamp-2">
-                        {room.title}
+                      <span className="font-bold uppercase leading-tight text-xs wrap-break-word line-clamp-2">
+                        {area.title}
                       </span>
                       <span className="text-[0.65rem] text-palette-muted italic mt-0.5">
-                        {room.biome}
+                        {area.regionalType}
                       </span>
                     </>
                   ) : null}

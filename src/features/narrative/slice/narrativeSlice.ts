@@ -90,7 +90,7 @@ export const narrativeSlice = createSlice({
       const sceneId = action.payload.sceneId ?? nanoid();
       state.scenes.push({
         id: sceneId,
-        locationRoomId: action.payload.roomId,
+        locationAreaId: action.payload.roomId,
         mainThreadId: action.payload.mainThreadId,
         stageOfScene: action.payload.stageOfScene,
         participantIds: action.payload.participantIds ?? [],

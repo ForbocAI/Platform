@@ -6,25 +6,25 @@
  * once integrated (see system-todo.md §1.2, Priority Node 0).
  */
 
-import type { Player, Enemy, Room, Item, Servitor, ActiveQuest } from '../../types';
+import type { AgentPlayer, AgentNPC, Area, Item, Companion, ActiveQuest } from '../../types';
 
 // ── Capabilities ──
 
 /** Available capability modules that can be composed onto an agent */
 export type AgentCapability =
-    | 'awareness'     // Detect threats, merchants, loot
+    | 'awareness'     // Detect threats, vendors, loot
     | 'combat'        // Attack behavior
     | 'flee'          // Run from threats
-    | 'explore'       // Room navigation
-    | 'trade'         // Buy/sell with merchants
+    | 'explore'       // Area navigation
+    | 'trade'         // Buy/sell with vendors
     | 'craft'         // Base camp crafting/harvesting
     | 'heal'          // Use consumables
     | 'equip'         // Gear management
     | 'oracle'        // Commune / ask oracle
     | 'loot'          // Pick up ground items
-    | 'spell'         // Spell casting
+    | 'capability'    // Capability activation (combat/utility)
     | 'quest'         // Quest awareness and progression
-    | 'serve';        // Obey commands (servitor behavior)
+    | 'serve';        // Obey commands (companion behavior)
 
 // ── Traits ──
 
@@ -42,7 +42,7 @@ export interface AgentTraits {
 /** Complete agent configuration (static per agent type) */
 export interface AgentConfig {
     id: string;
-    type: 'player' | 'servitor' | 'npc';
+    type: 'player' | 'companion' | 'npc';
     capabilities: AgentCapability[];
     traits: AgentTraits;
 }
@@ -51,23 +51,23 @@ export interface AgentConfig {
 
 /** Result of scanning the environment for decisions */
 export interface AwarenessResult {
-    hasEnemies: boolean;
-    enemyCount: number;
-    primaryEnemy: Enemy | null;
-    hasMerchants: boolean;
+    hasNPCs: boolean;
+    npcCount: number;
+    primaryNPC: AgentNPC | null;
+    hasVendors: boolean;
     hasGroundLoot: boolean;
     hasReadyCrops: boolean;
     hasCraftableRecipes: boolean;
     isBaseCamp: boolean;
     availableExits: string[];     // Direction names
-    unvisitedExits: string[];     // Exits leading to unexplored rooms
-    safeExits: string[];           // Exits leading to safe rooms (no dangerous hazards when compromised)
+    unvisitedExits: string[];     // Exits leading to unexplored areas
+    safeExits: string[];           // Exits leading to safe areas (no dangerous hazards when compromised)
     baseCampExits: string[];       // Exits leading to base camp (prioritized when compromised)
-    recentlyScanned: boolean;     // Was current room scanned recently?
+    recentlyScanned: boolean;     // Was current area scanned recently?
     inCombat: boolean;            // Are we mid-fight? (looked at recent combat logs)
     recentDamage: number;         // Total damage taken from recent log entries
-    roomHazardCount: number;      // Number of active hazards in the room
-    isDangerousRoom: boolean;     // Room has damage-dealing hazards (Toxic Air, etc.)
+    areaHazardCount: number;      // Number of active hazards in the area
+    isDangerousArea: boolean;     // Area has damage-dealing hazards (Toxic Air, etc.)
     hpRatio: number;              // 0-1
     stressRatio: number;          // 0-1
     hasHealingItem: boolean;
@@ -76,13 +76,13 @@ export interface AwarenessResult {
     surgeCount: number;
     canAffordTrade: boolean;
     shouldSellExcess: boolean;
-    spiritBalance: number;
-    bloodBalance: number;
-    /** Player has at least one signed servitor (player.servitors?.length > 0) */
-    hasSignedServitor: boolean;
-    /** At least one merchant in the room sells a contract item */
-    merchantHasContract: boolean;
-    /** Can afford the cheapest contract in the room's merchant wares */
+    primaryResourceBalance: number;
+    secondaryResourceBalance: number;
+    /** Player has at least one signed companion (player.companions?.length > 0) */
+    hasSignedCompanion: boolean;
+    /** At least one vendor in the area sells a contract item */
+    vendorHasContract: boolean;
+    /** Can afford the cheapest contract in the area's vendor wares */
     canAffordContract: boolean;
     justRespawned: boolean;        // Player just respawned - needs preparation before exploring
     // Action history tracking (for cooldowns and loop prevention)
@@ -105,7 +105,7 @@ export type AgentActionType =
     | 'equip_weapon'
     | 'equip_armor'
     | 'flee'
-    | 'cast_spell'
+    | 'cast_capability'
     | 'engage'
     | 'loot'
     | 'sell'
@@ -118,7 +118,7 @@ export type AgentActionType =
 
 export interface AgentAction {
     type: AgentActionType;
-    /** Contextual payload (direction, item ID, spell ID, etc.) */
+    /** Contextual payload (direction, item ID, capability ID, etc.) */
     payload?: Record<string, unknown>;
     /** Why this action was chosen (for logging/debugging) */
     reason: string;

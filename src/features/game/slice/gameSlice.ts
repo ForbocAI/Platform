@@ -5,7 +5,7 @@ import type { GameState } from './types';
 import type { GameLogEntry } from '@/features/game/types';
 import type { RootState } from '@/features/core/store';
 
-export type { RoomCoordinates, InitializeGameOptions } from './types';
+export type { AreaCoordinates, InitializeGameOptions } from './types';
 
 export const gameSlice = createSlice({
   name: 'game',
@@ -20,11 +20,19 @@ export const gameSlice = createSlice({
         portraitUrl: action.payload.portraitUrl,
       });
     },
-    selectSpell: (state, action: PayloadAction<string | null>) => {
-      state.selectedSpellId = action.payload;
+    selectCapability: (state, action: PayloadAction<string | null>) => {
+      state.selectedCapabilityId = action.payload;
     },
     clearPendingQuestFacts: (state) => {
       state.pendingQuestFacts = [];
+    },
+    setAgentPondering: (state, action: PayloadAction<string>) => {
+      if (!state.ponderingAgentIds.includes(action.payload)) {
+        state.ponderingAgentIds.push(action.payload);
+      }
+    },
+    clearAgentPondering: (state, action: PayloadAction<string>) => {
+      state.ponderingAgentIds = state.ponderingAgentIds.filter(id => id !== action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -32,7 +40,7 @@ export const gameSlice = createSlice({
   },
 });
 
-export const { addLog, selectSpell, clearPendingQuestFacts } = gameSlice.actions;
+export const { addLog, selectCapability, clearPendingQuestFacts, setAgentPondering, clearAgentPondering } = gameSlice.actions;
 
 export {
   initializeGame,
@@ -40,7 +48,7 @@ export {
   queryOracle,
   movePlayer,
   scanSector,
-  castSpell,
+  castCapability,
   engageHostiles,
   respawnPlayer,
   tradeBuy,
@@ -62,18 +70,19 @@ export const selectPlayer = createSelector(
   [selectGameState],
   (game) => game.player
 );
-export const selectCurrentRoom = createSelector(
+export const selectCurrentArea = createSelector(
   [selectGameState],
-  (game) => game.currentRoom
+  (game) => game.currentArea
 );
-export const selectExploredRooms = createSelector(
+export const selectExploredAreas = createSelector(
   [selectGameState],
-  (game) => game.exploredRooms
+  (game) => game.exploredAreas
 );
-export const selectRoomCoordinates = createSelector(
+export const selectAreaCoordinates = createSelector(
   [selectGameState],
-  (game) => game.roomCoordinates
+  (game) => game.areaCoordinates
 );
+// Deprecated aliases removed.
 export const selectLogs = createSelector(
   [selectGameState],
   (game) => game.logs
@@ -86,9 +95,9 @@ export const selectIsLoading = createSelector(
   [selectGameState],
   (game) => game.isLoading
 );
-export const selectSelectedSpellId = createSelector(
+export const selectSelectedCapabilityId = createSelector(
   [selectGameState],
-  (game) => game.selectedSpellId
+  (game) => game.selectedCapabilityId
 );
 export const selectActiveQuests = createSelector(
   [selectGameState],
@@ -105,6 +114,10 @@ export const selectSessionComplete = createSelector(
 export const selectPendingQuestFacts = createSelector(
   [selectGameState],
   (game) => game.pendingQuestFacts
+);
+export const selectPonderingAgentIds = createSelector(
+  [selectGameState],
+  (game) => game.ponderingAgentIds
 );
 
 export default gameSlice.reducer;

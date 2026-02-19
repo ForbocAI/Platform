@@ -11,10 +11,10 @@
  *
  * Features exercised (for task.md / PLAYTEST_AUTOMATION): Init, Movement, SCAN, ENGAGE,
  * COMMUNE, Oracle, Facts (via commune/ask_oracle), Vignette (via handleVignetteProgression
- * on move/commune), Trading (buy/sell), Combat (engage, cast_spell), Hazards (flee/danger),
+ * on move/commune), Trading (buy/sell), Combat (engage, cast_capability), Hazards (flee/danger),
  * Crafting & Farming (harvest, craft), Quests (quest node + scan/move/engage/trade),
  * Concession/Death (respawn; auto-respawn when autoplay is on via core/listeners),
- * Servitors (combat slice uses them when present).
+ * Companions (combat slice uses them when present).
  *
  * SDK integration: When the ForbocAI SDK is integrated, a CortexDirective
  * will be injected into runBehaviorTree as its 4th argument. See system-todo.md §1.2.
@@ -23,7 +23,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { harvestCrop, craftItem } from './baseCamp';
 import { useItem, equipItem, pickUpGroundLoot } from './inventory';
-import { castSpell, engageHostiles, respawnPlayer } from './combat';
+import { castCapability, engageHostiles, respawnPlayer } from './combat';
 import { movePlayer, scanSector } from './exploration';
 import { tradeBuy, tradeSell } from './trade';
 import { askOracle, queryOracle } from './oracle';
@@ -32,31 +32,31 @@ import type { GameState } from '../types';
 import { computeAwareness } from '@/features/game/mechanics/ai/awareness';
 import { runBehaviorTree, AUTOPLAY_CONFIG } from '@/features/game/mechanics/ai/behaviorTree';
 import type { AgentAction, AgentActionType, CortexDirective } from '@/features/game/mechanics/ai/types';
-import { getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from '@/lib/sdk/config';
-import { sdkService } from '@/lib/sdk/cortexService';
-import { toObservation, toCortexDirective } from '@/lib/sdk/mappers';
-import { addLog } from '@/features/game/slice/gameSlice';
-import { getPortraitForAgent } from '@/lib/sdk/portraits';
+import { getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from '@/features/game/sdk/config';
+import { sdkService } from '@/features/game/sdk/cortexService';
+import { toObservation, toCortexDirective } from '@/features/game/sdk/mappers';
+import { addLog, setAgentPondering, clearAgentPondering } from '@/features/game/slice/gameSlice';
+import { getPortraitForAgent } from '@/features/game/sdk/portraits';
 import {
   pickBestPurchase,
   pickWorstItem,
-  pickBestSpell,
+  pickBestCapability,
   ORACLE_THEMES,
   HEALING_ITEM_NAMES,
 } from './autoplayHelpers';
 
 // Track last action for cooldown/loop prevention
 let lastActionType: AgentActionType | null = null;
-let lastRoomId: string | null = null;
+let lastAreaId: string | null = null;
 let stuckCounter = 0;
 
 /**
  * Check for "Abstract Stuck" state:
- * - Bot tries to move/explore but Room ID stays same.
+ * - Bot tries to move/explore but Area ID stays same.
  */
-function checkStuckState(currentRoomId: string, actionType: AgentActionType | null | undefined): boolean {
+function checkStuckState(currentAreaId: string, actionType: AgentActionType | null | undefined): boolean {
   if (actionType === ('move' as any) || actionType === ('explore' as any)) {
-    if (currentRoomId === lastRoomId) {
+    if (currentAreaId === lastAreaId) {
       stuckCounter++;
     } else {
       stuckCounter = 0;
@@ -66,7 +66,7 @@ function checkStuckState(currentRoomId: string, actionType: AgentActionType | nu
     // Or we just decay it.
     stuckCounter = Math.max(0, stuckCounter - 1);
   }
-  lastRoomId = currentRoomId;
+  lastAreaId = currentAreaId;
   return stuckCounter > 5;
 }
 
@@ -78,8 +78,8 @@ async function actuate(
   dispatch: any,
   getState: () => unknown,
 ): Promise<void> {
-  const { currentRoom: room, player } = state.game;
-  if (!room || !player) return;
+  const { currentArea: area, player } = state.game;
+  if (!area || !player) return;
 
   switch (action.type) {
     case 'respawn':
@@ -93,8 +93,8 @@ async function actuate(
     }
 
     case 'craft': {
-      const recipeId = action.payload?.recipeId as string;
-      if (recipeId) dispatch(craftItem({ recipeId }));
+      const blueprintId = action.payload?.recipeId as string;
+      if (blueprintId) dispatch(craftItem({ formulaId: blueprintId }));
       break;
     }
 
@@ -136,13 +136,13 @@ async function actuate(
       break;
     }
 
-    case 'cast_spell': {
-      let spellId = action.payload?.spellId as string;
-      // If behavior tree didn't pick a specific spell, use detailed heuristic
-      if (!spellId) {
-        spellId = pickBestSpell(player.spells || [], room.enemies || []) || '';
+    case 'cast_capability': {
+      let capabilityId = action.payload?.capabilityId as string;
+      // If behavior tree didn't pick a specific capability, use detailed heuristic
+      if (!capabilityId) {
+        capabilityId = pickBestCapability(player.capabilities || [], area.npcs || []) || '';
       }
-      if (spellId) await dispatch(castSpell({ spellId }));
+      if (capabilityId) await dispatch(castCapability({ capabilityId }));
       break;
     }
 
@@ -151,8 +151,8 @@ async function actuate(
       break;
 
     case 'loot':
-      if (room.groundLoot && room.groundLoot.length > 0) {
-        await dispatch(pickUpGroundLoot({ itemId: room.groundLoot[0].id }));
+      if (area.groundLoot && area.groundLoot.length > 0) {
+        await dispatch(pickUpGroundLoot({ itemId: area.groundLoot[0].id }));
       }
       break;
 
@@ -163,21 +163,21 @@ async function actuate(
     }
 
     case 'buy': {
-      const spirit = player.spirit ?? 0;
-      const blood = player.blood ?? 0;
-      const merchants = room.merchants || [];
-      // Prefer specialist merchants
-      const sorted = [...merchants].sort((a, b) => {
+      const resourcePrimary = player.resourcePrimary ?? 0;
+      const resourceSecondary = player.resourceSecondary ?? 0;
+      const vendors = area.vendors || [];
+      // Prefer specialist vendors
+      const sorted = [...vendors].sort((a, b) => {
         const aSpec = a.specialty ? 1 : 0;
         const bSpec = b.specialty ? 1 : 0;
         return bSpec - aSpec;
       });
-      const preferContract = action.reason?.includes('servitor contract') ?? false;
-      for (const merchant of sorted) {
-        if (spirit < 5) break;
-        const purchase = pickBestPurchase(merchant.wares, spirit, blood, player.inventory, preferContract);
+      const preferContract = action.reason?.includes('companion contract') ?? false;
+      for (const vendor of sorted) {
+        if (resourcePrimary < 5) break;
+        const purchase = pickBestPurchase(vendor.wares, resourcePrimary, resourceSecondary, player.inventory, preferContract);
         if (purchase) {
-          await dispatch(tradeBuy({ merchantId: merchant.id, itemId: purchase.id }));
+          await dispatch(tradeBuy({ merchantId: vendor.id, itemId: purchase.id }));
           return;
         }
       }
@@ -213,9 +213,9 @@ export const runAutoplayTick = createAsyncThunk(
   async (_, { getState, dispatch }): Promise<{ nextTickAt: number; nextDelayMs: number } | undefined> => {
     const rootState = getState() as { game: GameState; ui?: { autoplayDelayMs?: number } };
     const state = { game: rootState.game };
-    const { currentRoom: room, player } = state.game;
+    const { currentArea: area, player } = state.game;
 
-    if (!room || !player) return undefined;
+    if (!area || !player) return undefined;
 
     // 1. Perceive — gather awareness of the environment (with last action for cooldown tracking)
     const awareness = computeAwareness(state.game, lastActionType);
@@ -226,10 +226,12 @@ export const runAutoplayTick = createAsyncThunk(
       const agent = await sdkService.getAgent();
       const observation = toObservation(state.game);
 
+      dispatch(setAgentPondering('player-autoplay'));
       const response = await agent.process(observation.content, state.game as any);
+      dispatch(clearAgentPondering('player-autoplay'));
 
       if (response.dialogue) {
-        const portraitUrl = getPortraitForAgent('player', "Qua'dar Adventurer");
+        const portraitUrl = getPortraitForAgent('player', "Agent Explorer");
         dispatch(addLog({ message: response.dialogue, type: 'dialogue', portraitUrl }));
       }
 
@@ -238,16 +240,17 @@ export const runAutoplayTick = createAsyncThunk(
       }
     } catch (e) {
       console.warn('SDK Decision failed, falling back to pure Behavior Tree:', e);
+      dispatch(clearAgentPondering('player-autoplay'));
     }
 
     // 3. Decide — run the shared behavior tree with SDK directive as Node 0
     let action = runBehaviorTree(AUTOPLAY_CONFIG, state.game, awareness, cortexDirective);
 
     // 3.5 Stuck Recovery Override
-    const isStuck = checkStuckState(room.id, lastActionType); // Check result of PREVIOUS action
+    const isStuck = checkStuckState(area.id, lastActionType); // Check result of PREVIOUS action
     if (isStuck) {
       // Force a random move to a random exit to unstick
-      const exits = (Object.keys(room.exits) as import('@/features/game/types').Direction[]).filter(k => room.exits[k as import('@/features/game/types').Direction]);
+      const exits = (Object.keys(area.exits) as import('@/features/game/types').Direction[]).filter(k => area.exits[k as import('@/features/game/types').Direction]);
       if (exits.length > 0) {
         const randomExit = exits[Math.floor(Math.random() * exits.length)];
         action = {

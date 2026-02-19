@@ -1,8 +1,8 @@
-import type { Room, Biome, Enemy, Merchant } from "../types";
-import { selectNextBiome, generateGroundLoot, generateRandomEnemy, ENEMY_TEMPLATES, type RoomGenContext } from "../generation";
-import { generateRandomMerchant, generateMarketplace, generateWares } from "./merchant";
+import type { Area, Biome, AgentNPC, Vendor } from "../types";
+import { selectNextBiome, generateGroundLoot, generateRandomAgentNPC, NPC_TEMPLATES, type AreaGenContext } from "../generation";
+import { generateRandomVendor, generateMarketplace, generateWares } from "./vendor";
 
-// --- Immutable room-name data tables ---
+// --- Immutable area-name data tables ---
 
 const BIOME_NAME_PARTS: Readonly<Record<Biome, readonly string[]>> = {
     "Ethereal Marshlands": ["Ghost", "Mist", "Dread", "Swamp", "Veil"],
@@ -48,7 +48,7 @@ const BIOME_DESCRIPTIONS: Readonly<Record<Biome, string>> = {
     "The Sterile Chamber": "An operating table inscribed with ancient sigils pulsates in eerie half-light. Incisions pierce the veil between worlds; specters emerge from fissures. Entities ageless and vast scrutinize from beyond.",
 } as const;
 
-/** Biomes with elevated danger — higher enemy/hazard spawn rates. */
+/** Biomes with elevated danger — higher NPC/hazard spawn rates. */
 const DEEP_BIOMES: readonly Biome[] = [
     "Chthonic Depths", "Cavernous Abyss", "Abyss of Infernal Lore",
     "Dimensional Nexus", "Static Sea of All Noise", "Twilight Alchemy Haven",
@@ -56,42 +56,62 @@ const DEEP_BIOMES: readonly Biome[] = [
     "Labyrinthine Dungeon", "Eldritch Fortress"
 ] as const;
 
-// --- Pure helpers ---
+const BIOME_TO_REGIONAL: Record<Biome, string> = {
+    "Ethereal Marshlands": "Marshlands",
+    "Toxic Wastes": "Toxic Wastes",
+    "Haunted Chapel": "Chapel",
+    "Obsidian Spire": "Spire",
+    "Quadar Tower": "Tower",
+    "Military Installation": "Installation",
+    "Eldritch Fortress": "Fortress",
+    "Labyrinthine Dungeon": "Dungeon",
+    "Chromatic-Steel Fungi": "Metal Fungi",
+    "Chthonic Depths": "Depths",
+    "Static Sea of All Noise": "Static Sea",
+    "Twilight Alchemy Haven": "Alchemy Haven",
+    "Abyss of Infernal Lore": "Lore Abyss",
+    "Precipice of the Shadowlands": "Shadowlands",
+    "Rune Temples": "Temple",
+    "Crumbling Ruins": "Ruins",
+    "Dimensional Nexus": "Nexus",
+    "Cavernous Abyss": "Abyss",
+    "The Sterile Chamber": "Chamber",
+};
 
 const pickFrom = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
 const dangerFactorFor = (biome: Biome): number => DEEP_BIOMES.includes(biome) ? 1.25 : 1;
 
 const generateExits = () => ({
-    North: Math.random() > 0.3 ? "new-room" as const : null,
-    South: Math.random() > 0.3 ? "new-room" as const : null,
-    East: Math.random() > 0.3 ? "new-room" as const : null,
-    West: Math.random() > 0.3 ? "new-room" as const : null,
+    North: Math.random() > 0.3 ? "new-area" as const : null,
+    South: Math.random() > 0.3 ? "new-area" as const : null,
+    East: Math.random() > 0.3 ? "new-area" as const : null,
+    West: Math.random() > 0.3 ? "new-area" as const : null,
 });
 
-const generateEnemies = (dangerFactor: number): Enemy[] => {
+const generateNPCs = (dangerFactor: number): AgentNPC[] => {
     const threshold = 70 / dangerFactor;
-    return Math.random() * 100 > threshold ? [generateRandomEnemy()] : [];
+    return Math.random() * 100 > threshold ? [generateRandomAgentNPC()] : [];
 };
 
-const generateMerchants = (p1: string, biome: Biome): { merchants: Merchant[]; isMarketplace: boolean } => {
+const generateVendors = (p1: string, biome: Biome): { vendors: Vendor[]; isMarketplace: boolean } => {
     if (p1.includes("Market") && Math.random() < 0.90) {
-        return { merchants: generateMarketplace(biome), isMarketplace: true };
+        return { vendors: generateMarketplace(biome), isMarketplace: true };
     }
-    const merchantChance = (p1.includes("Store") || p1.includes("Shop")) ? 0.60 : 0.15;
-    return Math.random() < merchantChance
-        ? { merchants: [generateRandomMerchant(biome)], isMarketplace: false }
-        : { merchants: [], isMarketplace: false };
+    const vendorChance = (p1.includes("Store") || p1.includes("Shop")) ? 0.60 : 0.15;
+    return Math.random() < vendorChance
+        ? { vendors: [generateRandomVendor(biome)], isMarketplace: false }
+        : { vendors: [], isMarketplace: false };
 };
 
 // --- Public API ---
 
-export const generateRoom = (id?: string, biomeOverride?: Biome, context?: RoomGenContext | null): Room => {
+export const generateArea = (id?: string, biomeOverride?: Biome, context?: AreaGenContext | null): Area => {
     const biome = biomeOverride ?? selectNextBiome(context);
     const parts = BIOME_NAME_PARTS[biome];
     const p1 = pickFrom(parts);
     const p2 = pickFrom(parts);
     const dangerFactor = dangerFactorFor(biome);
-    const { merchants, isMarketplace } = generateMerchants(p1, biome);
+    const { vendors, isMarketplace } = generateVendors(p1, biome);
     const hazardThreshold = 20 * dangerFactor;
 
     return {
@@ -99,111 +119,113 @@ export const generateRoom = (id?: string, biomeOverride?: Biome, context?: RoomG
         title: `${p1} ${p2}`,
         description: BIOME_DESCRIPTIONS[biome] || "You stand in a strange, uncharted area.",
         biome,
-        hazards: Math.random() * 100 < hazardThreshold ? ["Toxic Air"] : [],
+        regionalType: BIOME_TO_REGIONAL[biome] || "Area",
+        hazards: Math.random() * 100 < hazardThreshold ? ["Anomalous Flux"] : [],
         exits: generateExits(),
-        enemies: generateEnemies(dangerFactor),
-        merchants,
+        npcs: generateNPCs(dangerFactor),
+        vendors,
         groundLoot: generateGroundLoot(biome),
         isMarketplace,
     };
 };
 
-export interface GenerateRoomOptions {
-    forceMerchant?: boolean;
+export interface GenerateAreaOptions {
+    forceVendor?: boolean;
     /** Context for story-coherent biome progression. */
-    context?: RoomGenContext | null;
+    context?: AreaGenContext | null;
 }
 
-export const generateRoomWithOptions = (id?: string, biomeOverride?: Biome, options?: GenerateRoomOptions): Room => {
-    const room = generateRoom(id, biomeOverride, options?.context);
-    if (options?.forceMerchant && (!room.merchants || room.merchants.length === 0)) {
-        const merchantTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic", "Mercenary Captain"] as const;
-        const type = pickFrom(merchantTypes);
+export const generateAreaWithOptions = (id?: string, biomeOverride?: Biome, options?: GenerateAreaOptions): Area => {
+    const area = generateArea(id, biomeOverride, options?.context);
+    if (options?.forceVendor && (!area.vendors || area.vendors.length === 0)) {
+        const vendorTypes = ["Scavenger", "Nomad", "Tech-Trader", "Mystic", "Mercenary Captain"] as const;
+        const type = pickFrom(vendorTypes);
         return {
-            ...room,
-            merchants: [{
+            ...area,
+            vendors: [{
                 id: Math.random().toString(36).substring(7),
                 name: `${type} ${Math.floor(Math.random() * 100)}`,
-                description: "A wandering soul with goods to trade.",
-                wares: generateWares(room.biome, type)
+                description: "A wandering soul with items to trade.",
+                wares: generateWares(area.biome, type)
             }]
         };
     }
-    return room;
+    return area;
 };
 
-export interface GenerateStartRoomOptions {
+export interface GenerateStartAreaOptions {
     id?: string;
     biome?: Biome;
     deterministic?: boolean;
-    forceMerchant?: boolean;
-    forceEnemy?: boolean;
+    forceVendor?: boolean;
+    forceNPC?: boolean | string;
 }
 
 const BASE_CAMP_FEATURES = [
-    { type: "farming_plot" as const, crop: "mushroom", progress: 0, ready: false },
-    { type: "crafting_station" as const, kind: "smithing" },
-    { type: "crafting_station" as const, kind: "alchemy" }
+    { type: "resource_plot" as const, progress: 0, ready: false },
+    { type: "work_station" as const, kind: "maintenance" },
+    { type: "work_station" as const, kind: "fabrication" }
 ] as const;
 
-const createBaseCampRoom = (id: string, biome: Biome): Room => ({
+const createBaseCampArea = (id: string, biome: Biome): Area => ({
     id,
-    title: "Recon Base Camp // STORE ROOM",
-    description: "A secure perimeter established within the ruins. A small hydroponic plot glows with UV light, and a makeshift workbench sits ready.",
+    title: "Secure Operations Base",
+    description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
     biome,
+    regionalType: "Operations Base",
     hazards: [],
-    exits: { North: "new-room", South: "new-room", East: "new-room", West: "new-room" },
-    enemies: [],
-    merchants: [],
+    exits: { North: "new-area", South: "new-area", East: "new-area", West: "new-area" },
+    npcs: [],
+    vendors: [],
     isBaseCamp: true,
     features: [...BASE_CAMP_FEATURES],
 });
 
-const applyForcedEnemy = (room: Room, forceEnemy: boolean | string): Room => {
-    if (!forceEnemy) return room;
-    const enemies = typeof forceEnemy === 'string' && ENEMY_TEMPLATES[forceEnemy]
+const applyForcedNPC = (area: Area, forceNPC: boolean | string): Area => {
+    if (!forceNPC) return area;
+    const npcs = typeof forceNPC === 'string' && NPC_TEMPLATES[forceNPC]
         ? [{
             id: Math.random().toString(36).substring(7),
-            name: forceEnemy,
-            ...ENEMY_TEMPLATES[forceEnemy],
-            hp: ENEMY_TEMPLATES[forceEnemy].maxHp || 10,
+            name: forceNPC,
+            ...NPC_TEMPLATES[forceNPC],
+            hp: NPC_TEMPLATES[forceNPC].maxHp || 10,
             maxStress: 100,
             stress: 0,
             activeEffects: []
-        } as Enemy]
-        : [generateRandomEnemy()];
-    return { ...room, enemies, isBaseCamp: false };
+        } as AgentNPC]
+        : [generateRandomAgentNPC()];
+    return { ...area, npcs, isBaseCamp: false };
 };
 
-export const generateStartRoom = (opts?: GenerateStartRoomOptions): Room => {
-    const roomId = opts?.id ?? "start_room";
+export const generateStartArea = (opts?: GenerateStartAreaOptions): Area => {
+    const areaId = opts?.id ?? "start_area";
     const biome = opts?.biome ?? "Quadar Tower";
 
     if (opts?.deterministic) {
-        const base = createBaseCampRoom(roomId, biome);
-        const withMerchant = opts.forceMerchant
-            ? { ...base, merchants: [generateRandomMerchant(biome, "Mercenary Captain")] }
+        const base = createBaseCampArea(areaId, biome);
+        const withVendor = opts.forceVendor
+            ? { ...base, vendors: [generateRandomVendor(biome, "Mercenary Captain")] }
             : base;
-        return opts.forceEnemy ? applyForcedEnemy(withMerchant, opts.forceEnemy) : withMerchant;
+        return opts.forceNPC ? applyForcedNPC(withVendor, opts.forceNPC) : withVendor;
     }
 
-    const room = generateRoomWithOptions(roomId, biome, { forceMerchant: opts?.forceMerchant });
+    const area = generateAreaWithOptions(areaId, biome, { forceVendor: opts?.forceVendor });
 
-    if (!opts?.forceEnemy) {
+    if (!opts?.forceNPC) {
         return {
-            ...room,
-            title: "Recon Base Camp",
-            description: "A secure perimeter established within the ruins. A small hydroponic plot glows with UV light, and a makeshift workbench sits ready.",
-            enemies: [],
+            ...area,
+            title: "Secure Operations Base",
+            description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
+            npcs: [],
             isBaseCamp: true,
             features: [...BASE_CAMP_FEATURES],
         };
     }
 
     return {
-        ...room,
-        title: "Recon Base Camp",
-        description: "A secure perimeter established within the ruins. A small hydroponic plot glows with UV light, and a makeshift workbench sits ready.",
-        enemies: room.enemies.length > 0 ? room.enemies : [generateRandomEnemy()],
+        ...area,
+        title: "Initial Ingress Point",
+        description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
+        npcs: area.npcs.length > 0 ? area.npcs : [generateRandomAgentNPC()],
     };
 };

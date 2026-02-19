@@ -7,7 +7,6 @@
 
 import type { GameState } from '../../slice/types';
 import type { AwarenessResult, AgentActionType } from './types';
-import type { ActiveQuest } from '../../types';
 
 const DIRECTIONS = ['North', 'South', 'East', 'West'] as const;
 const DANGEROUS_HAZARDS = ['Toxic Air', 'Radioactive Decay', 'Void Instability', 'Extreme Cold', 'Scorching Heat'];
@@ -20,14 +19,14 @@ const DANGEROUS_HAZARDS = ['Toxic Air', 'Radioactive Decay', 'Void Instability',
  * @param lastAction - Last action taken (for cooldown tracking)
  */
 export function computeAwareness(state: GameState, lastAction: AgentActionType | null = null): AwarenessResult {
-    const { currentRoom: room, player, logs, exploredRooms, activeQuests } = state;
+    const { currentArea: area, player, logs, exploredAreas, activeQuests } = state;
 
-    if (!room || !player) {
+    if (!area || !player) {
         return {
-            hasEnemies: false,
-            enemyCount: 0,
-            primaryEnemy: null,
-            hasMerchants: false,
+            hasNPCs: false,
+            npcCount: 0,
+            primaryNPC: null,
+            hasVendors: false,
             hasGroundLoot: false,
             hasReadyCrops: false,
             hasCraftableRecipes: false,
@@ -39,8 +38,8 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
             recentlyScanned: false,
             inCombat: false,
             recentDamage: 0,
-            roomHazardCount: 0,
-            isDangerousRoom: false,
+            areaHazardCount: 0,
+            isDangerousArea: false,
             hpRatio: 0,
             stressRatio: 0,
             hasHealingItem: false,
@@ -49,10 +48,10 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
             surgeCount: 0,
             canAffordTrade: false,
             shouldSellExcess: false,
-            spiritBalance: 0,
-            bloodBalance: 0,
-            hasSignedServitor: false,
-            merchantHasContract: false,
+            primaryResourceBalance: 0,
+            secondaryResourceBalance: 0,
+            hasSignedCompanion: false,
+            vendorHasContract: false,
             canAffordContract: false,
             justRespawned: false,
             lastActionType: null,
@@ -63,12 +62,12 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
     }
 
     // ── Threats ──
-    const enemies = room.enemies || [];
-    const primaryEnemy = enemies.length > 0 ? enemies[0] : null;
+    const npcs = area.npcs || [];
+    const primaryNPC = npcs.length > 0 ? npcs[0] : null;
 
     // ── Resources ──
-    const spirit = player.spirit ?? 0;
-    const blood = player.blood ?? 0;
+    const resourcePrimary = player.resourcePrimary ?? 0;
+    const resourceSecondary = player.resourceSecondary ?? 0;
     const inventory = player.inventory || [];
 
     // ── Health ──
@@ -91,56 +90,56 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
         (!player.equipment?.armor && inventory.some(i => i.type === 'armor'));
 
     // ── Base Camp ──
-    const isBaseCamp = !!room.isBaseCamp;
-    const hasReadyCrops = isBaseCamp && (room.features || []).some(
-        f => f.type === 'farming_plot' && f.ready
+    const isBaseCamp = !!area.isBaseCamp;
+    const hasReadyCrops = isBaseCamp && (area.features || []).some(
+        f => f.type === 'resource_plot' && f.ready
     );
-    const hasCraftableRecipes = (player.recipes || []).some(recipe =>
+    const hasCraftableRecipes = (player.blueprints || []).some(recipe =>
         recipe.ingredients.every(
             ing => inventory.filter(i => i.name === ing.name).length >= ing.quantity
         )
     );
 
     // ── Navigation ──
-    const availableExits = DIRECTIONS.filter(d => room.exits[d]).map(String);
-    const exploredRoomIds = Object.keys(exploredRooms || {});
+    const availableExits = DIRECTIONS.filter(d => area.exits[d]).map(String);
+    const exploredAreaIds = Object.keys(exploredAreas || {});
     const unvisitedExits = DIRECTIONS
-        .filter(d => room.exits[d] === 'new-room' || (room.exits[d] && !exploredRoomIds.includes(room.exits[d]!)))
+        .filter(d => area.exits[d] === 'new-area' || (area.exits[d] && !exploredAreaIds.includes(area.exits[d]!)))
         .map(String);
 
-    // ── Proactive Pathfinding: Evaluate adjacent rooms for safety ──
-    // When compromised (low HP), avoid entering rooms with dangerous hazards
+    // ── Proactive Pathfinding: Evaluate adjacent areas for safety ──
+    // When compromised (low HP), avoid entering areas with dangerous hazards
     const isCompromised = hpRatio < 0.5; // Consider compromised when HP is below 50%
     const safeExits: string[] = [];
     const baseCampExits: string[] = []; // Exits leading to base camp (safest option when compromised)
-    
-    if (isCompromised && exploredRooms) {
-        // Check each exit to see if the destination room is safe
+
+    if (isCompromised && exploredAreas) {
+        // Check each exit to see if the destination area is safe
         for (const direction of DIRECTIONS) {
-            const exitRoomId = room.exits[direction];
-            if (!exitRoomId) continue; // No exit in this direction
-            
-            // When compromised, NEVER enter unexplored rooms - we can't know if they're safe
-            if (!exploredRoomIds.includes(exitRoomId)) continue;
-            
-            const adjacentRoom = exploredRooms[exitRoomId];
-            if (!adjacentRoom) continue;
-            
+            const exitAreaId = area.exits[direction];
+            if (!exitAreaId) continue; // No exit in this direction
+
+            // When compromised, NEVER enter unexplored areas - we can't know if they're safe
+            if (!exploredAreaIds.includes(exitAreaId)) continue;
+
+            const adjacentArea = exploredAreas[exitAreaId];
+            if (!adjacentArea) continue;
+
             // Base camp is always safe - prioritize it when compromised
-            if (adjacentRoom.isBaseCamp) {
+            if (adjacentArea.isBaseCamp) {
                 baseCampExits.push(String(direction));
                 safeExits.push(String(direction)); // Also add to safe exits
                 continue;
             }
-            
-            // Check if the adjacent room has dangerous hazards
-            const hasDangerousHazards = (adjacentRoom.hazards || []).some(h => DANGEROUS_HAZARDS.includes(h));
-            
-            // Also check if the room has enemies (additional danger)
-            const hasEnemies = (adjacentRoom.enemies || []).length > 0;
-            
-            // Consider safe if no dangerous hazards and no enemies
-            if (!hasDangerousHazards && !hasEnemies) {
+
+            // Check if the adjacent area has dangerous hazards
+            const hasDangerousHazards = (adjacentArea.hazards || []).some(h => DANGEROUS_HAZARDS.includes(h));
+
+            // Also check if the area has NPCs (additional danger)
+            const hasNPCs = (adjacentArea.npcs || []).length > 0;
+
+            // Consider safe if no dangerous hazards and no NPCs
+            if (!hasDangerousHazards && !hasNPCs) {
                 safeExits.push(String(direction));
             }
         }
@@ -152,7 +151,7 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
     // ── Scan status ──
     const recentLogs = (logs || []).slice(-5);
     const recentlyScanned = recentLogs.some(
-        l => l.message.includes('[SCAN RESULT]') && l.message.includes(room.title)
+        l => l.message.includes('[SCAN RESULT]') && l.message.includes(area.title)
     );
 
     // ── Respawn detection ──
@@ -161,7 +160,7 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
     const justRespawned = veryRecentLogs.some(
         l => l.message.includes('Resurrecting') || l.message.includes('void releases you')
     ) || (player as any).justRespawned === true;
-    
+
     // Clear the flag after detection (one-time check)
     if ((player as any).justRespawned === true) {
         (player as any).justRespawned = false;
@@ -169,8 +168,8 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
 
     // ── Combat detection ──
     const combatLogs = (logs || []).slice(-8);
-    const combatKeywords = ['swing at', 'strikes you', 'cast ', 'attacks', 'hits you for', 'damage', 'has fallen'];
-    const inCombat = enemies.length > 0 && combatLogs.some(
+    const combatKeywords = ['swing at', 'strikes you', 'activate ', 'attacks', 'hits you for', 'damage', 'neutralized'];
+    const inCombat = npcs.length > 0 && combatLogs.some(
         l => combatKeywords.some(k => l.message.toLowerCase().includes(k))
     );
     let recentDamage = 0;
@@ -182,26 +181,26 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
     }
 
     // ── Hazard detection ──
-    const hazards = room.hazards || [];
-    const roomHazardCount = hazards.length;
-    const isDangerousRoom = hazards.some(h => DANGEROUS_HAZARDS.includes(h));
+    const hazards = area.hazards || [];
+    const areaHazardCount = hazards.length;
+    const isDangerousArea = hazards.some(h => DANGEROUS_HAZARDS.includes(h));
 
     // ── Trade ──
-    const hasMerchants = !!(room.merchants && room.merchants.length > 0);
-    const canAffordTrade = hasMerchants && spirit >= 4;
-    const shouldSellExcess = inventory.length > 6 || (spirit < 15 && inventory.length > 2);
+    const hasVendors = !!(area.vendors && area.vendors.length > 0);
+    const canAffordTrade = hasVendors && resourcePrimary >= 4;
+    const shouldSellExcess = inventory.length > 6 || (resourcePrimary < 15 && inventory.length > 2);
 
-    // ── Servitors: contract availability and affordability ──
-    const hasSignedServitor = !!(player.servitors && player.servitors.length > 0);
-    let merchantHasContract = false;
+    // ── Companions: contract availability and affordability ──
+    const hasSignedCompanion = !!(player.companions && player.companions.length > 0);
+    let vendorHasContract = false;
     let canAffordContract = false;
-    if (hasMerchants && room.merchants) {
-        for (const m of room.merchants) {
-            const contractWares = (m.wares || []).filter((w: { type?: string }) => w.type === 'contract');
-            if (contractWares.length > 0) merchantHasContract = true;
+    if (hasVendors && area.vendors) {
+        for (const v of area.vendors) {
+            const contractWares = (v.wares || []).filter((w: { type?: string }) => w.type === 'contract');
+            if (contractWares.length > 0) vendorHasContract = true;
             for (const w of contractWares) {
-                const cost = (w as { cost?: { spirit?: number; blood?: number } }).cost || {};
-                if (spirit >= (cost.spirit ?? 0) && blood >= (cost.blood ?? 0)) {
+                const cost = (w as { cost?: { primary?: number; secondary?: number } }).cost || {};
+                if (resourcePrimary >= (cost.primary ?? 0) && resourceSecondary >= (cost.secondary ?? 0)) {
                     canAffordContract = true;
                     break;
                 }
@@ -214,27 +213,27 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
     // Extract action history from recent logs (last 10 actions)
     const actionHistory: Array<{ type: AgentActionType; timestamp: number }> = [];
     const recentActionLogs = (logs || []).slice(-20); // Check last 20 logs for actions
-    
+
     for (const log of recentActionLogs) {
         const msg = log.message.toLowerCase();
         let actionType: AgentActionType | null = null;
-        
+
         if (msg.includes('moved') || msg.includes('moving')) actionType = 'move';
         else if (msg.includes('scanning') || msg.includes('[scan result]')) actionType = 'scan';
         else if (msg.includes('purchased') || msg.includes('bought')) actionType = 'buy';
         else if (msg.includes('sold')) actionType = 'sell';
-        else if (msg.includes('cast') || msg.includes('casting')) actionType = 'cast_spell';
+        else if (msg.includes('activate') || msg.includes('activating')) actionType = 'cast_capability';
         else if (msg.includes('engaged') || msg.includes('engaging')) actionType = 'engage';
         else if (msg.includes('picked up') || msg.includes('loot')) actionType = 'loot';
         else if (msg.includes('heal') || msg.includes('healing')) actionType = 'heal';
         else if (msg.includes('commune') || msg.includes('oracle')) actionType = msg.includes('commune') ? 'commune' : 'ask_oracle';
         else if (msg.includes('equipped')) actionType = msg.includes('weapon') ? 'equip_weapon' : 'equip_armor';
-        
+
         if (actionType) {
             actionHistory.push({ type: actionType, timestamp: log.timestamp });
         }
     }
-    
+
     // Keep only last 10 actions
     const trimmedHistory = actionHistory.slice(-10);
     const lastActionType = lastAction || (trimmedHistory.length > 0 ? trimmedHistory[trimmedHistory.length - 1].type : null);
@@ -247,13 +246,13 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
     }
 
     return {
-        hasEnemies: enemies.length > 0,
-        enemyCount: enemies.length,
-        primaryEnemy,
-        hasMerchants,
-        hasGroundLoot: !!(room.groundLoot && room.groundLoot.length > 0),
+        hasNPCs: npcs.length > 0,
+        npcCount: npcs.length,
+        primaryNPC,
+        hasVendors,
+        hasGroundLoot: !!(area.groundLoot && area.groundLoot.length > 0),
         hasReadyCrops,
-        hasCraftableRecipes,
+        hasCraftableRecipes: hasCraftableRecipes,
         isBaseCamp,
         availableExits,
         unvisitedExits,
@@ -262,8 +261,8 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
         recentlyScanned,
         inCombat,
         recentDamage,
-        roomHazardCount,
-        isDangerousRoom,
+        areaHazardCount,
+        isDangerousArea,
         hpRatio,
         stressRatio,
         hasHealingItem,
@@ -272,10 +271,10 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
         surgeCount: player.surgeCount || 0,
         canAffordTrade,
         shouldSellExcess,
-        spiritBalance: spirit,
-        bloodBalance: blood,
-        hasSignedServitor,
-        merchantHasContract,
+        primaryResourceBalance: resourcePrimary,
+        secondaryResourceBalance: resourceSecondary,
+        hasSignedCompanion,
+        vendorHasContract,
         canAffordContract,
         justRespawned,
         lastActionType,

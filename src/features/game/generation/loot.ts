@@ -23,7 +23,7 @@ export const BIOME_GROUND_LOOT: Partial<Record<Biome, { materialId: string; chan
     "Twilight Alchemy Haven": [{ materialId: "chromatic_spore", chance: 0.3 }, { materialId: "acid_vial", chance: 0.25 }, { materialId: "static_lichen", chance: 0.15 }],
 };
 
-export const ENEMY_LOOT: Partial<Record<string, { materialId: string; chance: number; guaranteed?: boolean }[]>> = {
+export const NPC_LOOT: Partial<Record<string, { materialId: string; chance: number; guaranteed?: boolean }[]>> = {
     "Obsidian Warden": [{ materialId: "obsidian_shard", chance: 1, guaranteed: true }],
     "Doomguard": [{ materialId: "blood_crystal", chance: 0.6 }],
     "Ashwalker Renegade": [{ materialId: "leather_scraps", chance: 0.7 }, { materialId: "relic_shard", chance: 0.3 }],
@@ -55,8 +55,8 @@ export function generateGroundLoot(biome: Biome): Item[] {
     return loot;
 }
 
-export function getEnemyLoot(enemyName: string): Item[] {
-    const drops = ENEMY_LOOT[enemyName];
+export function getNPCLoot(npcName: string): Item[] {
+    const drops = NPC_LOOT[npcName];
     if (!drops) return [];
     const loot: Item[] = [];
     for (const d of drops) {

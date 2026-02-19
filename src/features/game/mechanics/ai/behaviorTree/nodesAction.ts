@@ -1,6 +1,6 @@
 import type { AgentConfig, AgentAction, AwarenessResult } from '../types';
 import type { GameState } from '../../../slice/types';
-import { pickBestSpell } from './helpers';
+import { pickBestCapability } from './helpers';
 import { isActionOnCooldown, isActionLooping } from './cooldowns';
 
 /**
@@ -16,35 +16,35 @@ export function nodeCombat(
 
     if (!player) return null;
 
-    if (has('combat') && awareness.hasEnemies && awareness.hpRatio > 0.25) {
-        // Try spells first (more interesting combat)
-        if (has('spell') && config.traits.aggression > 0.3) {
-            const spellId = pickBestSpell(state, awareness);
-            if (spellId && Math.random() < 0.6) {
-                return { type: 'cast_spell', payload: { spellId }, reason: 'Casting spell in combat' };
+    if (has('combat') && awareness.hasNPCs && awareness.hpRatio > 0.25) {
+        // Try capabilities first (more interesting combat)
+        if (has('capability') && config.traits.aggression > 0.3) {
+            const capabilityId = pickBestCapability(state, awareness);
+            if (capabilityId && Math.random() < 0.6) {
+                return { type: 'cast_capability', payload: { capabilityId }, reason: 'Activating capability in combat' };
             }
         }
 
         // Melee engagement
-        return { type: 'engage', reason: `Engaging ${awareness.primaryEnemy?.name || 'hostile'} (HP: ${awareness.primaryEnemy?.hp ?? '?'})` };
+        return { type: 'engage', reason: `Engaging ${awareness.primaryNPC?.name || 'hostile'} (HP: ${awareness.primaryNPC?.hp ?? '?'})` };
     }
 
     return null;
 }
 
 /**
- * Node 4b: Servitor prep — when merchant + enemy present and no signed servitor, buy contract before engaging
+ * Node 4b: Companion prep — when vendor + hostile present and no signed companion, buy contract before engaging
  */
-export function nodeServitorPrep(
+export function nodeCompanionPrep(
     config: AgentConfig,
     awareness: AwarenessResult,
 ): AgentAction | null {
     const has = (cap: string) => config.capabilities.includes(cap as any);
-    if (!has('trade') || !awareness.hasMerchants || !awareness.hasEnemies) return null;
-    if (awareness.hasSignedServitor) return null;
-    if (!awareness.merchantHasContract || !awareness.canAffordContract) return null;
+    if (!has('trade') || !awareness.hasVendors || !awareness.hasNPCs) return null;
+    if (awareness.hasSignedCompanion) return null;
+    if (!awareness.vendorHasContract || !awareness.canAffordContract) return null;
     if (isActionOnCooldown('buy', awareness)) return null;
-    return { type: 'buy', reason: 'Strategic: Buying servitor contract before combat' };
+    return { type: 'buy', reason: 'Strategic: Buying companion contract before combat' };
 }
 
 /**
@@ -72,7 +72,7 @@ export function nodeEconomy(
 ): AgentAction | null {
     const has = (cap: string) => config.capabilities.includes(cap as any);
 
-    if (!has('trade') || !awareness.hasMerchants) {
+    if (!has('trade') || !awareness.hasVendors) {
         return null;
     }
 
@@ -92,18 +92,18 @@ export function nodeEconomy(
         return { type: 'buy', reason: `Strategic: Buying healing items (HP: ${Math.round(awareness.hpRatio * 100)}%)` };
     }
 
-    // Strategic priority 3: Buy upgrades when spirit is high (resourcefulness trait influences this)
-    const hasHighSpirit = awareness.spiritBalance >= 20;
-    const shouldBuyUpgrade = hasHighSpirit && config.traits.resourcefulness > 0.5;
+    // Strategic priority 3: Buy upgrades when primary resource is high (resourcefulness trait influences this)
+    const hasHighResource = awareness.primaryResourceBalance >= 20;
+    const shouldBuyUpgrade = hasHighResource && config.traits.resourcefulness > 0.5;
     if (shouldBuyUpgrade && awareness.canAffordTrade && !isActionOnCooldown('buy', awareness)) {
         // Only buy if not recently bought (cooldown check)
-        return { type: 'buy', reason: 'Strategic: Buying upgrades with excess spirit' };
+        return { type: 'buy', reason: 'Strategic: Buying upgrades with excess resource' };
     }
 
     // Fallback: Random trading based on resourcefulness trait (but still respect cooldowns)
     if (config.traits.resourcefulness > 0.3 && awareness.canAffordTrade) {
         if (!isActionOnCooldown('buy', awareness) && Math.random() < config.traits.resourcefulness * 0.3) {
-            return { type: 'buy', reason: 'Browsing merchant wares' };
+            return { type: 'buy', reason: 'Browsing vendor wares' };
         }
     }
 
@@ -119,9 +119,9 @@ export function nodeRecon(
 ): AgentAction | null {
     const has = (cap: string) => config.capabilities.includes(cap as any);
 
-    // Scan: Only if room not recently scanned and not on cooldown
+    // Scan: Only if area not recently scanned and not on cooldown
     if (has('awareness') && !awareness.recentlyScanned && !isActionOnCooldown('scan', awareness)) {
-        return { type: 'scan', reason: 'Room not yet scanned' };
+        return { type: 'scan', reason: 'Area not yet scanned' };
     }
 
     // Oracle/Commune: Check cooldowns and prevent loops
@@ -158,87 +158,87 @@ export function nodeExploration(
     awareness: AwarenessResult,
 ): AgentAction | null {
     const has = (cap: string) => config.capabilities.includes(cap as any);
-    const room = state.currentRoom;
+    const area = state.currentArea;
 
-    if (!room) return null;
+    if (!area) return null;
 
     if (has('explore') && awareness.availableExits.length > 0) {
-        // Proactive pathfinding: When compromised (low HP), avoid hazardous/unexplored rooms
+        // Proactive pathfinding: When compromised (low HP), avoid hazardous/unexplored areas
         let exits = awareness.availableExits;
         let reason = `Exploring ${exits[0]}`;
-        
-        // ── Exploration Fallback Strategy: When all rooms explored ──
-        const allRoomsExplored = awareness.unvisitedExits.length === 0 && awareness.availableExits.length > 0;
-        
-        if (allRoomsExplored) {
+
+        // ── Exploration Fallback Strategy: When all areas explored ──
+        const allAreasExplored = awareness.unvisitedExits.length === 0 && awareness.availableExits.length > 0;
+
+        if (allAreasExplored) {
             // Fallback 1: Return to base camp if not already there
             if (!awareness.isBaseCamp && awareness.baseCampExits.length > 0) {
                 exits = awareness.baseCampExits;
                 reason = 'All areas explored — returning to base camp';
             }
             // Fallback 2: Seek combat for XP/quests if HP is good
-            else if (awareness.hpRatio > 0.7 && !awareness.hasEnemies) {
-                // Look for rooms with enemies
-                const exitsWithEnemies = awareness.availableExits.filter(dir => {
-                    const exitRoomId = room.exits[dir as 'North' | 'South' | 'East' | 'West'];
-                    if (!exitRoomId) return false;
-                    const exploredRoom = state.exploredRooms?.[exitRoomId];
-                    return exploredRoom && (exploredRoom.enemies || []).length > 0;
+            else if (awareness.hpRatio > 0.7 && !awareness.hasNPCs) {
+                // Look for areas with NPCs
+                const exitsWithNPCs = awareness.availableExits.filter(dir => {
+                    const exitAreaId = area.exits[dir as 'North' | 'South' | 'East' | 'West'];
+                    if (!exitAreaId) return false;
+                    const exploredArea = state.exploredAreas?.[exitAreaId];
+                    return exploredArea && (exploredArea.npcs || []).length > 0;
                 });
-                
-                if (exitsWithEnemies.length > 0) {
-                    exits = exitsWithEnemies;
-                    reason = 'All areas explored — seeking combat for XP';
+
+                if (exitsWithNPCs.length > 0) {
+                    exits = exitsWithNPCs;
+                    reason = 'All areas explored — seeking combat for progression';
                 } else {
                     // Fallback 3: Just move randomly (better than idle)
                     reason = 'All areas explored — patrolling';
                 }
             }
-            // Fallback 4: If HP is low, prioritize safe rooms
+            // Fallback 4: If HP is low, prioritize safe areas
             else if (awareness.hpRatio < 0.5 && awareness.safeExits.length > 0) {
                 exits = awareness.safeExits;
                 reason = 'All areas explored — moving to safe area';
             }
         }
-        
+
         if (awareness.hpRatio < 0.5) {
             // When compromised, prioritize base camp if available
             if (awareness.baseCampExits.length > 0) {
                 exits = awareness.baseCampExits;
                 reason = `Returning to base camp (HP: ${Math.round(awareness.hpRatio * 100)}%)`;
             } else if (awareness.safeExits.length > 0) {
-                // Otherwise, use safe explored exits (no hazards, no enemies)
+                // Otherwise, use safe explored exits (no hazards, no NPCs)
                 exits = awareness.safeExits;
-                reason = `Moving to safe room (avoiding hazards, HP: ${Math.round(awareness.hpRatio * 100)}%)`;
+                reason = `Moving to safe area (avoiding hazards, HP: ${Math.round(awareness.hpRatio * 100)}%)`;
             } else {
                 // No safe explored exits available
-                // Check if we're in a dangerous room - evacuate immediately if so
-                if (awareness.isDangerousRoom && awareness.availableExits.length > 0) {
-                    // We're in a dangerous room - evacuate to ANY exit (even if it's toxic, better than staying)
+                // Check if we're in a dangerous area - evacuate immediately if so
+                if (awareness.isDangerousArea && awareness.availableExits.length > 0) {
+                    // We're in a dangerous area - evacuate to ANY exit
                     exits = awareness.availableExits;
-                    reason = `⚠️ EVACUATING dangerous room (HP: ${Math.round(awareness.hpRatio * 100)}%)`;
+                    reason = `⚠️ EVACUATING dangerous area (HP: ${Math.round(awareness.hpRatio * 100)}%)`;
                 } else {
                     // Not in immediate danger, but no safe exits
                     // Check if all explored exits are dangerous
                     const exploredExits = awareness.availableExits.filter(dir => {
-                        const exitRoomId = room.exits[dir as 'North' | 'South' | 'East' | 'West'];
-                        return exitRoomId && Object.keys(state.exploredRooms || {}).includes(exitRoomId);
+                        const exitAreaId = area.exits[dir as 'North' | 'South' | 'East' | 'West'];
+                        return exitAreaId && Object.keys(state.exploredAreas || {}).includes(exitAreaId);
                     });
-                    
+
                     const exploredSafeExits = exploredExits.filter(dir => {
-                        const exitRoomId = room.exits[dir as 'North' | 'South' | 'East' | 'West'];
-                        if (!exitRoomId) return false;
-                        const exploredRoom = state.exploredRooms?.[exitRoomId];
-                        if (!exploredRoom) return false;
-                        const hasDangerousHazards = (exploredRoom.hazards || []).some((h: string) => 
+                        const exitAreaId = area.exits[dir as 'North' | 'South' | 'East' | 'West'];
+                        if (!exitAreaId) return false;
+                        const exploredArea = state.exploredAreas?.[exitAreaId];
+                        if (!exploredArea) return false;
+                        const hasDangerousHazards = (exploredArea.hazards || []).some((h: string) =>
                             ['Toxic Air', 'Radioactive Decay', 'Void Instability', 'Extreme Cold', 'Scorching Heat'].includes(h)
                         );
-                        return !hasDangerousHazards && (exploredRoom.enemies || []).length === 0;
+                        return !hasDangerousHazards && (exploredArea.npcs || []).length === 0;
                     });
-                    
+
                     if (exploredSafeExits.length > 0) {
                         exits = exploredSafeExits;
-                        reason = `Retreating to safe explored room (HP: ${Math.round(awareness.hpRatio * 100)}%)`;
+                        reason = `Retreating to safe explored area (HP: ${Math.round(awareness.hpRatio * 100)}%)`;
                     } else if (exploredExits.length > 0) {
                         // All explored exits are dangerous - try to heal first
                         if (has('heal') && awareness.hasHealingItem) {
@@ -252,18 +252,18 @@ export function nodeExploration(
                         if (has('heal') && awareness.hasHealingItem) {
                             return { type: 'heal', reason: `HP critical (${Math.round(awareness.hpRatio * 100)}%) - all exits unexplored, healing first` };
                         }
-                        // Last resort: enter unexplored room
+                        // Last resort: enter unexplored area
                         exits = awareness.availableExits;
                         reason = `⚠️ FORCED: All exits unexplored (HP: ${Math.round(awareness.hpRatio * 100)}%) - entering unknown`;
                     }
                 }
             }
         } else if (awareness.unvisitedExits.length > 0) {
-            // When not compromised, prefer unvisited rooms for exploration
+            // When not compromised, prefer unvisited areas for exploration
             exits = awareness.unvisitedExits;
             reason = `Exploring unvisited area`;
         }
-        
+
         const direction = exits[Math.floor(Math.random() * exits.length)];
         return { type: 'move', payload: { direction }, reason };
     }

@@ -1,10 +1,10 @@
 
-import { Player, Stats, Item, EquipmentSlot } from "./types";
+import { AgentPlayer, Stats, Item, EquipmentSlot } from "./types";
 
 /**
  * Calculates effective stats by summing base stats and equipment bonuses.
  */
-export function calculateEffectiveStats(player: Player): Stats {
+export function calculateEffectiveStats(player: AgentPlayer): Stats {
     const stats: Stats = {
         maxHp: player.maxHp,
         hp: player.hp,
@@ -41,7 +41,7 @@ export function calculateEffectiveStats(player: Player): Stats {
  * Applies a consumable effect to the player.
  * Returns updated player and log message, or null if no effect.
  */
-export function useConsumable(player: Player, item: Item): { updatedPlayer: Player; message: string } | null {
+export function useConsumable(player: AgentPlayer, item: Item): { updatedPlayer: AgentPlayer; message: string } | null {
     if (item.type !== "consumable" || !item.effect) return null;
 
     const newPlayer = { ...player };
@@ -71,7 +71,7 @@ export function useConsumable(player: Player, item: Item): { updatedPlayer: Play
     if (item.effect === "arcane_boost") {
         const oldStress = newPlayer.stress;
         newPlayer.stress = Math.max(0, newPlayer.stress - 5);
-        message = `Used ${item.name}. Arcane energies soothe your mind (-${oldStress - newPlayer.stress} stress).`;
+        message = `Used ${item.name}. Localized stabilization applied (-${oldStress - newPlayer.stress} stress).`;
         return { updatedPlayer: newPlayer, message };
     }
 

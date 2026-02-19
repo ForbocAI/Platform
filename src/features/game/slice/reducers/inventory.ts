@@ -7,14 +7,14 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
         if (!action.payload || !state.player) return;
         const { itemIndex, effect } = action.payload;
 
-        if (effect === 'hire_servitor') {
-            const contractDetails = (action.payload as { contractDetails?: { role: string; servitorName: string; maxHp: number; description: string } }).contractDetails;
+        if (effect === 'hire_companion') {
+            const contractDetails = (action.payload as { contractDetails?: { role: string; targetName: string; maxHp: number; description: string } }).contractDetails;
             if (contractDetails) {
                 state.player.inventory.splice(itemIndex, 1);
-                if (!state.player.servitors) state.player.servitors = [];
-                state.player.servitors.push({
+                if (!state.player.companions) state.player.companions = [];
+                state.player.companions.push({
                     id: Date.now().toString(),
-                    name: contractDetails.servitorName,
+                    name: contractDetails.targetName,
                     role: contractDetails.role as "Warrior" | "Scout" | "Mystic",
                     hp: contractDetails.maxHp,
                     maxHp: contractDetails.maxHp,
@@ -38,10 +38,10 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
         const { itemIndex, gain } = action.payload;
 
         state.player.inventory.splice(itemIndex, 1);
-        state.player.spirit = (state.player.spirit || 0) + gain;
+        state.player.resourcePrimary = (state.player.resourcePrimary || 0) + gain;
 
         if (state.sessionScore) {
-            state.sessionScore.spiritEarned += gain;
+            state.sessionScore.resourcesEarned += gain;
         }
     });
 
@@ -51,32 +51,32 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
 
         state.player.inventory.splice(itemIndex, 1);
 
-        const existing = state.player.equipment?.[slot];
+        const existing = (state.player as any).equipment?.[slot];
         if (existing) {
             state.player.inventory.push(existing);
         }
 
-        if (!state.player.equipment) state.player.equipment = {};
-        state.player.equipment[slot] = item;
+        if (!(state.player as any).equipment) (state.player as any).equipment = {};
+        (state.player as any).equipment[slot] = item;
     });
 
     builder.addCase(thunks.unequipItem.fulfilled, (state, action) => {
-        if (!action.payload || !state.player || !state.player.equipment) return;
+        if (!action.payload || !state.player || !(state.player as any).equipment) return;
         const { slot } = action.payload;
 
-        const item = state.player.equipment[slot];
+        const item = (state.player as any).equipment[slot];
         if (item) {
             state.player.inventory.push(item);
-            delete state.player.equipment[slot];
+            delete (state.player as any).equipment[slot];
         }
     });
 
     builder.addCase(thunks.harvestCrop.fulfilled, (state, action) => {
-        if (!action.payload || !state.currentRoom?.features) return;
+        if (!action.payload || !state.currentArea?.features) return;
         const { featureIndex, item } = action.payload;
 
-        const plot = state.currentRoom.features[featureIndex];
-        if (plot && plot.type === 'farming_plot') {
+        const plot = state.currentArea.features[featureIndex];
+        if (plot && plot.type === 'resource_plot') {
             plot.progress = 0;
             plot.ready = false;
         }
@@ -85,10 +85,10 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
     });
 
     builder.addCase(thunks.pickUpGroundLoot.fulfilled, (state, action) => {
-        if (!action.payload || !state.player || !state.currentRoom?.groundLoot) return;
+        if (!action.payload || !state.player || !state.currentArea?.groundLoot) return;
         const { item, itemId } = action.payload;
         state.player.inventory.push(item);
-        state.currentRoom.groundLoot = state.currentRoom.groundLoot.filter((i) => i.id !== itemId);
+        state.currentArea.groundLoot = state.currentArea.groundLoot.filter((i) => i.id !== itemId);
     });
 
     builder.addCase(thunks.craftItem.fulfilled, (state, action) => {

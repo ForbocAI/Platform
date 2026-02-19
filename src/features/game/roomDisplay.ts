@@ -1,4 +1,4 @@
-import type { Room } from "./types";
+import type { Area } from "./types";
 
 export interface ExitDisplay {
   dir: string;
@@ -13,9 +13,9 @@ const EXITS_CONFIG = [
   { dir: "W", label: "West" as const },
 ] as const;
 
-export const getRoomExitsDisplay = (room: Room): ExitDisplay[] =>
+export const getAreaExitsDisplay = (area: Area): ExitDisplay[] =>
   EXITS_CONFIG.map(({ dir, label }) => ({
     dir,
     label,
-    open: !!room.exits[label],
+    open: !!area.exits[label],
   }));

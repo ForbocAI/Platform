@@ -25,11 +25,11 @@ export function nodeSurvival(
 ): AgentAction | null {
     const has = (cap: string) => config.capabilities.includes(cap as any);
     const player = state.player;
-    const room = state.currentRoom;
+    const area = state.currentArea;
 
-    if (!player || !room) return null;
+    if (!player || !area) return null;
 
-    // When dead, do not return respawn here — concession listener (autoplay) or UI (manual) dispatches
+    // When neutralized, do not return respawn here — concession listener (autoplay) or UI (manual) dispatches
     // respawnPlayer. Returning respawn from the tree would double-dispatch and block the loop.
     if (player.hp <= 0) return null;
 
@@ -45,16 +45,16 @@ export function nodeSurvival(
                 return { type: 'equip_armor', payload: { itemId: armor.id }, reason: 'Post-respawn: Equipping armor' };
             }
         }
-        
-        if (awareness.isDangerousRoom && awareness.availableExits.length > 0) {
+
+        if (awareness.isDangerousArea && awareness.availableExits.length > 0) {
             const exit = awareness.availableExits[Math.floor(Math.random() * awareness.availableExits.length)];
-            return { type: 'move', payload: { direction: exit }, reason: 'Post-respawn: Leaving dangerous room' };
+            return { type: 'move', payload: { direction: exit }, reason: 'Post-respawn: Leaving dangerous area' };
         }
-        
+
         if (has('awareness') && !awareness.recentlyScanned) {
             return { type: 'scan', reason: 'Post-respawn: Assessing situation' };
         }
-        
+
         if (has('heal') && awareness.hasHealingItem && player.hp < player.maxHp * 0.9) {
             return { type: 'heal', reason: 'Post-respawn: Ensuring full health' };
         }
@@ -75,18 +75,18 @@ export function nodeSurvival(
     }
 
     // Flee from danger
-    if (has('flee') && awareness.hasEnemies && awareness.hpRatio < 0.25 && config.traits.caution >= 0.5) {
+    if (has('flee') && awareness.hasNPCs && awareness.hpRatio < 0.25 && config.traits.caution >= 0.5) {
         if (awareness.availableExits.length > 0) {
             const exit = awareness.availableExits[Math.floor(Math.random() * awareness.availableExits.length)];
             return { type: 'move', payload: { direction: exit }, reason: 'Fleeing — HP dangerously low' };
         }
     }
 
-    // Evacuate hazardous room
-    if (awareness.isDangerousRoom && awareness.hpRatio < 0.5 && !awareness.hasEnemies) {
+    // Evacuate hazardous area
+    if (awareness.isDangerousArea && awareness.hpRatio < 0.5 && !awareness.hasNPCs) {
         if (awareness.availableExits.length > 0) {
             const exit = awareness.availableExits[Math.floor(Math.random() * awareness.availableExits.length)];
-            return { type: 'move', payload: { direction: exit }, reason: `Evacuating hazardous room (${Math.round(awareness.hpRatio * 100)}% HP)` };
+            return { type: 'move', payload: { direction: exit }, reason: `Evacuating hazardous area (${Math.round(awareness.hpRatio * 100)}% HP)` };
         }
     }
 
@@ -111,20 +111,20 @@ export function nodeBaseCamp(
 ): AgentAction | null {
     const has = (cap: string) => config.capabilities.includes(cap as any);
     const player = state.player;
-    const room = state.currentRoom;
+    const area = state.currentArea;
 
-    if (!player || !room) return null;
+    if (!player || !area) return null;
 
     if (has('craft') && awareness.isBaseCamp) {
         if (awareness.hasReadyCrops) {
-            const readyIdx = (room.features || []).findIndex(f => f.type === 'farming_plot' && f.ready);
+            const readyIdx = (area.features || []).findIndex(f => f.type === 'resource_plot' && f.ready);
             if (readyIdx >= 0) {
                 return { type: 'harvest', payload: { featureIndex: readyIdx }, reason: 'Crop ready for harvest' };
             }
         }
 
         if (awareness.hasCraftableRecipes) {
-            const recipe = (player.recipes || []).find(r =>
+            const recipe = (player.blueprints || []).find(r =>
                 r.ingredients.every(
                     ing => (player.inventory || []).filter(i => i.name === ing.name).length >= ing.quantity
                 )

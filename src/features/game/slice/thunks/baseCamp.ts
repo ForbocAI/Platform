@@ -5,15 +5,15 @@ import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
 
 /** Weighted mushroom pool for farming harvests. New types (Spore Clump, Rust Spindle) add variety and distinct effects/flavor. */
-const HARVESTABLE_MUSHROOMS: { id: string; name: string; description: string; cost: { spirit: number; blood?: number }; weight: number }[] = [
-  { id: "glowing_mushroom", name: "Glowing Mushroom", description: "A faint blue fungus with regenerative properties.", cost: { spirit: 5 }, weight: 28 },
-  { id: "chromatic_cap", name: "Chromatic Cap", description: "Iridescent fungus from chromatic-steel growths. Shifts hue when touched.", cost: { spirit: 8 }, weight: 20 },
-  { id: "ember_puffball", name: "Ember Puffball", description: "Smoldering orange puffball that radiates faint warmth. Used in pyrokinetic compounds.", cost: { spirit: 7 }, weight: 18 },
-  { id: "static_lichen", name: "Static Lichen", description: "Lichen crackling with residual noise from the Static Sea. Disrupts nearby enchantments.", cost: { spirit: 10 }, weight: 12 },
-  { id: "void_morel", name: "Void Morel", description: "A pitch-black morel that hums with dimensional resonance. Potent in rift alchemy.", cost: { spirit: 12 }, weight: 10 },
-  { id: "chthonic_truffle", name: "Chthonic Truffle", description: "Subterranean truffle veined with crimson. Whispers of the deep cling to it.", cost: { spirit: 14, blood: 1 }, weight: 6 },
-  { id: "spore_clump", name: "Spore Clump", description: "Soft grey cluster that soothes the mind. Calms stress and mild anxiety when prepared correctly.", cost: { spirit: 6 }, weight: 14 },
-  { id: "rust_spindle", name: "Rust Spindle", description: "Copper-toned spindle that bonds with metal. Used in reinforcement and repair alchemy.", cost: { spirit: 9 }, weight: 8 },
+const HARVESTABLE_MUSHROOMS: { id: string; name: string; description: string; cost: { primary: number; secondary?: number }; weight: number }[] = [
+  { id: "glowing_mushroom", name: "Glowing Mushroom", description: "A faint blue fungus with regenerative properties.", cost: { primary: 5 }, weight: 28 },
+  { id: "chromatic_cap", name: "Chromatic Cap", description: "Iridescent fungus from chromatic-steel growths. Shifts hue when touched.", cost: { primary: 8 }, weight: 20 },
+  { id: "ember_puffball", name: "Ember Puffball", description: "Smoldering orange puffball that radiates faint warmth. Used in pyrokinetic compounds.", cost: { primary: 7 }, weight: 18 },
+  { id: "static_lichen", name: "Static Lichen", description: "Lichen crackling with residual noise from the Static Sea. Disrupts nearby enchantments.", cost: { primary: 10 }, weight: 12 },
+  { id: "void_morel", name: "Void Morel", description: "A pitch-black morel that hums with dimensional resonance. Potent in rift alchemy.", cost: { primary: 12 }, weight: 10 },
+  { id: "chthonic_truffle", name: "Chthonic Truffle", description: "Subterranean truffle veined with crimson. Whispers of the deep cling to it.", cost: { primary: 14, secondary: 1 }, weight: 6 },
+  { id: "spore_clump", name: "Spore Clump", description: "Soft grey cluster that soothes the mind. Calms stress and mild anxiety when prepared correctly.", cost: { primary: 6 }, weight: 14 },
+  { id: "rust_spindle", name: "Rust Spindle", description: "Copper-toned spindle that bonds with metal. Used in reinforcement and repair alchemy.", cost: { primary: 9 }, weight: 8 },
 ];
 
 function pickRandomMushroom(): (typeof HARVESTABLE_MUSHROOMS)[number] {
@@ -30,10 +30,10 @@ export const harvestCrop = createAsyncThunk(
   'game/harvestCrop',
   async (arg: { featureIndex: number }, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
-    const { currentRoom } = state.game;
-    if (!currentRoom?.isBaseCamp || !currentRoom.features) return;
-    const feature = currentRoom.features[arg.featureIndex];
-    if (!feature || feature.type !== 'farming_plot' || !feature.ready) return;
+    const { currentArea } = state.game;
+    if (!currentArea?.isBaseCamp || !currentArea.features) return;
+    const feature = currentArea.features[arg.featureIndex];
+    if (!feature || feature.type !== 'resource_plot' || !feature.ready) return;
 
     const mushroom = pickRandomMushroom();
     const cropItem: Item = {
@@ -52,18 +52,18 @@ export const harvestCrop = createAsyncThunk(
 
 export const craftItem = createAsyncThunk(
   'game/craftItem',
-  async (arg: { recipeId: string }, { getState, dispatch }) => {
+  async (arg: { formulaId: string }, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
-    const { player, currentRoom } = state.game;
-    if (!player || !currentRoom?.isBaseCamp) return;
+    const { player, currentArea } = state.game;
+    if (!player || !currentArea?.isBaseCamp) return;
 
-    const recipe = player.recipes.find((r) => r.id === arg.recipeId);
-    if (!recipe) {
-      dispatch(addLog({ message: 'Unknown recipe.', type: 'system' }));
+    const formula = player.blueprints.find((f) => f.id === arg.formulaId);
+    if (!formula) {
+      dispatch(addLog({ message: 'Unknown blueprint.', type: 'system' }));
       return;
     }
 
-    const hasIngredients = recipe.ingredients.every((ing) => {
+    const hasIngredients = formula.ingredients.every((ing) => {
       const count = player.inventory.filter((i) => i.name === ing.name).length;
       return count >= ing.quantity;
     });
@@ -73,12 +73,12 @@ export const craftItem = createAsyncThunk(
     }
 
     const craftedItem: Item = {
-      id: `${recipe.produces.name.toLowerCase().replace(/\s/g, '_')}_${Date.now()}`,
-      name: recipe.produces.name,
-      type: recipe.produces.type,
-      description: recipe.produces.description,
-      effect: recipe.produces.effect,
-      cost: recipe.produces.cost,
+      id: `${formula.produces.name.toLowerCase().replace(/\s/g, '_')}_${Date.now()}`,
+      name: formula.produces.name,
+      type: formula.produces.type,
+      description: formula.produces.description,
+      effect: formula.produces.effect,
+      cost: formula.produces.cost,
     };
 
     dispatch(addLog({ message: `Crafted ${craftedItem.name}.`, type: 'system' }));
@@ -89,6 +89,6 @@ export const craftItem = createAsyncThunk(
         isFollowUp: false,
       })
     );
-    return { craftedItem, ingredients: recipe.ingredients };
+    return { craftedItem, ingredients: formula.ingredients };
   }
 );

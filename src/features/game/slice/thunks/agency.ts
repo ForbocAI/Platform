@@ -1,11 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { GameState } from '../types';
-import { sdkService } from '@/lib/sdk/cortexService';
-import { toObservation, toCortexDirective } from '@/lib/sdk/mappers';
-import { addLog } from '@/features/game/slice/gameSlice';
+import { sdkService } from '@/features/game/sdk/cortexService';
+import { toObservation, toCortexDirective } from '@/features/game/sdk/mappers';
+import { addLog, setAgentPondering, clearAgentPondering } from '@/features/game/slice/gameSlice';
 import { computeAwareness } from '@/features/game/mechanics/ai/awareness';
 import { runBehaviorTree, AUTOPLAY_CONFIG } from '@/features/game/mechanics/ai/behaviorTree';
-import { getPortraitForAgent } from '@/lib/sdk/portraits';
+import { getPortraitForAgent } from '@/features/game/sdk/portraits';
 
 /**
  * Generic Agent Tick Thunk.
@@ -14,13 +14,11 @@ import { getPortraitForAgent } from '@/lib/sdk/portraits';
  */
 export const runAgentTick = createAsyncThunk(
     'game/runAgentTick',
-    async (arg: { agentId: string; type: 'npc' | 'servitor' | 'player'; persona?: string }, { getState, dispatch }): Promise<{ agentId: string; nextTickAt: number } | undefined> => {
+    async (arg: { agentId: string; type: 'npc' | 'companion' | 'player'; persona?: string; soulId?: string }, { getState, dispatch }): Promise<{ agentId: string; nextTickAt: number } | undefined> => {
         const rootState = getState() as { game: GameState };
-        const { agentId, type, persona } = arg;
+        const { agentId, type, persona, soulId } = arg;
 
         // 1. OBSERVE
-        // For now, NPCs share the same awareness as the player's perspective,
-        // but this should be refined to be agent-centric.
         const awareness = computeAwareness(rootState.game);
 
         // 2. SDK DECISION
@@ -28,14 +26,22 @@ export const runAgentTick = createAsyncThunk(
         let reason = 'Default ambient behavior';
 
         try {
-            const agentPersona = persona || (type === 'npc' ? 'Hostile Entity' : 'Loyal Servitor');
-            const agent = await sdkService.getAgent(agentId, agentPersona);
+            const agentPersona = persona || (type === 'npc' ? 'Neutral Entity' : 'Loyal Companion');
+
+            // Rehydrate from Soul if TXID provided, otherwise get/create standard agent
+            const agent = soulId
+                ? await sdkService.rehydrateAgent(soulId)
+                : await sdkService.getAgent(agentId, agentPersona);
+
+            // 3. SDK DECISION
+            dispatch(setAgentPondering(agentId));
 
             // Map state to agent-specific observation
             const observation = toObservation(rootState.game);
 
-            // ...
             const response = await agent.process(observation.content, rootState.game as any);
+
+            dispatch(clearAgentPondering(agentId));
 
             if (response.dialogue) {
                 const portraitUrl = getPortraitForAgent(type, agentPersona);
@@ -48,15 +54,13 @@ export const runAgentTick = createAsyncThunk(
             }
         } catch (e) {
             console.warn(`Agency: Tick failed for agent [${agentId}]:`, e);
+            dispatch(clearAgentPondering(agentId));
         }
 
         // 3. ACTUATE
-        // TODO: Implement NPC/Servitor specific actuation.
-        // For now, we logging the intent.
         console.log(`Agency: Agent [${agentId}] intends to [${instruction}] because [${reason}]`);
 
         // 4. SCHEDULE
-        // Return next tick (e.g. 5-10 seconds for NPCs)
         const delay = 5000 + Math.random() * 5000;
         return { agentId, nextTickAt: Date.now() + delay };
     }

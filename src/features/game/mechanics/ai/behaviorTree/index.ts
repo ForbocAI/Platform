@@ -4,7 +4,7 @@
  * Aligned with Forboc/client/src/features/mechanics/orchestrators/systems/bots/botSystem.ts.
  * Implements: SDK Directive > Safety > Base Camp > Economy > Combat > Recon > Default
  *
- * Used by both autoplay (player) and NPC/servitor AI.
+ * Used by both autoplay (player) and NPC/companion AI.
  * SDK integration: When CortexDirective is present, it is executed as Priority Node 0.
  */
 
@@ -15,7 +15,7 @@ import { nodeRival } from './nodesRival';
 import { nodeSDKDirective, nodeSurvival, nodeBaseCamp, nodeEquipment } from './nodesSurvival';
 import {
     nodeCombat,
-    nodeServitorPrep,
+    nodeCompanionPrep,
     nodeLoot,
     nodeEconomy,
     nodeRecon,
@@ -39,7 +39,7 @@ export function runBehaviorTree(
         nodeSurvival(config, state, awareness) ||
         nodeBaseCamp(config, state, awareness) ||
         nodeEquipment(config, state, awareness) ||
-        nodeServitorPrep(config, awareness) ||
+        nodeCompanionPrep(config, awareness) ||
         nodeCombat(config, state, awareness) ||
         nodeLoot(config, awareness) ||
         nodeEconomy(config, awareness) ||
@@ -59,7 +59,7 @@ export const AUTOPLAY_CONFIG: AgentConfig = {
     type: 'player',
     capabilities: [
         'awareness', 'combat', 'flee', 'explore', 'trade',
-        'craft', 'heal', 'equip', 'oracle', 'loot', 'spell', 'quest',
+        'craft', 'heal', 'equip', 'oracle', 'loot', 'capability', 'quest',
     ],
     traits: {
         aggression: 0.65,
@@ -84,10 +84,10 @@ export const NPC_RANGER_CONFIG: AgentConfig = {
     },
 };
 
-/** Servitor: follows orders, supports in combat */
-export const SERVITOR_CONFIG: AgentConfig = {
-    id: 'servitor',
-    type: 'servitor',
+/** Companion: follows orders, supports in combat */
+export const COMPANION_CONFIG: AgentConfig = {
+    id: 'companion',
+    type: 'companion',
     capabilities: ['awareness', 'combat', 'serve', 'heal'],
     traits: {
         aggression: 0.5,

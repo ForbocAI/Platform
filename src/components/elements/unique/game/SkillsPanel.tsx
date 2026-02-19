@@ -1,7 +1,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
-import type { Player } from "@/features/game/types";
+import type { AgentPlayer } from "@/features/game/types";
 import { Modal } from "@/components/elements/generic";
 
 /** Format skill id for display (e.g. keen_senses -> Keen Senses). */
@@ -13,12 +13,12 @@ function formatSkillLabel(skillId: string): string {
 }
 
 interface SkillsPanelProps {
-  player: Player;
+  player: AgentPlayer;
   onClose: () => void;
 }
 
 export function SkillsPanel({ player, onClose }: SkillsPanelProps) {
-  const skills = player.skills ?? [];
+  const skills = player.capabilities ?? [];
   return (
     <Modal
       title="Unlocked Skills"

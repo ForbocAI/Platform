@@ -3,14 +3,14 @@
 
 // Entity modules
 export { initializePlayer } from "./entities/player";
-export { generateRandomMerchant, generateMarketplace, generateWares } from "./entities/merchant";
-export { generateRoom, generateRoomWithOptions, generateStartRoom } from "./entities/room";
-export type { GenerateRoomOptions, GenerateStartRoomOptions } from "./entities/room";
+export { generateRandomVendor, generateMarketplace, generateWares } from "./entities/vendor";
+export { generateArea, generateAreaWithOptions, generateStartArea } from "./entities/area";
+export type { GenerateAreaOptions, GenerateStartAreaOptions } from "./entities/area";
 
 // Generation (passthrough)
-export type { RoomGenContext } from "./generation";
-export { getEnemyLoot } from "./generation/loot";
-export { generateRandomEnemy } from "./generation";
+export type { AreaGenContext } from "./generation";
+export { getNPCLoot } from "./generation/loot";
+export { generateRandomAgentNPC } from "./generation";
 
 // Oracle (passthrough)
 export { consultOracle } from "./oracle";

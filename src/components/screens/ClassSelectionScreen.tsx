@@ -81,13 +81,13 @@ export function ClassSelectionScreen() {
             {/* Starting Loadout */}
             <div className="space-y-4">
               <h3 className="text-xs uppercase text-palette-muted-light font-bold flex items-center gap-2">
-                <Zap className="w-4 h-4" /> Starting Spells
+                <Zap className="w-4 h-4" /> Starting Capabilities
               </h3>
               <div className="space-y-2">
-                {template.startingSpells.length > 0 ? (
-                  template.startingSpells.map((spell) => (
-                    <div key={spell} className="bg-palette-bg-dark p-2 rounded border border-palette-border text-sm text-palette-accent-soft">
-                      {spell.replace(/_/g, " ")}
+                {template.startingCapabilities.length > 0 ? (
+                  template.startingCapabilities.map((id) => (
+                    <div key={id} className="bg-palette-bg-dark p-2 rounded border border-palette-border text-sm text-palette-accent-soft">
+                      {id.replace(/_/g, " ")}
                     </div>
                   ))
                 ) : (

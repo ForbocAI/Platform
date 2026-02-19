@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { sdkService } from '@/lib/sdk/cortexService';
+import { sdkService } from '@/features/game/sdk/cortexService';
 import { getKeenSensesScanExtra } from '@/features/game/skills';
 import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
@@ -8,35 +8,35 @@ export const movePlayer = createAsyncThunk(
   'game/movePlayer',
   async (direction: string, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
-    if (!state.game.currentRoom) throw new Error('No room');
+    if (!state.game.currentArea) throw new Error('No area');
 
-    const isValid = await sdkService.validateMove(state.game.currentRoom, direction);
+    const isValid = await sdkService.validateMove(state.game.currentArea, direction);
     if (!isValid) {
       dispatch(addLog({ message: 'Path blocked or invalid vector.', type: 'system' }));
       throw new Error('Invalid move');
     }
 
-    const roomsExplored = state.game.sessionScore?.roomsExplored ?? 0;
+    const areasExplored = state.game.sessionScore?.areasExplored ?? 0;
     const playerLevel = state.game.player?.level ?? 1;
-    const newRoom = await sdkService.generateRoom(undefined, undefined, {
+    const newArea = await sdkService.generateArea(undefined, undefined, {
       context: {
-        previousRoom: state.game.currentRoom,
+        previousArea: state.game.currentArea,
         direction,
         playerLevel,
-        roomsExplored,
+        areasExplored,
       },
     });
 
     // Check for hazards
     const { calculateHazardEffects } = await import('@/features/game/mechanics/hazards');
-    const hazardEffects = calculateHazardEffects(newRoom.hazards);
+    const hazardEffects = calculateHazardEffects(newArea.hazards);
 
     dispatch(addLog({ message: `Moved ${direction}.`, type: 'exploration' }));
     if (hazardEffects.message) {
       dispatch(addLog({ message: hazardEffects.message, type: 'system' }));
     }
 
-    return { room: newRoom, direction, hazardEffects };
+    return { area: newArea, direction, hazardEffects };
   }
 );
 
@@ -44,19 +44,19 @@ export const scanSector = createAsyncThunk(
   'game/scanSector',
   async (_, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
-    const room = state.game.currentRoom;
-    if (!room) return;
+    const area = state.game.currentArea;
+    if (!area) return;
 
     dispatch(addLog({ message: 'Scanning sector...', type: 'system' }));
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const enemies =
-      room.enemies.length > 0 ? room.enemies.map((e) => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
-    const allies = room.allies ? room.allies.map((a) => a.name).join(', ') : 'None';
-    const extra = state.game.player?.skills?.includes('keen_senses')
-      ? getKeenSensesScanExtra(room)
+    const npcs =
+      area.npcs.length > 0 ? area.npcs.map((e) => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
+    const allies = area.allies ? area.allies.map((a) => a.name).join(', ') : 'None';
+    const extra = state.game.player?.capabilities?.includes('keen_senses')
+      ? getKeenSensesScanExtra(area as any) // Cast for now
       : '';
-    const message = `[SCAN RESULT] ${room.title}: Enemies: ${enemies}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
+    const message = `[SCAN RESULT] ${area.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
     dispatch(addLog({ message, type: 'exploration' }));
   }
 );

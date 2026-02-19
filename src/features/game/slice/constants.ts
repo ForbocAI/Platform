@@ -4,12 +4,12 @@ import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
 import type { GameState } from './types';
 
 export const initialSessionScore = (): SessionScore => ({
-  roomsExplored: 0,
-  roomsScanned: 0,
-  enemiesDefeated: 0,
-  merchantTrades: 0,
+  areasExplored: 0,
+  areasScanned: 0,
+  npcsDefeated: 0,
+  vendorTrades: 0,
   questsCompleted: 0,
-  spiritEarned: 0,
+  resourcesEarned: 0,
   startTime: Date.now(),
   endTime: null,
 });
@@ -43,24 +43,25 @@ export function handleVignetteProgression(dispatch: (a: unknown) => void, getSta
 export function seedQuests(): ActiveQuest[] {
   return [
     { id: 'recon-1', kind: 'reconnaissance', label: 'Scan 5 sectors', target: 5, progress: 0, complete: false },
-    { id: 'rescue-1', kind: 'rescue', label: 'Find a Fellow Ranger', target: 1, progress: 0, complete: false },
+    { id: 'rescue-1', kind: 'rescue', label: 'Find a Fellow Agent', target: 1, progress: 0, complete: false },
     { id: 'hostiles-1', kind: 'hostiles', label: 'Defeat 3 hostiles', target: 3, progress: 0, complete: false },
-    { id: 'merchant-1', kind: 'merchant', label: 'Trade with 2 merchants', target: 2, progress: 0, complete: false },
+    { id: 'vendor-1', kind: 'vendor', label: 'Trade with 2 vendors', target: 2, progress: 0, complete: false },
   ];
 }
 
 export const initialState: GameState = {
   player: null,
-  currentRoom: null,
-  exploredRooms: {},
-  roomCoordinates: {},
+  currentArea: null,
+  exploredAreas: {},
+  areaCoordinates: {},
   logs: [],
   isInitialized: false,
   isLoading: false,
   error: null,
-  selectedSpellId: null,
+  selectedCapabilityId: null,
   activeQuests: [],
   sessionScore: null,
   sessionComplete: null,
   pendingQuestFacts: [],
+  ponderingAgentIds: [],
 };

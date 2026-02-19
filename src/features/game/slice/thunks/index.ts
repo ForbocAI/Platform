@@ -1,7 +1,7 @@
 export { initializeGame } from './init';
 export { askOracle, queryOracle } from './oracle';
 export { movePlayer, scanSector } from './exploration';
-export { castSpell, engageHostiles, respawnPlayer } from './combat';
+export { castCapability, engageHostiles, respawnPlayer } from './combat';
 export { tradeBuy, tradeSell } from './trade';
 export { pickUpGroundLoot, useItem, equipItem, unequipItem, sacrificeItem } from './inventory';
 export { harvestCrop, craftItem } from './baseCamp';

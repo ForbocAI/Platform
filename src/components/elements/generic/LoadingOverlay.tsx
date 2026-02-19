@@ -8,7 +8,7 @@ export function LoadingOverlay({
   onRetry?: () => void;
 }) {
   return (
-    <div className="h-screen w-screen bg-palette-bg-dark text-palette-accent-mid flex flex-col items-center justify-center gap-2 leading-relaxed">
+    <div className="h-screen w-screen bg-palette-bg-dark text-palette-accent-mid flex flex-col items-center justify-center gap-2 leading-relaxed" suppressHydrationWarning>
       <TopRunes />
       <span className={onRetry ? "" : "animate-pulse"}>{message}</span>
       {onRetry && (

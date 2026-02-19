@@ -10,7 +10,7 @@ const ACTION_COOLDOWNS: Partial<Record<AgentActionType, number>> = {
     'sell': 3,          // Don't sell more than once every 3 actions
     'commune': 5,       // Don't commune more than once every 5 actions
     'ask_oracle': 5,    // Don't ask oracle more than once every 5 actions
-    'scan': 2,          // Don't scan more than once every 2 actions (unless room changed)
+    'scan': 2,          // Don't scan more than once every 2 actions (unless area changed)
     'move': 0,          // Movement has no cooldown (needed for exploration)
     'loot': 1,          // Can loot every other action
 };

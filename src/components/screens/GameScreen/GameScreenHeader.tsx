@@ -1,7 +1,7 @@
 "use client";
 
 import { PlayerHeader, StageSelector } from "@/components/elements/unique";
-import type { Player } from "@/features/game/types";
+import type { AgentPlayer } from "@/features/game/types";
 import type { StageOfScene } from "@/features/game/types";
 
 export function GameScreenHeader({
@@ -9,7 +9,7 @@ export function GameScreenHeader({
   stage,
   onStageChange,
 }: {
-  player: Player;
+  player: AgentPlayer;
   stage: StageOfScene;
   onStageChange: (s: StageOfScene) => void;
 }) {

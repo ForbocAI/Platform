@@ -1,34 +1,35 @@
-import type { Player, Room, GameLogEntry, ActiveQuest, SessionScore } from '@/features/game/types';
+import type { AgentPlayer, Area, GameLogEntry, ActiveQuest, SessionScore } from '@/features/game/types';
 
-export interface RoomCoordinates {
+export interface AreaCoordinates {
   x: number;
   y: number;
 }
 
 export interface GameState {
-  player: Player | null;
-  currentRoom: Room | null;
-  exploredRooms: Record<string, Room>;
-  roomCoordinates: Record<string, RoomCoordinates>;
+  player: AgentPlayer | null;
+  currentArea: Area | null;
+  exploredAreas: Record<string, Area>;
+  areaCoordinates: Record<string, AreaCoordinates>;
   logs: GameLogEntry[];
   isInitialized: boolean;
   isLoading: boolean;
   error: string | null;
-  selectedSpellId: string | null;
+  selectedCapabilityId: string | null;
   activeQuests: ActiveQuest[];
   sessionScore: SessionScore | null;
   sessionComplete: 'quests' | 'death' | null;
   pendingQuestFacts: string[];
+  ponderingAgentIds: string[];
 }
 
 export interface InitializeGameOptions {
-  forceMerchant?: boolean;
+  forceVendor?: boolean;
   deterministic?: boolean;
-  forceEnemy?: boolean | string;
+  forceNPC?: boolean | string;
   lowHp?: boolean;
-  forceServitor?: boolean;
-  /** When true with forceServitor, servitor starts at 1 HP for quick death-state testing. */
-  lowServitorHp?: boolean;
+  forceCompanion?: boolean;
+  /** When true with forceCompanion, companion starts at 1 HP for quick death-state testing. */
+  lowCompanionHp?: boolean;
   /** Force re-initialization even if already initialized (e.g. ?reset=1). */
   reset?: boolean;
   /** Select specific class to play. */

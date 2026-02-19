@@ -1,10 +1,10 @@
-import type { Biome, Room } from "../types";
+import type { Biome, Area } from "../types";
 
-export interface RoomGenContext {
-    previousRoom?: Room | null;
+export interface AreaGenContext {
+    previousArea?: Area | null;
     direction?: string;
     playerLevel?: number;
-    roomsExplored?: number;
+    areasExplored?: number;
 }
 
 type TransitionEntry = { biome: Biome; weight: number };
@@ -42,13 +42,13 @@ export const BIOMES: Biome[] = [
 const deeperBiomes: Biome[] = ["Chthonic Depths", "Cavernous Abyss", "Abyss of Infernal Lore", "Dimensional Nexus", "Static Sea of All Noise", "Twilight Alchemy Haven", "Precipice of the Shadowlands", "Chromatic-Steel Fungi", "The Sterile Chamber"];
 const shallowerBiomes: Biome[] = ["Quadar Tower", "Haunted Chapel", "Military Installation", "Ethereal Marshlands", "Crumbling Ruins"];
 
-export function selectNextBiome(context?: RoomGenContext | null): Biome {
-    const prevBiome = context?.previousRoom?.biome;
+export function selectNextBiome(context?: AreaGenContext | null): Biome {
+    const prevBiome = context?.previousArea?.biome;
     const transitions = prevBiome ? BIOME_TRANSITIONS[prevBiome] : null;
     if (!transitions || transitions.length === 0) return "Quadar Tower";
 
     const direction = context?.direction ?? "";
-    const roomsExplored = context?.roomsExplored ?? 0;
+    const areasExplored = context?.areasExplored ?? 0;
     const playerLevel = context?.playerLevel ?? 1;
 
     const weightMultiplier = (entry: TransitionEntry): number => {
@@ -57,7 +57,7 @@ export function selectNextBiome(context?: RoomGenContext | null): Biome {
         else if (direction === "North" && shallowerBiomes.includes(entry.biome)) mult *= 1.3;
         else if (direction === "North" && deeperBiomes.includes(entry.biome)) mult *= 0.7;
         else if (direction === "South" && shallowerBiomes.includes(entry.biome)) mult *= 0.8;
-        if (roomsExplored >= 10 && deeperBiomes.includes(entry.biome)) mult *= 1.1;
+        if (areasExplored >= 10 && deeperBiomes.includes(entry.biome)) mult *= 1.1;
         if (playerLevel >= 10 && deeperBiomes.includes(entry.biome)) mult *= 1.1;
         return mult;
     };

@@ -3,9 +3,9 @@
 import { PlayerHeaderIdentity } from "./PlayerHeaderIdentity";
 import { PlayerHeaderBars } from "./PlayerHeaderBars";
 import { PlayerHeaderMedia } from "./PlayerHeaderMedia";
-import type { Player } from "@/features/game/types";
+import type { AgentPlayer } from "@/features/game/types";
 
-export function PlayerHeader({ player }: { player: Player }) {
+export function PlayerHeader({ player }: { player: AgentPlayer }) {
   return (
     <header
       className="shrink-0 vengeance-border bg-palette-bg-mid/50 flex flex-col lg:flex-row items-start lg:items-center justify-between p-1.5 sm:p-2 gap-1.5 sm:gap-2 overflow-x-auto min-w-0"

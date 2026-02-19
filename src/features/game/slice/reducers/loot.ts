@@ -1,5 +1,5 @@
 import type { GameState } from '../types';
-import { SPELLS, getSpellUnlockForLevel, getSkillUnlockForLevel } from '@/features/game/mechanics';
+import { CAPABILITIES, getCapabilityUnlockForLevel } from '@/features/game/mechanics/capabilities';
 import type { Item } from '@/features/game/types';
 
 /** Shared helper: distribute loot items to player inventory and log. */
@@ -18,18 +18,18 @@ export function applyLoot(state: GameState, lootItems: Item[]): void {
     }
 }
 
-/** Shared helper: grant spirit + blood rewards and update quest tracking. */
+/** Shared helper: grant primary + secondary resource rewards and update quest tracking. */
 export function applyCombatRewards(state: GameState, defeatedCount: number): void {
     if (!state.player) return;
-    state.player.spirit = (state.player.spirit || 0) + (5 * defeatedCount);
-    state.player.blood = (state.player.blood || 0) + (2 * defeatedCount);
+    state.player.resourcePrimary = (state.player.resourcePrimary || 0) + (5 * defeatedCount);
+    state.player.resourceSecondary = (state.player.resourceSecondary || 0) + (2 * defeatedCount);
 
     if (state.sessionScore) {
-        state.sessionScore.enemiesDefeated += defeatedCount;
-        state.sessionScore.spiritEarned += (5 * defeatedCount);
+        state.sessionScore.npcsDefeated += defeatedCount;
+        state.sessionScore.resourcesEarned += (5 * defeatedCount);
         const hostilesQuest = state.activeQuests.find(q => q.kind === "hostiles" && !q.complete);
         if (hostilesQuest) {
-            hostilesQuest.progress = state.sessionScore.enemiesDefeated;
+            hostilesQuest.progress = state.sessionScore.npcsDefeated;
             if (hostilesQuest.progress >= hostilesQuest.target) {
                 hostilesQuest.complete = true;
                 state.sessionScore.questsCompleted += 1;
@@ -49,7 +49,7 @@ export function applyCombatRewards(state: GameState, defeatedCount: number): voi
     }
 }
 
-/** Shared helper: apply XP gain, level-up, spell/skill unlock. */
+/** Shared helper: apply XP gain, level-up, capability unlock. */
 export function applyXpGain(state: GameState, xpGain: number): void {
     if (!state.player || xpGain <= 0) return;
 
@@ -62,36 +62,17 @@ export function applyXpGain(state: GameState, xpGain: number): void {
         state.player.hp = state.player.maxHp;
         state.player.stress = Math.max(0, state.player.stress - 20);
 
-        const newSpell = getSpellUnlockForLevel(state.player.characterClass, state.player.level);
-        const newSkill = getSkillUnlockForLevel(state.player.characterClass, state.player.level);
+        const newCapabilityId = getCapabilityUnlockForLevel(state.player.agentClass, state.player.level);
 
-        if (newSpell && !state.player.spells.includes(newSpell)) {
-            state.player.spells = [...state.player.spells, newSpell];
-            const spellName = SPELLS[newSpell]?.name ?? newSpell;
+        if (newCapabilityId && !state.player.capabilities.includes(newCapabilityId)) {
+            state.player.capabilities = [...state.player.capabilities, newCapabilityId];
+            const capabilityName = (CAPABILITIES as any)[newCapabilityId]?.name ?? newCapabilityId;
             state.logs.push({
                 id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 timestamp: Date.now(),
-                message: `LEVEL UP! You are now level ${state.player.level}! Unlocked: ${spellName}.`,
+                message: `LEVEL UP! You are now level ${state.player.level}! Unlocked capability: ${capabilityName}.`,
                 type: "system"
             });
-        } else if (newSkill) {
-            const skillList = state.player.skills ?? [];
-            if (!skillList.includes(newSkill)) {
-                state.player.skills = [...skillList, newSkill];
-                state.logs.push({
-                    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    timestamp: Date.now(),
-                    message: `LEVEL UP! You are now level ${state.player.level}! Unlocked skill: ${newSkill}.`,
-                    type: "system"
-                });
-            } else {
-                state.logs.push({
-                    id: Date.now().toString(),
-                    timestamp: Date.now(),
-                    message: `LEVEL UP! You are now level ${state.player.level}! Max HP increased.`,
-                    type: "system"
-                });
-            }
         } else {
             state.logs.push({
                 id: Date.now().toString(),

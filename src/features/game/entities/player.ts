@@ -1,7 +1,7 @@
-import type { Player, CharacterClass } from "../types";
+import type { AgentPlayer, AgentClass } from "../types";
 import { CLASS_TEMPLATES } from "../mechanics";
 
-export function initializePlayer(classId?: string): Player {
+export function initializePlayer(classId?: string): AgentPlayer {
     // Defines the "Starting Initiation"
     // Valid player classes
     const validClasses: Partial<Record<string, boolean>> = {
@@ -26,30 +26,30 @@ export function initializePlayer(classId?: string): Player {
     };
 
     // Default to Ashwalker if invalid or missing
-    const selectedClass = (classId && validClasses[classId]) ? classId as CharacterClass : "Ashwalker";
+    const selectedClass = (classId && validClasses[classId]) ? classId as AgentClass : "Ashwalker";
     const template = CLASS_TEMPLATES[selectedClass];
 
     return {
         id: "player_1",
         name: "Kamenal",
         level: 12,
-        characterClass: selectedClass,
+        agentClass: selectedClass,
         ...template.baseStats,
         hp: template.baseStats.maxHp,
         stress: 0,
         inventory: [
-            { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword.", cost: { spirit: 5 } },
-            { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor.", cost: { spirit: 5 } },
-            { id: "relic_shard", name: "Relic Shard", type: "relic", description: "A buzzing shard of old tech.", cost: { spirit: 10 } }
+            { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword.", cost: { primary: 5 } },
+            { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor.", cost: { primary: 5 } },
+            { id: "relic_shard", name: "Relic Shard", type: "relic", description: "A buzzing shard of old tech.", cost: { primary: 10 } }
         ],
-        spells: template.startingSpells,
+        capabilities: template.startingCapabilities,
         surgeCount: 0,
-        spirit: 20,
-        blood: 0,
+        resourcePrimary: 20,
+        resourceSecondary: 0,
         xp: 0,
         activeEffects: [],
         maxXp: 1200, // Level 12 * 100
-        recipes: [
+        blueprints: [
             {
                 id: "recipe_minor_healing_potion",
                 ingredients: [{ name: "Glowing Mushroom", quantity: 2 }],
@@ -59,7 +59,7 @@ export function initializePlayer(classId?: string): Player {
                     type: "consumable",
                     description: "A small vial of healing liquid.",
                     effect: "heal_hp_20",
-                    cost: { spirit: 5 }
+                    cost: { primary: 5 }
                 }
             },
             {
@@ -71,7 +71,7 @@ export function initializePlayer(classId?: string): Player {
                     type: "armor",
                     description: "Sturdy armor reinforced with metal plates.",
                     bonus: { ac: 2, maxHp: 10 },
-                    cost: { spirit: 20 }
+                    cost: { primary: 20 }
                 }
             }
         ]

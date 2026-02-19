@@ -1,8 +1,8 @@
 "use client";
 
-import { RoomViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel, QuestsPanel } from "@/components/elements/unique";
-import type { Room, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore, VignetteStage } from "@/features/game/types";
-import type { RoomCoordinates } from "@/features/game/slice/gameSlice";
+import { AreaViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel, QuestsPanel } from "@/components/elements/unique";
+import type { Area, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore, VignetteStage } from "@/features/game/types";
+import type { AreaCoordinates } from "@/features/game/slice/gameSlice";
 
 interface VignetteState {
   theme: string;
@@ -11,10 +11,10 @@ interface VignetteState {
 }
 
 export function GameScreenMain({
-  currentRoom,
+  currentArea,
   showMap,
-  exploredRooms,
-  roomCoordinates,
+  exploredAreas,
+  areaCoordinates,
   threads,
   mainThreadId,
   onSetMainThread,
@@ -24,17 +24,17 @@ export function GameScreenMain({
   onAdvanceVignette,
   onEndVignette,
   logs,
-  onTradeMerchant,
+  onTradeVendor,
   activeQuests,
   sessionScore,
   sessionComplete,
   currentSceneId,
   onFadeOutScene,
 }: {
-  currentRoom: Room;
+  currentArea: Area;
   showMap: boolean;
-  exploredRooms: Record<string, Room>;
-  roomCoordinates: Record<string, RoomCoordinates>;
+  exploredAreas: Record<string, Area>;
+  areaCoordinates: Record<string, AreaCoordinates>;
   threads: Thread[];
   mainThreadId: string | null;
   onSetMainThread: (id: string) => void;
@@ -44,7 +44,7 @@ export function GameScreenMain({
   onAdvanceVignette: (stage: VignetteStage) => void;
   onEndVignette: () => void;
   logs: GameLogEntry[];
-  onTradeMerchant: (merchantId: string) => void;
+  onTradeVendor: (vendorId: string) => void;
   activeQuests: ActiveQuest[];
   sessionScore: SessionScore | null;
   sessionComplete: "quests" | "death" | null;
@@ -53,18 +53,18 @@ export function GameScreenMain({
 }) {
   return (
     <main className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-y-auto overflow-x-hidden lg:overflow-hidden">
-      {/* Room / Map: full width on mobile (top), left column on lg+; flex-none on mobile so sidebar gets space below */}
+      {/* Area / Map: full width on mobile (top), left column on lg+; flex-none on mobile so sidebar gets space below */}
       <div className="flex-none lg:flex-1 min-w-0 flex flex-col min-h-[35vh] lg:min-h-0 order-1">
         {showMap ? (
           <div className="flex-1 min-h-0 min-w-0 overflow-auto">
             <MapView
-              exploredRooms={exploredRooms}
-              roomCoordinates={roomCoordinates}
-              currentRoomId={currentRoom.id}
+              exploredAreas={exploredAreas}
+              areaCoordinates={areaCoordinates}
+              currentAreaId={currentArea.id}
             />
           </div>
         ) : (
-          <RoomViewport room={currentRoom} onTradeMerchant={onTradeMerchant} />
+          <AreaViewport area={currentArea} onTradeVendor={onTradeVendor} />
         )}
       </div>
       {/* Sidebar: full width on mobile (below room), right column on lg+ */}

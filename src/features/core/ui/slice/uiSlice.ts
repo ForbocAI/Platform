@@ -1,7 +1,8 @@
-import type { StageOfScene, CharacterClass } from '@/features/game/types';
+import type { StageOfScene, AgentClass } from '@/features/game/types';
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
+import { type RootState } from '@/features/core/store';
 
-const DEFAULT_SELECTED_CLASS: CharacterClass = 'Ashwalker';
+const DEFAULT_SELECTED_CLASS: AgentClass = 'Ashwalker';
 
 /** Payload for scheduling next autoplay tick (reducer-only scheduling). */
 export interface AutoplaySchedulePayload {
@@ -22,17 +23,17 @@ interface UIState {
   factsPanelOpen: boolean;
   vignetteThemeInput: string;
   inventoryOpen: boolean;
-  spellsPanelOpen: boolean;
+  capabilitiesPanelOpen: boolean;
   skillsPanelOpen: boolean;
-  servitorPanelOpen: boolean;
-  /** Map of agentId -> timestamp for next tick. Managed by BotOrchestrator and agentTick thunks. */
+  companionPanelOpen: boolean;
+  /** Map of agentId -> timestamp for next tick. Managed by BotOrchestrator and agent Tick thunks. */
   agentTickSchedule: Record<string, number | null>;
   /** Set true when app/bootstrap runs (client); used to avoid hydration mismatch (e.g. runes). */
   clientHydrated: boolean;
-  activeMerchantId: string | null;
+  activeVendorId: string | null;
   craftingPanelOpen: boolean;
   /** Selected class on class selection screen (UI state). */
-  selectedClassId: CharacterClass;
+  selectedClassId: AgentClass;
 }
 
 const initialState: UIState = {
@@ -46,12 +47,12 @@ const initialState: UIState = {
   factsPanelOpen: false,
   vignetteThemeInput: "",
   inventoryOpen: false,
-  spellsPanelOpen: false,
+  capabilitiesPanelOpen: false,
   skillsPanelOpen: false,
-  servitorPanelOpen: false,
+  companionPanelOpen: false,
   agentTickSchedule: {},
   clientHydrated: false,
-  activeMerchantId: null,
+  activeVendorId: null,
   craftingPanelOpen: false,
   selectedClassId: DEFAULT_SELECTED_CLASS,
 };
@@ -103,25 +104,25 @@ export const uiSlice = createSlice({
     toggleInventory: (state) => {
       state.inventoryOpen = !state.inventoryOpen;
     },
-    toggleSpellsPanel: (state) => {
-      state.spellsPanelOpen = !state.spellsPanelOpen;
+    toggleCapabilitiesPanel: (state) => {
+      state.capabilitiesPanelOpen = !state.capabilitiesPanelOpen;
     },
     toggleSkillsPanel: (state) => {
       state.skillsPanelOpen = !state.skillsPanelOpen;
     },
-    toggleServitorPanel: (state) => {
-      state.servitorPanelOpen = !state.servitorPanelOpen;
+    toggleCompanionPanel: (state) => {
+      state.companionPanelOpen = !state.companionPanelOpen;
     },
     openTrade: (state, action: PayloadAction<string>) => {
-      state.activeMerchantId = action.payload;
+      state.activeVendorId = action.payload;
     },
     closeTrade: (state) => {
-      state.activeMerchantId = null;
+      state.activeVendorId = null;
     },
     toggleCraftingPanel: (state, action: PayloadAction<boolean | undefined>) => {
       state.craftingPanelOpen = action.payload !== undefined ? action.payload : !state.craftingPanelOpen;
     },
-    setSelectedClassId: (state, action: PayloadAction<CharacterClass>) => {
+    setSelectedClassId: (state, action: PayloadAction<AgentClass>) => {
       state.selectedClassId = action.payload;
     },
   },
@@ -155,10 +156,10 @@ export const uiSlice = createSlice({
   },
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, setAgentSchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleSpellsPanel, toggleSkillsPanel, toggleServitorPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
+export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, setAgentSchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleCapabilitiesPanel, toggleSkillsPanel, toggleCompanionPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
-const selectUIState = (state: { ui: UIState }) => state.ui;
+const selectUIState = (state: RootState) => state.ui;
 
 export const selectOracleInput = createSelector(
   [selectUIState],
@@ -210,9 +211,9 @@ export const selectInventoryOpen = createSelector(
   (ui) => ui.inventoryOpen
 );
 
-export const selectSpellsPanelOpen = createSelector(
+export const selectCapabilitiesPanelOpen = createSelector(
   [selectUIState],
-  (ui) => ui.spellsPanelOpen
+  (ui) => ui.capabilitiesPanelOpen
 );
 
 export const selectSkillsPanelOpen = createSelector(
@@ -220,9 +221,9 @@ export const selectSkillsPanelOpen = createSelector(
   (ui) => ui.skillsPanelOpen
 );
 
-export const selectServitorPanelOpen = createSelector(
+export const selectCompanionPanelOpen = createSelector(
   [selectUIState],
-  (ui) => ui.servitorPanelOpen
+  (ui) => ui.companionPanelOpen
 );
 
 export const selectClientHydrated = createSelector(
@@ -230,9 +231,9 @@ export const selectClientHydrated = createSelector(
   (ui) => ui.clientHydrated
 );
 
-export const selectActiveMerchantId = createSelector(
+export const selectActiveVendorId = createSelector(
   [selectUIState],
-  (ui) => ui.activeMerchantId
+  (ui) => ui.activeVendorId
 );
 
 export const selectCraftingPanelOpen = createSelector(

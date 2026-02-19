@@ -36,18 +36,18 @@ export function QuestsPanel({
       ))}
       {sessionComplete === "quests" && sessionScore && (
         <div className="text-xs text-palette-accent-mid pt-1 border-t border-palette-border/50">
-          Session complete — Rooms: {sessionScore.roomsExplored} | Scans:{" "}
-          {sessionScore.roomsScanned} | Foes: {sessionScore.enemiesDefeated} |
-          Trades: {sessionScore.merchantTrades} | Quests:{" "}
-          {sessionScore.questsCompleted} | Spirit: {sessionScore.spiritEarned}
+          Session complete — Areas: {sessionScore.areasExplored} | Scans:{" "}
+          {sessionScore.areasScanned} | Foes: {sessionScore.npcsDefeated} |
+          Trades: {sessionScore.vendorTrades} | Quests:{" "}
+          {sessionScore.questsCompleted} | Resources: {sessionScore.resourcesEarned}
         </div>
       )}
       {sessionComplete === "death" && sessionScore && (
         <div className="text-xs text-palette-accent-mid pt-1 border-t border-palette-border/50">
-          Session ended (death) — Rooms: {sessionScore.roomsExplored} | Scans:{" "}
-          {sessionScore.roomsScanned} | Foes: {sessionScore.enemiesDefeated} |
-          Trades: {sessionScore.merchantTrades} | Quests:{" "}
-          {sessionScore.questsCompleted} | Spirit: {sessionScore.spiritEarned}
+          Session ended (death) — Areas: {sessionScore.areasExplored} | Scans:{" "}
+          {sessionScore.areasScanned} | Foes: {sessionScore.npcsDefeated} |
+          Trades: {sessionScore.vendorTrades} | Quests:{" "}
+          {sessionScore.questsCompleted} | Resources: {sessionScore.resourcesEarned}
         </div>
       )}
     </div>

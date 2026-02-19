@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { sdkService } from '@/lib/sdk/cortexService';
+import { sdkService } from '@/features/game/sdk/cortexService';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../gameSlice';
 import type { GameState } from '../types';

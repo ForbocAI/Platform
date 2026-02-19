@@ -2,7 +2,7 @@
  * Helper functions for combat thunks
  */
 
-export interface SpellEffectFlags {
+export interface CapabilityEffectFlags {
     isAoE: boolean;
     isBuff: boolean;
     isInvuln: boolean;
@@ -18,9 +18,9 @@ export interface SpellEffectFlags {
 }
 
 /**
- * Parse spell effect string to determine effect flags
+ * Parse capability effect string to determine effect flags
  */
-export function parseSpellEffect(effectStr: string): SpellEffectFlags {
+export function parseCapabilityEffect(effectStr: string): CapabilityEffectFlags {
     const lower = effectStr.toLowerCase();
     return {
         isAoE: lower.includes("aoe"),
@@ -39,7 +39,7 @@ export function parseSpellEffect(effectStr: string): SpellEffectFlags {
 }
 
 /**
- * Create player status update based on spell effect
+ * Create player status update based on capability effect
  */
 export function createPlayerStatusUpdate(effectStr: string): any[] {
     const updates: any[] = [];
@@ -48,29 +48,29 @@ export function createPlayerStatusUpdate(effectStr: string): any[] {
     if (lower.includes("evasion")) {
         updates.push({
             id: "evasion_buff",
-            name: "Shadowmeld",
+            name: "Enhanced Evasion",
             type: "buff",
             statModifiers: { ac: 5 },
             duration: 3,
-            description: "Harder to hit."
+            description: "Increased evasion rating."
         });
     } else if (lower.includes("defense")) {
         updates.push({
             id: "defense_buff",
-            name: "Defensive Stance",
+            name: "Defensive Matrix",
             type: "buff",
             statModifiers: { ac: 2 },
             duration: 3,
-            description: "Braced for impact."
+            description: "Reinforced shielding."
         });
     } else if (lower.includes("buff damage")) {
         updates.push({
             id: "damage_buff",
-            name: "Inferno Overdrive",
+            name: "Damage Overdrive",
             type: "buff",
             damageBonus: 5,
             duration: 3,
-            description: "Attacks deal +5 damage."
+            description: "Attacks deal bonus damage."
         });
     }
 
@@ -78,9 +78,9 @@ export function createPlayerStatusUpdate(effectStr: string): any[] {
 }
 
 /**
- * Create enemy status effects based on spell effect flags
+ * Create NPC status effects based on capability effect flags
  */
-export function createEnemyStatusEffects(flags: SpellEffectFlags): any[] {
+export function createNPCStatusEffects(flags: CapabilityEffectFlags): any[] {
     const effects: any[] = [];
 
     if (flags.isImmobilize) {
@@ -90,13 +90,13 @@ export function createEnemyStatusEffects(flags: SpellEffectFlags): any[] {
         effects.push({ id: "stun", name: "Stunned", type: "debuff", duration: 2, description: "Cannot act." });
     }
     if (flags.isBurn) {
-        effects.push({ id: "burn", name: "Burn", type: "debuff", duration: 3, description: "Takes fire damage.", damagePerTurn: 3 });
+        effects.push({ id: "burn", name: "Degradation", type: "debuff", duration: 3, description: "Takes periodic damage.", damagePerTurn: 3 });
     }
     if (flags.isConfuse) {
         effects.push({ id: "confused", name: "Confused", type: "debuff", duration: 2, description: "Chance to attack allies." });
     }
     if (flags.isFear) {
-        effects.push({ id: "fear", name: "Fear", type: "debuff", duration: 2, description: "Reduced accuracy." });
+        effects.push({ id: "fear", name: "Suppression", type: "debuff", duration: 2, description: "Reduced accuracy." });
     }
 
     return effects;

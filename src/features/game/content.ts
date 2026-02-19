@@ -20,7 +20,7 @@ export const LORE_GOETIAN_CHTHONICA = "Goetéian Chthonica";
 export const LORE_QUADAR_TOWER = "Qua'dar Tower";
 export const LORE_MIGDAL_KUDAR = "Migdal Kudar";
 
-/** The Quadrangle — central hub area, focal point of the plot; Merchant dwells here. */
+/** The Quadrangle — central hub area, focal point of the plot; Vendor dwells here. */
 export const LORE_QUADRANGLE = "Quadrangle";
 
 /** The protagonist: interloper, ranger, nomadic chronicler, starweaver. */
@@ -43,7 +43,7 @@ export const LORE_CHURNING_PHRASE =
 export const LORE_RIFT_REALM = "Rift-laden Realm";
 export const LORE_THE_MANY = "the Many";
 
-/** Wares the Merchant offers: tomes, spells, rations, food, booze, gear, weapons, upgrades. */
+/** Wares the Vendor offers: tomes, spells, rations, food, booze, gear, weapons, upgrades. */
 export const LORE_WARES = [
   "tomes",
   "spell books",

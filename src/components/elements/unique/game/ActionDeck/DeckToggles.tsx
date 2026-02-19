@@ -1,44 +1,49 @@
 "use client";
 
-import { Wand2, Award, Box, Users } from "lucide-react";
-import type { Player } from "@/features/game/types";
+import { Wand2, Award, Box, Users, Zap } from "lucide-react";
+import type { AgentPlayer } from "@/features/game/types";
 
 export function DeckToggles({
   player,
-  onOpenSpells,
+  onOpenCapabilities,
   onOpenSkills,
   onOpenInventory,
-  onOpenServitor,
+  onOpenCompanion,
 }: {
-  player: Player;
-  onOpenSpells?: () => void;
+  player: AgentPlayer;
+  onOpenCapabilities?: () => void;
   onOpenSkills?: () => void;
   onOpenInventory?: () => void;
-  onOpenServitor?: () => void;
+  onOpenCompanion?: () => void;
 }) {
   return (
     <div className="flex flex-row gap-2 border-l border-palette-border pl-2 items-center shrink-0">
       <button
         type="button"
-        onClick={onOpenSpells}
+        onClick={onOpenCapabilities}
         className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-mid/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
-        data-testid="spells-toggle"
-        aria-label="View spells"
-        title="View spells"
+        data-testid="capabilities-toggle"
+        aria-label="View capabilities"
+        title="View capabilities"
       >
         <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs whitespace-nowrap">
-          <span className="hidden sm:inline">Spells</span>
+          <span className="hidden sm:inline">Capabilities</span>
         </span>
         <div className="flex gap-px">
-          {player.spells.map((spell) => (
+          {(player.capabilities ?? []).slice(0, 3).map((id) => (
             <div
-              key={spell}
+              key={id}
               className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
-              title={spell}
+              title={id}
             >
-              <Wand2 className="app-icon" />
+              <Zap className="app-icon" />
             </div>
           ))}
+          {player.capabilities.length > 3 && (
+            <div className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted text-[10px] font-mono pointer-events-none">
+              +{player.capabilities.length - 3}
+            </div>
+          )}
         </div>
       </button>
       <button
@@ -53,7 +58,7 @@ export function DeckToggles({
           <span className="hidden sm:inline">Skills</span>
         </span>
         <div className="flex gap-px">
-          {(player.skills ?? []).map((skill) => (
+          {(player.capabilities ?? []).map((skill) => (
             <div
               key={skill}
               className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
@@ -87,20 +92,20 @@ export function DeckToggles({
           ))}
         </div>
       </button>
-      {(player.servitors?.length ?? 0) > 0 && (
+      {(player.companions?.length ?? 0) > 0 && (
         <button
           type="button"
-          onClick={onOpenServitor}
+          onClick={onOpenCompanion}
           className="flex flex-col gap-0.5 text-left border border-transparent hover:border-palette-accent-lime/50 rounded p-1 -m-1 transition-colors cursor-pointer min-w-0"
-          data-testid="servitor-toggle"
-          aria-label="View Servitors"
-          title="View Servitors"
+          data-testid="companion-toggle"
+          aria-label="View Companions"
+          title="View Companions"
         >
           <span className="text-palette-muted uppercase tracking-widest leading-tight text-xs whitespace-nowrap">
-            <span className="hidden sm:inline">Servitors</span>
+            <span className="hidden sm:inline">Companions</span>
           </span>
           <div className="flex gap-px">
-            {player.servitors!.map((comp) => (
+            {player.companions!.map((comp) => (
               <div
                 key={comp.id}
                 className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"

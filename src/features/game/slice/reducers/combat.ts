@@ -8,11 +8,11 @@ import { addDeathReducers } from './death';
 
 function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.engageHostiles.fulfilled, (state, action) => {
-        if (!action.payload || !state.player || !state.currentRoom) return;
-        const { enemyId, enemyDamage, enemyDefeated, playerDamage } = action.payload;
-        const skills = state.player.skills ?? [];
-        const actualPlayerDamage = applyDamageTakenReduction(skills, playerDamage);
-        const actualEnemyDamage = applyDamageDealtBonus(skills, state.player.activeEffects, enemyDamage);
+        if (!action.payload || !state.player || !state.currentArea) return;
+        const { npcId, npcDamage, npcDefeated, playerDamage } = action.payload;
+        const capabilities = state.player.capabilities ?? [];
+        const actualPlayerDamage = applyDamageTakenReduction(capabilities, playerDamage);
+        const actualNPCDamage = applyDamageDealtBonus(capabilities, state.player.activeEffects, npcDamage);
 
         // Process Player Effects (DoT & Duration)
         if (state.player.activeEffects) {
@@ -46,28 +46,28 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
         if (state.player.hp < 0) state.player.hp = 0;
         state.player.stress += 1;
 
-        const servitorUpdates = (action.payload as { servitorUpdates?: { id: string; damageTaken: number }[] }).servitorUpdates;
-        if (servitorUpdates && state.player.servitors) {
-            for (const update of servitorUpdates) {
-                const srvIndex = state.player.servitors.findIndex(c => c.id === update.id);
-                if (srvIndex !== -1) {
-                    const srv = state.player.servitors[srvIndex];
-                    srv.hp -= update.damageTaken;
-                    if (srv.hp <= 0) {
+        const companionUpdates = (action.payload as { companionUpdates?: { id: string; damageTaken: number }[] }).companionUpdates;
+        if (companionUpdates && state.player.companions) {
+            for (const update of companionUpdates) {
+                const cmpIndex = state.player.companions.findIndex(c => c.id === update.id);
+                if (cmpIndex !== -1) {
+                    const cmp = state.player.companions[cmpIndex];
+                    cmp.hp -= update.damageTaken;
+                    if (cmp.hp <= 0) {
                         state.logs.push({
                             id: Date.now().toString(),
                             timestamp: Date.now(),
-                            message: `${srv.name} has fallen in battle!`,
+                            message: `${cmp.name} has fallen in battle!`,
                             type: "combat"
                         });
-                        state.player.servitors.splice(srvIndex, 1);
+                        state.player.companions.splice(cmpIndex, 1);
                     }
                 }
             }
         }
 
-        const enemies = state.currentRoom.enemies.map(e => {
-            // Process Enemy Effects (DoT & Duration)
+        const npcs = state.currentArea.npcs.map(e => {
+            // Process NPC Effects (DoT & Duration)
             let currentHp = e.hp;
             let currentEffects = e.activeEffects || [];
             const nextEffects: typeof currentEffects = [];
@@ -88,12 +88,12 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
                 }
             }
 
-            if (e.id === enemyId) {
-                const afterAttackHp = currentHp - actualEnemyDamage;
+            if (e.id === npcId) {
+                const afterAttackHp = currentHp - actualNPCDamage;
                 return {
                     ...e,
                     hp: afterAttackHp,
-                    lastDamageTime: actualEnemyDamage > 0 ? Date.now() : e.lastDamageTime,
+                    lastDamageTime: actualNPCDamage > 0 ? Date.now() : e.lastDamageTime,
                     lastAttackTime: Date.now(),
                     activeEffects: nextEffects
                 };
@@ -106,47 +106,47 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
             };
         });
 
-        if (enemyDefeated) {
-            state.currentRoom.enemies = enemies.filter(e => e.id !== enemyId);
+        if (npcDefeated) {
+            state.currentArea.npcs = npcs.filter(e => e.id !== npcId);
             const lootItems = (action.payload as { lootItems?: Item[] }).lootItems ?? [];
             applyLoot(state, lootItems);
             applyCombatRewards(state, 1);
             const xpGain = (action.payload as { xpGain?: number }).xpGain || 0;
             applyXpGain(state, xpGain);
         } else {
-            state.currentRoom.enemies = enemies;
+            state.currentArea.npcs = npcs;
         }
     });
 }
 
-function addCastSpellReducer(builder: ActionReducerMapBuilder<GameState>): void {
-    builder.addCase(thunks.castSpell.fulfilled, (state, action) => {
-        if (!action.payload || !state.player || !state.currentRoom) return;
+function addCastCapabilityReducer(builder: ActionReducerMapBuilder<GameState>): void {
+    builder.addCase(thunks.castCapability.fulfilled, (state, action) => {
+        if (!action.payload || !state.player || !state.currentArea) return;
 
         const payload = action.payload as {
-            enemyId: string;
-            enemyDamage: number;
-            enemyDefeated: boolean;
+            npcId: string;
+            npcDamage: number;
+            npcDefeated: boolean;
             playerDamage: number;
             xpGain: number;
             lootItems: Item[];
-            aoeUpdates?: { enemyId: string; damage: number; defeated: boolean; statusEffects?: StatusEffect[] }[];
+            aoeUpdates?: { npcId: string; damage: number; defeated: boolean; statusEffects?: StatusEffect[] }[];
             playerStatusUpdates?: StatusEffect[];
             playerHeal?: number;
         };
 
         const { playerDamage, aoeUpdates, playerStatusUpdates, playerHeal } = payload;
-        const spellSkills = state.player.skills ?? [];
+        const capabilities = state.player.capabilities ?? [];
 
         // 1. Apply Player Damage, Heal, and Status
-        const actualPlayerDamageSpell = applyDamageTakenReduction(spellSkills, playerDamage);
+        const actualPlayerDamageCapability = applyDamageTakenReduction(capabilities, playerDamage);
 
         // Apply Heal
         if (playerHeal && playerHeal > 0) {
             state.player.hp = Math.min(state.player.maxHp, state.player.hp + playerHeal);
         }
 
-        state.player.hp -= actualPlayerDamageSpell;
+        state.player.hp -= actualPlayerDamageCapability;
         if (state.player.hp < 0) state.player.hp = 0;
         state.player.stress += 1;
 
@@ -159,21 +159,21 @@ function addCastSpellReducer(builder: ActionReducerMapBuilder<GameState>): void 
             }
         }
 
-        // 2. Apply Enemy Damage (AoE or Single) and Status
+        // 2. Apply NPC Damage (AoE or Single) and Status
         let updates = aoeUpdates;
         if (!updates) {
             updates = [{
-                enemyId: payload.enemyId,
-                damage: payload.enemyDamage,
-                defeated: payload.enemyDefeated,
+                npcId: payload.npcId,
+                damage: payload.npcDamage,
+                defeated: payload.npcDefeated,
                 statusEffects: []
             }];
         }
 
-        const enemiesSpell = state.currentRoom.enemies.map(e => {
-            const update = updates?.find(u => u.enemyId === e.id);
+        const npcsCapability = state.currentArea.npcs.map(e => {
+            const update = updates?.find(u => u.npcId === e.id);
             if (update) {
-                const actualDamage = applyDamageDealtBonus(spellSkills, state.player?.activeEffects, update.damage);
+                const actualDamage = applyDamageDealtBonus(capabilities, state.player?.activeEffects, update.damage);
                 let newHp = e.hp - actualDamage;
 
                 let newEffects = e.activeEffects || [];
@@ -196,24 +196,24 @@ function addCastSpellReducer(builder: ActionReducerMapBuilder<GameState>): void 
         });
 
         // 3. Handle Death and Loot
-        const livingEnemies = enemiesSpell.filter(e => e.hp > 0);
-        const deadEnemiesCount = state.currentRoom.enemies.length - livingEnemies.length;
+        const livingNPCs = npcsCapability.filter(e => e.hp > 0);
+        const deadNPCsCount = state.currentArea.npcs.length - livingNPCs.length;
 
-        if (deadEnemiesCount > 0) {
-            state.currentRoom.enemies = livingEnemies;
+        if (deadNPCsCount > 0) {
+            state.currentArea.npcs = livingNPCs;
             applyLoot(state, payload.lootItems ?? []);
-            applyCombatRewards(state, deadEnemiesCount);
+            applyCombatRewards(state, deadNPCsCount);
         } else {
-            state.currentRoom.enemies = enemiesSpell;
+            state.currentArea.npcs = npcsCapability;
         }
 
         applyXpGain(state, payload.xpGain || 0);
     });
-    builder.addCase(thunks.castSpell.rejected, (state, action) => {
+    builder.addCase(thunks.castCapability.rejected, (state, action) => {
         state.logs.push({
             id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             timestamp: Date.now(),
-            message: `Spell cast failed: ${action.error.message || "Unknown error"}`,
+            message: `Capability execution failed: ${action.error.message || "Unknown error"}`,
             type: "system"
         });
     });
@@ -221,6 +221,6 @@ function addCastSpellReducer(builder: ActionReducerMapBuilder<GameState>): void 
 
 export function addCombatReducers(builder: ActionReducerMapBuilder<GameState>): void {
     addEngageHostilesReducer(builder);
-    addCastSpellReducer(builder);
+    addCastCapabilityReducer(builder);
     addDeathReducers(builder);
 }

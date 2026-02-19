@@ -6,21 +6,21 @@ import type { CortexDirective } from '@/features/game/mechanics/ai/types';
  * Maps Qua'dar GameState to ForbocAI SDK Observation
  */
 export function toObservation(gameState: GameState): Observation {
-    const { player, currentRoom } = gameState;
+    const { player, currentArea } = gameState;
 
     const parts: string[] = [];
     if (player) {
         parts.push(`Player HP: ${player.hp}/${player.maxHp}`);
         parts.push(`Stress: ${player.stress ?? 0}/${player.maxStress}`);
-        parts.push(`Spirit: ${player.spirit ?? 0}, Blood: ${player.blood ?? 0}`);
+        parts.push(`Primary Resource: ${player.resourcePrimary ?? 0}, Secondary Resource: ${player.resourceSecondary ?? 0}`);
         parts.push(`Inventory: ${player.inventory?.length ?? 0} items`);
     }
-    if (currentRoom) {
-        parts.push(`Location: ${currentRoom.title}`);
-        parts.push(`Enemies: ${currentRoom.enemies?.length ?? 0}`);
-        parts.push(`Merchants: ${currentRoom.merchants?.length ?? 0}`);
-        parts.push(`Ground loot: ${currentRoom.groundLoot?.length ?? 0}`);
-        parts.push(`Base camp: ${currentRoom.isBaseCamp ? 'yes' : 'no'}`);
+    if (currentArea) {
+        parts.push(`Location: ${currentArea.title}`);
+        parts.push(`NPCs: ${currentArea.npcs?.length ?? 0}`);
+        parts.push(`Vendors: ${currentArea.vendors?.length ?? 0}`);
+        parts.push(`Ground loot: ${currentArea.groundLoot?.length ?? 0}`);
+        parts.push(`Base camp: ${currentArea.isBaseCamp ? 'yes' : 'no'}`);
     }
 
     return {
@@ -32,9 +32,9 @@ export function toObservation(gameState: GameState): Observation {
             hp: player?.hp,
             maxHp: player?.maxHp,
             stress: player?.stress,
-            enemyCount: currentRoom?.enemies?.length ?? 0,
-            roomTitle: currentRoom?.title,
-            isBaseCamp: currentRoom?.isBaseCamp,
+            npcCount: currentArea?.npcs?.length ?? 0,
+            areaTitle: currentArea?.title,
+            isBaseCamp: currentArea?.isBaseCamp,
         },
     };
 }

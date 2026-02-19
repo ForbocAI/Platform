@@ -1,4 +1,4 @@
 export { selectNextBiome, BIOME_TRANSITIONS, BIOMES } from "./biomes";
-export type { RoomGenContext } from "./biomes";
-export { generateGroundLoot, getEnemyLoot, BIOME_GROUND_LOOT, ENEMY_LOOT } from "./loot";
-export { generateRandomEnemy, ENEMY_TEMPLATES } from "./enemies";
+export type { AreaGenContext } from "./biomes";
+export { generateGroundLoot, getNPCLoot, BIOME_GROUND_LOOT, NPC_LOOT } from "./loot";
+export { generateRandomAgentNPC, NPC_TEMPLATES } from "./npcs";

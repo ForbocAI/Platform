@@ -1,4 +1,4 @@
-import type { Biome, Merchant, Item } from "../types";
+import type { Biome, Vendor, Item } from "../types";
 import { ITEMS, MATERIALS } from "../mechanics";
 import { BIOME_GROUND_LOOT } from "../generation";
 
@@ -31,9 +31,9 @@ const SPECIALIST_DESCRIPTIONS: Readonly<Record<string, string>> = {
 } as const;
 
 const SPECIALIST_TYPES = ["Weaponsmith", "Alchemist", "Relic Hunter"] as const;
-const MERCHANT_TYPES = ["Scavenger", "Nomad", "Tech-Trader", "Mystic", "Mercenary Captain", ...SPECIALIST_TYPES] as const;
+const VENDOR_TYPES = ["Scavenger", "Nomad", "Tech-Trader", "Mystic", "Mercenary Captain", ...SPECIALIST_TYPES] as const;
 
-// --- Wares generation (pure functions per merchant specialty) ---
+// --- Wares generation (pure functions per vendor specialty) ---
 
 const generateWeaponsmithWares = (): Item[] => {
     const weaponItems = ITEMS.filter(i => i.type === "weapon" || i.type === "armor");
@@ -54,7 +54,7 @@ const generateAlchemistWares = (biome?: Biome): Item[] => {
 };
 
 const generateRelicHunterWares = (): Item[] => {
-    const rareItems = ITEMS.filter(i => (i.cost?.spirit || 0) >= 15 || i.type === "relic");
+    const rareItems = ITEMS.filter(i => (i.cost?.primary || 0) >= 15 || i.type === "relic");
     const pool = rareItems.length > 0 ? rareItems : ITEMS.filter(i => i.type !== "contract");
     return pickRandom(pool, Math.floor(Math.random() * 2) + 2).map(instanceOf);
 };
@@ -65,17 +65,17 @@ const SPECIALIST_WARES: Readonly<Record<string, (biome?: Biome) => Item[]>> = {
     "Relic Hunter": generateRelicHunterWares,
 };
 
-/** Generate wares for a merchant (pure, data-driven). */
-export const generateWares = (biome?: Biome, merchantType?: string): Item[] => {
+/** Generate wares for a vendor (pure, data-driven). */
+export const generateWares = (biome?: Biome, vendorType?: string): Item[] => {
     // Specialist curated wares
-    const specialistGen = merchantType ? SPECIALIST_WARES[merchantType] : undefined;
+    const specialistGen = vendorType ? SPECIALIST_WARES[vendorType] : undefined;
     if (specialistGen) return specialistGen(biome);
 
-    // Generic merchant wares
+    // Generic vendor wares
     const wares: Item[] = [];
 
     // Contracts for Mercenary Captain or occasional random
-    if (merchantType === "Mercenary Captain" || Math.random() < 0.1) {
+    if (vendorType === "Mercenary Captain" || Math.random() < 0.1) {
         const contracts = ITEMS.filter(i => i.type === "contract");
         if (contracts.length > 0) {
             wares.push(instanceOf(contracts[Math.floor(Math.random() * contracts.length)]));
@@ -104,9 +104,9 @@ export const generateWares = (biome?: Biome, merchantType?: string): Item[] => {
     return wares;
 };
 
-/** Generate a single merchant (pure). */
-export const generateRandomMerchant = (biome?: Biome, forcedType?: string): Merchant => {
-    const type = forcedType ?? MERCHANT_TYPES[Math.floor(Math.random() * MERCHANT_TYPES.length)];
+/** Generate a single vendor (pure). */
+export const generateRandomVendor = (biome?: Biome, forcedType?: string): Vendor => {
+    const type = forcedType ?? VENDOR_TYPES[Math.floor(Math.random() * VENDOR_TYPES.length)];
     const wares = generateWares(biome, type);
 
     const namePool = SPECIALIST_NAMES[type];
@@ -119,13 +119,13 @@ export const generateRandomMerchant = (biome?: Biome, forcedType?: string): Merc
     return { id: Math.random().toString(36).substring(7), name, description, specialty, wares };
 };
 
-/** Generate a marketplace with 2 specialists + 1 generic merchant (pure). */
-export const generateMarketplace = (biome?: Biome): Merchant[] => {
+/** Generate a marketplace with 2 specialists + 1 generic vendor (pure). */
+export const generateMarketplace = (biome?: Biome): Vendor[] => {
     const picked = [...SPECIALIST_TYPES]
         .sort(() => Math.random() - 0.5)
         .slice(0, 2);
     return [
-        ...picked.map(s => generateRandomMerchant(biome, s)),
-        generateRandomMerchant(biome), // one generic
+        ...picked.map(s => generateRandomVendor(biome, s)),
+        generateRandomVendor(biome), // one generic
     ];
 };

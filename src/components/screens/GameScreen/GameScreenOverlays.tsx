@@ -1,47 +1,47 @@
 "use client";
 
-import { InventoryPanel, SpellsPanel, SkillsPanel, ConcessionModal, TradePanel, ServitorPanel, CraftingPanel } from "@/components/elements/unique";
-import type { Player, EquipmentSlot, Merchant } from "@/features/game/types";
+import { InventoryPanel, CapabilitiesPanel, SkillsPanel, ConcessionModal, TradePanel, CompanionPanel, CraftingPanel } from "@/components/elements/unique";
+import type { AgentPlayer, EquipmentSlot, Vendor } from "@/features/game/types";
 
 export function GameScreenOverlays({
   inventoryOpen,
-  spellsPanelOpen,
+  capabilitiesPanelOpen,
   skillsPanelOpen,
   player,
   onCloseInventory,
-  onCloseSpells,
+  onCloseCapabilities,
   onCloseSkills,
-  servitorPanelOpen,
-  onCloseServitor,
+  companionPanelOpen,
+  onCloseCompanion,
   onAcceptConcession,
   onRejectConcession,
   onEquipItem,
   onUnequipItem,
   onUseItem,
-  activeMerchant,
+  activeVendor,
   onCloseTrade,
-  onSelectSpell,
+  onSelectCapability,
   onSacrificeItem,
   craftingPanelOpen,
   onCloseCrafting,
 }: {
   inventoryOpen: boolean;
-  spellsPanelOpen: boolean;
+  capabilitiesPanelOpen: boolean;
   skillsPanelOpen: boolean;
-  player: Player;
+  player: AgentPlayer;
   onCloseInventory: () => void;
-  onCloseSpells: () => void;
+  onCloseCapabilities: () => void;
   onCloseSkills: () => void;
-  servitorPanelOpen: boolean;
-  onCloseServitor: () => void;
+  companionPanelOpen: boolean;
+  onCloseCompanion: () => void;
   onAcceptConcession?: (type: 'flee' | 'capture') => void;
   onRejectConcession?: () => void;
   onEquipItem?: (itemId: string, slot: EquipmentSlot) => void;
   onUnequipItem?: (slot: EquipmentSlot) => void;
   onUseItem?: (itemId: string) => void;
-  activeMerchant?: Merchant | null;
+  activeVendor: Vendor | null;
   onCloseTrade?: () => void;
-  onSelectSpell?: (spellId: string) => void;
+  onSelectCapability?: (id: string) => void;
   onSacrificeItem?: (itemId: string) => void;
   craftingPanelOpen: boolean;
   onCloseCrafting: () => void;
@@ -56,13 +56,14 @@ export function GameScreenOverlays({
           onUnequip={(slot) => onUnequipItem?.(slot)}
           onUse={(id) => onUseItem?.(id)}
           onSacrifice={(id) => onSacrificeItem?.(id)}
+          onDrop={(id) => console.warn('Drop not implemented')}
         />
       )}
-      {spellsPanelOpen && (
-        <SpellsPanel
+      {capabilitiesPanelOpen && (
+        <CapabilitiesPanel
           player={player}
-          onClose={onCloseSpells}
-          onSelectSpell={onSelectSpell}
+          onClose={onCloseCapabilities}
+          onSelectCapability={onSelectCapability}
         />
       )}
       {skillsPanelOpen && (
@@ -71,10 +72,10 @@ export function GameScreenOverlays({
           onClose={onCloseSkills}
         />
       )}
-      {servitorPanelOpen && (
-        <ServitorPanel
+      {companionPanelOpen && (
+        <CompanionPanel
           player={player}
-          onClose={onCloseServitor}
+          onClose={onCloseCompanion}
         />
       )}
       <ConcessionModal
@@ -82,10 +83,10 @@ export function GameScreenOverlays({
         onAccept={(type) => onAcceptConcession?.(type)}
         onReject={() => onRejectConcession?.()}
       />
-      {activeMerchant && (
+      {activeVendor && (
         <TradePanel
           player={player}
-          merchant={activeMerchant}
+          vendor={activeVendor}
           onClose={() => onCloseTrade?.()}
         />
       )}

@@ -10,5 +10,5 @@
  */
 
 export { computeAwareness } from './awareness';
-export { runBehaviorTree, AUTOPLAY_CONFIG, NPC_RANGER_CONFIG, SERVITOR_CONFIG } from './behaviorTree';
+export { runBehaviorTree, AUTOPLAY_CONFIG, NPC_RANGER_CONFIG, COMPANION_CONFIG } from './behaviorTree';
 export type { AgentConfig, AgentAction, AgentCapability, AgentTraits, AwarenessResult, CortexDirective } from './types';

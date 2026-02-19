@@ -7,10 +7,10 @@ export const pickUpGroundLoot = createAsyncThunk(
   'game/pickUpGroundLoot',
   async ({ itemId }: { itemId: string }, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
-    const { currentRoom, player } = state.game;
-    if (!currentRoom || !player || !currentRoom.groundLoot) return;
+    const { currentArea, player } = state.game;
+    if (!currentArea || !player || !currentArea.groundLoot) return;
 
-    const item = currentRoom.groundLoot.find((i) => i.id === itemId);
+    const item = currentArea.groundLoot.find((i) => i.id === itemId);
     if (!item) return;
 
     dispatch(addLog({ message: `Picked up ${item.name}.`, type: 'system' }));
@@ -37,8 +37,8 @@ export const useItem = createAsyncThunk(
     const item = player.inventory[itemIndex];
 
     if (item.type === 'contract' && item.contractDetails) {
-      dispatch(addLog({ message: `You signed ${item.name}. ${item.contractDetails.servitorName} joins your party!`, type: 'system' }));
-      return { itemIndex, effect: 'hire_servitor' as const, contractDetails: item.contractDetails };
+      dispatch(addLog({ message: `You signed ${item.name}. ${item.contractDetails.targetName} joins your party!`, type: 'system' }));
+      return { itemIndex, effect: 'hire_companion' as const, contractDetails: item.contractDetails };
     }
 
     if (item.type !== 'consumable') return;
@@ -107,13 +107,13 @@ export const sacrificeItem = createAsyncThunk(
     if (itemIndex === -1) return;
 
     const item = player.inventory[itemIndex];
-    const value = item.cost?.spirit || 0;
+    const value = item.cost?.primary || 0;
 
     if (value <= 0) return;
 
     const gain = Math.max(1, Math.floor(value / 2));
 
-    dispatch(addLog({ message: `Sacrificed ${item.name} for ${gain} Spirit.`, type: 'system' }));
+    dispatch(addLog({ message: `Sacrificed ${item.name} for ${gain} Primary.`, type: 'system' }));
     dispatch(
       addFact({
         text: `Sacrificed ${item.name} to the void.`,

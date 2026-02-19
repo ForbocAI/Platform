@@ -1,6 +1,6 @@
-import type { Player } from "@/features/game/types";
+import type { AgentPlayer } from "@/features/game/types";
 
-export function PlayerHeaderBars({ player }: { player: Player }) {
+export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
   return (
     <div className="flex-1 flex flex-col gap-0.5 sm:gap-1 justify-center min-w-44">
       <div className="min-w-0 flex items-center gap-1" title="HP">
@@ -49,22 +49,22 @@ export function PlayerHeaderBars({ player }: { player: Player }) {
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Spirit</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
-            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.spirit ?? 0) > 0 ? "100%" : "0%" }} />
+            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.resourcePrimary ?? 0) > 0 ? "100%" : "0%" }} />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.spirit ?? 0}
+          {player.resourcePrimary ?? 0}
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="Blood">
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Blood</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
-            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.blood ?? 0) > 0 ? "100%" : "0%" }} />
+            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.resourceSecondary ?? 0) > 0 ? "100%" : "0%" }} />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.blood ?? 0}
+          {player.resourceSecondary ?? 0}
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="Surge">

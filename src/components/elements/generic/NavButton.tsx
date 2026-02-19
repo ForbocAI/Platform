@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/features/core/utils";
 import { useAppDispatch } from "@/features/core/store";
 import { playButtonSound } from "@/features/audio";
 

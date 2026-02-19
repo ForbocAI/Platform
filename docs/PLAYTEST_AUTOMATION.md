@@ -126,6 +126,9 @@ Use auto-play for soak testing or to quickly generate log/facts state for manual
 | **Session completion / Scoring** | Complete all quests → session complete; score shows rooms explored, scans, foes defeated, quests completed, spirit earned. | ✅ **Implemented:** When all active quests are complete, `sessionComplete` is set; Quests panel shows "Session complete — Rooms: N | Scans: N | Foes: N | Quests: N | Spirit: N". |
 | **Servitor Combat** | Load `?deterministic=1&forceMerchant=1&forceEnemy=1` (spawns Captain & Enemy). Trade -> Buy Contract -> Inventory -> Sign. Click "Engage enemy". | ✅ Servitor participates in combat. Log shows "ServitorName attacks Enemy...". Enemy retaliates against Player OR Servitor. |
 | **Servitor Management** | With a servitor hired (Servitors indicator visible in header), click "Servitors". | ✅ **Implemented:** Servitors panel opens showing servitor name, role, HP bar, and stats. |
+| **SDK Initialization** | Load game normally. Check browser console for "ForbocAI SDK Initialized". | ✅ **Implemented:** Handled via `BootstrapGate`. |
+| **Soul Re-hydration** | Inject `soulId` (Arweave TXID) into room enemy data. Verify NPC/Agent hydrate correctly. | ✅ **Implemented:** `rehydrateAgent` thunk support. |
+| **Pondering States** | Observe `ponderingAgentIds` in Redux during agent tick. | ✅ **Implemented:** UI log entries + Redux state. |
 
 ### Reproduction steps (cursor-ide-browser)
 
