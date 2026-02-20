@@ -116,7 +116,7 @@ export function AreaViewport({
                   <h3 className="text-palette-accent-mid font-bold uppercase tracking-wider flex items-center gap-1">
                     <Skull className="app-icon" /> {npc.name}
                   </h3>
-                  <span className="font-bold text-palette-white">HP {npc.hp}</span>
+                  <span className="font-bold text-palette-white">HP {npc.stats.hp}</span>
                 </div>
               );
             })}

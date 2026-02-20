@@ -1,83 +1,83 @@
 import type { AgentNPC } from "../types";
 
-export const NPC_TEMPLATES: Record<string, Partial<AgentNPC>> = {
+export const NPC_TEMPLATES: Record<string, any> = {
     "Obsidian Warden": {
-        agentClass: "Obsidian Warden",
-        ac: 15,
+        type: "Obsidian Warden", // Will be made generic in Phase 2
         description: "A tower of black glass and malice.",
-        maxHp: 60, capabilities: ["obsidian_surge", "death_shard_strike"]
+        baseStats: { maxHp: 60, defense: 15, damage: 10, speed: 0.5 },
+        capabilities: ["obsidian_surge", "death_shard_strike"]
     },
     "Doomguard": {
-        agentClass: "Doomguard",
-        ac: 14,
+        type: "Doomguard",
         description: "A shell of armor powered by sheer hate.",
-        maxHp: 50, capabilities: ["hellfire_explosion", "dreadful_charge"]
+        baseStats: { maxHp: 50, defense: 14, damage: 8, speed: 0.8 },
+        capabilities: ["hellfire_explosion", "dreadful_charge"]
     },
     "Ashwalker Renegade": {
-        agentClass: "Ashwalker",
-        ac: 13,
+        type: "Ashwalker",
         description: "A fallen ranger turned to madness.",
-        maxHp: 40, capabilities: ["ember_dash", "relic_strike"]
+        baseStats: { maxHp: 40, defense: 13, damage: 7, speed: 1.0 },
+        capabilities: ["ember_dash", "relic_strike"]
     },
     "Iron Armored Guardian": {
-        agentClass: "Iron Armored Guardian",
-        ac: 16,
+        type: "Iron Armored Guardian",
         description: "Heavily armored medieval swordfest knight.",
-        maxHp: 55, capabilities: ["ironclad_charge", "steel_shield_block"]
+        baseStats: { maxHp: 55, defense: 16, damage: 9, speed: 0.6 },
+        capabilities: ["ironclad_charge", "steel_shield_block"]
     },
     "Aether Spirit": {
-        agentClass: "Aether Spirit",
-        ac: 12,
+        type: "Aether Spirit",
         description: "A fleeting form of shimmering angles.",
-        maxHp: 35, capabilities: ["ethereal_phasing", "astral_bolt"]
+        baseStats: { maxHp: 35, defense: 12, damage: 12, speed: 1.2 },
+        capabilities: ["ethereal_phasing", "astral_bolt"]
     },
     "Thunder Trooper": {
-        agentClass: "Thunder Trooper",
-        ac: 13,
+        type: "Thunder Trooper",
         description: "A raining commando with a love of carnage.",
-        maxHp: 45, capabilities: ["shotgun_barrage", "grenade_assault"]
+        baseStats: { maxHp: 45, defense: 13, damage: 11, speed: 1.1 },
+        capabilities: ["shotgun_barrage", "grenade_assault"]
     },
     "Storm Titan": {
-        agentClass: "Storm Titan",
-        ac: 18,
+        type: "Storm Titan",
         description: "A hulking creature with quantum electric attacks.",
-        maxHp: 120, capabilities: ["electrical_charge", "thunderous_slam"]
+        baseStats: { maxHp: 120, defense: 18, damage: 20, speed: 0.4 },
+        capabilities: ["electrical_charge", "thunderous_slam"]
     },
     "Flame Corps Brute": {
-        agentClass: "Flame Corps",
-        ac: 14,
+        type: "Flame Corps",
         description: "A large, brutish phallic creature with a grenade launcher.",
-        maxHp: 65, capabilities: ["napalm_grenade", "inferno_overdrive"]
+        baseStats: { maxHp: 65, defense: 14, damage: 15, speed: 0.7 },
+        capabilities: ["napalm_grenade", "inferno_overdrive"]
     },
     "Gravewalker": {
-        agentClass: "Gravewalker",
-        ac: 11,
+        type: "Gravewalker",
         description: "A reanimated corpse, a dead wandering.",
-        maxHp: 70, capabilities: ["necrotic_strike", "rotting_grasp", "bone_shatter"]
+        baseStats: { maxHp: 70, defense: 11, damage: 13, speed: 0.9 },
+        capabilities: ["necrotic_strike", "rotting_grasp", "bone_shatter"]
     },
     "Shadowhorn Juggernaut": {
-        agentClass: "Shadowhorn Juggernaut",
-        ac: 14,
+        type: "Shadowhorn Juggernaut",
         description: "An agile, horned creature with powerful melee attacks.",
-        maxHp: 60, capabilities: ["horn_charge", "seismic_stomp", "shadow_rush"]
+        baseStats: { maxHp: 60, defense: 14, damage: 14, speed: 1.3 },
+        capabilities: ["horn_charge", "seismic_stomp", "shadow_rush"]
     },
     "Magma Leviathan": {
-        agentClass: "Magma Leviathan",
-        ac: 20,
+        type: "Magma Leviathan",
         description: "A huge, massive lava creature from the core.",
-        maxHp: 200, capabilities: ["molten_breath", "lava_slam", "magma_eruption"]
+        baseStats: { maxHp: 200, defense: 20, damage: 25, speed: 0.3 },
+        capabilities: ["molten_breath", "lava_slam", "magma_eruption"]
     },
     "Abyssal Overfiend": {
-        agentClass: "Abyssal Overfiend",
-        ac: 22,
+        type: "Abyssal Overfiend",
         description: "The ultimate antagonist. A monstrous entity with tentacles and void power.",
-        maxHp: 500, capabilities: ["void_tentacles", "chaos_gaze", "netherstorm"]
+        baseStats: { maxHp: 500, defense: 22, damage: 40, speed: 0.5 },
+        capabilities: ["void_tentacles", "chaos_gaze", "netherstorm"]
     },
     "Aetherwing Herald": {
-        agentClass: "Aetherwing Herald",
-        ac: 15,
+        type: "Aetherwing Herald",
         description: "A flying, otherworldly creature that shoots energy projectiles.",
-        maxHp: 120, capabilities: ["celestial_beam", "spectral_tempest", "dimensional_rift"]
+        baseStats: { maxHp: 120, defense: 15, damage: 18, speed: 1.4 },
+        capabilities: ["celestial_beam", "spectral_tempest", "dimensional_rift"]
     }
 };
 
@@ -85,13 +85,66 @@ export function generateRandomAgentNPC(): AgentNPC {
     const npcNames = Object.keys(NPC_TEMPLATES);
     const npcName = npcNames[Math.floor(Math.random() * npcNames.length)];
     const template = NPC_TEMPLATES[npcName];
+
     return {
         id: Math.random().toString(36).substring(7),
+        type: template.type,
+        faction: 'enemy',
         name: npcName,
-        ...template,
-        hp: template.maxHp || 10,
-        maxStress: 100,
-        stress: 0,
-        activeEffects: []
-    } as AgentNPC;
+        description: template.description || "A mysterious entity.",
+
+        // Stats Component
+        stats: {
+            hp: template.baseStats.maxHp,
+            maxHp: template.baseStats.maxHp,
+            stress: 0,
+            maxStress: 100,
+            speed: template.baseStats.speed || 1,
+            defense: template.baseStats.defense || 0,
+            damage: template.baseStats.damage || 1,
+            invulnerable: 0,
+        },
+
+        // Capability Component
+        capabilities: {
+            learned: template.capabilities || [],
+        },
+
+        // Inventory Component (Empty for NPCs by default)
+        inventory: {
+            weapons: [],
+            currentWeaponIndex: 0,
+            items: [],
+            equipment: {},
+            spirit: 0,
+            blood: 0,
+        },
+
+        // AI Component
+        ai: {
+            behaviorState: 'idle',
+            targetId: null,
+            memory: {},
+            awareness: null
+        },
+
+        // Physics
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        width: 14,
+        height: 24,
+        isGrounded: false,
+        facingRight: false,
+
+        // Visual State
+        state: "idle",
+        frame: 0,
+        animTimer: 0,
+
+        // Flags
+        activeEffects: [],
+        active: true
+    };
 }

@@ -1,17 +1,11 @@
-export interface Stats {
-    maxHp: number;
-    hp: number;
-    maxStress: number;
-    stress: number;
-    ac?: number;
-    activeEffects?: StatusEffect[];
-}
+import type { Actor, StatsComponent, InventoryComponent, AIComponent } from "./entities/types";
+export type { Actor, StatsComponent, InventoryComponent, AIComponent };
 
 export interface StatusEffect {
     id: string; // e.g. "shield_block"
     name: string;
     type: "buff" | "debuff";
-    statModifiers?: Partial<Stats>;
+    statModifiers?: Partial<StatsComponent>;
     duration: number; // turns
     description: string;
     damagePerTurn?: number;
@@ -38,31 +32,19 @@ export type AgentClass =
     | "Abyssal Overfiend"
     | "Aetherwing Herald";
 
-export interface AgentPlayer extends Stats {
-    id: string;
-    name: string;
-    level: number;
+export interface AgentPlayer extends Actor {
+    // Note: Actor already contains id, faction, stats, inventory, capabilities, etc.
+    name: string; // To be moved to profile/metadata component
     agentClass: AgentClass;
-    inventory: Item[];
-    capabilities: string[]; // IDs of learned capabilities
-    resourcePrimary: number;
-    resourceSecondary: number;
-    xp: number;
-    maxXp: number;
+    surgeCount: number;
     blueprints: CraftingFormula[];
     companions?: Companion[];
-    equipment?: Partial<Record<EquipmentSlot, Item>>;
-    surgeCount: number;
 }
 
-export interface Companion {
-    id: string;
+export interface Companion extends Actor {
     soulId?: string; // Neural signature record
     name: string;
     role: "Warrior" | "Scout" | "Mystic";
-    hp: number;
-    maxHp: number;
-    description: string;
 }
 
 export interface CraftingFormula {
@@ -71,14 +53,10 @@ export interface CraftingFormula {
     produces: Item;
 }
 
-export interface AgentNPC extends Stats {
-    id: string;
+export interface AgentNPC extends Actor {
     soulId?: string; // Neural signature record
     name: string;
-    agentClass: string; // Keep as string for variety in NPCs
-    ac: number;
     description: string;
-    capabilities: string[];
     lastActionTime?: number;
     lastDamageTime?: number;
 }
@@ -90,7 +68,7 @@ export interface Item {
     name: string;
     description: string;
     type: "weapon" | "armor" | "consumable" | "relic" | "resource" | "contract";
-    bonus?: Partial<Stats> & { ac?: number };
+    bonus?: Partial<StatsComponent> & { ac?: number };
     effect?: string;
     cost?: { primary: number; secondary?: number };
     contractDetails?: {
@@ -178,7 +156,7 @@ export interface Capability {
     description: string;
     agentClass: AgentClass;
     magnitude?: string; // e.g. "2d6"
-    effect: (attacker: Stats, defender: Stats) => string;
+    effect: (attacker: StatsComponent, defender: StatsComponent) => string;
 }
 
 export interface GameLogEntry {
@@ -216,14 +194,14 @@ export interface SessionScore {
     endTime: number | null;
 }
 
-export interface OracleResult {
+export interface InquiryResponse {
     answer: "Yes" | "No";
     qualifier?: "and" | "but" | "unexpectedly";
     description: string;
     roll: number;
-    surgeUpdate: number; // How much to add/reset to surge count
-    unexpectedRoll?: number; // The d20 roll if 'unexpectedly' occurred
-    unexpectedEvent?: string; // The text description of the unexpected event
+    surgeUpdate: number;
+    unexpectedRoll?: number;
+    unexpectedEvent?: string;
 }
 
 export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";

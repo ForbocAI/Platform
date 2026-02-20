@@ -79,7 +79,7 @@ export function GameScreenOverlays({
         />
       )}
       <ConcessionModal
-        open={player.hp <= 0}
+        open={player.stats.hp <= 0}
         onAccept={(type) => onAcceptConcession?.(type)}
         onReject={() => onRejectConcession?.()}
       />

@@ -20,14 +20,15 @@ export const tradeBuy = createAsyncThunk(
     const cost = item.cost || { primary: 0 };
     const primaryCost = cost.primary || 0;
     const secondaryCost = cost.secondary || 0;
-    if ((player.resourcePrimary || 0) < primaryCost || (player.resourceSecondary || 0) < secondaryCost) {
+    if ((player.inventory.spirit || 0) < primaryCost || (player.inventory.blood || 0) < secondaryCost) {
       dispatch(addLog({ message: 'Insufficient currency.', type: 'system' }));
       return;
     }
     dispatch(addLog({ message: `Purchased ${item.name} from ${vendor.name}.`, type: 'system' }));
     dispatch(addFact({ text: `Purchased ${item.name} from ${vendor.name}.`, questionKind: 'trade', isFollowUp: false }));
+    const now = Date.now();
     handleVignetteProgression(dispatch, getState);
-    return { item, primaryCost, secondaryCost };
+    return { item, primaryCost, secondaryCost, now };
   }
 );
 
@@ -37,14 +38,15 @@ export const tradeSell = createAsyncThunk(
     const state = getState() as { game: GameState };
     const { player } = state.game;
     if (!player) return;
-    const itemIndex = player.inventory.findIndex((i) => i.id === itemId);
+    const itemIndex = player.inventory.items.findIndex((i) => i.id === itemId);
     if (itemIndex === -1) return;
-    const item = player.inventory[itemIndex];
+    const item = player.inventory.items[itemIndex];
     const cost = item.cost || { primary: 10 };
     const value = Math.max(1, Math.floor((cost.primary || 0) / 2));
+    const now = Date.now();
     dispatch(addLog({ message: `Sold ${item.name} for ${value} Spirit.`, type: 'system' }));
     dispatch(addFact({ text: `Sold ${item.name}.`, questionKind: 'trade', isFollowUp: false }));
     handleVignetteProgression(dispatch, getState);
-    return { itemIndex, value };
+    return { itemIndex, value, now };
   }
 );

@@ -1,4 +1,4 @@
-import type { Capability } from "../../types";
+import type { Capability, StatsComponent } from "../../types";
 
 export const TECH_CLASS_CAPABILITIES: Record<string, Capability> = {
     // Thunder Trooper

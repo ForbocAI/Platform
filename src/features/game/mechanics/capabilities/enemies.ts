@@ -1,4 +1,4 @@
-import type { Capability } from "../../types";
+import type { Capability, StatsComponent } from "../../types";
 
 export const ENEMY_CAPABILITIES: Record<string, Capability> = {
     // Gravewalker

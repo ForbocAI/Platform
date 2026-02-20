@@ -11,14 +11,14 @@ export const HEALING_ITEM_NAMES = [
   'Healing', 'Potion', 'Mushroom', 'Salve', 'Puffball', 'Cap', 'Morel', 'Truffle', 'Lichen',
 ];
 
-export const ORACLE_THEMES = [
-  'What shadows lurk in this corner of the otherworld?',
-  'Is the fabric of reality weakening here?',
-  'Can I hear the whispers of the ancient ones?',
-  'Is there a slipgate hidden amidst the eerige foliage?',
-  "Does the presence of the Governor of Qua'dar linger here?",
-  'Are there hidden relics waiting to be discovered?',
-  'Is the void shifting nearby?',
+export const INQUIRY_THEMES = [
+  'What data anomalies exist in this regional sector?',
+  'Is the system integrity weakening in this area?',
+  'Can I detect background transmissions from the central node?',
+  'Is there a network interface hidden amidst the environment?',
+  'Does the signature of the System Administrator linger here?',
+  'Are there encrypted archives waiting to be accessed?',
+  'Is the system frequency shifting nearby?',
 ];
 
 /** Find best item to buy from a vendor. When preferContract is true (e.g. companion prep), pick a contract if affordable. */
@@ -95,7 +95,7 @@ export function pickBestCapability(capabilityIds: string[], npcs: AgentNPC[]): s
       const match = capability.magnitude.match(/(\d+)d(\d+)/);
       if (match) score = Number(match[1]) * (Number(match[2]) + 1) / 2;
     }
-    if (npcs.length > 0 && npcs[0].hp > 30) score *= 1.5;
+    if (npcs.length > 0 && npcs[0].stats.hp > 30) score *= 1.5;
     const effectStr = typeof capability.effect === 'function' ? capability.effect({} as never, {} as never) : '';
     if (effectStr.includes('DoT') || effectStr.includes('Debuff')) score += 2;
     if (!best || score > best.score) best = { id, score };

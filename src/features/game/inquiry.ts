@@ -1,14 +1,14 @@
-import type { OracleResult } from "./types";
 import { UNEXPECTEDLY_TABLE } from "./mechanics/tables";
+import type { InquiryResponse } from "./types";
 
-export function consultOracle(question: string, currentSurgeCount: number): OracleResult {
+export function simulateInquiryResponse(question: string, currentSystemStress: number): InquiryResponse {
     const d100 = Math.floor(Math.random() * 100) + 1;
     let modifiedRoll = d100;
 
     if (d100 > 50) {
-        modifiedRoll += currentSurgeCount;
+        modifiedRoll += currentSystemStress;
     } else {
-        modifiedRoll -= currentSurgeCount;
+        modifiedRoll -= currentSystemStress;
     }
 
     if (modifiedRoll < 1) modifiedRoll = 1;
@@ -17,46 +17,46 @@ export function consultOracle(question: string, currentSurgeCount: number): Orac
     let resultString = "";
     let answer: "Yes" | "No";
     let qualifier: "and" | "but" | "unexpectedly" | undefined;
-    let newSurge = 0;
+    let surgeAdjustment = 0;
 
     if (modifiedRoll >= 96) {
         answer = "Yes";
         qualifier = "unexpectedly";
-        resultString = "The void screams affirmation, and unexpectedly...";
+        resultString = "The system confirms, and unexpectedly...";
     } else if (modifiedRoll >= 86) {
         answer = "Yes";
         qualifier = "but";
-        resultString = "The void whispers yes, but...";
+        resultString = "The system tentatively confirms, but...";
     } else if (modifiedRoll >= 81) {
         answer = "Yes";
         qualifier = "and";
-        resultString = "The void answers yes, and...";
+        resultString = "The system confirms, and...";
     } else if (modifiedRoll >= 51) {
         answer = "Yes";
-        resultString = "The void whispers affirmation.";
+        resultString = "The system confirms.";
     } else if (modifiedRoll >= 21) {
         answer = "No";
-        resultString = "The void remains silent.";
+        resultString = "The system remains unresponsive.";
     } else if (modifiedRoll >= 16) {
         answer = "No";
         qualifier = "and";
-        resultString = "The void rejects your query, and...";
+        resultString = "The system denies the request, and...";
     } else if (modifiedRoll >= 6) {
         answer = "No";
         qualifier = "but";
-        resultString = "The void is silent, but...";
+        resultString = "The system is silent, but...";
     } else {
         answer = "No";
         qualifier = "unexpectedly";
-        resultString = "The void recoils, and unexpectedly...";
+        resultString = "The system errors, and unexpectedly...";
     }
 
     let description = resultString;
 
     if (!qualifier) {
-        newSurge = 2;
+        surgeAdjustment = 2;
     } else {
-        newSurge = -1;
+        surgeAdjustment = -1;
     }
 
     let unexpectedRoll: number | undefined;
@@ -74,7 +74,7 @@ export function consultOracle(question: string, currentSurgeCount: number): Orac
         qualifier,
         description,
         roll: modifiedRoll,
-        surgeUpdate: newSurge,
+        surgeUpdate: surgeAdjustment,
         unexpectedRoll,
         unexpectedEvent: unexpectedEventName
     };

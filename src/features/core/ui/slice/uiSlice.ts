@@ -11,7 +11,7 @@ export interface AutoplaySchedulePayload {
 }
 
 interface UIState {
-  oracleInput: string;
+  inquiryInput: string;
   showMap: boolean;
   stageOfScene: StageOfScene;
   autoPlay: boolean;
@@ -37,7 +37,7 @@ interface UIState {
 }
 
 const initialState: UIState = {
-  oracleInput: "",
+  inquiryInput: "",
   showMap: false,
   stageOfScene: "To Knowledge",
   autoPlay: false,
@@ -61,11 +61,11 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    setOracleInput: (state, action: PayloadAction<string>) => {
-      state.oracleInput = action.payload;
+    setInquiryInput: (state, action: PayloadAction<string>) => {
+      state.inquiryInput = action.payload;
     },
-    clearOracleInput: (state) => {
-      state.oracleInput = "";
+    clearInquiryInput: (state) => {
+      state.inquiryInput = "";
     },
     toggleShowMap: (state) => {
       state.showMap = !state.showMap;
@@ -75,7 +75,11 @@ export const uiSlice = createSlice({
     },
     toggleAutoPlay: (state) => {
       state.autoPlay = !state.autoPlay;
-      if (!state.autoPlay) {
+      if (state.autoPlay) {
+        // Kickstart the loop with a 1s delay
+        state.autoplayNextTickAt = Date.now() + 1000;
+        state.autoplayDelayMs = 2800; // Reset to default
+      } else {
         state.autoplayNextTickAt = null;
         state.agentTickSchedule = {};
       }
@@ -137,10 +141,15 @@ export const uiSlice = createSlice({
       (action): action is PayloadAction<{ nextTickAt?: number; nextDelayMs?: number } | undefined> =>
         action.type === 'game/runAutoplayTick/fulfilled',
       (state, action) => {
+        if (!state.autoPlay) return;
         const payload = action.payload;
-        if (!state.autoPlay || payload?.nextTickAt == null) return;
-        state.autoplayNextTickAt = payload.nextTickAt;
-        if (payload.nextDelayMs !== undefined) state.autoplayDelayMs = payload.nextDelayMs;
+
+        // If thunk returned a schedule, use it. Otherwise, use current delay to keep logic moving.
+        const nextDelayMs = payload?.nextDelayMs ?? state.autoplayDelayMs;
+        const nextTickAt = payload?.nextTickAt ?? (Date.now() + nextDelayMs);
+
+        state.autoplayNextTickAt = nextTickAt;
+        state.autoplayDelayMs = nextDelayMs;
       }
     );
     builder.addMatcher(
@@ -156,14 +165,14 @@ export const uiSlice = createSlice({
   },
 });
 
-export const { setOracleInput, clearOracleInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, setAgentSchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleCapabilitiesPanel, toggleSkillsPanel, toggleCompanionPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
+export const { setInquiryInput, clearInquiryInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, setAgentSchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleCapabilitiesPanel, toggleSkillsPanel, toggleCompanionPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
 const selectUIState = (state: RootState) => state.ui;
 
-export const selectOracleInput = createSelector(
+export const selectInquiryInput = createSelector(
   [selectUIState],
-  (ui) => ui.oracleInput
+  (ui) => ui.inquiryInput
 );
 
 export const selectShowMap = createSelector(

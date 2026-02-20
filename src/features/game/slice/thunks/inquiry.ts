@@ -4,22 +4,22 @@ import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../gameSlice';
 import type { GameState } from '../types';
 
-export const askOracle = createAsyncThunk(
-  'game/askOracle',
+export const askInquiry = createAsyncThunk(
+  'game/askInquiry',
   async (question: string, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
     if (!state.game.player) throw new Error('No player');
 
-    dispatch(addLog({ message: `Your Question: "${question}"`, type: 'system' }));
+    dispatch(addLog({ message: `Your Inquiry: "${question}"`, type: 'system' }));
 
-    const result = await sdkService.consultOracle(question, state.game.player.surgeCount);
+    const result = await sdkService.generateInquiryResponse(question, state.game.player.stats.stress); // Using stress as context
 
     dispatch(
       addFact({
         sourceQuestion: question,
         sourceAnswer: result.description,
-        text: `Oracle answered: ${result.description}`,
-        questionKind: 'oracle',
+        text: `Inquiry response: ${result.description}`,
+        questionKind: 'inquiry',
         isFollowUp: false,
       })
     );
@@ -28,21 +28,21 @@ export const askOracle = createAsyncThunk(
   }
 );
 
-export const queryOracle = createAsyncThunk(
-  'game/queryOracle',
+export const performSystemInquiry = createAsyncThunk(
+  'game/performSystemInquiry',
   async (_, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
     if (!state.game.player) return;
 
-    dispatch(addLog({ message: 'You attempt to commune with the void...', type: 'system' }));
+    dispatch(addLog({ message: 'Requesting system overview...', type: 'system' }));
 
-    const result = await sdkService.consultOracle('Commune', state.game.player.surgeCount);
+    const result = await sdkService.generateInquiryResponse('System Overview', state.game.player.stats.stress);
 
-    dispatch(addLog({ message: `Oracle: ${result.description}`, type: 'oracle' }));
+    dispatch(addLog({ message: `Response: ${result.description}`, type: 'inquiry' }));
     dispatch(
       addFact({
-        text: `Communed with void: ${result.description}`,
-        questionKind: 'commune',
+        text: `System Inquiry: ${result.description}`,
+        questionKind: 'system',
         sourceAnswer: result.description,
         isFollowUp: false,
       })

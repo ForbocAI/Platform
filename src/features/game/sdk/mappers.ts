@@ -10,10 +10,10 @@ export function toObservation(gameState: GameState): Observation {
 
     const parts: string[] = [];
     if (player) {
-        parts.push(`Player HP: ${player.hp}/${player.maxHp}`);
-        parts.push(`Stress: ${player.stress ?? 0}/${player.maxStress}`);
-        parts.push(`Primary Resource: ${player.resourcePrimary ?? 0}, Secondary Resource: ${player.resourceSecondary ?? 0}`);
-        parts.push(`Inventory: ${player.inventory?.length ?? 0} items`);
+        parts.push(`Player HP: ${player.stats.hp}/${player.stats.maxHp}`);
+        parts.push(`Stress: ${player.stats.stress ?? 0}/${player.stats.maxStress}`);
+        parts.push(`Primary Resource: ${player.inventory.spirit}, Secondary Resource: ${player.inventory.blood}`);
+        parts.push(`Inventory: ${player.inventory.items?.length ?? 0} items`);
     }
     if (currentArea) {
         parts.push(`Location: ${currentArea.title}`);
@@ -29,9 +29,9 @@ export function toObservation(gameState: GameState): Observation {
         agentId: 'player-autoplay',
         content: parts.join('. '),
         data: {
-            hp: player?.hp,
-            maxHp: player?.maxHp,
-            stress: player?.stress,
+            hp: player?.stats.hp,
+            maxHp: player?.stats.maxHp,
+            stress: player?.stats.stress,
             npcCount: currentArea?.npcs?.length ?? 0,
             areaTitle: currentArea?.title,
             isBaseCamp: currentArea?.isBaseCamp,

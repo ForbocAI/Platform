@@ -6,7 +6,7 @@ import { useAppDispatch } from "@/features/core/store";
 import { playButtonSound } from "@/features/audio";
 import { GameButton } from "@/components/elements/generic";
 
-export function OracleForm({
+export function InquiryForm({
   value,
   onChange,
   onSubmit,
@@ -44,15 +44,15 @@ export function OracleForm({
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => formContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
           onKeyDown={handleKeyDown}
-          placeholder="Ask Oracle… (Enter to send)"
+          placeholder="System Inquiry… (Enter to send)"
           className="w-full bg-palette-bg-dark border border-palette-border text-palette-accent-soft px-1.5 sm:px-2 py-1 sm:py-1.5 leading-relaxed focus:outline-none focus:border-palette-accent-mid/50 placeholder:text-palette-muted min-w-0"
-          data-testid="oracle-input"
-          aria-label="Ask Oracle (press Enter to send)"
+          data-testid="inquiry-input"
+          aria-label="System Inquiry (press Enter to send)"
         />
         <GameButton
           type="submit"
           icon={<Send className="app-icon" />}
-          data-testid="oracle-submit"
+          data-testid="inquiry-submit"
           className="shrink-0"
           aria-label="Send"
         />

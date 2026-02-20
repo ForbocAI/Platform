@@ -1,25 +1,18 @@
-
-import { AgentPlayer, Stats, Item, EquipmentSlot } from "./types";
+import { AgentPlayer, StatsComponent, Item, EquipmentSlot } from "./types";
 
 /**
  * Calculates effective stats by summing base stats and equipment bonuses.
  */
-export function calculateEffectiveStats(player: AgentPlayer): Stats {
-    const stats: Stats = {
-        maxHp: player.maxHp,
-        hp: player.hp,
-        maxStress: player.maxStress,
-        stress: player.stress,
-        ac: player.ac,
-    };
+export function calculateEffectiveStats(player: AgentPlayer): StatsComponent {
+    const stats: StatsComponent = { ...player.stats };
 
     const slots: EquipmentSlot[] = ["mainHand", "armor", "relic"];
     for (const slot of slots) {
-        const item = player.equipment?.[slot];
+        const item = player.inventory.equipment?.[slot];
         if (item && item.bonus) {
             stats.maxHp += item.bonus.maxHp || 0;
             stats.maxStress += item.bonus.maxStress || 0;
-            stats.ac = (stats.ac ?? 0) + (item.bonus.ac || 0);
+            stats.defense = (stats.defense ?? 0) + (item.bonus.ac || 0);
         }
     }
 
@@ -28,8 +21,7 @@ export function calculateEffectiveStats(player: AgentPlayer): Stats {
             if (effect.statModifiers) {
                 stats.maxHp += effect.statModifiers.maxHp || 0;
                 stats.maxStress += effect.statModifiers.maxStress || 0;
-                stats.ac = (stats.ac ?? 0) + (effect.statModifiers.ac || 0);
-                // Can add more stats here like damage bonus if Stats interface supports it
+                stats.defense = (stats.defense ?? 0) + (effect.statModifiers.ac || 0);
             }
         }
     }
@@ -44,34 +36,34 @@ export function calculateEffectiveStats(player: AgentPlayer): Stats {
 export function useConsumable(player: AgentPlayer, item: Item): { updatedPlayer: AgentPlayer; message: string } | null {
     if (item.type !== "consumable" || !item.effect) return null;
 
-    const newPlayer = { ...player };
+    const newPlayer = { ...player, stats: { ...player.stats } };
     let message = "";
 
     // Handle standard effects: "heal_10", "stress_-5"
     const parts = item.effect.split("_");
     const type = parts[0];
-    const value = parseInt(parts[1], 10);
+    const value = parseInt(parts[parts.length - 1], 10);
 
     // If parsing succeeds, apply numeric effect
     if (!isNaN(value)) {
         if (type === "heal") {
-            const oldHp = newPlayer.hp;
-            newPlayer.hp = Math.min(newPlayer.maxHp, newPlayer.hp + value);
-            message = `Used ${item.name}. Healed ${newPlayer.hp - oldHp} HP.`;
+            const oldHp = newPlayer.stats.hp;
+            newPlayer.stats.hp = Math.min(newPlayer.stats.maxHp, newPlayer.stats.hp + value);
+            message = `Used ${item.name}. Healed ${newPlayer.stats.hp - oldHp} HP.`;
             return { updatedPlayer: newPlayer, message };
         } else if (type === "stress") {
-            const oldStress = newPlayer.stress;
-            newPlayer.stress = Math.max(0, newPlayer.stress + value); // value is typically negative
-            message = `Used ${item.name}. Stress changed by ${newPlayer.stress - oldStress}.`;
+            const oldStress = newPlayer.stats.stress;
+            newPlayer.stats.stress = Math.max(0, newPlayer.stats.stress + value); // value is typically negative
+            message = `Used ${item.name}. Stress changed by ${newPlayer.stats.stress - oldStress}.`;
             return { updatedPlayer: newPlayer, message };
         }
     }
 
     // Handle keywords / fallbacks if numeric parsing failed or type didn't match
     if (item.effect === "arcane_boost") {
-        const oldStress = newPlayer.stress;
-        newPlayer.stress = Math.max(0, newPlayer.stress - 5);
-        message = `Used ${item.name}. Localized stabilization applied (-${oldStress - newPlayer.stress} stress).`;
+        const oldStress = newPlayer.stats.stress;
+        newPlayer.stats.stress = Math.max(0, newPlayer.stats.stress - 5);
+        message = `Used ${item.name}. Localized stabilization applied (-${oldStress - newPlayer.stats.stress} stress).`;
         return { updatedPlayer: newPlayer, message };
     }
 

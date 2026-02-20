@@ -33,11 +33,11 @@ export function CapabilitiesPanel({ player, onClose, onSelectCapability }: Capab
         </div>
 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {player.capabilities.length === 0 ? (
+          {player.capabilities.learned.length === 0 ? (
             <p className="text-palette-muted text-sm">No capabilities learned yet.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {player.capabilities.map((id) => {
+              {player.capabilities.learned.map((id) => {
                 const capability = CAPABILITIES[id];
                 if (!capability) return null;
 

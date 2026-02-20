@@ -10,8 +10,8 @@
  * + actuation.ts. The Brain decides, this file executes.
  *
  * Features exercised (for task.md / PLAYTEST_AUTOMATION): Init, Movement, SCAN, ENGAGE,
- * COMMUNE, Oracle, Facts (via commune/ask_oracle), Vignette (via handleVignetteProgression
- * on move/commune), Trading (buy/sell), Combat (engage, cast_capability), Hazards (flee/danger),
+ * COMMUNE, Inquiry, Facts (via perform_inquiry/ask_inquiry), Vignette (via handleVignetteProgression
+ * on move/perform_inquiry), Trading (buy/sell), Combat (engage, cast_capability), Hazards (flee/danger),
  * Crafting & Farming (harvest, craft), Quests (quest node + scan/move/engage/trade),
  * Concession/Death (respawn; auto-respawn when autoplay is on via core/listeners),
  * Companions (combat slice uses them when present).
@@ -21,12 +21,22 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { harvestCrop, craftItem } from './baseCamp';
-import { useItem, equipItem, pickUpGroundLoot } from './inventory';
-import { castCapability, engageHostiles, respawnPlayer } from './combat';
-import { movePlayer, scanSector } from './exploration';
-import { tradeBuy, tradeSell } from './trade';
-import { askOracle, queryOracle } from './oracle';
+import { harvestCrop } from './baseCamp';
+import { pickUpGroundLoot } from './inventory';
+import { castCapability, respawnPlayer } from './combat';
+import {
+  movePlayer,
+  scanSector,
+  engageHostiles,
+  askInquiry,
+  tradeBuy,
+  tradeSell,
+  useItem,
+  equipItem,
+  craftItem,
+  sacrificeItem,
+  performSystemInquiry,
+} from './index';
 import { handleVignetteProgression } from '../constants';
 import type { GameState } from '../types';
 import { computeAwareness } from '@/features/game/mechanics/ai/awareness';
@@ -41,7 +51,7 @@ import {
   pickBestPurchase,
   pickWorstItem,
   pickBestCapability,
-  ORACLE_THEMES,
+  INQUIRY_THEMES,
   HEALING_ITEM_NAMES,
 } from './autoplayHelpers';
 
@@ -99,7 +109,7 @@ async function actuate(
     }
 
     case 'heal': {
-      const healingItem = player.inventory.find(
+      const healingItem = player.inventory.items.find(
         i => i.type === 'consumable' && HEALING_ITEM_NAMES.some(n => i.name.includes(n)),
       );
       if (healingItem) await dispatch(useItem({ itemId: healingItem.id }));
@@ -107,7 +117,7 @@ async function actuate(
     }
 
     case 'reduce_stress': {
-      const stressItem = player.inventory.find(
+      const stressItem = player.inventory.items.find(
         i => i.type === 'consumable' && (i.name.includes('Calm') || i.name.includes('Tonic') || i.name.includes('Serenity') || i.name.includes('Spore Clump'))
       );
       if (stressItem) await dispatch(useItem({ itemId: stressItem.id }));
@@ -140,7 +150,7 @@ async function actuate(
       let capabilityId = action.payload?.capabilityId as string;
       // If behavior tree didn't pick a specific capability, use detailed heuristic
       if (!capabilityId) {
-        capabilityId = pickBestCapability(player.capabilities || [], area.npcs || []) || '';
+        capabilityId = pickBestCapability(player.capabilities.learned || [], area.npcs || []) || '';
       }
       if (capabilityId) await dispatch(castCapability({ capabilityId }));
       break;
@@ -157,14 +167,14 @@ async function actuate(
       break;
 
     case 'sell': {
-      const sellTarget = pickWorstItem(player.inventory);
+      const sellTarget = pickWorstItem(player.inventory.items);
       if (sellTarget) await dispatch(tradeSell({ itemId: sellTarget.id }));
       break;
     }
 
     case 'buy': {
-      const resourcePrimary = player.resourcePrimary ?? 0;
-      const resourceSecondary = player.resourceSecondary ?? 0;
+      const spirit = player.inventory.spirit ?? 0;
+      const blood = player.inventory.blood ?? 0;
       const vendors = area.vendors || [];
       // Prefer specialist vendors
       const sorted = [...vendors].sort((a, b) => {
@@ -174,8 +184,8 @@ async function actuate(
       });
       const preferContract = action.reason?.includes('companion contract') ?? false;
       for (const vendor of sorted) {
-        if (resourcePrimary < 5) break;
-        const purchase = pickBestPurchase(vendor.wares, resourcePrimary, resourceSecondary, player.inventory, preferContract);
+        if (spirit < 5) break;
+        const purchase = pickBestPurchase(vendor.wares, spirit, blood, player.inventory.items, preferContract);
         if (purchase) {
           await dispatch(tradeBuy({ merchantId: vendor.id, itemId: purchase.id }));
           return;
@@ -188,16 +198,20 @@ async function actuate(
       await dispatch(scanSector());
       break;
 
-    case 'commune':
-      await dispatch(queryOracle());
+    case 'perform_inquiry':
+      dispatch(performSystemInquiry());
       handleVignetteProgression(dispatch, getState);
       break;
 
-    case 'ask_oracle': {
-      const question = ORACLE_THEMES[Math.floor(Math.random() * ORACLE_THEMES.length)];
-      await dispatch(askOracle(question));
+    case 'ask_inquiry': {
+      const question = INQUIRY_THEMES[Math.floor(Math.random() * INQUIRY_THEMES.length)];
+      dispatch(askInquiry(question));
       break;
     }
+
+    case 'advance_vignette':
+      handleVignetteProgression(dispatch, getState);
+      break;
 
     case 'idle':
     default:
@@ -214,37 +228,57 @@ export const runAutoplayTick = createAsyncThunk(
     const rootState = getState() as { game: GameState; ui?: { autoplayDelayMs?: number } };
     const state = { game: rootState.game };
     const { currentArea: area, player } = state.game;
+    console.log(`runAutoplayTick: Starting. Area=[${area?.title}] Player=[${player?.name}]`);
 
-    if (!area || !player) return undefined;
+    if (!area || !player) {
+      console.warn('runAutoplayTick: Aborting — Missing area or player.');
+      return undefined;
+    }
 
     // 1. Perceive — gather awareness of the environment (with last action for cooldown tracking)
-    const awareness = computeAwareness(state.game, lastActionType);
+    const hasActiveVignette = !!(rootState as any).narrative?.vignette;
+    const awareness = computeAwareness(state.game, lastActionType, hasActiveVignette);
+    console.log(`runAutoplayTick: Perceived. hasVignette=${awareness.hasActiveVignette}, health=${awareness.hpRatio.toFixed(2)}`);
 
-    // 2. SDK Directive — Call real ForbocAI SDK
+    // 2. SDK Directive — Call real ForbocAI SDK (skip if cortex is unavailable)
     let cortexDirective: CortexDirective | null = null;
-    try {
-      const agent = await sdkService.getAgent();
-      const observation = toObservation(state.game);
+    if (sdkService.isCortexReady()) {
+      try {
+        const SDK_TIMEOUT_MS = 5000;
+        const sdkPromise = (async () => {
+          const agent = await sdkService.getAgent();
+          const observation = toObservation(state.game);
 
-      dispatch(setAgentPondering('player-autoplay'));
-      const response = await agent.process(observation.content, state.game as any);
-      dispatch(clearAgentPondering('player-autoplay'));
+          dispatch(setAgentPondering('player-autoplay'));
+          const response = await agent.process(observation.content, state.game as any);
+          dispatch(clearAgentPondering('player-autoplay'));
 
-      if (response.dialogue) {
-        const portraitUrl = getPortraitForAgent('player', "Agent Explorer");
-        dispatch(addLog({ message: response.dialogue, type: 'dialogue', portraitUrl }));
+          return response;
+        })();
+
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('SDK timeout')), SDK_TIMEOUT_MS)
+        );
+
+        const response = await Promise.race([sdkPromise, timeoutPromise]);
+
+        if (response.dialogue) {
+          const portraitUrl = getPortraitForAgent('player', "Agent Explorer");
+          dispatch(addLog({ message: response.dialogue, type: 'dialogue', portraitUrl }));
+        }
+
+        if (response.action) {
+          cortexDirective = toCortexDirective(response.action);
+        }
+      } catch (e) {
+        console.warn('SDK Decision failed, falling back to pure Behavior Tree:', e);
+        dispatch(clearAgentPondering('player-autoplay'));
       }
-
-      if (response.action) {
-        cortexDirective = toCortexDirective(response.action);
-      }
-    } catch (e) {
-      console.warn('SDK Decision failed, falling back to pure Behavior Tree:', e);
-      dispatch(clearAgentPondering('player-autoplay'));
-    }
+    } // end isCortexReady guard
 
     // 3. Decide — run the shared behavior tree with SDK directive as Node 0
     let action = runBehaviorTree(AUTOPLAY_CONFIG, state.game, awareness, cortexDirective);
+    console.log(`runAutoplayTick: Decided. Action=[${action.type}] Reason=[${action.reason}]`);
 
     // 3.5 Stuck Recovery Override
     const isStuck = checkStuckState(area.id, lastActionType); // Check result of PREVIOUS action
@@ -263,7 +297,9 @@ export const runAutoplayTick = createAsyncThunk(
     }
 
     // 4. Act — execute the chosen action via Redux dispatches
+    console.log(`runAutoplayTick: Actuating [${action.type}]...`);
     await actuate(action, state, dispatch, getState);
+    console.log(`runAutoplayTick: Actuated [${action.type}].`);
 
     // 5. Track last action for next tick's cooldown checks
     lastActionType = action.type;

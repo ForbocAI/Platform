@@ -7,53 +7,53 @@ export interface SurgeEvent {
     id: string;
     name: string;
     description: string;
-    /** Effect type determines how the Oracle thunk applies the consequence */
-    effectType: "stress" | "hp_drain" | "item_corrupt" | "enemy_empower" | "hazard_spawn" | "oracle_lockout";
+    /** Effect type determines how the inquiry flow applies the consequence */
+    effectType: "stress" | "hp_drain" | "item_corrupt" | "enemy_empower" | "hazard_spawn" | "inquiry_lockout";
     /** Magnitude of the effect (stress points, HP drained, etc.) */
     magnitude: number;
 }
 
 export const SURGE_EVENTS: SurgeEvent[] = [
     {
-        id: "void_whisper",
-        name: "Void Whisper",
-        description: "The accumulated surge tears at your psyche. Stress floods your neural link.",
+        id: "system_strain",
+        name: "System Strain",
+        description: "The accumulated stress tears at your psyche. Data floods your neural link.",
         effectType: "stress",
         magnitude: 15,
     },
     {
-        id: "necrotic_feedback",
-        name: "Necrotic Feedback",
-        description: "Dark energy courses through your veins, draining your vitality.",
+        id: "hardware_feedback",
+        name: "Hardware Feedback",
+        description: "Power surges course through your chassis, draining your vitality.",
         effectType: "hp_drain",
         magnitude: 10,
     },
     {
-        id: "entropic_decay",
-        name: "Entropic Decay",
-        description: "A random item in your inventory corrodes and disintegrates.",
+        id: "data_decay",
+        name: "Data Decay",
+        description: "A random item in your inventory suffers catastrophic data corruption.",
         effectType: "item_corrupt",
         magnitude: 1,
     },
     {
-        id: "abyssal_resonance",
-        name: "Abyssal Resonance",
-        description: "Nearby enemies absorb the surge, growing stronger.",
+        id: "interference_resonance",
+        name: "Interference Resonance",
+        description: "Nearby hostiles absorb the system surge, growing stronger.",
         effectType: "enemy_empower",
         magnitude: 10,
     },
     {
         id: "rift_hazard",
-        name: "Rift Hazard",
-        description: "A dimensional rift opens, flooding the area with toxic energy.",
+        name: "Regional Hazard",
+        description: "An environmental rupture opens, flooding the area with toxic energy.",
         effectType: "hazard_spawn",
         magnitude: 1,
     },
     {
-        id: "oracle_silence",
-        name: "Oracle Silence",
-        description: "The Oracle recoils from the surge. It refuses to answer for a time.",
-        effectType: "oracle_lockout",
+        id: "inquiry_lockout",
+        name: "Inquiry Lockout",
+        description: "The inquiry engine recoils from the surge. It refuses to answer for a time.",
+        effectType: "inquiry_lockout",
         magnitude: 1,
     },
 ];

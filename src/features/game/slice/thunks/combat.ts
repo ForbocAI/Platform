@@ -22,7 +22,7 @@ export const castCapability = createAsyncThunk(
     }
 
     // Effect Parsing
-    const effectStr = capability.effect(player, { ...player, hp: 0, maxHp: 0, maxStress: 0, stress: 0, ac: 0 });
+    const effectStr = capability.effect(player.stats, { ...player.stats, hp: 0, maxHp: 0, maxStress: 0, stress: 0, defense: 0 });
     const flags = parseCapabilityEffect(effectStr);
     const { isAoE, isBuff, isInvuln, isHeal, isLifeSteal, isSummon } = flags;
 
@@ -77,7 +77,7 @@ export const castCapability = createAsyncThunk(
         playerHeal += damage;
       }
 
-      const defeated = (e.hp - damage) <= 0;
+      const defeated = (e.stats.hp - damage) <= 0;
       const statusEffects = result.hit ? createNPCStatusEffects(flags) : [];
 
       return { npcId: e.id, damage, defeated, statusEffects };
@@ -154,7 +154,8 @@ export const castCapability = createAsyncThunk(
       lootItems,
       aoeUpdates: updates,
       playerStatusUpdates,
-      playerHeal
+      playerHeal,
+      now: Date.now()
     };
   }
 );
@@ -175,7 +176,7 @@ export const engageHostiles = createAsyncThunk(
       return null;
     }
     const targetNPC = currentArea.npcs[0];
-    let currentNPCHp = targetNPC.hp;
+    let currentNPCHp = targetNPC.stats.hp;
 
     // Player vs NPC
     const duelResult = resolveDuel(player, targetNPC);
@@ -190,7 +191,7 @@ export const engageHostiles = createAsyncThunk(
     // Companions vs NPC
     if (player.companions && currentNPCHp > 0) {
       for (const companion of player.companions) {
-        if (companion.hp > 0) {
+        if (companion.stats.hp > 0) {
           const companionResult = resolveCompanionAttack(companion, targetNPC);
           dispatch(addLog({ message: companionResult.message, type: 'combat' }));
           if (companionResult.hit) {
@@ -222,7 +223,7 @@ export const engageHostiles = createAsyncThunk(
       } else {
         // Determine Target: Player or Companion
         let targetId = 'player';
-        const validCompanions = player.companions?.filter(c => c.hp > 0) || [];
+        const validCompanions = player.companions?.filter(c => c.stats.hp > 0) || [];
 
         // 25% chance to target a companion if any exist
         if (validCompanions.length > 0 && Math.random() < 0.25) {
@@ -231,7 +232,7 @@ export const engageHostiles = createAsyncThunk(
 
           const victimDefender = {
             name: victim.name,
-            ac: 10
+            defense: 10
           };
 
           const npcAttack = resolveNPCAttackOnCompanion(targetNPC, victimDefender);
@@ -248,8 +249,9 @@ export const engageHostiles = createAsyncThunk(
       }
     }
 
+    const now = Date.now();
     const lootItems = npcDefeated ? getNPCLoot(targetNPC.name) : [];
-    return { npcId: targetNPC.id, npcDamage, npcDefeated, playerDamage, companionUpdates, xpGain: npcDefeated ? 50 : 0, lootItems };
+    return { npcId: targetNPC.id, npcDamage, npcDefeated, playerDamage, companionUpdates, xpGain: npcDefeated ? 50 : 0, lootItems, now };
   }
 );
 

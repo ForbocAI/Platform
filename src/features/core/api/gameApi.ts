@@ -1,6 +1,6 @@
 import { baseApi } from './baseApi';
 import { sdkService } from '@/features/game/sdk/cortexService';
-import type { Area, OracleResult, StageOfScene } from '@/features/game/types';
+import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
 
 export const gameApi = baseApi.injectEndpoints({
   overrideExisting: true,
@@ -12,12 +12,12 @@ export const gameApi = baseApi.injectEndpoints({
       },
       keepUnusedDataFor: 0,
     }),
-    consultOracle: build.mutation<
-      OracleResult,
+    performInquiry: build.mutation<
+      InquiryResponse,
       { question: string; surgeCount: number; stage: StageOfScene }
     >({
       async queryFn({ question, surgeCount, stage }) {
-        const result = await sdkService.consultOracle(
+        const result = await sdkService.generateInquiryResponse(
           question,
           surgeCount,
           stage
@@ -46,7 +46,7 @@ export const gameApi = baseApi.injectEndpoints({
 
 export const {
   useGetStartRoomQuery,
-  useConsultOracleMutation,
+  usePerformInquiryMutation,
   useNavigateMutation,
 } = gameApi;
 

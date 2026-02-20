@@ -6,8 +6,8 @@ export function addMovementReducers(builder: ActionReducerMapBuilder<GameState>)
     builder.addCase(thunks.movePlayer.fulfilled, (state, action) => {
         const { area: newArea, hazardEffects } = action.payload;
         if (state.player && hazardEffects) {
-            state.player.hp = Math.max(0, state.player.hp - hazardEffects.damage);
-            state.player.stress = Math.min(state.player.maxStress, state.player.stress + hazardEffects.stress);
+            state.player.stats.hp = Math.max(0, state.player.stats.hp - hazardEffects.damage);
+            state.player.stats.stress = Math.min(state.player.stats.maxStress, state.player.stats.stress + hazardEffects.stress);
         }
         const prevArea = state.currentArea;
         if (!prevArea) return;
@@ -26,16 +26,15 @@ export function addMovementReducers(builder: ActionReducerMapBuilder<GameState>)
                 rescue.complete = true;
                 state.sessionScore.questsCompleted += 1;
                 state.pendingQuestFacts.push(`Completed quest: ${rescue.label}.`);
-                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${rescue.label}.`, type: "system" });
                 if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
                     state.sessionComplete = "quests";
-                    state.sessionScore.endTime = Date.now();
+                    state.sessionScore.endTime = (action.payload as any).now ?? Date.now(); // Fallback but thunk should pass it
                 }
             }
         }
     });
 
-    builder.addCase(thunks.scanSector.fulfilled, (state) => {
+    builder.addCase(thunks.scanSector.fulfilled, (state, action) => {
         if (state.sessionScore) state.sessionScore.areasScanned += 1;
         const recon = state.activeQuests.find(q => q.kind === "reconnaissance" && !q.complete);
         if (recon && state.sessionScore) {
@@ -44,10 +43,9 @@ export function addMovementReducers(builder: ActionReducerMapBuilder<GameState>)
                 recon.complete = true;
                 state.sessionScore.questsCompleted += 1;
                 state.pendingQuestFacts.push(`Completed quest: ${recon.label}.`);
-                state.logs.push({ id: Date.now().toString(), timestamp: Date.now(), message: `Quest complete: ${recon.label}.`, type: "system" });
                 if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
                     state.sessionComplete = "quests";
-                    state.sessionScore.endTime = Date.now();
+                    state.sessionScore.endTime = (action.payload as any).now ?? Date.now();
                 }
             }
         }

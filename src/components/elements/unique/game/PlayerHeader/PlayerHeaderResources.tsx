@@ -7,12 +7,12 @@ export function PlayerHeaderResources({ player }: { player: AgentPlayer }) {
       <div className="flex items-center gap-1" title="Spirit">
         <Sparkles className="app-icon text-palette-accent-mid shrink-0" aria-hidden />
         <span className="hidden sm:inline text-palette-muted-light uppercase tracking-widest text-[10px] sm:text-xs leading-tight">Spirit</span>
-        <span className="hidden sm:inline font-black text-palette-accent-mid tabular-nums leading-tight">{player.resourcePrimary ?? 0}</span>
+        <span className="hidden sm:inline font-black text-palette-accent-mid tabular-nums leading-tight">{player.inventory.spirit ?? 0}</span>
       </div>
       <div className="flex items-center gap-1" title="Blood">
         <Droplets className="app-icon text-palette-accent-mid shrink-0" aria-hidden />
         <span className="hidden sm:inline text-palette-muted-light uppercase tracking-widest text-[10px] sm:text-xs leading-tight">Blood</span>
-        <span className="hidden sm:inline font-black text-palette-accent-mid tabular-nums leading-tight">{player.resourceSecondary ?? 0}</span>
+        <span className="hidden sm:inline font-black text-palette-accent-mid tabular-nums leading-tight">{player.inventory.blood ?? 0}</span>
       </div>
       <div className="flex items-center gap-1" title="Surge">
         <Activity className="app-icon text-palette-white shrink-0" aria-hidden />

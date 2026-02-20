@@ -13,10 +13,10 @@ import {
   selectSessionComplete,
   initializeGame,
   movePlayer,
-  askOracle,
+  askInquiry,
   addLog,
   scanSector,
-  queryOracle,
+  performSystemInquiry,
   engageHostiles,
   respawnPlayer,
   selectCapability,
@@ -28,13 +28,13 @@ import {
   tradeSell,
 } from "@/features/game/slice/gameSlice";
 import {
-  selectOracleInput,
+  selectInquiryInput,
   selectStageOfScene,
   selectInventoryOpen,
   selectCapabilitiesPanelOpen,
   selectSkillsPanelOpen,
-  setOracleInput,
-  clearOracleInput,
+  setInquiryInput,
+  clearInquiryInput,
   setStageOfScene,
   selectShowMap,
   toggleShowMap,
@@ -82,7 +82,7 @@ export function GameScreen() {
   const areaCoordinates = useAppSelector(selectAreaCoordinates);
   const logs = useAppSelector(selectLogs);
   const isInitialized = useAppSelector(selectIsInitialized);
-  const oracleInput = useAppSelector(selectOracleInput);
+  const inquiryInput = useAppSelector(selectInquiryInput);
   const stageOfScene = useAppSelector(selectStageOfScene);
   const inventoryOpen = useAppSelector(selectInventoryOpen);
   const capabilitiesPanelOpen = useAppSelector(selectCapabilitiesPanelOpen);
@@ -124,12 +124,12 @@ export function GameScreen() {
     );
   }
 
-  const handleOracleSubmit = (e: React.FormEvent) => {
+  const handleInquirySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const q = oracleInput.trim();
+    const q = inquiryInput.trim();
     if (!q) return;
-    dispatch(askOracle(q));
-    dispatch(clearOracleInput());
+    dispatch(askInquiry(q));
+    dispatch(clearInquiryInput());
   };
 
   return (
@@ -167,16 +167,16 @@ export function GameScreen() {
         onFadeOutScene={() => dispatch(fadeOutScene({ sceneId: currentSceneId ?? undefined }))}
       />
       <GameScreenFooter
-        oracleInput={oracleInput}
-        onOracleChange={(v) => dispatch(setOracleInput(v))}
-        onOracleSubmit={handleOracleSubmit}
+        inquiryInput={inquiryInput}
+        onInquiryChange={(v) => dispatch(setInquiryInput(v))}
+        onInquirySubmit={handleInquirySubmit}
         player={player}
         currentArea={currentArea}
         onMove={(dir) => dispatch(movePlayer(dir))}
         onMapClick={() => dispatch(toggleShowMap())}
         onScan={() => dispatch(scanSector())}
         onEngage={() => dispatch(engageHostiles())}
-        onCommune={() => dispatch(queryOracle())}
+        onPerformInquiry={() => dispatch(performSystemInquiry())}
         onOpenInventory={() => dispatch(toggleInventory())}
         onOpenCapabilities={() => dispatch(toggleCapabilitiesPanel())}
         onOpenSkills={() => dispatch(toggleSkillsPanel())}

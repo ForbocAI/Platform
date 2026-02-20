@@ -9,12 +9,12 @@ export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
               className="h-full bg-palette-accent-mid transition-all duration-500"
-              style={{ width: `${(player.hp / player.maxHp) * 100}%` }}
+              style={{ width: `${(player.stats.hp / player.stats.maxHp) * 100}%` }}
             />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.hp}/{player.maxHp}
+          {player.stats.hp}/{player.stats.maxHp}
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="Stress">
@@ -23,12 +23,12 @@ export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
               className="h-full bg-palette-accent-mid transition-all duration-500"
-              style={{ width: `${(player.stress / player.maxStress) * 100}%` }}
+              style={{ width: `${(player.stats.stress / player.stats.maxStress) * 100}%` }}
             />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.stress}/{player.maxStress}
+          {player.stats.stress}/{player.stats.maxStress}
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="XP">
@@ -37,34 +37,34 @@ export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
               className="h-full bg-palette-accent-bright transition-all duration-500"
-              style={{ width: `${(player.xp / player.maxXp) * 100}%` }}
+              style={{ width: `${((player.stats.xp ?? 0) / (player.stats.maxXp ?? 1)) * 100}%` }}
             />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.xp}/{player.maxXp} (Lvl {player.level})
+          {player.stats.xp ?? 0}/{player.stats.maxXp ?? 1} (Lvl {player.stats.level})
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="Spirit">
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Spirit</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
-            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.resourcePrimary ?? 0) > 0 ? "100%" : "0%" }} />
+            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.inventory.spirit ?? 0) > 0 ? "100%" : "0%" }} />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.resourcePrimary ?? 0}
+          {player.inventory.spirit ?? 0}
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="Blood">
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Blood</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
-            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.resourceSecondary ?? 0) > 0 ? "100%" : "0%" }} />
+            <div className="h-full bg-palette-accent-mid transition-all duration-500 min-w-[2px]" style={{ width: (player.inventory.blood ?? 0) > 0 ? "100%" : "0%" }} />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.resourceSecondary ?? 0}
+          {player.inventory.blood ?? 0}
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="Surge">

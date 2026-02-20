@@ -1,19 +1,19 @@
 "use client";
 
-import { OracleForm, ActionDeck } from "@/components/elements/unique";
+import { InquiryForm, ActionDeck } from "@/components/elements/unique";
 import type { AgentPlayer, Area } from "@/features/game/types";
 
 export function GameScreenFooter({
-  oracleInput,
-  onOracleChange,
-  onOracleSubmit,
+  inquiryInput,
+  onInquiryChange,
+  onInquirySubmit,
   player,
   currentArea,
   onMove,
   onMapClick,
   onScan,
   onEngage,
-  onCommune,
+  onPerformInquiry,
   onOpenInventory,
   onOpenCapabilities,
   onOpenSkills,
@@ -21,16 +21,16 @@ export function GameScreenFooter({
   autoPlay,
   onToggleAutoPlay,
 }: {
-  oracleInput: string;
-  onOracleChange: (v: string) => void;
-  onOracleSubmit: (e: React.FormEvent) => void;
+  inquiryInput: string;
+  onInquiryChange: (v: string) => void;
+  onInquirySubmit: (e: React.FormEvent) => void;
   player: AgentPlayer;
   currentArea: Area;
   onMove: (dir: string) => void;
   onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;
-  onCommune: () => void;
+  onPerformInquiry: () => void;
   onOpenInventory?: () => void;
   onOpenCapabilities?: () => void;
   onOpenSkills?: () => void;
@@ -41,10 +41,10 @@ export function GameScreenFooter({
   return (
     <>
       <div className="shrink-0 border-t border-palette-border">
-        <OracleForm
-          value={oracleInput}
-          onChange={onOracleChange}
-          onSubmit={onOracleSubmit}
+        <InquiryForm
+          value={inquiryInput}
+          onChange={onInquiryChange}
+          onSubmit={onInquirySubmit}
         />
       </div>
       <ActionDeck
@@ -54,7 +54,7 @@ export function GameScreenFooter({
         onMapClick={onMapClick}
         onScan={onScan}
         onEngage={onEngage}
-        onCommune={onCommune}
+        onPerformInquiry={onPerformInquiry}
         onOpenInventory={onOpenInventory}
         onOpenCapabilities={onOpenCapabilities}
         onOpenSkills={onOpenSkills}

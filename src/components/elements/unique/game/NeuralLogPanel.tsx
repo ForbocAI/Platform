@@ -56,6 +56,13 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
                   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`;
                 })()}]
               </span>
+              <span className="text-[10px] opacity-30 mt-0.5" suppressHydrationWarning>
+                {new Date(log.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </span>
               <span className="wrap-break-word">
                 {log.type === "dialogue" && index === logs.length - 1 ? (
                   <TypewriterText text={log.message} speed={25} />

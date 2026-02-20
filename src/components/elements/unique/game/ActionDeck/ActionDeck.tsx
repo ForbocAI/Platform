@@ -11,7 +11,7 @@ export function ActionDeck({
   onMapClick,
   onScan,
   onEngage,
-  onCommune,
+  onPerformInquiry,
   onOpenInventory,
   onOpenCapabilities,
   onOpenSkills,
@@ -25,7 +25,7 @@ export function ActionDeck({
   onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;
-  onCommune: () => void;
+  onPerformInquiry: () => void;
   onOpenInventory?: () => void;
   onOpenCapabilities?: () => void;
   onOpenSkills?: () => void;
@@ -44,7 +44,7 @@ export function ActionDeck({
         onMapClick={onMapClick}
         onScan={onScan}
         onEngage={onEngage}
-        onCommune={onCommune}
+        onPerformInquiry={onPerformInquiry}
         autoPlay={autoPlay}
         onToggleAutoPlay={onToggleAutoPlay}
       />

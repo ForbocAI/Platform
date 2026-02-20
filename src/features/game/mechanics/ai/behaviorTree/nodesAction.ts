@@ -26,7 +26,7 @@ export function nodeCombat(
         }
 
         // Melee engagement
-        return { type: 'engage', reason: `Engaging ${awareness.primaryNPC?.name || 'hostile'} (HP: ${awareness.primaryNPC?.hp ?? '?'})` };
+        return { type: 'engage', reason: `Engaging ${awareness.primaryNPC?.name || 'hostile'} (HP: ${awareness.primaryNPC?.stats.hp ?? '?'})` };
     }
 
     return null;
@@ -111,7 +111,7 @@ export function nodeEconomy(
 }
 
 /**
- * Node 7: Recon (Scan & Oracle) — With cooldowns to prevent spam
+ * Node 7: Recon (Scan & Inquiry) — With cooldowns to prevent spam
  */
 export function nodeRecon(
     config: AgentConfig,
@@ -124,23 +124,24 @@ export function nodeRecon(
         return { type: 'scan', reason: 'Area not yet scanned' };
     }
 
-    // Oracle/Commune: Check cooldowns and prevent loops
-    if (has('oracle')) {
-        // Prevent oracle spam - check if we've been doing this too much
-        if (isActionLooping('commune', awareness, 3) || isActionLooping('ask_oracle', awareness, 3)) {
+    // Inquiry/Commune: Check cooldowns and prevent loops
+    if (has('inquiry')) {
+        // Prevent inquiry spam - check if we've been doing this too much
+        if (isActionLooping('perform_inquiry', awareness, 3) || isActionLooping('ask_inquiry', awareness, 3)) {
             return null; // Break the loop
         }
 
-        // Frequency based on mysticism trait (enough to populate Facts during autoplay), with cooldown checks
-        const oracleChance = config.traits.mysticism * 0.28;
-        if (Math.random() < oracleChance) {
+        // Frequency based on inquiryFrequency trait (enough to populate Facts during autoplay), with cooldown checks
+        const inquiryChance = config.traits.inquiryFrequency * 0.28;
+        if (Math.random() < inquiryChance) {
             if (Math.random() < 0.5) {
-                if (!isActionOnCooldown('commune', awareness)) {
-                    return { type: 'commune', reason: 'Communing with the void' };
+                if (!isActionOnCooldown('perform_inquiry', awareness)) {
+                    console.log('nodeInquiry: Performing inquiry.');
+                    return { type: 'perform_inquiry', reason: 'Attempting to gather knowledge / generate spirit' };
                 }
             } else {
-                if (!isActionOnCooldown('ask_oracle', awareness)) {
-                    return { type: 'ask_oracle', reason: 'Seeking oracle guidance' };
+                if (!isActionOnCooldown('ask_inquiry', awareness)) {
+                    return { type: 'ask_inquiry', reason: 'Seeking inquiry guidance' };
                 }
             }
         }

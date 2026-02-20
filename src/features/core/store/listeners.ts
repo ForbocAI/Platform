@@ -96,7 +96,7 @@ export function registerGameListeners(
       const state = listenerApi.getState();
       if (!state.ui.autoPlay) return;
       const player = state.game.player;
-      if (!player || player.hp > 0) return;
+      if (!player || player.stats.hp > 0) return;
       await listenerApi.dispatch(respawnPlayer());
       listenerApi.dispatch(setAutoplaySchedule({ nextTickAt: Date.now() }));
     },

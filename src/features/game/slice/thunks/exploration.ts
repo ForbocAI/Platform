@@ -27,16 +27,16 @@ export const movePlayer = createAsyncThunk(
       },
     });
 
-    // Check for hazards
     const { calculateHazardEffects } = await import('@/features/game/mechanics/hazards');
     const hazardEffects = calculateHazardEffects(newArea.hazards);
+    const now = Date.now();
 
     dispatch(addLog({ message: `Moved ${direction}.`, type: 'exploration' }));
     if (hazardEffects.message) {
       dispatch(addLog({ message: hazardEffects.message, type: 'system' }));
     }
 
-    return { area: newArea, direction, hazardEffects };
+    return { area: newArea, direction, hazardEffects, now };
   }
 );
 
@@ -57,6 +57,8 @@ export const scanSector = createAsyncThunk(
       ? getKeenSensesScanExtra(area as any) // Cast for now
       : '';
     const message = `[SCAN RESULT] ${area.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
+    const now = Date.now();
     dispatch(addLog({ message, type: 'exploration' }));
+    return { now };
   }
 );

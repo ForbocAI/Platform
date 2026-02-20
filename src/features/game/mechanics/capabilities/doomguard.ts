@@ -1,4 +1,4 @@
-import type { Capability, Stats } from "../../types";
+import type { Capability, StatsComponent } from "../../types";
 
 export const DOOMGUARD_CAPABILITIES: Record<string, Capability> = {
     "hellfire_explosion": {
@@ -23,7 +23,7 @@ export const DOOMGUARD_CAPABILITIES: Record<string, Capability> = {
         agentClass: "Doomguard",
         description: "Barrage of ranged death attacks.",
         magnitude: "2d6 AoE",
-        effect: (_a: Stats, _d: Stats) => "AoE"
+        effect: (_a: StatsComponent, _d: StatsComponent) => "AoE"
     },
     "sword_attacks": {
         id: "sword_attacks",
@@ -89,6 +89,6 @@ export const DOOMGUARD_CAPABILITIES: Record<string, Capability> = {
         agentClass: "Doomguard",
         description: "Searing jagged blade slash.",
         magnitude: "1d8",
-        effect: (_a: Stats, _d: Stats) => "Fire/melee"
+        effect: (_a: StatsComponent, _d: StatsComponent) => "Fire/melee"
     },
 };

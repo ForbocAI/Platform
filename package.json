@@ -10,6 +10,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@forbocai/browser": "^0.5.4",
+    "@forbocai/core": "^0.5.4",
     "@iconify-icons/pixelarticons": "^1.2.5",
     "@iconify-json/game-icons": "^1.2.3",
     "@iconify/react": "^6.0.2",
@@ -21,9 +23,7 @@
     "react-dom": "19.2.3",
     "react-redux": "^9.2.0",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss": "4.0.12",
-    "@forbocai/core": "^0.4.10",
-    "@forbocai/browser": "^0.4.10"
+    "tailwindcss": "4.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

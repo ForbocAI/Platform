@@ -47,6 +47,7 @@ export const initializeGame = createAsyncThunk(
 
     dispatch(addLog({ message: 'Scanning sector...', type: 'system' }));
     dispatch(addLog({ message, type: 'exploration' }));
+    dispatch(addLog({ message: "SYSTEM: Connection Stable. Welcome to Quadar Tower, Ranger.", type: "system" }));
 
     return { player, initialArea };
   }

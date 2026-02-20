@@ -17,8 +17,13 @@ const DANGEROUS_HAZARDS = ['Toxic Air', 'Radioactive Decay', 'Void Instability',
  * 
  * @param state - Current game state
  * @param lastAction - Last action taken (for cooldown tracking)
+ * @param hasActiveVignette - Is there an active narrative vignette?
  */
-export function computeAwareness(state: GameState, lastAction: AgentActionType | null = null): AwarenessResult {
+export function computeAwareness(
+    state: GameState,
+    lastAction: AgentActionType | null = null,
+    hasActiveVignette: boolean = false
+): AwarenessResult {
     const { currentArea: area, player, logs, exploredAreas, activeQuests } = state;
 
     if (!area || !player) {
@@ -54,6 +59,7 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
             vendorHasContract: false,
             canAffordContract: false,
             justRespawned: false,
+            hasActiveVignette: false,
             lastActionType: null,
             actionHistory: [],
             incompleteQuests: [],
@@ -66,13 +72,13 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
     const primaryNPC = npcs.length > 0 ? npcs[0] : null;
 
     // ── Resources ──
-    const resourcePrimary = player.resourcePrimary ?? 0;
-    const resourceSecondary = player.resourceSecondary ?? 0;
-    const inventory = player.inventory || [];
+    const resourcePrimary = player.inventory.spirit ?? 0;
+    const resourceSecondary = player.inventory.blood ?? 0;
+    const inventory = player.inventory.items || [];
 
     // ── Health ──
-    const hpRatio = player.maxHp > 0 ? player.hp / player.maxHp : 0;
-    const stressRatio = player.maxStress > 0 ? (player.stress || 0) / player.maxStress : 0;
+    const hpRatio = player.stats.maxHp > 0 ? player.stats.hp / player.stats.maxHp : 0;
+    const stressRatio = player.stats.maxStress > 0 ? (player.stats.stress || 0) / player.stats.maxStress : 0;
 
     const healingNames = ['Healing', 'Potion', 'Mushroom', 'Salve', 'Puffball', 'Cap', 'Morel', 'Truffle', 'Lichen'];
     const hasHealingItem = inventory.some(
@@ -86,8 +92,8 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
 
     // ── Equipment ──
     const hasUnequippedGear =
-        (!player.equipment?.mainHand && inventory.some(i => i.type === 'weapon')) ||
-        (!player.equipment?.armor && inventory.some(i => i.type === 'armor'));
+        (!player.inventory.equipment?.mainHand && inventory.some(i => i.type === 'weapon')) ||
+        (!player.inventory.equipment?.armor && inventory.some(i => i.type === 'armor'));
 
     // ── Base Camp ──
     const isBaseCamp = !!area.isBaseCamp;
@@ -226,7 +232,7 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
         else if (msg.includes('engaged') || msg.includes('engaging')) actionType = 'engage';
         else if (msg.includes('picked up') || msg.includes('loot')) actionType = 'loot';
         else if (msg.includes('heal') || msg.includes('healing')) actionType = 'heal';
-        else if (msg.includes('commune') || msg.includes('oracle')) actionType = msg.includes('commune') ? 'commune' : 'ask_oracle';
+        else if (msg.includes('perform inquiry') || msg.includes('inquiry')) actionType = 'perform_inquiry';
         else if (msg.includes('equipped')) actionType = msg.includes('weapon') ? 'equip_weapon' : 'equip_armor';
 
         if (actionType) {
@@ -277,6 +283,7 @@ export function computeAwareness(state: GameState, lastAction: AgentActionType |
         vendorHasContract,
         canAffordContract,
         justRespawned,
+        hasActiveVignette,
         lastActionType,
         actionHistory: trimmedHistory,
         incompleteQuests,

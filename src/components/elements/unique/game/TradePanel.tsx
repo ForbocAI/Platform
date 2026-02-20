@@ -29,7 +29,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
   const canAfford = (cost: { primary?: number; secondary?: number } = {}) => {
     const primary = cost.primary ?? 0;
     const secondary = cost.secondary ?? 0;
-    return (player.resourcePrimary ?? 0) >= primary && (player.resourceSecondary ?? 0) >= secondary;
+    return (player.inventory.spirit ?? 0) >= primary && (player.inventory.blood ?? 0) >= secondary;
   };
 
   const getSellValue = (item: Item) => {
@@ -87,14 +87,14 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
           </h3>
           <div className="mb-2 text-sm flex gap-4">
             <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
-              <span>Primary:</span> {player.resourcePrimary ?? 0}
+              <span>Primary:</span> {player.inventory.spirit ?? 0}
             </div>
             <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
-              <span>Secondary:</span> {player.resourceSecondary ?? 0}
+              <span>Secondary:</span> {player.inventory.blood ?? 0}
             </div>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-palette-border min-h-0">
-            {player.inventory.map((item) => (
+            {player.inventory.items.map((item) => (
               <div key={item.id} className="p-2 border border-palette-border/50 bg-palette-bg-mid/20 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>
@@ -110,7 +110,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
                 </GameButton>
               </div>
             ))}
-            {player.inventory.length === 0 && <p className="text-palette-text-muted italic">Inventory empty.</p>}
+            {player.inventory.items.length === 0 && <p className="text-palette-text-muted italic">Inventory empty.</p>}
           </div>
         </div>
       </div>

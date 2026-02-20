@@ -11,14 +11,21 @@ export const gameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
-    addLog: (state, action: PayloadAction<{ message: string; type: GameLogEntry['type']; portraitUrl?: string }>) => {
-      state.logs.push({
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: Date.now(),
-        message: action.payload.message,
-        type: action.payload.type,
-        portraitUrl: action.payload.portraitUrl,
-      });
+    addLog: {
+      reducer: (state, action: PayloadAction<GameLogEntry>) => {
+        state.logs.push(action.payload);
+      },
+      prepare: (payload: { message: string; type: GameLogEntry['type']; portraitUrl?: string }) => {
+        return {
+          payload: {
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            timestamp: Date.now(),
+            message: payload.message,
+            type: payload.type,
+            portraitUrl: payload.portraitUrl,
+          },
+        };
+      },
     },
     selectCapability: (state, action: PayloadAction<string | null>) => {
       state.selectedCapabilityId = action.payload;
@@ -44,8 +51,8 @@ export const { addLog, selectCapability, clearPendingQuestFacts, setAgentPonderi
 
 export {
   initializeGame,
-  askOracle,
-  queryOracle,
+  askInquiry,
+  performSystemInquiry,
   movePlayer,
   scanSector,
   castCapability,

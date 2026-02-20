@@ -40,6 +40,11 @@ class BotOrchestrator {
         if (!this.dispatch || !this.stateGetter) return;
         const state = this.stateGetter();
 
+        // Debug log (remove after verification)
+        if (state.ui.autoPlay) {
+            console.log(`BotOrchestrator: Update tick. autoPlay=true, nextTickAt=${state.ui.autoplayNextTickAt}, now=${Date.now()}`);
+        }
+
         // 1. Player Autoplay Orchestration
         if (state.ui.autoPlay) {
             this.orchestratePlayer(state);
@@ -54,6 +59,7 @@ class BotOrchestrator {
         if (state.ui.autoplayNextTickAt == null) return;
 
         if (Date.now() >= state.ui.autoplayNextTickAt) {
+            console.log(`BotOrchestrator: Triggering Player Tick. nextTickAt=${state.ui.autoplayNextTickAt}, now=${Date.now()}`);
             // Step 1: Clear the schedule to prevent double-ticks
             this.dispatch!(setAutoplaySchedule({ nextTickAt: null }));
 

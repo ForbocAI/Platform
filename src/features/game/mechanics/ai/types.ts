@@ -20,7 +20,7 @@ export type AgentCapability =
     | 'craft'         // Base camp crafting/harvesting
     | 'heal'          // Use consumables
     | 'equip'         // Gear management
-    | 'oracle'        // Commune / ask oracle
+    | 'inquiry'       // Perform system inquiry / ask technical question
     | 'loot'          // Pick up ground items
     | 'capability'    // Capability activation (combat/utility)
     | 'quest'         // Quest awareness and progression
@@ -34,7 +34,7 @@ export interface AgentTraits {
     curiosity: number;    // How much agent explores vs stays put
     caution: number;      // How quickly agent heals/flees
     resourcefulness: number; // How much agent trades/crafts
-    mysticism: number;    // How often agent communes with oracle
+    inquiryFrequency: number; // How often agent performs system inquiries
 }
 
 // ── Configuration ──
@@ -85,6 +85,7 @@ export interface AwarenessResult {
     /** Can afford the cheapest contract in the area's vendor wares */
     canAffordContract: boolean;
     justRespawned: boolean;        // Player just respawned - needs preparation before exploring
+    hasActiveVignette: boolean;    // Is there a narrative vignette overlay active?
     // Action history tracking (for cooldowns and loop prevention)
     lastActionType: AgentActionType | null;  // Last action taken
     actionHistory: Array<{ type: AgentActionType; timestamp: number }>;  // Recent action history (last 10 actions)
@@ -111,8 +112,9 @@ export type AgentActionType =
     | 'sell'
     | 'buy'
     | 'scan'
-    | 'commune'
-    | 'ask_oracle'
+    | 'perform_inquiry'
+    | 'ask_inquiry'
+    | 'advance_vignette'
     | 'move'
     | 'idle';
 

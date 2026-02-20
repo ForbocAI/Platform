@@ -11,7 +11,7 @@ export function pickBestCapability(
     const player = state.player;
     if (!player) return null;
 
-    const capabilityIds = player.capabilities || [];
+    const capabilityIds = player.capabilities.learned || [];
     if (capabilityIds.length === 0) return null;
 
     // Simple heuristic: prefer higher-magnitude capabilities when NPCs are tough

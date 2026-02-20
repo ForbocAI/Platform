@@ -30,7 +30,7 @@ export function DeckToggles({
           <span className="hidden sm:inline">Capabilities</span>
         </span>
         <div className="flex gap-px">
-          {(player.capabilities ?? []).slice(0, 3).map((id) => (
+          {(player.capabilities.learned ?? []).slice(0, 3).map((id) => (
             <div
               key={id}
               className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
@@ -39,9 +39,9 @@ export function DeckToggles({
               <Zap className="app-icon" />
             </div>
           ))}
-          {player.capabilities.length > 3 && (
+          {(player.capabilities.learned?.length ?? 0) > 3 && (
             <div className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted text-[10px] font-mono pointer-events-none">
-              +{player.capabilities.length - 3}
+              +{(player.capabilities.learned?.length ?? 0) - 3}
             </div>
           )}
         </div>
@@ -58,7 +58,7 @@ export function DeckToggles({
           <span className="hidden sm:inline">Skills</span>
         </span>
         <div className="flex gap-px">
-          {(player.capabilities ?? []).map((skill) => (
+          {([] as string[]).map((skill) => (
             <div
               key={skill}
               className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"
@@ -81,7 +81,7 @@ export function DeckToggles({
           <span className="hidden sm:inline">Items</span>
         </span>
         <div className="flex gap-px">
-          {player.inventory.map((item) => (
+          {player.inventory.items.map((item) => (
             <div
               key={item.id}
               className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"

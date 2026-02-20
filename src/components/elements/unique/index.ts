@@ -3,7 +3,7 @@ export { PlayerHeader } from "./game/PlayerHeader/index";
 export { AreaViewport } from "./game/AreaViewport";
 export { MapView } from "./game/MapView";
 export { NeuralLogPanel } from "./game/NeuralLogPanel";
-export { OracleForm } from "./narrative/OracleForm";
+export { InquiryForm } from "./narrative/InquiryForm";
 export { ActionDeck } from "./game/ActionDeck";
 export { RuneSigil, TopRunes, BottomRunes } from "./shared/Runes";
 export { ConcessionModal } from "./game/ConcessionModal";

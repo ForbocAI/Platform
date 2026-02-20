@@ -1,5 +1,5 @@
 export { initializeGame } from './init';
-export { askOracle, queryOracle } from './oracle';
+export { askInquiry, performSystemInquiry } from './inquiry';
 export { movePlayer, scanSector } from './exploration';
 export { castCapability, engageHostiles, respawnPlayer } from './combat';
 export { tradeBuy, tradeSell } from './trade';

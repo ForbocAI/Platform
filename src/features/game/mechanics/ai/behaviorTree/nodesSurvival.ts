@@ -16,6 +16,19 @@ export function nodeSDKDirective(cortexDirective?: CortexDirective | null): Agen
 }
 
 /**
+ * Node 0.5: Narrative Vignette (Priority Block)
+ */
+export function nodeVignette(awareness: AwarenessResult): AgentAction | null {
+    if (awareness.hasActiveVignette) {
+        return {
+            type: 'advance_vignette',
+            reason: 'Narrative vignette active — advancing exposition',
+        };
+    }
+    return null;
+}
+
+/**
  * Node 1: Survival (Safety > Everything)
  */
 export function nodeSurvival(
@@ -31,17 +44,17 @@ export function nodeSurvival(
 
     // When neutralized, do not return respawn here — concession listener (autoplay) or UI (manual) dispatches
     // respawnPlayer. Returning respawn from the tree would double-dispatch and block the loop.
-    if (player.hp <= 0) return null;
+    if (player.stats.hp <= 0) return null;
 
     // ── Post-Respawn Preparation ──
     if (awareness.justRespawned) {
         if (has('equip') && awareness.hasUnequippedGear) {
-            const weapon = (player.inventory || []).find(i => i.type === 'weapon');
-            if (weapon && !player.equipment?.mainHand) {
+            const weapon = (player.inventory.items || []).find(i => i.type === 'weapon');
+            if (weapon && !player.inventory.equipment?.mainHand) {
                 return { type: 'equip_weapon', payload: { itemId: weapon.id }, reason: 'Post-respawn: Equipping gear' };
             }
-            const armor = (player.inventory || []).find(i => i.type === 'armor');
-            if (armor && !player.equipment?.armor) {
+            const armor = (player.inventory.items || []).find(i => i.type === 'armor');
+            if (armor && !player.inventory.equipment?.armor) {
                 return { type: 'equip_armor', payload: { itemId: armor.id }, reason: 'Post-respawn: Equipping armor' };
             }
         }
@@ -55,7 +68,7 @@ export function nodeSurvival(
             return { type: 'scan', reason: 'Post-respawn: Assessing situation' };
         }
 
-        if (has('heal') && awareness.hasHealingItem && player.hp < player.maxHp * 0.9) {
+        if (has('heal') && awareness.hasHealingItem && player.stats.hp < player.stats.maxHp * 0.9) {
             return { type: 'heal', reason: 'Post-respawn: Ensuring full health' };
         }
     }
@@ -126,7 +139,7 @@ export function nodeBaseCamp(
         if (awareness.hasCraftableRecipes) {
             const recipe = (player.blueprints || []).find(r =>
                 r.ingredients.every(
-                    ing => (player.inventory || []).filter(i => i.name === ing.name).length >= ing.quantity
+                    ing => (player.inventory.items || []).filter(i => i.name === ing.name).length >= ing.quantity
                 )
             );
             if (recipe) {
@@ -152,12 +165,12 @@ export function nodeEquipment(
     if (!player) return null;
 
     if (has('equip') && awareness.hasUnequippedGear) {
-        const weapon = (player.inventory || []).find(i => i.type === 'weapon');
-        if (weapon && !player.equipment?.mainHand) {
+        const weapon = (player.inventory.items || []).find(i => i.type === 'weapon');
+        if (weapon && !player.inventory.equipment?.mainHand) {
             return { type: 'equip_weapon', payload: { itemId: weapon.id }, reason: `Equip ${weapon.name}` };
         }
-        const armor = (player.inventory || []).find(i => i.type === 'armor');
-        if (armor && !player.equipment?.armor) {
+        const armor = (player.inventory.items || []).find(i => i.type === 'armor');
+        if (armor && !player.inventory.equipment?.armor) {
             return { type: 'equip_armor', payload: { itemId: armor.id }, reason: `Equip ${armor.name}` };
         }
     }

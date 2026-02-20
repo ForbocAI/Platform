@@ -12,7 +12,7 @@ export function PlayerHeaderIdentity({ player }: { player: AgentPlayer }) {
         </span>
         <span className="font-bold text-palette-accent-mid tracking-tight leading-tight flex items-baseline gap-1 min-w-0">
           <span className="truncate min-w-0">{player.name}</span>
-          <span className="text-palette-muted-light shrink-0">LVL {player.level}</span>
+          <span className="text-palette-muted-light shrink-0">LVL {player.stats.level ?? 1}</span>
         </span>
       </div>
     </div>

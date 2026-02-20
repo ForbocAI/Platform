@@ -9,8 +9,8 @@ import { addDeathReducers } from './death';
 function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.engageHostiles.fulfilled, (state, action) => {
         if (!action.payload || !state.player || !state.currentArea) return;
-        const { npcId, npcDamage, npcDefeated, playerDamage } = action.payload;
-        const capabilities = state.player.capabilities ?? [];
+        const { npcId, npcDamage, npcDefeated, playerDamage, now } = action.payload;
+        const capabilities = state.player.capabilities.learned ?? [];
         const actualPlayerDamage = applyDamageTakenReduction(capabilities, playerDamage);
         const actualNPCDamage = applyDamageDealtBonus(capabilities, state.player.activeEffects, npcDamage);
 
@@ -19,32 +19,19 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
             const nextEffects: typeof state.player.activeEffects = [];
             for (const effect of state.player.activeEffects) {
                 if (effect.damagePerTurn) {
-                    state.player.hp -= effect.damagePerTurn;
-                    state.logs.push({
-                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        timestamp: Date.now(),
-                        message: `You take ${effect.damagePerTurn} damage from ${effect.name}.`,
-                        type: "combat"
-                    });
+                    state.player.stats.hp -= effect.damagePerTurn;
                 }
                 const nextDuration = effect.duration - 1;
                 if (nextDuration > 0) {
                     nextEffects.push({ ...effect, duration: nextDuration });
-                } else {
-                    state.logs.push({
-                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        timestamp: Date.now(),
-                        message: `${effect.name} fades.`,
-                        type: "combat"
-                    });
                 }
             }
             state.player.activeEffects = nextEffects;
         }
 
-        state.player.hp -= actualPlayerDamage;
-        if (state.player.hp < 0) state.player.hp = 0;
-        state.player.stress += 1;
+        state.player.stats.hp -= actualPlayerDamage;
+        if (state.player.stats.hp < 0) state.player.stats.hp = 0;
+        state.player.stats.stress += 1;
 
         const companionUpdates = (action.payload as { companionUpdates?: { id: string; damageTaken: number }[] }).companionUpdates;
         if (companionUpdates && state.player.companions) {
@@ -54,12 +41,6 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
                     const cmp = state.player.companions[cmpIndex];
                     cmp.hp -= update.damageTaken;
                     if (cmp.hp <= 0) {
-                        state.logs.push({
-                            id: Date.now().toString(),
-                            timestamp: Date.now(),
-                            message: `${cmp.name} has fallen in battle!`,
-                            type: "combat"
-                        });
                         state.player.companions.splice(cmpIndex, 1);
                     }
                 }
@@ -68,19 +49,13 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
 
         const npcs = state.currentArea.npcs.map(e => {
             // Process NPC Effects (DoT & Duration)
-            let currentHp = e.hp;
+            let currentHp = e.stats.hp;
             let currentEffects = e.activeEffects || [];
             const nextEffects: typeof currentEffects = [];
 
             for (const effect of currentEffects) {
                 if (effect.damagePerTurn) {
                     currentHp -= effect.damagePerTurn;
-                    state.logs.push({
-                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        timestamp: Date.now(),
-                        message: `${e.name} takes ${effect.damagePerTurn} damage from ${effect.name}.`,
-                        type: "combat"
-                    });
                 }
                 const nextDuration = effect.duration - 1;
                 if (nextDuration > 0) {
@@ -92,16 +67,16 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
                 const afterAttackHp = currentHp - actualNPCDamage;
                 return {
                     ...e,
-                    hp: afterAttackHp,
-                    lastDamageTime: actualNPCDamage > 0 ? Date.now() : e.lastDamageTime,
-                    lastAttackTime: Date.now(),
+                    stats: { ...e.stats, hp: afterAttackHp },
+                    lastDamageTime: actualNPCDamage > 0 ? (now || Date.now()) : e.lastDamageTime,
+                    lastAttackTime: now || Date.now(),
                     activeEffects: nextEffects
                 };
             }
 
             return {
                 ...e,
-                hp: currentHp,
+                stats: { ...e.stats, hp: currentHp },
                 activeEffects: nextEffects
             };
         });
@@ -133,22 +108,23 @@ function addCastCapabilityReducer(builder: ActionReducerMapBuilder<GameState>): 
             aoeUpdates?: { npcId: string; damage: number; defeated: boolean; statusEffects?: StatusEffect[] }[];
             playerStatusUpdates?: StatusEffect[];
             playerHeal?: number;
+            now?: number;
         };
 
-        const { playerDamage, aoeUpdates, playerStatusUpdates, playerHeal } = payload;
-        const capabilities = state.player.capabilities ?? [];
+        const { playerDamage, aoeUpdates, playerStatusUpdates, playerHeal, now } = payload;
+        const capabilities = state.player.capabilities.learned ?? [];
 
         // 1. Apply Player Damage, Heal, and Status
         const actualPlayerDamageCapability = applyDamageTakenReduction(capabilities, playerDamage);
 
         // Apply Heal
         if (playerHeal && playerHeal > 0) {
-            state.player.hp = Math.min(state.player.maxHp, state.player.hp + playerHeal);
+            state.player.stats.hp = Math.min(state.player.stats.maxHp, state.player.stats.hp + playerHeal);
         }
 
-        state.player.hp -= actualPlayerDamageCapability;
-        if (state.player.hp < 0) state.player.hp = 0;
-        state.player.stress += 1;
+        state.player.stats.hp -= actualPlayerDamageCapability;
+        if (state.player.stats.hp < 0) state.player.stats.hp = 0;
+        state.player.stats.stress += 1;
 
         // Apply Player Status Updates
         if (playerStatusUpdates && playerStatusUpdates.length > 0) {
@@ -174,7 +150,7 @@ function addCastCapabilityReducer(builder: ActionReducerMapBuilder<GameState>): 
             const update = updates?.find(u => u.npcId === e.id);
             if (update) {
                 const actualDamage = applyDamageDealtBonus(capabilities, state.player?.activeEffects, update.damage);
-                let newHp = e.hp - actualDamage;
+                let newHp = e.stats.hp - actualDamage;
 
                 let newEffects = e.activeEffects || [];
                 if (update.statusEffects && update.statusEffects.length > 0) {
@@ -186,9 +162,9 @@ function addCastCapabilityReducer(builder: ActionReducerMapBuilder<GameState>): 
 
                 return {
                     ...e,
-                    hp: newHp,
-                    lastDamageTime: actualDamage > 0 ? Date.now() : e.lastDamageTime,
-                    lastAttackTime: Date.now(),
+                    stats: { ...e.stats, hp: newHp },
+                    lastDamageTime: actualDamage > 0 ? (now || Date.now()) : e.lastDamageTime,
+                    lastAttackTime: now || Date.now(),
                     activeEffects: newEffects
                 };
             }
@@ -196,7 +172,7 @@ function addCastCapabilityReducer(builder: ActionReducerMapBuilder<GameState>): 
         });
 
         // 3. Handle Death and Loot
-        const livingNPCs = npcsCapability.filter(e => e.hp > 0);
+        const livingNPCs = npcsCapability.filter(e => e.stats.hp > 0);
         const deadNPCsCount = state.currentArea.npcs.length - livingNPCs.length;
 
         if (deadNPCsCount > 0) {
@@ -208,14 +184,6 @@ function addCastCapabilityReducer(builder: ActionReducerMapBuilder<GameState>): 
         }
 
         applyXpGain(state, payload.xpGain || 0);
-    });
-    builder.addCase(thunks.castCapability.rejected, (state, action) => {
-        state.logs.push({
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            timestamp: Date.now(),
-            message: `Capability execution failed: ${action.error.message || "Unknown error"}`,
-            type: "system"
-        });
     });
 }
 

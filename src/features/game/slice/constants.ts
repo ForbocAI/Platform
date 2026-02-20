@@ -21,22 +21,25 @@ function nextVignetteStage(current: VignetteStage): VignetteStage | null {
   return VIGNETTE_STAGES[i + 1] ?? null;
 }
 
+import { addLog } from './gameSlice';
+
 export function handleVignetteProgression(dispatch: (a: unknown) => void, getState: () => unknown): void {
-  const state = getState() as { narrative?: { vignette?: { stage: VignetteStage } } };
+  const state = getState() as { narrative?: { vignette?: { theme: string; stage: VignetteStage } }; game: GameState };
   const vignette = state.narrative?.vignette;
 
   if (vignette) {
     const next = nextVignetteStage(vignette.stage);
     if (next) {
+      dispatch(addLog({ message: `Narrative progression: ${vignette.theme} · ${next}`, type: 'system' }));
       dispatch(advanceVignetteStage({ stage: next }));
     } else {
+      dispatch(addLog({ message: `Narrative concluded: ${vignette.theme}`, type: 'system' }));
       dispatch(endVignette());
-      const theme = VIGNETTE_THEMES[Math.floor(Math.random() * VIGNETTE_THEMES.length)];
-      dispatch(startVignette({ theme }));
+      // DO NOT auto-restart here to avoid infinite loop
     }
   } else {
-    const theme = VIGNETTE_THEMES[Math.floor(Math.random() * VIGNETTE_THEMES.length)];
-    dispatch(startVignette({ theme }));
+    // Only start a vignette if specifically needed (e.g. on game init)
+    // For now, let the game handle this via specific triggers
   }
 }
 

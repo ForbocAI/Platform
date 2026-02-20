@@ -1,4 +1,4 @@
-import type { Capability } from "../../types";
+import type { Capability, StatsComponent } from "../../types";
 
 export const ASHWALKER_CAPABILITIES: Record<string, Capability> = {
     "relic_strike": {
@@ -43,13 +43,13 @@ export const ASHWALKER_CAPABILITIES: Record<string, Capability> = {
         name: "Eternal Flame",
         agentClass: "Ashwalker",
         description: "Absorb residual life after killing, empower attacks.",
-        effect: (_a, _d) => "Buff on kill"
+        effect: (_a: StatsComponent, _d: StatsComponent) => "Buff on kill"
     },
     "blazing_trail": {
         id: "blazing_trail",
         name: "Blazing Trail",
         agentClass: "Ashwalker",
         description: "Leave magikal flames in wake.",
-        effect: (_a, _d) => "Burning trail"
+        effect: (_a: StatsComponent, _d: StatsComponent) => "Burning trail"
     },
 };

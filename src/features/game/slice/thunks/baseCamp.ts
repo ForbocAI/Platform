@@ -64,7 +64,7 @@ export const craftItem = createAsyncThunk(
     }
 
     const hasIngredients = formula.ingredients.every((ing) => {
-      const count = player.inventory.filter((i) => i.name === ing.name).length;
+      const count = player.inventory.items.filter((i) => i.name === ing.name).length;
       return count >= ing.quantity;
     });
     if (!hasIngredients) {

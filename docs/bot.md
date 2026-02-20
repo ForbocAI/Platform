@@ -28,7 +28,7 @@ The Platform uses a unified AI system for NPCs (Servitors, Enemies) and the Auto
     *   **Node 5**: Loot (Pick Up Items)
     *   **Node 6**: Economy (Strategic Trading)
     *   **Node 6.5**: Quest Prioritization (Active Quest Pursuit)
-    *   **Node 7**: Recon (Scan, Oracle/Commune with Cooldowns)
+    *   **Node 7**: Recon (Scan, Perform Inquiry with Cooldowns)
     *   **Node 8**: Exploration (Move with Proactive Pathfinding & Fallback Strategy)
     *   **Node 9**: Idle
 *   **Modular Architecture**: Split into `nodesSurvival.ts`, `nodesAction.ts`, `nodesQuest.ts`, `cooldowns.ts`, and `helpers.ts` for maintainability.
@@ -84,7 +84,7 @@ The system supports URL parameters for automated testing ("Ghost Mode"):
 
 ### 2026-02-12: Macro-Level Bot Improvements
 
-- **Action Cooldowns & Throttling**: Implemented cooldown system (`cooldowns.ts`) to prevent action spam. Buy/sell actions have 3-action cooldowns, oracle/commune have 5-action cooldowns, scan has 2-action cooldown. Added loop detection to break repetitive action patterns.
+- **Action Cooldowns & Throttling**: Implemented cooldown system (`cooldowns.ts`) to prevent action spam. Buy/sell actions have 3-action cooldowns, inquiry actions have 5-action cooldowns, scan has 2-action cooldown. Added loop detection to break repetitive action patterns.
 - **Quest Prioritization Node**: Created dedicated quest node (`nodesQuest.ts`) that actively pursues incomplete objectives. Prioritizes quests by progress ratio and type (reconnaissance > hostiles > merchant > rescue). Bot now actively seeks quest objectives rather than completing them incidentally.
 - **Strategic Resource Management**: Enhanced economy node with goal-driven trading:
   - Priority 1: Sell excess inventory (always)

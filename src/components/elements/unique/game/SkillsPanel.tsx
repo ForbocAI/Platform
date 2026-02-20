@@ -18,7 +18,7 @@ interface SkillsPanelProps {
 }
 
 export function SkillsPanel({ player, onClose }: SkillsPanelProps) {
-  const skills = player.capabilities ?? [];
+  const skills = player.capabilities.learned ?? [];
   return (
     <Modal
       title="Unlocked Skills"

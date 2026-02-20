@@ -1,4 +1,4 @@
-import type { Capability, Stats } from "../../types";
+import type { Capability, StatsComponent } from "../../types";
 
 export const OBSIDIAN_WARDEN_CAPABILITIES: Record<string, Capability> = {
     "obsidian_surge": {
@@ -6,7 +6,7 @@ export const OBSIDIAN_WARDEN_CAPABILITIES: Record<string, Capability> = {
         name: "Obsidian Surge",
         agentClass: "Obsidian Warden",
         description: "Channel latent power for strength/speed.",
-        effect: (_attacker) => "Buff stats"
+        effect: (_attacker: StatsComponent) => "Buff stats"
     },
     "petrified_diamond_embrace": {
         id: "petrified_diamond_embrace",
@@ -20,7 +20,7 @@ export const OBSIDIAN_WARDEN_CAPABILITIES: Record<string, Capability> = {
         name: "Dark Crystal Shielding",
         agentClass: "Obsidian Warden",
         description: "Form protective abyssal crystal shields.",
-        effect: (_a: Stats, _d: Stats) => "Reduce incoming damage"
+        effect: (_a: StatsComponent, _d: StatsComponent) => "Reduce incoming damage"
     },
     "shatterstrike_slam": {
         id: "shatterstrike_slam",
@@ -71,6 +71,6 @@ export const OBSIDIAN_WARDEN_CAPABILITIES: Record<string, Capability> = {
         agentClass: "Obsidian Warden",
         description: "Rapid flurry of crystalline poison shards.",
         magnitude: "2d6",
-        effect: (_a: Stats, _d: Stats) => "Piercing"
+        effect: (_a: StatsComponent, _d: StatsComponent) => "Piercing"
     },
 };

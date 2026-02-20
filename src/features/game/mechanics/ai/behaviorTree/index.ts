@@ -12,7 +12,7 @@ import type { AgentConfig, AgentAction, AwarenessResult, CortexDirective } from 
 import type { GameState } from '../../../slice/types';
 import { nodeRival } from './nodesRival';
 
-import { nodeSDKDirective, nodeSurvival, nodeBaseCamp, nodeEquipment } from './nodesSurvival';
+import { nodeSDKDirective, nodeVignette, nodeSurvival, nodeBaseCamp, nodeEquipment } from './nodesSurvival';
 import {
     nodeCombat,
     nodeCompanionPrep,
@@ -35,6 +35,7 @@ export function runBehaviorTree(
     // Execute nodes in priority order
     const action =
         nodeSDKDirective(cortexDirective) ||
+        nodeVignette(awareness) ||
         nodeRival(config, state, awareness) || // Priority 1.5: Rival/Strategic Overrides
         nodeSurvival(config, state, awareness) ||
         nodeBaseCamp(config, state, awareness) ||
@@ -59,14 +60,14 @@ export const AUTOPLAY_CONFIG: AgentConfig = {
     type: 'player',
     capabilities: [
         'awareness', 'combat', 'flee', 'explore', 'trade',
-        'craft', 'heal', 'equip', 'oracle', 'loot', 'capability', 'quest',
+        'craft', 'heal', 'equip', 'inquiry', 'loot', 'capability', 'quest',
     ],
     traits: {
         aggression: 0.65,
         curiosity: 0.7,
         caution: 0.5,
         resourcefulness: 0.6,
-        mysticism: 0.4,
+        inquiryFrequency: 0.4,
     },
 };
 
@@ -80,7 +81,7 @@ export const NPC_RANGER_CONFIG: AgentConfig = {
         curiosity: 0.5,
         caution: 0.4,
         resourcefulness: 0.3,
-        mysticism: 0.1,
+        inquiryFrequency: 0.1,
     },
 };
 
@@ -94,6 +95,6 @@ export const COMPANION_CONFIG: AgentConfig = {
         curiosity: 0.2,
         caution: 0.6,
         resourcefulness: 0.1,
-        mysticism: 0.0,
+        inquiryFrequency: 0.0,
     },
 };

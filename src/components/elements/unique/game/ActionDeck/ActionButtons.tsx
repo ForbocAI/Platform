@@ -11,7 +11,7 @@ export function ActionButtons({
   onMapClick,
   onScan,
   onEngage,
-  onCommune,
+  onPerformInquiry,
   autoPlay,
   onToggleAutoPlay,
 }: {
@@ -20,7 +20,7 @@ export function ActionButtons({
   onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;
-  onCommune: () => void;
+  onPerformInquiry: () => void;
   autoPlay?: boolean;
   onToggleAutoPlay?: () => void;
 }) {
@@ -51,8 +51,13 @@ export function ActionButtons({
         >
           ENGAGE
         </GameButton>
-        <GameButton onClick={onCommune} variant="magic" icon={<MessageCircle className="app-icon" />} data-testid="action-commune">
-          COMMUNE
+        <GameButton
+          onClick={onPerformInquiry}
+          variant="magic"
+          icon={<MessageCircle className="app-icon" />}
+          data-testid="action-perform-inquiry"
+        >
+          PERFORM INQUIRY
         </GameButton>
       </div>
     </div>

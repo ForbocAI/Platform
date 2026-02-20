@@ -21,16 +21,16 @@ export const calculateRivalPriority = (
 
     // Low HP = High Priority (Kill Steal)
     // Checking maxHp to be safe against div by zero, though unlikely
-    const maxHp = target.maxHp || 100;
-    if (target.hp < maxHp * 0.3) score += 50;
+    const maxHp = target.stats.maxHp || 100;
+    if (target.stats.hp < maxHp * 0.3) score += 50;
 
     // High-value targets (Bosses) = High Priority
-    // In Platform, 'boss' might be deduced from class or name/description
+    // In Platform, 'boss' is deduced from type
     const isBoss =
-        target.agentClass.includes('Titan') ||
-        target.agentClass.includes('Leviathan') ||
-        target.agentClass.includes('Overfiend') ||
-        target.agentClass.includes('Warden');
+        target.type.includes('Titan') ||
+        target.type.includes('Leviathan') ||
+        target.type.includes('Overfiend') ||
+        target.type.includes('Warden');
 
     if (isBoss) score += 100;
 
@@ -68,7 +68,7 @@ export function nodeRival(
 
     for (const npc of npcs) {
         // Skip neutralized
-        if (npc.hp <= 0) continue;
+        if (npc.stats.hp <= 0) continue;
 
         const priority = calculateRivalPriority(npc, null, 10); // Assume close range (10m) in same area
         if (priority > maxScore) {
@@ -83,7 +83,7 @@ export function nodeRival(
             type: 'engage',
             // We might need to target a SPECIFIC NPC. 
             // The `engage` action in Platform is currently generic "engageHostiles",
-            // but for Rival precision we should ideally pass the target ID.
+            // but for Rival precision we should ideally pass the targetId.
             // Actuator `engageHostiles` picks best target usually. 
             // We'll pass `payload` with targetId if actuator supports it, or use reason to hint.
             payload: { targetId: bestTarget.id },

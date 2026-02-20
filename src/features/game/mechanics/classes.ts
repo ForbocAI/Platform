@@ -25,8 +25,10 @@ export function normalizeClassIdFromParam(param: string): AgentClass | undefined
   );
 }
 
+import { StatsComponent } from "../types";
+
 type ClassTemplate = {
-  baseStats: { Str: number; Agi: number; Arcane: number; maxHp: number; maxStress: number };
+  baseStats: Partial<StatsComponent> & { Str: number; Agi: number; Arcane: number; maxHp: number; maxStress: number };
   startingCapabilities: string[];
 };
 

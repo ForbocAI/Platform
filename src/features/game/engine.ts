@@ -12,5 +12,5 @@ export type { AreaGenContext } from "./generation";
 export { getNPCLoot } from "./generation/loot";
 export { generateRandomAgentNPC } from "./generation";
 
-// Oracle (passthrough)
-export { consultOracle } from "./oracle";
+// Inquiry (passthrough)
+export { simulateInquiryResponse } from "./inquiry";

@@ -1,4 +1,4 @@
-import type { OracleResult, UnexpectedlyEffect } from "@/features/game/types";
+import type { InquiryResponse, UnexpectedlyEffect } from "@/features/game/types";
 import { LORE_VIGNETTE_THEMES } from "@/features/game/content";
 
 export const VIGNETTE_THEMES = [
@@ -20,7 +20,7 @@ export const VIGNETTE_THEMES = [
 /** Generate obvious follow-up facts from a Loom answer (Familiar: "record the answer, then create a few obvious follow-up facts"). */
 export function generateFollowUpFacts(
   question: string,
-  result: OracleResult
+  result: InquiryResponse
 ): string[] {
   const q = question.toLowerCase();
   const { answer, qualifier } = result;

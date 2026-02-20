@@ -10,9 +10,15 @@ export const autoplayListener = {
   startListening: (startListening: TypedStartListening<RootState, AppDispatch>) => {
     // 1. Initialize Orchestrator on Bootstrap
     startListening({
-      predicate: (action) => action.type === 'app/init' || action.type === 'game/initializeGame/fulfilled',
-      effect: (_, listenerApi) => {
+      predicate: (action) => action.type === 'app/bootstrap' || action.type === 'game/initialize/fulfilled',
+      effect: (action, listenerApi) => {
+        console.log(`autoplayListener: Triggered by ${action.type}. Initializing Orchestrator.`);
         botOrchestrator.init(listenerApi.dispatch, listenerApi.getState);
+
+        // Start SDK initialization in background (non-blocking)
+        import('@/features/game/sdk/cortexService').then(({ sdkService }) => {
+          sdkService.init();
+        });
 
         // Single central poll for all AI systems
         setInterval(() => {

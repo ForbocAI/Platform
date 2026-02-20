@@ -1,4 +1,4 @@
-import { Stats, AgentNPC, AgentPlayer, Capability } from "./types";
+import { StatsComponent, AgentNPC, AgentPlayer, Capability } from "./types";
 import { calculateEffectiveStats } from "./items";
 import { parseDiceString } from "./dice";
 import { CAPABILITIES } from "./mechanics";
@@ -69,8 +69,8 @@ export function resolveNPCAttack(
     // AI Logic: Simple decision making
     // 60% chance to use capability if available
     let capability: Capability | undefined;
-    if (attacker.capabilities && attacker.capabilities.length > 0 && Math.random() < 0.6) {
-        const capabilityId = attacker.capabilities[Math.floor(Math.random() * attacker.capabilities.length)];
+    if (attacker.capabilities && attacker.capabilities.learned.length > 0 && Math.random() < 0.6) {
+        const capabilityId = attacker.capabilities.learned[Math.floor(Math.random() * attacker.capabilities.learned.length)];
         capability = CAPABILITIES[capabilityId];
     }
 
@@ -81,8 +81,8 @@ export function resolveNPCAttack(
     let defenderTotal = rollCombatTotal(0);
     defenderTotal += groupScore?.defenderBonus ?? 0;
 
-    // AC Defensive Bonus
-    defenderTotal += effectiveDefender.ac ?? 0;
+    // Defensive Bonus
+    defenderTotal += effectiveDefender.defense ?? 0;
 
     const isHit = attackerTotal > defenderTotal;
     let damage = 0;
@@ -102,7 +102,7 @@ export function resolveNPCAttack(
 
             let effectMsg = "";
             if (capability.effect) {
-                effectMsg = capability.effect(attacker, effectiveDefender);
+                effectMsg = capability.effect(attacker.stats, effectiveDefender);
             }
             message = `${attacker.name} activates ${capability.name}! It hits you for ${damage} damage! ${effectMsg ? `(${effectMsg})` : ""}`;
         } else {
@@ -161,7 +161,7 @@ export function resolveCapabilityDuel(
 
         let effectMsg = "";
         if (capability.effect) {
-            effectMsg = capability.effect(effectiveAttacker, defender);
+            effectMsg = capability.effect(effectiveAttacker, defender.stats);
         }
 
         message = `You activate ${capability.name}! It hits for ${damage} damage. ${effectMsg ? `(${effectMsg})` : ""}`;
@@ -204,18 +204,17 @@ export function resolveCompanionAttack(
     return { hit: isHit, damage, roll: attackerTotal, message };
 }
 
-export function resolveNPCAttackOnCompanion(
-    attacker: AgentNPC,
-    defender: { name: string; ac?: number },
-    groupScore?: GroupScoreModifier
-): CombatResult {
-    let attackerTotal = rollCombatTotal(0);
-    attackerTotal += groupScore?.attackerBonus ?? 0;
+export interface SurvivorDefender {
+    name: string;
+    defense: number;
+}
 
-    let defenderTotal = rollCombatTotal(0);
-    defenderTotal += groupScore?.defenderBonus ?? 0;
-    // Companions don't usually have AC yet, but if they do, add it
-    defenderTotal += defender.ac ?? 0;
+export const resolveNPCAttackOnCompanion = (
+    attacker: AgentNPC,
+    defender: SurvivorDefender
+): { hit: boolean; damage: number; message: string } => {
+    const attackerTotal = (attacker.stats.hp / attacker.stats.maxHp) * 20 + (Math.random() * 10);
+    const defenderTotal = defender.defense + (Math.random() * 5);
     const isHit = attackerTotal > defenderTotal;
     let damage = 0;
     let message = "";
@@ -228,5 +227,5 @@ export function resolveNPCAttackOnCompanion(
         message = `${attacker.name} attacks ${defender.name} but misses!`;
     }
 
-    return { hit: isHit, damage, roll: attackerTotal, message };
+    return { hit: isHit, damage, message };
 }
