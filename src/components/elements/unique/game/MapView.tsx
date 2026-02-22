@@ -1,5 +1,5 @@
 import type { Area } from "@/features/game/types";
-import type { AreaCoordinates } from "@/features/game/slice/gameSlice";
+import type { AreaCoordinates } from "@/features/game/store/gameSlice";
 import { Map as MapIcon } from "lucide-react";
 
 export interface ExploredMapViewProps {

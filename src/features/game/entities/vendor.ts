@@ -1,6 +1,6 @@
 import type { Biome, Vendor, Item } from "../types";
 import { ITEMS, MATERIALS } from "../mechanics";
-import { BIOME_GROUND_LOOT } from "../generation";
+import { BIOME_GROUND_LOOT } from '../mechanics/systems/generation';
 
 // --- Pure utility helpers ---
 

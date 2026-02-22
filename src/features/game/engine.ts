@@ -8,9 +8,9 @@ export { generateArea, generateAreaWithOptions, generateStartArea } from "./enti
 export type { GenerateAreaOptions, GenerateStartAreaOptions } from "./entities/area";
 
 // Generation (passthrough)
-export type { AreaGenContext } from "./generation";
-export { getNPCLoot } from "./generation/loot";
-export { generateRandomAgentNPC } from "./generation";
+export type { AreaGenContext } from './mechanics/systems/generation';
+export { getNPCLoot } from './mechanics/systems/generation/loot';
+export { generateRandomAgentNPC } from './mechanics/systems/generation';
 
 // Inquiry (passthrough)
 export { simulateInquiryResponse } from "./inquiry";

@@ -1,5 +1,5 @@
 import type { Area, Biome, AgentNPC, Vendor } from "../types";
-import { selectNextBiome, generateGroundLoot, generateRandomAgentNPC, NPC_TEMPLATES, type AreaGenContext } from "../generation";
+import { selectNextBiome, generateGroundLoot, generateRandomAgentNPC, NPC_TEMPLATES, type AreaGenContext } from '../mechanics/systems/generation';
 import { generateRandomVendor, generateMarketplace, generateWares } from "./vendor";
 
 // --- Immutable area-name data tables ---
@@ -169,7 +169,7 @@ const BASE_CAMP_FEATURES = [
 
 const createBaseCampArea = (id: string, biome: Biome): Area => ({
     id,
-    title: "Secure Operations Base",
+    title: "Store Room",
     description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
     biome,
     regionalType: "Operations Base",
@@ -232,7 +232,7 @@ export const generateStartArea = (opts?: GenerateStartAreaOptions): Area => {
     if (!opts?.forceNPC) {
         return {
             ...area,
-            title: "Secure Operations Base",
+            title: "Store Room",
             description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
             npcs: [],
             isBaseCamp: true,
@@ -242,7 +242,7 @@ export const generateStartArea = (opts?: GenerateStartAreaOptions): Area => {
 
     return {
         ...area,
-        title: "Initial Ingress Point",
+        title: "Store Room",
         description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
         npcs: area.npcs.length > 0 ? area.npcs : [generateRandomAgentNPC()],
     };

@@ -1,0 +1,41 @@
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/scripts/fix_imports.js
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/scripts/fix_imports_final.js
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/scripts/rewrite_imports.js
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/mechanics/orchestrators/agency.ts
+   4:25  warning  'toCortexDirective' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+   7:10  warning  'runBehaviorTree' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   7:27  warning  'AUTOPLAY_CONFIG' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  22:15  warning  'awareness' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/mechanics/orchestrators/autoplay.ts
+  38:3  warning  'sacrificeItem' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/mechanics/orchestrators/combat.ts
+  231:11  warning  'targetId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/mechanics/orchestrators/init.ts
+  9:15  warning  'GameState' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/mechanics/transformations/movement.ts
+  31:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/mechanics/transformations/trade.ts
+  25:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/sdk/mappers.ts
+  8:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 18 problems (6 errors, 12 warnings)
+

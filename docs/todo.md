@@ -397,8 +397,11 @@ Based on playtest findings, fix bugs and make improvements:
 
 ## URL params for testing
 
+*Note: As of 2026-02-21, all manual testing parameters below EXCEPT `?FORBOCAI_SDK` have been temporarily removed from the codebase. They will be re-implemented via a Developer Console. View `classified/docs/reference/url-parameters.md` for permanent reference.*
+
 | Param | Effect |
 |-------|--------|
+| `?FORBOCAI_SDK=ON` | Enables the ForbocAI SDK connection. By default, the game uses local procedural logic. |
 | `?deterministic=1` | Fixed start: Ranger/Ashwalker, Lvl 12, 120 HP, basic gear, no random NPCs |
 | `?forceEnemy=1` | Adds enemy to starting room |
 | `?forceMerchant=1` | Adds merchant to starting room |

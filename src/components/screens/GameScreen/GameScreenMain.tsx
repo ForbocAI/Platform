@@ -2,7 +2,7 @@
 
 import { AreaViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel, QuestsPanel } from "@/components/elements/unique";
 import type { Area, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore, VignetteStage } from "@/features/game/types";
-import type { AreaCoordinates } from "@/features/game/slice/gameSlice";
+import type { AreaCoordinates } from "@/features/game/store/gameSlice";
 
 interface VignetteState {
   theme: string;

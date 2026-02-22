@@ -8,16 +8,7 @@ export interface AutoplayURLConfig {
 }
 
 export function getAutoplayConfig(): AutoplayURLConfig {
-    if (typeof window === 'undefined') {
-        return { focus: 'full', speed: 'normal', autoStart: false };
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    return {
-        focus: (params.get('autoFocus') as AutoFocusMode) || 'full',
-        speed: (params.get('autoSpeed') as AutoSpeedMode) || 'normal',
-        autoStart: params.get('autoStart') === '1',
-    };
+    return { focus: 'full', speed: 'normal', autoStart: false };
 }
 
 export function getTickInterval(speed: AutoSpeedMode): number {

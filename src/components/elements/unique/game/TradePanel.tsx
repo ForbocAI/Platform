@@ -3,7 +3,7 @@
 import { ShoppingBag, Coins } from "lucide-react";
 import type { AgentPlayer, Vendor, Item } from "@/features/game/types";
 import { useAppDispatch } from "@/features/core/store";
-import { tradeBuy, tradeSell } from "@/features/game/slice/gameSlice";
+import { tradeBuy, tradeSell } from "@/features/game/store/gameSlice";
 import { playButtonSound } from "@/features/audio";
 import { Modal, GameButton } from "@/components/elements/generic";
 
@@ -94,7 +94,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-palette-border min-h-0">
-            {player.inventory.items.map((item) => (
+            {(player.inventory.items as Item[]).map((item) => (
               <div key={item.id} className="p-2 border border-palette-border/50 bg-palette-bg-mid/20 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>

@@ -26,7 +26,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
     };
 
     const renderEquippedItem = (slot: EquipmentSlot, icon: React.ReactNode, label: string) => {
-        const item = player.inventory.equipment?.[slot];
+        const item = player.inventory.equipment?.[slot] as Item | undefined;
         return (
             <div className="flex items-center justify-between p-2 bg-palette-bg-mid/30 border border-palette-border rounded">
                 <div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                         <div className="text-palette-muted italic text-sm p-4 text-center border border-dashed border-palette-border rounded">Empty</div>
                     ) : (
                         <div className="grid gap-2">
-                            {player.inventory.items.map((item) => (
+                            {(player.inventory.items as Item[]).map((item) => (
                                 <div key={item.id} className="flex items-center justify-between p-2 bg-palette-bg-mid/10 border border-palette-border hover:bg-palette-bg-mid/20 transition-colors rounded">
                                     <div className="flex flex-col min-w-0">
                                         <div className="flex items-center gap-2">

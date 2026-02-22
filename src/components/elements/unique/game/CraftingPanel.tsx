@@ -1,8 +1,8 @@
 import { Hammer } from "lucide-react";
-import type { AgentPlayer, CraftingFormula } from "@/features/game/types";
+import type { AgentPlayer, CraftingFormula, Item } from "@/features/game/types";
 import { Modal, GameButton } from "@/components/elements/generic";
 import { useAppDispatch } from "@/features/core/store";
-import { craftItem } from "@/features/game/slice/gameSlice";
+import { craftItem } from "@/features/game/store/gameSlice";
 
 interface CraftingPanelProps {
     player: AgentPlayer;
@@ -18,7 +18,7 @@ export function CraftingPanel({ player, onClose }: CraftingPanelProps) {
 
     const canCraft = (formula: CraftingFormula) => {
         return formula.ingredients.every((ing) => {
-            const count = player.inventory.items.filter((i) => i.name === ing.name).length;
+            const count = (player.inventory.items as Item[]).filter((i) => i.name === ing.name).length;
             return count >= ing.quantity;
         });
     };
@@ -54,7 +54,7 @@ export function CraftingPanel({ player, onClose }: CraftingPanelProps) {
                                             <p className="text-xs text-palette-muted mb-2">{formula.produces.description}</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {formula.ingredients.map((ing, idx) => {
-                                                    const count = player.inventory.items.filter((i) => i.name === ing.name).length;
+                                                    const count = (player.inventory.items as Item[]).filter((i) => i.name === ing.name).length;
                                                     const hasEnough = count >= ing.quantity;
                                                     return (
                                                         <span key={idx} className={`text-xs px-1.5 py-0.5 rounded border ${hasEnough ? "bg-palette-accent-green/10 border-palette-accent-green/30 text-palette-accent-green" : "bg-palette-accent-mid/10 border-palette-accent-mid/30 text-palette-accent-mid"}`}>

@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import gameReducer from '@/features/game/slice/gameSlice';
+import gameReducer from '@/features/game/store/gameSlice';
 import uiReducer, { clearVignetteThemeInput, toggleCraftingPanel } from '@/features/core/ui/slice/uiSlice';
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';

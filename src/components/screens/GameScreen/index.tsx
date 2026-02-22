@@ -23,7 +23,7 @@ import {
   unequipItem,
   consumeItem,
   sacrificeItem,
-} from "@/features/game/slice/gameSlice";
+} from "@/features/game/store/gameSlice";
 import {
   selectInquiryInput,
   selectStageOfScene,

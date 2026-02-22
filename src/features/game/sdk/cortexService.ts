@@ -20,10 +20,10 @@ class SDKService {
         if (this.initialized) return;
         if (typeof window === 'undefined') return;
 
-        // --- Priority 0: URL Override ---
+        // --- Feature Gate: SDK is OFF by default ---
         const params = new URLSearchParams(window.location.search);
-        if (params.get('no-sdk') === '1') {
-            console.log('SDKService: no-sdk=1 detected. Skipping SDK initialization.');
+        if (params.get('FORBOCAI_SDK') !== 'ON') {
+            console.log('SDKService: FORBOCAI_SDK is OFF. Skipping SDK initialization.');
             this.initialized = true;
             return;
         }
@@ -52,7 +52,7 @@ class SDKService {
             }
 
             this.cortex = browserModule.createCortex({ apiUrl });
-            this.memory = browserModule.createMemory?.({}) ?? null;
+            this.memory = (browserModule.createMemory?.({}) as IMemory) ?? null;
             this.bridge = coreModule.createBridge({ apiUrl, strictMode: true });
 
             if (this.cortex) {
@@ -85,7 +85,7 @@ class SDKService {
     /** Returns an existing agent or creates a new one. */
     async getAgent(id: string = 'player-autoplay', persona: string = 'Neutral Agent'): Promise<IAgent> {
         if (!this.initialized) await this.init();
-        if (!this.cortex) throw new Error('Cortex not available (fallback mode)');
+        if (!this.cortex) throw new Error('Cortex not available (SDK disabled)');
 
         if (!this.agents.has(id)) {
             const apiUrl = this.getApiUrl();
@@ -155,16 +155,8 @@ class SDKService {
     async generateStartRoom(options?: GenerateStartAreaOptions) { return this.generateStartArea(options); }
     async generateStartArea(options?: GenerateStartAreaOptions): Promise<Area> {
         if (!this.cortex) {
-            return {
-                id: 'start_area_mock',
-                title: 'Testing Grounds',
-                description: 'The SDK modules failed to load. Operating in local fallback mode.',
-                biome: 'Quadar Tower',
-                regionalType: 'Ruins',
-                hazards: [],
-                exits: { North: null, South: null, East: null, West: null },
-                npcs: []
-            };
+            const { generateStartArea } = await import('@/features/game/entities/area');
+            return generateStartArea(options);
         }
 
         try {
@@ -175,23 +167,17 @@ class SDKService {
             });
             return JSON.parse(response.dialogue) as Area;
         } catch (_e) {
-            // Fallback to a safe room if JSON/completion fails
-            return {
-                id: 'start_area_fallback',
-                title: 'Entrance',
-                description: 'You stand at the threshold.',
-                biome: 'Quadar Tower',
-                regionalType: 'Ruins',
-                hazards: [],
-                exits: { North: null, South: null, East: null, West: null },
-                npcs: []
-            };
+            const { generateStartArea } = await import('@/features/game/entities/area');
+            return generateStartArea(options);
         }
     }
 
     async generateRoom(regionalType?: string, magnitude?: number, context?: Record<string, unknown>) { return this.generateArea(regionalType, magnitude, context); }
     async generateArea(regionalType?: string, magnitude?: number, context?: Record<string, unknown>): Promise<Area> {
-        if (!this.cortex) return this.generateStartArea();
+        if (!this.cortex) {
+            const { generateArea } = await import('@/features/game/entities/area');
+            return generateArea();
+        }
         try {
             const agent = await this.getWorldgenAgent();
             const response = await agent.process('WORLDGEN_REQUEST', {
@@ -202,7 +188,8 @@ class SDKService {
             });
             return JSON.parse(response.dialogue) as Area;
         } catch (_e) {
-            return this.generateStartArea(); // fallback
+            const { generateArea } = await import('@/features/game/entities/area');
+            return generateArea(); // Use native procedural generation
         }
     }
 
@@ -210,7 +197,7 @@ class SDKService {
         if (!this.cortex) {
             return {
                 answer: Math.random() > 0.5 ? "Yes" : "No",
-                description: "The inquiry engine is currently disconnected (fallback mode).",
+                description: "The SDK is not enabled. The Oracle remains silent.",
                 roll: Math.floor(Math.random() * 20) + 1,
                 surgeUpdate: 0
             };

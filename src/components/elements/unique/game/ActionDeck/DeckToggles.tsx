@@ -1,7 +1,7 @@
 "use client";
 
 import { Award, Box, Users, Zap } from "lucide-react";
-import type { AgentPlayer } from "@/features/game/types";
+import type { AgentPlayer, Item } from "@/features/game/types";
 
 export function DeckToggles({
   player,
@@ -81,7 +81,7 @@ export function DeckToggles({
           <span className="hidden sm:inline">Items</span>
         </span>
         <div className="flex gap-px">
-          {player.inventory.items.map((item) => (
+          {(player.inventory.items as Item[]).map((item) => (
             <div
               key={item.id}
               className="w-5 h-5 bg-palette-bg-mid border border-palette-border flex items-center justify-center text-palette-muted pointer-events-none"

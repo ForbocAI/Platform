@@ -1,4 +1,4 @@
-import { AgentPlayer, StatsComponent, Item, EquipmentSlot } from "./types";
+import { AgentPlayer, StatsComponent, Item, EquipmentSlot, StatusEffect } from "./types";
 
 /**
  * Calculates effective stats by summing base stats and equipment bonuses.
@@ -21,7 +21,7 @@ export function calculateEffectiveStats(player: AgentPlayer): StatsComponent {
             if (effect.statModifiers) {
                 stats.maxHp += effect.statModifiers.maxHp || 0;
                 stats.maxStress += effect.statModifiers.maxStress || 0;
-                stats.defense = (stats.defense ?? 0) + (effect.statModifiers.ac || 0);
+                stats.defense = (stats.defense ?? 0) + (effect.statModifiers.defense || 0);
             }
         }
     }

@@ -1,6 +1,6 @@
 import type { TypedStartListening } from '@reduxjs/toolkit';
 import { getInitOptionsFromUrl } from '@/features/core/store/getInitOptions';
-import { initializeGame, clearPendingQuestFacts, respawnPlayer } from '@/features/game/slice/gameSlice';
+import { initializeGame, clearPendingQuestFacts, respawnPlayer } from '@/features/game/store/gameSlice';
 import { normalizeClassIdFromParam } from '@/features/game/mechanics/classes';
 import { addThread, setMainThread, addFact } from '@/features/narrative/slice/narrativeSlice';
 import { toggleAutoPlay, setSelectedClassId, setAutoplaySchedule } from '@/features/core/ui/slice/uiSlice';

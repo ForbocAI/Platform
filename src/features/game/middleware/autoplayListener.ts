@@ -2,7 +2,7 @@ import { setAutoplaySchedule, toggleAutoPlay } from '@/features/core/ui/slice/ui
 import type { TypedStartListening } from '@reduxjs/toolkit';
 import type { RootState, AppDispatch } from '@/features/core/store';
 import { getAutoplayConfig, getTickInterval } from '@/features/game/sdk/config';
-import { botOrchestrator } from '@/features/game/mechanics/ai/BotOrchestrator';
+import { botOrchestrator } from '@/features/game/mechanics/systems/ai/BotOrchestrator';
 
 const POLL_MS = 100;
 

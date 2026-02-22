@@ -3,9 +3,9 @@
 import { CLASS_TEMPLATES, CHARACTER_CLASSES } from "@/features/game/mechanics";
 import { GameButton } from "@/components/elements/generic";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
-import { initializeGame } from "@/features/game/slice/gameSlice";
+import { initializeGame } from "@/features/game/store/gameSlice";
 import { selectSelectedClassId, setSelectedClassId } from "@/features/core/ui/slice/uiSlice";
-import { selectIsLoading } from "@/features/game/slice/gameSlice";
+import { selectIsLoading } from "@/features/game/store/gameSlice";
 import { User, Zap, Activity } from "lucide-react";
 
 export function ClassSelectionScreen() {
