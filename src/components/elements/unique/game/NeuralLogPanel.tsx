@@ -1,6 +1,7 @@
 "use client";
 
 import { Terminal } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/features/core/utils";
 import type { GameLogEntry } from "@/features/game/types";
@@ -33,10 +34,13 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
           <div key={log.id} className="min-w-0 wrap-break-word shrink-0 flex gap-2">
             {log.type === "dialogue" && log.portraitUrl && (
               <div className="shrink-0 mt-1">
-                <img
+                <Image
                   src={log.portraitUrl}
                   alt="Agent Portrait"
+                  width={40}
+                  height={40}
                   className="w-10 h-10 rounded-sm border border-palette-border object-cover opacity-80"
+                  unoptimized
                 />
               </div>
             )}

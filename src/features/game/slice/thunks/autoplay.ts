@@ -21,6 +21,7 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import type { Item } from '@/features/game/types';
 import { harvestCrop } from './baseCamp';
 import { pickUpGroundLoot } from './inventory';
 import { castCapability, respawnPlayer } from './combat';
@@ -65,7 +66,7 @@ let stuckCounter = 0;
  * - Bot tries to move/explore but Area ID stays same.
  */
 function checkStuckState(currentAreaId: string, actionType: AgentActionType | null | undefined): boolean {
-  if (actionType === ('move' as any) || actionType === ('explore' as any)) {
+  if (actionType === 'move' || (actionType as string) === 'explore') {
     if (currentAreaId === lastAreaId) {
       stuckCounter++;
     } else {
@@ -85,7 +86,7 @@ function checkStuckState(currentAreaId: string, actionType: AgentActionType | nu
 async function actuate(
   action: AgentAction,
   state: { game: GameState },
-  dispatch: any,
+  dispatch: import('@/features/core/store').AppDispatch,
   getState: () => unknown,
 ): Promise<void> {
   const { currentArea: area, player } = state.game;
@@ -109,7 +110,7 @@ async function actuate(
     }
 
     case 'heal': {
-      const healingItem = player.inventory.items.find(
+      const healingItem = (player.inventory.items as Item[] || []).find(
         i => i.type === 'consumable' && HEALING_ITEM_NAMES.some(n => i.name.includes(n)),
       );
       if (healingItem) await dispatch(consumeItem({ itemId: healingItem.id }));
@@ -117,7 +118,7 @@ async function actuate(
     }
 
     case 'reduce_stress': {
-      const stressItem = player.inventory.items.find(
+      const stressItem = (player.inventory.items as Item[] || []).find(
         i => i.type === 'consumable' && (i.name.includes('Calm') || i.name.includes('Tonic') || i.name.includes('Serenity') || i.name.includes('Spore Clump'))
       );
       if (stressItem) await dispatch(consumeItem({ itemId: stressItem.id }));
@@ -167,7 +168,7 @@ async function actuate(
       break;
 
     case 'sell': {
-      const sellTarget = pickWorstItem(player.inventory.items);
+      const sellTarget = pickWorstItem(player.inventory.items as import('../../types').Item[]);
       if (sellTarget) await dispatch(tradeSell({ itemId: sellTarget.id }));
       break;
     }
@@ -185,7 +186,7 @@ async function actuate(
       const preferContract = action.reason?.includes('companion contract') ?? false;
       for (const vendor of sorted) {
         if (spirit < 5) break;
-        const purchase = pickBestPurchase(vendor.wares, spirit, blood, player.inventory.items, preferContract);
+        const purchase = pickBestPurchase(vendor.wares, spirit, blood, player.inventory.items as import('../../types').Item[], preferContract);
         if (purchase) {
           await dispatch(tradeBuy({ merchantId: vendor.id, itemId: purchase.id }));
           return;
@@ -236,7 +237,7 @@ export const runAutoplayTick = createAsyncThunk(
     }
 
     // 1. Perceive — gather awareness of the environment (with last action for cooldown tracking)
-    const hasActiveVignette = !!(rootState as any).narrative?.vignette;
+    const hasActiveVignette = !!(rootState as { narrative?: { vignette?: unknown } }).narrative?.vignette;
     const awareness = computeAwareness(state.game, lastActionType, hasActiveVignette);
     console.log(`runAutoplayTick: Perceived. hasVignette=${awareness.hasActiveVignette}, health=${awareness.hpRatio.toFixed(2)}`);
 
@@ -250,7 +251,7 @@ export const runAutoplayTick = createAsyncThunk(
           const observation = toObservation(state.game);
 
           dispatch(setAgentPondering('player-autoplay'));
-          const response = await agent.process(observation.content, state.game as any);
+          const response = await agent.process(observation.content, state.game as unknown as Record<string, unknown>);
           dispatch(clearAgentPondering('player-autoplay'));
 
           return response;
@@ -298,7 +299,7 @@ export const runAutoplayTick = createAsyncThunk(
 
     // 4. Act — execute the chosen action via Redux dispatches
     console.log(`runAutoplayTick: Actuating [${action.type}]...`);
-    await actuate(action, state, dispatch, getState);
+    await actuate(action, state, dispatch as import('@/features/core/store').AppDispatch, getState);
     console.log(`runAutoplayTick: Actuated [${action.type}].`);
 
     // 5. Track last action for next tick's cooldown checks

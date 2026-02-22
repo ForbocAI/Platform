@@ -7,6 +7,7 @@
 
 import type { GameState } from '../../slice/types';
 import type { AwarenessResult, AgentActionType } from './types';
+import type { Item } from '../../types';
 
 const DIRECTIONS = ['North', 'South', 'East', 'West'] as const;
 const DANGEROUS_HAZARDS = ['Toxic Air', 'Radioactive Decay', 'Void Instability', 'Extreme Cold', 'Scorching Heat'];
@@ -74,7 +75,7 @@ export function computeAwareness(
     // ── Resources ──
     const resourcePrimary = player.inventory.spirit ?? 0;
     const resourceSecondary = player.inventory.blood ?? 0;
-    const inventory = player.inventory.items || [];
+    const inventory = (player.inventory.items as Item[]) || [];
 
     // ── Health ──
     const hpRatio = player.stats.maxHp > 0 ? player.stats.hp / player.stats.maxHp : 0;
@@ -165,11 +166,11 @@ export function computeAwareness(
     const veryRecentLogs = (logs || []).slice(-3);
     const justRespawned = veryRecentLogs.some(
         l => l.message.includes('Resurrecting') || l.message.includes('void releases you')
-    ) || (player as any).justRespawned === true;
+    ) || player.justRespawned === true;
 
     // Clear the flag after detection (one-time check)
-    if ((player as any).justRespawned === true) {
-        (player as any).justRespawned = false;
+    if (player.justRespawned === true) {
+        player.justRespawned = false;
     }
 
     // ── Combat detection ──

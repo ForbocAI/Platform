@@ -66,7 +66,8 @@ export function applyXpGain(state: GameState, xpGain: number): void {
 
         if (newCapabilityId && !state.player.capabilities.learned.includes(newCapabilityId)) {
             state.player.capabilities.learned = [...state.player.capabilities.learned, newCapabilityId];
-            const capabilityName = (CAPABILITIES as any)[newCapabilityId]?.name ?? newCapabilityId;
+            const capabilityEntry = CAPABILITIES[newCapabilityId as keyof typeof CAPABILITIES];
+            const capabilityName = capabilityEntry?.name ?? newCapabilityId;
             state.logs.push({
                 id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 timestamp: Date.now(),

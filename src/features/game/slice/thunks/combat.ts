@@ -26,7 +26,7 @@ export const castCapability = createAsyncThunk(
     const flags = parseCapabilityEffect(effectStr);
     const { isAoE, isBuff, isInvuln, isHeal, isLifeSteal, isSummon } = flags;
 
-    const playerStatusUpdates: any[] = [];
+    const playerStatusUpdates: import('../../types').StatusEffect[] = [];
     let playerHeal = 0;
 
     // 1. Buffs / Healing / Self-Target
@@ -69,7 +69,7 @@ export const castCapability = createAsyncThunk(
     const targets = isAoE ? currentArea.npcs : [currentArea.npcs[0]];
     const defeatedNPCs: string[] = [];
     const updates = targets.map(e => {
-      const result = resolveCapabilityDuel(player, e, capability as any);
+      const result = resolveCapabilityDuel(player, e, capability);
       const damage = result.hit ? result.damage : 0;
 
       // Life Steal Logic

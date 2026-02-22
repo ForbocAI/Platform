@@ -14,7 +14,7 @@ export const initializeGame = createAsyncThunk(
     dispatch(addLog({ message: 'SYSTEM: Establishing Neural Link...', type: 'system' }));
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const player = initializePlayer(options?.classId) as any;
+    const player = initializePlayer(options?.classId) as import('../../types').AgentPlayer;
     player.capabilities = { learned: getSkillsForLevels(player.agentClass, player.stats.level ?? 1) };
     if (options?.lowHp) {
       player.stats.hp = 5;
@@ -44,6 +44,7 @@ export const initializeGame = createAsyncThunk(
         x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,
         isGrounded: true, facingRight: true,
         state: "idle", frame: 0, animTimer: 0,
+        active: true,
       }];
     }
     const initialArea = await sdkService.generateStartArea({
@@ -58,7 +59,7 @@ export const initializeGame = createAsyncThunk(
     // Auto-scan initial area
     const npcs = (initialArea.npcs || []).length > 0 ? initialArea.npcs.map(e => `${e.name} (${e.stats?.hp ?? '?'} HP)`).join(', ') : 'None';
     const allies = initialArea.allies ? initialArea.allies.map(a => a.name).join(', ') : 'None';
-    const extra = player.capabilities?.learned?.includes('keen_senses') ? getKeenSensesScanExtra(initialArea as any) : '';
+    const extra = player.capabilities?.learned?.includes('keen_senses') ? getKeenSensesScanExtra(initialArea) : '';
     const message = `[SCAN RESULT] ${initialArea.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
 
     dispatch(addLog({ message: 'Scanning sector...', type: 'system' }));

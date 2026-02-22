@@ -1,6 +1,18 @@
 import type { AgentNPC } from "../types";
 
-export const NPC_TEMPLATES: Record<string, any> = {
+interface NPCTemplate {
+    type: string;
+    description?: string;
+    baseStats: {
+        maxHp: number;
+        defense?: number;
+        damage?: number;
+        speed?: number;
+    };
+    capabilities?: string[];
+}
+
+export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     "Obsidian Warden": {
         type: "Obsidian Warden", // Will be made generic in Phase 2
         description: "A tower of black glass and malice.",

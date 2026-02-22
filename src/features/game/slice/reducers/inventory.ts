@@ -1,6 +1,7 @@
 import type { ActionReducerMapBuilder } from '@reduxjs/toolkit';
 import * as thunks from '../thunks';
 import type { GameState } from '../types';
+import type { Item, EquipmentSlot, Companion } from '@/features/game/types';
 
 export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.consumeItem.fulfilled, (state, action) => {
@@ -8,12 +9,12 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
         const { itemIndex, effect } = action.payload;
 
         if (effect === 'hire_companion') {
-            const contractDetails = (action.payload as { contractDetails?: { role: string; targetName: string; maxHp: number; description: string } }).contractDetails;
+            const contractDetails = (action.payload as { contractDetails?: Item["contractDetails"]; now?: number }).contractDetails;
             if (contractDetails) {
                 state.player.inventory.items.splice(itemIndex, 1);
                 if (!state.player.companions) state.player.companions = [];
-                state.player.companions.push({
-                    id: (action.payload as any).now?.toString() ?? Date.now().toString(),
+                const newCompanion: Companion = {
+                    id: (action.payload as { now?: number }).now?.toString() ?? Date.now().toString(),
                     type: "companion",
                     faction: "ally",
                     name: contractDetails.targetName,
@@ -43,7 +44,8 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
                     x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,
                     isGrounded: true, facingRight: true,
                     state: "idle", frame: 0, animTimer: 0,
-                });
+                };
+                state.player.companions.push(newCompanion);
             }
             return;
         }
@@ -75,23 +77,25 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
 
         state.player.inventory.items.splice(itemIndex, 1);
 
-        const existing = state.player.inventory.equipment?.[slot];
+        const equipment = state.player.inventory.equipment as Record<EquipmentSlot, Item | undefined> | undefined;
+        const existing = equipment?.[slot];
         if (existing) {
             state.player.inventory.items.push(existing);
         }
 
         if (!state.player.inventory.equipment) state.player.inventory.equipment = {};
-        state.player.inventory.equipment[slot] = item;
+        (state.player.inventory.equipment as Record<EquipmentSlot, Item | undefined>)[slot] = item;
     });
 
     builder.addCase(thunks.unequipItem.fulfilled, (state, action) => {
         if (!action.payload || !state.player || !state.player.inventory.equipment) return;
         const { slot } = action.payload;
 
-        const item = (state.player.inventory.equipment as any)?.[slot];
+        const equipment = state.player.inventory.equipment as Record<EquipmentSlot, Item | undefined> | undefined;
+        const item = equipment?.[slot];
         if (item) {
             state.player.inventory.items.push(item);
-            delete (state.player.inventory.equipment as any)[slot];
+            delete (state.player.inventory.equipment as Record<EquipmentSlot, Item | undefined>)[slot];
         }
     });
 

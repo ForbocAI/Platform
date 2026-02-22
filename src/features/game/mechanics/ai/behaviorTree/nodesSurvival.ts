@@ -36,7 +36,7 @@ export function nodeSurvival(
     state: GameState,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: string) => (config.capabilities as string[]).includes(cap);
     const player = state.player;
     const area = state.currentArea;
 
@@ -49,11 +49,11 @@ export function nodeSurvival(
     // ── Post-Respawn Preparation ──
     if (awareness.justRespawned) {
         if (has('equip') && awareness.hasUnequippedGear) {
-            const weapon = (player.inventory.items || []).find(i => i.type === 'weapon');
+            const weapon = (player.inventory.items as import('../../../types').Item[] || []).find(i => i.type === 'weapon');
             if (weapon && !player.inventory.equipment?.mainHand) {
                 return { type: 'equip_weapon', payload: { itemId: weapon.id }, reason: 'Post-respawn: Equipping gear' };
             }
-            const armor = (player.inventory.items || []).find(i => i.type === 'armor');
+            const armor = (player.inventory.items as import('../../../types').Item[] || []).find(i => i.type === 'armor');
             if (armor && !player.inventory.equipment?.armor) {
                 return { type: 'equip_armor', payload: { itemId: armor.id }, reason: 'Post-respawn: Equipping armor' };
             }
@@ -122,7 +122,7 @@ export function nodeBaseCamp(
     state: GameState,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: string) => (config.capabilities as string[]).includes(cap);
     const player = state.player;
     const area = state.currentArea;
 
@@ -139,7 +139,7 @@ export function nodeBaseCamp(
         if (awareness.hasCraftableRecipes) {
             const recipe = (player.blueprints || []).find(r =>
                 r.ingredients.every(
-                    ing => (player.inventory.items || []).filter(i => i.name === ing.name).length >= ing.quantity
+                    ing => (player.inventory.items as import('../../../types').Item[] || []).filter(i => i.name === ing.name).length >= ing.quantity
                 )
             );
             if (recipe) {
@@ -159,17 +159,17 @@ export function nodeEquipment(
     state: GameState,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: string) => (config.capabilities as string[]).includes(cap);
     const player = state.player;
 
     if (!player) return null;
 
     if (has('equip') && awareness.hasUnequippedGear) {
-        const weapon = (player.inventory.items || []).find(i => i.type === 'weapon');
+        const weapon = (player.inventory.items as import('../../../types').Item[] || []).find(i => i.type === 'weapon');
         if (weapon && !player.inventory.equipment?.mainHand) {
             return { type: 'equip_weapon', payload: { itemId: weapon.id }, reason: `Equip ${weapon.name}` };
         }
-        const armor = (player.inventory.items || []).find(i => i.type === 'armor');
+        const armor = (player.inventory.items as import('../../../types').Item[] || []).find(i => i.type === 'armor');
         if (armor && !player.inventory.equipment?.armor) {
             return { type: 'equip_armor', payload: { itemId: armor.id }, reason: `Equip ${armor.name}` };
         }

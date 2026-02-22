@@ -1,4 +1,4 @@
-import type { AgentConfig, AgentAction, AwarenessResult } from '../types';
+import type { AgentConfig, AgentAction, AwarenessResult, AgentCapability } from '../types';
 import type { GameState } from '../../../slice/types';
 import type { AgentNPC } from '../../../types';
 
@@ -50,7 +50,7 @@ export function nodeRival(
     state: GameState,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability | 'rival') => config.capabilities.includes(cap as AgentCapability);
 
     // Only "Rivals" run this logic
     if (!has('rival')) return null;

@@ -5,7 +5,7 @@
  * Priority: Between Economy and Recon (after basic needs, before exploration).
  */
 
-import type { AgentConfig, AgentAction, AwarenessResult } from '../types';
+import type { AgentConfig, AgentAction, AwarenessResult, AgentCapability } from '../types';
 import type { GameState } from '../../../slice/types';
 import { isActionOnCooldown } from './cooldowns';
 
@@ -21,7 +21,7 @@ export function nodeQuest(
     state: GameState,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability) => config.capabilities.includes(cap);
 
     if (!has('quest')) {
         return null; // Agent doesn't have quest capability

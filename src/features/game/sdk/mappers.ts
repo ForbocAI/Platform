@@ -1,6 +1,6 @@
 import type { Observation, AgentAction } from '@forbocai/core';
 import type { GameState } from '@/features/game/slice/types';
-import type { CortexDirective } from '@/features/game/mechanics/ai/types';
+import type { CortexDirective, AgentActionType } from '@/features/game/mechanics/ai/types';
 
 /**
  * Maps Qua'dar GameState to ForbocAI SDK Observation
@@ -43,8 +43,14 @@ export function toObservation(gameState: GameState): Observation {
  * Maps ForbocAI SDK AgentAction back to Qua'dar CortexDirective
  */
 export function toCortexDirective(action: AgentAction): CortexDirective {
+    const allowed: AgentActionType[] = [
+        'respawn', 'harvest', 'craft', 'heal', 'reduce_stress', 'equip_weapon', 'equip_armor',
+        'flee', 'cast_capability', 'engage', 'loot', 'sell', 'buy', 'scan', 'perform_inquiry',
+        'ask_inquiry', 'advance_vignette', 'move', 'idle'
+    ];
+    const type = allowed.includes(action.type as AgentActionType) ? (action.type as AgentActionType) : 'idle';
     return {
-        type: action.type as any, // Cast to the game's directive types
+        type,
         payload: action.payload,
         priority: 1, // Default priority for SDK directives
         source: 'sdk'

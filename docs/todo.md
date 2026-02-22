@@ -115,6 +115,21 @@
 
 ---
 
+## Current Status Update (2026-02-22)
+
+**Focus:** Lint/build stabilization + deep audit prep.
+
+**What is in progress:**
+- ESLint warnings cleanup (remaining warnings were `any` usage + unused vars in autoplay/agency/combat/exploration/init + Next.js `<img>` warning).
+- Build fix: `generateStartArea` forced NPC path creates `AgentNPC` without required `active` flag (TypeScript error in `src/features/game/entities/area.ts`).
+
+**Next immediate steps:**
+- Fix `active` on forced NPC and re-run `npm run build`.
+- Replace `NeuralLogPanel` portrait `<img>` with `next/image`.
+- Remove remaining `any` and unused vars in AI behavior tree nodes and game thunks.
+- Re-run `npm run lint` and `npm run build`.
+- Then perform the deep audit (architecture + gameplay + security/perf risks) and document findings.
+
 ## Current Phase: Phase 1 — Browser Playtest
 
 ### What to do

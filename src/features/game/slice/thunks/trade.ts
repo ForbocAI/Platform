@@ -38,9 +38,9 @@ export const tradeSell = createAsyncThunk(
     const state = getState() as { game: GameState };
     const { player } = state.game;
     if (!player) return;
-    const itemIndex = player.inventory.items.findIndex((i) => i.id === itemId);
+    const itemIndex = (player.inventory.items as import('../../types').Item[]).findIndex((i) => i.id === itemId);
     if (itemIndex === -1) return;
-    const item = player.inventory.items[itemIndex];
+    const item = (player.inventory.items as import('../../types').Item[])[itemIndex];
     const cost = item.cost || { primary: 10 };
     const value = Math.max(1, Math.floor((cost.primary || 0) / 2));
     const now = Date.now();

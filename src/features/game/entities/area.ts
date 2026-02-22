@@ -208,6 +208,7 @@ const applyForcedNPC = (area: Area, forceNPC: boolean | string): Area => {
                 x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,
                 isGrounded: false, facingRight: true,
                 state: "idle", frame: 0, animTimer: 0,
+                active: true,
             } as AgentNPC;
         })()]
         : [generateRandomAgentNPC()];

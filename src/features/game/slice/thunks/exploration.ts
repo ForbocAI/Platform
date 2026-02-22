@@ -54,7 +54,7 @@ export const scanSector = createAsyncThunk(
       area.npcs.length > 0 ? area.npcs.map((e) => `${e.name} (${e.stats.hp} HP)`).join(', ') : 'None';
     const allies = area.allies ? area.allies.map((a) => a.name).join(', ') : 'None';
     const extra = state.game.player?.capabilities?.learned?.includes('keen_senses')
-      ? getKeenSensesScanExtra(area as any) // Cast for now
+      ? getKeenSensesScanExtra(area) // Removed cast
       : '';
     const message = `[SCAN RESULT] ${area.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
     const now = Date.now();

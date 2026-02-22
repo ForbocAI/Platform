@@ -8,7 +8,7 @@ export function calculateEffectiveStats(player: AgentPlayer): StatsComponent {
 
     const slots: EquipmentSlot[] = ["mainHand", "armor", "relic"];
     for (const slot of slots) {
-        const item = player.inventory.equipment?.[slot];
+        const item = player.inventory.equipment?.[slot] as Item | undefined;
         if (item && item.bonus) {
             stats.maxHp += item.bonus.maxHp || 0;
             stats.maxStress += item.bonus.maxStress || 0;
@@ -17,7 +17,7 @@ export function calculateEffectiveStats(player: AgentPlayer): StatsComponent {
     }
 
     if (player.activeEffects) {
-        for (const effect of player.activeEffects) {
+        for (const effect of player.activeEffects as StatusEffect[]) {
             if (effect.statModifiers) {
                 stats.maxHp += effect.statModifiers.maxHp || 0;
                 stats.maxStress += effect.statModifiers.maxStress || 0;

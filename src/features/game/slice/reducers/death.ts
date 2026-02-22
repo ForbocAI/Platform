@@ -11,6 +11,6 @@ export function addDeathReducers(builder: ActionReducerMapBuilder<GameState>): v
         state.sessionComplete = null;
         // Mark that player just respawned - this will be used by behavior tree
         // to prioritize preparation before exploration
-        (state.player as any).justRespawned = true;
+        state.player.justRespawned = true;
     });
 }

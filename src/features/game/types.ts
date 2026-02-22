@@ -32,13 +32,15 @@ export type AgentClass =
     | "Abyssal Overfiend"
     | "Aetherwing Herald";
 
-export interface AgentPlayer extends Actor {
+export interface AgentPlayer extends Omit<Actor, 'activeEffects'> {
     // Note: Actor already contains id, faction, stats, inventory, capabilities, etc.
+    activeEffects?: StatusEffect[];
     name: string; // To be moved to profile/metadata component
     agentClass: AgentClass;
     surgeCount: number;
     blueprints: CraftingFormula[];
     companions?: Companion[];
+    justRespawned?: boolean;
 }
 
 export interface Companion extends Actor {
@@ -54,7 +56,8 @@ export interface CraftingFormula {
     produces: Item;
 }
 
-export interface AgentNPC extends Actor {
+export interface AgentNPC extends Omit<Actor, 'activeEffects'> {
+    activeEffects?: StatusEffect[];
     soulId?: string; // Neural signature record
     name: string;
     description: string;

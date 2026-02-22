@@ -41,8 +41,8 @@ export function parseCapabilityEffect(effectStr: string): CapabilityEffectFlags 
 /**
  * Create player status update based on capability effect
  */
-export function createPlayerStatusUpdate(effectStr: string): any[] {
-    const updates: any[] = [];
+export function createPlayerStatusUpdate(effectStr: string): import('../../../types').StatusEffect[] {
+    const updates: import('../../../types').StatusEffect[] = [];
     const lower = effectStr.toLowerCase();
 
     if (lower.includes("evasion")) {
@@ -50,7 +50,7 @@ export function createPlayerStatusUpdate(effectStr: string): any[] {
             id: "evasion_buff",
             name: "Enhanced Evasion",
             type: "buff",
-            statModifiers: { ac: 5 },
+            statModifiers: { defense: 5 },
             duration: 3,
             description: "Increased evasion rating."
         });
@@ -59,7 +59,7 @@ export function createPlayerStatusUpdate(effectStr: string): any[] {
             id: "defense_buff",
             name: "Defensive Matrix",
             type: "buff",
-            statModifiers: { ac: 2 },
+            statModifiers: { defense: 2 },
             duration: 3,
             description: "Reinforced shielding."
         });
@@ -80,8 +80,8 @@ export function createPlayerStatusUpdate(effectStr: string): any[] {
 /**
  * Create NPC status effects based on capability effect flags
  */
-export function createNPCStatusEffects(flags: CapabilityEffectFlags): any[] {
-    const effects: any[] = [];
+export function createNPCStatusEffects(flags: CapabilityEffectFlags): import('../../../types').StatusEffect[] {
+    const effects: import('../../../types').StatusEffect[] = [];
 
     if (flags.isImmobilize) {
         effects.push({ id: "immobilized", name: "Immobilized", type: "debuff", duration: 2, description: "Cannot move or attack." });

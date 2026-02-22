@@ -1,14 +1,15 @@
 // lib/sdk/cortexService.ts
 // Environment-aware SDK Service to prevent native Node modules leaking to browser bundle.
 
-import type { IAgent, ICortex, IBridge } from '@forbocai/core';
+import type { IAgent, ICortex, IBridge, IMemory } from '@forbocai/core';
 import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
+import type { GenerateStartAreaOptions } from '@/features/game/entities/area';
 
 class SDKService {
     private agents: Map<string, IAgent> = new Map();
     private cortex: ICortex | null = null;
     private bridge: IBridge | null = null;
-    private memory: any = null;
+    private memory: IMemory | null = null;
     private initialized = false;
 
     private getApiUrl(): string {
@@ -29,7 +30,7 @@ class SDKService {
 
         try {
             // --- Pre-flight Check: WebGPU Support ---
-            const hasGpu = typeof navigator !== 'undefined' && (navigator as any).gpu;
+            const hasGpu = typeof navigator !== 'undefined' && 'gpu' in navigator;
             if (!hasGpu) {
                 console.warn('SDKService: No WebGPU support detected. Falling back to Local AI.');
                 this.initialized = true;
@@ -70,7 +71,7 @@ class SDKService {
             }
 
             this.initialized = true;
-        } catch (_error: any) {
+        } catch (_error) {
             console.error('SDKService: Initialization error:', _error);
             this.initialized = true;
         }
@@ -88,7 +89,7 @@ class SDKService {
 
         if (!this.agents.has(id)) {
             const apiUrl = this.getApiUrl();
-            const core: any = await import('@forbocai/core');
+            const core = await import('@forbocai/core');
 
             const agent = core.createAgent({
                 id,
@@ -129,7 +130,7 @@ class SDKService {
         // Check if already rehydrated
         if (this.agents.has(txId)) return this.agents.get(txId)!;
 
-        const core: any = await import('@forbocai/core');
+        const core = await import('@forbocai/core');
 
         try {
             // 1. Fetch data from persistent layer
@@ -151,8 +152,8 @@ class SDKService {
 
     // --- COMPATIBILITY WRAPPERS ---
 
-    async generateStartRoom(options?: any) { return this.generateStartArea(options); }
-    async generateStartArea(options?: { deterministic?: boolean; forceVendor?: boolean; forceNPC?: boolean }): Promise<Area> {
+    async generateStartRoom(options?: GenerateStartAreaOptions) { return this.generateStartArea(options); }
+    async generateStartArea(options?: GenerateStartAreaOptions): Promise<Area> {
         if (!this.cortex) {
             return {
                 id: 'start_area_mock',
@@ -188,8 +189,8 @@ class SDKService {
         }
     }
 
-    async generateRoom(regionalType?: string, magnitude?: number, context?: any) { return this.generateArea(regionalType, magnitude, context); }
-    async generateArea(regionalType?: string, magnitude?: number, context?: any): Promise<Area> {
+    async generateRoom(regionalType?: string, magnitude?: number, context?: Record<string, unknown>) { return this.generateArea(regionalType, magnitude, context); }
+    async generateArea(regionalType?: string, magnitude?: number, context?: Record<string, unknown>): Promise<Area> {
         if (!this.cortex) return this.generateStartArea();
         try {
             const agent = await this.getWorldgenAgent();

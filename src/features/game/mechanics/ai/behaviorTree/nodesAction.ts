@@ -1,4 +1,4 @@
-import type { AgentConfig, AgentAction, AwarenessResult } from '../types';
+import type { AgentConfig, AgentAction, AwarenessResult, AgentCapability } from '../types';
 import type { GameState } from '../../../slice/types';
 import { pickBestCapability } from './helpers';
 import { isActionOnCooldown, isActionLooping } from './cooldowns';
@@ -11,7 +11,7 @@ export function nodeCombat(
     state: GameState,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability) => config.capabilities.includes(cap);
     const player = state.player;
 
     if (!player) return null;
@@ -39,7 +39,7 @@ export function nodeCompanionPrep(
     config: AgentConfig,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability) => config.capabilities.includes(cap);
     if (!has('trade') || !awareness.hasVendors || !awareness.hasNPCs) return null;
     if (awareness.hasSignedCompanion) return null;
     if (!awareness.vendorHasContract || !awareness.canAffordContract) return null;
@@ -54,7 +54,7 @@ export function nodeLoot(
     config: AgentConfig,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability) => config.capabilities.includes(cap);
 
     if (has('loot') && awareness.hasGroundLoot) {
         return { type: 'loot', reason: 'Ground loot available' };
@@ -70,7 +70,7 @@ export function nodeEconomy(
     config: AgentConfig,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability) => config.capabilities.includes(cap);
 
     if (!has('trade') || !awareness.hasVendors) {
         return null;
@@ -117,7 +117,7 @@ export function nodeRecon(
     config: AgentConfig,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability) => config.capabilities.includes(cap);
 
     // Scan: Only if area not recently scanned and not on cooldown
     if (has('awareness') && !awareness.recentlyScanned && !isActionOnCooldown('scan', awareness)) {
@@ -158,7 +158,7 @@ export function nodeExploration(
     state: GameState,
     awareness: AwarenessResult,
 ): AgentAction | null {
-    const has = (cap: string) => config.capabilities.includes(cap as any);
+    const has = (cap: AgentCapability) => config.capabilities.includes(cap);
     const area = state.currentArea;
 
     if (!area) return null;

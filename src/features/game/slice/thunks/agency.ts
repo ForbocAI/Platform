@@ -39,7 +39,7 @@ export const runAgentTick = createAsyncThunk(
             // Map state to agent-specific observation
             const observation = toObservation(rootState.game);
 
-            const response = await agent.process(observation.content, rootState.game as any);
+            const response = await agent.process(observation.content, rootState.game as unknown as Record<string, unknown>);
 
             dispatch(clearAgentPondering(agentId));
 

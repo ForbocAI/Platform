@@ -32,9 +32,9 @@ export const consumeItem = createAsyncThunk(
     const { player } = state.game;
     if (!player) return;
 
-    const itemIndex = player.inventory.items.findIndex((i) => i.id === itemId);
+    const itemIndex = (player.inventory.items as import('../../types').Item[]).findIndex((i) => i.id === itemId);
     if (itemIndex === -1) return;
-    const item = player.inventory.items[itemIndex];
+    const item = (player.inventory.items as import('../../types').Item[])[itemIndex];
 
     if (item.type === 'contract' && item.contractDetails) {
       dispatch(addLog({ message: `You signed ${item.name}. ${item.contractDetails.targetName} joins your party!`, type: 'system' }));
@@ -71,10 +71,10 @@ export const equipItem = createAsyncThunk(
     const { player } = state.game;
     if (!player) return;
 
-    const itemIndex = player.inventory.items.findIndex((i) => i.id === itemId);
+    const itemIndex = (player.inventory.items as import('../../types').Item[]).findIndex((i) => i.id === itemId);
     if (itemIndex === -1) return;
 
-    const item = player.inventory.items[itemIndex];
+    const item = (player.inventory.items as import('../../types').Item[])[itemIndex];
     if (slot === 'mainHand' && item.type !== 'weapon') return;
     if (slot === 'armor' && item.type !== 'armor') return;
     if (slot === 'relic' && item.type !== 'relic') return;
@@ -89,9 +89,11 @@ export const unequipItem = createAsyncThunk(
   async ({ slot }: { slot: import('@/features/game/types').EquipmentSlot }, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
     const { player } = state.game;
-    if (!player || !player.inventory.equipment || !(player.inventory.equipment as any)[slot]) return;
+    if (!player) return;
+    const equipment = player.inventory.equipment as Record<import('@/features/game/types').EquipmentSlot, import('@/features/game/types').Item | undefined> | undefined;
+    if (!equipment || !equipment[slot]) return;
 
-    dispatch(addLog({ message: `Unequipped ${(player.inventory.equipment as any)[slot]?.name}.`, type: 'system' }));
+    dispatch(addLog({ message: `Unequipped ${equipment[slot]?.name}.`, type: 'system' }));
     return { slot };
   }
 );
@@ -103,10 +105,10 @@ export const sacrificeItem = createAsyncThunk(
     const { player } = state.game;
     if (!player) return;
 
-    const itemIndex = player.inventory.items.findIndex((i) => i.id === itemId);
+    const itemIndex = (player.inventory.items as import('../../types').Item[]).findIndex((i) => i.id === itemId);
     if (itemIndex === -1) return;
 
-    const item = player.inventory.items[itemIndex];
+    const item = (player.inventory.items as import('../../types').Item[])[itemIndex];
     const value = item.cost?.primary || 0;
 
     if (value <= 0) return;

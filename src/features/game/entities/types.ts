@@ -17,7 +17,7 @@ export interface Effect {
     magnitude: number;
     remainingDurationMs: number;
     sourceEntityId: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 /**
@@ -45,8 +45,8 @@ export interface StatsComponent {
 export interface InventoryComponent {
     weapons: string[];
     currentWeaponIndex: number;
-    items: any[];
-    equipment: Record<string, any>;
+    items: unknown[];
+    equipment: Record<string, unknown>;
     spirit: number; // Primary currency
     blood: number;  // Special currency
 }
@@ -58,8 +58,8 @@ export interface InventoryComponent {
 export interface AIComponent {
     behaviorState: 'idle' | 'patrol' | 'combat' | 'flee' | 'search';
     targetId?: string | null;
-    memory: Record<string, any>;
-    awareness: any;
+    memory: Record<string, unknown>;
+    awareness: Record<string, unknown> | null;
 }
 
 /**
@@ -99,7 +99,7 @@ export interface Actor {
     stats: StatsComponent;
     inventory: InventoryComponent;
     capabilities: CapabilityComponent;
-    activeEffects: any[]; // Status effects
+    activeEffects: Effect[]; // Status effects
 
     // Optional Components
     ai?: AIComponent;
