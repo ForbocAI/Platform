@@ -45,6 +45,7 @@ export interface Companion extends Actor {
     soulId?: string; // Neural signature record
     name: string;
     role: "Warrior" | "Scout" | "Mystic";
+    description?: string;
 }
 
 export interface CraftingFormula {

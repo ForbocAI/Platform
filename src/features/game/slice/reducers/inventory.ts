@@ -3,7 +3,7 @@ import * as thunks from '../thunks';
 import type { GameState } from '../types';
 
 export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>): void {
-    builder.addCase(thunks.useItem.fulfilled, (state, action) => {
+    builder.addCase(thunks.consumeItem.fulfilled, (state, action) => {
         if (!action.payload || !state.player) return;
         const { itemIndex, effect } = action.payload;
 
@@ -23,10 +23,16 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
                         maxHp: contractDetails.maxHp,
                         stress: 0,
                         maxStress: 100,
+                        speed: 1,
                         defense: 10,
+                        damage: 5,
+                        invulnerable: 0,
                     },
                     inventory: {
+                        weapons: [],
+                        currentWeaponIndex: 0,
                         items: [],
+                        equipment: {},
                         spirit: 0,
                         blood: 0,
                     },
@@ -34,6 +40,9 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
                         learned: [],
                     },
                     activeEffects: [],
+                    x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,
+                    isGrounded: true, facingRight: true,
+                    state: "idle", frame: 0, animTimer: 0,
                 });
             }
             return;

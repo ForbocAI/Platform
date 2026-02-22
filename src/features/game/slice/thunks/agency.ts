@@ -28,7 +28,7 @@ export const runAgentTick = createAsyncThunk(
         try {
             const agentPersona = persona || (type === 'npc' ? 'Neutral Entity' : 'Loyal Companion');
 
-            // Rehydrate from Soul if TXID provided, otherwise get/create standard agent
+            // Rehydrate from Soul if Arweave data item ID provided, otherwise get/create standard agent
             const agent = soulId
                 ? await sdkService.rehydrateAgent(soulId)
                 : await sdkService.getAgent(agentId, agentPersona);

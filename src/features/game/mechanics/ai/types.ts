@@ -6,7 +6,7 @@
  * once integrated (see system-todo.md §1.2, Priority Node 0).
  */
 
-import type { AgentPlayer, AgentNPC, Area, Item, Companion, ActiveQuest } from '../../types';
+import type { AgentNPC, ActiveQuest } from '../../types';
 
 // ── Capabilities ──
 

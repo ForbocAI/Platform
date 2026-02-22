@@ -1,4 +1,4 @@
-import { Hammer, Package } from "lucide-react";
+import { Hammer } from "lucide-react";
 import type { AgentPlayer, CraftingFormula } from "@/features/game/types";
 import { Modal, GameButton } from "@/components/elements/generic";
 import { useAppDispatch } from "@/features/core/store";

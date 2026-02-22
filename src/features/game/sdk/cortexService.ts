@@ -2,7 +2,7 @@
 // Environment-aware SDK Service to prevent native Node modules leaking to browser bundle.
 
 import type { IAgent, ICortex, IBridge } from '@forbocai/core';
-import type { Area, InquiryResponse, StageOfScene, AgentNPC, AgentPlayer } from '@/features/game/types';
+import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
 
 class SDKService {
     private agents: Map<string, IAgent> = new Map();
@@ -10,6 +10,10 @@ class SDKService {
     private bridge: IBridge | null = null;
     private memory: any = null;
     private initialized = false;
+
+    private getApiUrl(): string {
+        return process.env.NEXT_PUBLIC_FORBOC_API_URL || 'https://api.forboc.ai';
+    }
 
     async init() {
         if (this.initialized) return;
@@ -38,7 +42,7 @@ class SDKService {
                 import('@forbocai/core').catch(() => null)
             ]);
 
-            const apiUrl = process.env.NEXT_PUBLIC_FORBOC_API_URL || 'http://localhost:8080';
+            const apiUrl = this.getApiUrl();
 
             if (!browserModule?.createCortex || !coreModule?.createBridge) {
                 console.warn('SDKService: Modules failed to load. Operating in Fallback mode.');
@@ -59,15 +63,15 @@ class SDKService {
                     );
                     await Promise.race([initPromise, timeoutPromise]);
                     console.log('ForbocAI SDK: Initialized.');
-                } catch (ce) {
-                    console.warn('ForbocAI SDK: Initialization failed or timed out. Using Fallback mode.', ce);
+                } catch (_ce) {
+                    console.warn('ForbocAI SDK: Initialization failed or timed out. Using Fallback mode.', _ce);
                     this.cortex = null;
                 }
             }
 
             this.initialized = true;
-        } catch (error: any) {
-            console.error('SDKService: Initialization error:', error);
+        } catch (_error: any) {
+            console.error('SDKService: Initialization error:', _error);
             this.initialized = true;
         }
     }
@@ -83,7 +87,7 @@ class SDKService {
         if (!this.cortex) throw new Error('Cortex not available (fallback mode)');
 
         if (!this.agents.has(id)) {
-            const apiUrl = process.env.NEXT_PUBLIC_FORBOC_API_URL || 'http://localhost:8080';
+            const apiUrl = this.getApiUrl();
             const core: any = await import('@forbocai/core');
 
             const agent = core.createAgent({
@@ -97,6 +101,20 @@ class SDKService {
         }
 
         return this.agents.get(id)!;
+    }
+
+    private async getWorldgenAgent(): Promise<IAgent> {
+        return this.getAgent(
+            'worldgen-agent',
+            'You generate structured area data for a game world. Return only JSON.'
+        );
+    }
+
+    private async getInquiryAgent(): Promise<IAgent> {
+        return this.getAgent(
+            'oracle-agent',
+            'You answer inquiries with structured JSON responses. Return only JSON.'
+        );
     }
 
     getBridge(): IBridge {
@@ -125,9 +143,9 @@ class SDKService {
 
             console.log(`SDKService: Rehydrated Agent [${soul.id}] from signature [${txId}]`);
             return agent;
-        } catch (e) {
-            console.error(`SDKService: Failed to rehydrate agent from signature [${txId}]:`, e);
-            throw e;
+        } catch (_e) {
+            console.error(`SDKService: Failed to rehydrate agent from signature [${txId}]:`, _e);
+            throw _e;
         }
     }
 
@@ -147,15 +165,15 @@ class SDKService {
                 npcs: []
             };
         }
-        const prompt = `Generate a start area for an agentic session. 
-        Options: ${JSON.stringify(options)}. 
-        Return ONLY valid JSON matching the Area interface. 
-        Ensure regionalType is one of the valid RegionalType values.`;
 
         try {
-            const response = await this.cortex.complete(prompt);
-            return JSON.parse(response) as Area;
-        } catch (e) {
+            const agent = await this.getWorldgenAgent();
+            const response = await agent.process('WORLDGEN_REQUEST', {
+                kind: 'worldgen',
+                options
+            });
+            return JSON.parse(response.dialogue) as Area;
+        } catch (_e) {
             // Fallback to a safe room if JSON/completion fails
             return {
                 id: 'start_area_fallback',
@@ -173,17 +191,16 @@ class SDKService {
     async generateRoom(regionalType?: string, magnitude?: number, context?: any) { return this.generateArea(regionalType, magnitude, context); }
     async generateArea(regionalType?: string, magnitude?: number, context?: any): Promise<Area> {
         if (!this.cortex) return this.generateStartArea();
-        const prompt = `Generate a new Area. 
-        Type: ${regionalType || 'Random'}. 
-        Magnitude: ${magnitude || 1}. 
-        Context: ${JSON.stringify(context)}.
-        Return ONLY valid JSON matching the Area interface.
-        Note: specify 'biome' as one of the valid Biome names.`;
-
         try {
-            const response = await this.cortex.complete(prompt);
-            return JSON.parse(response) as Area;
-        } catch (e) {
+            const agent = await this.getWorldgenAgent();
+            const response = await agent.process('WORLDGEN_REQUEST', {
+                kind: 'worldgen',
+                regionalType: regionalType || 'Random',
+                magnitude: magnitude || 1,
+                context
+            });
+            return JSON.parse(response.dialogue) as Area;
+        } catch (_e) {
             return this.generateStartArea(); // fallback
         }
     }
@@ -197,16 +214,16 @@ class SDKService {
                 surgeUpdate: 0
             };
         }
-        const prompt = `Act as an Inquiry Engine. Answer: "${question}". 
-        System Context: ${surgeCount}. 
-        Stage: ${stage || 'Initialization'}.
-        Return ONLY valid JSON matching the InquiryResponse interface. 
-        Example structure: { "answer": "Yes", "qualifier": "but", "description": "...", "roll": 15, "surgeUpdate": 1 }`;
-
         try {
-            const response = await this.cortex.complete(prompt);
-            return JSON.parse(response) as InquiryResponse;
-        } catch (e) {
+            const agent = await this.getInquiryAgent();
+            const response = await agent.process('INQUIRY_REQUEST', {
+                kind: 'inquiry',
+                question,
+                surgeCount,
+                stage: stage || 'Initialization'
+            });
+            return JSON.parse(response.dialogue) as InquiryResponse;
+        } catch (_e) {
             return {
                 answer: "No",
                 description: "The Oracle remains silent.",

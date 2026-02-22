@@ -1,7 +1,7 @@
 import type { SessionScore, ActiveQuest, VignetteStage } from '@/features/game/types';
-import { advanceVignetteStage, startVignette, endVignette } from '@/features/narrative/slice/narrativeSlice';
-import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
+import { advanceVignetteStage, endVignette } from '@/features/narrative/slice/narrativeSlice';
 import type { GameState } from './types';
+import { addLog } from './gameSlice';
 
 export const initialSessionScore = (): SessionScore => ({
   areasExplored: 0,
@@ -20,8 +20,6 @@ function nextVignetteStage(current: VignetteStage): VignetteStage | null {
   const i = VIGNETTE_STAGES.indexOf(current);
   return VIGNETTE_STAGES[i + 1] ?? null;
 }
-
-import { addLog } from './gameSlice';
 
 export function handleVignetteProgression(dispatch: (a: unknown) => void, getState: () => unknown): void {
   const state = getState() as { narrative?: { vignette?: { theme: string; stage: VignetteStage } }; game: GameState };

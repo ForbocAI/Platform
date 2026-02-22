@@ -12,7 +12,7 @@ interface InventoryPanelProps {
     onClose: () => void;
 }
 
-export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice, onDrop, onClose }: InventoryPanelProps) {
+export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice, onDrop: _onDrop, onClose }: InventoryPanelProps) {
     const renderItemBonus = (item: Item) => {
         if (!item.bonus) return null;
         return (

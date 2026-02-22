@@ -56,7 +56,7 @@ export function GameScreenOverlays({
           onUnequip={(slot) => onUnequipItem?.(slot)}
           onUse={(id) => onUseItem?.(id)}
           onSacrifice={(id) => onSacrificeItem?.(id)}
-          onDrop={(id) => console.warn('Drop not implemented')}
+          onDrop={(_id) => console.warn('Drop not implemented')}
         />
       )}
       {capabilitiesPanelOpen && (

@@ -50,13 +50,13 @@ export function CompanionPanel({ player, onClose }: CompanionPanelProps) {
                     </span>
                   </div>
                   <div className="text-xs text-palette-muted">
-                    HP: {comp.hp} / {comp.maxHp}
+                    HP: {comp.stats.hp} / {comp.stats.maxHp}
                   </div>
                 </div>
                 <div className="h-1.5 w-full bg-palette-bg-dark rounded-full overflow-hidden border border-palette-border/50">
                   <div
                     className="h-full bg-palette-accent-dim transition-all duration-300"
-                    style={{ width: `${Math.max(0, Math.min(100, (comp.hp / comp.maxHp) * 100))}%` }}
+                    style={{ width: `${Math.max(0, Math.min(100, (comp.stats.hp / comp.stats.maxHp) * 100))}%` }}
                   />
                 </div>
                 <p className="text-xs text-palette-muted-light line-clamp-2 md:line-clamp-none italic">

@@ -3,8 +3,6 @@
 import type { VignetteStage } from "@/features/game/types";
 import { GameButton } from "@/components/elements/generic";
 
-const STAGES: VignetteStage[] = ["Exposition", "Rising Action", "Climax", "Epilogue"];
-
 export function VignetteControls({
   theme = "",
   stage = "Exposition",

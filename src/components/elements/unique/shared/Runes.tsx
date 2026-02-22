@@ -1,19 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useAppSelector } from "@/features/core/store/hooks";
+import { selectClientHydrated } from "@/features/core/ui/slice/uiSlice";
 
 const PLACEHOLDER = "\u00A0";
 
-function useHydrated() {
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-  return hydrated;
-}
-
 export function RuneSigil({ className = "" }: { className?: string }) {
-  const hydrated = useHydrated();
+  const hydrated = useAppSelector(selectClientHydrated);
   if (!hydrated) return <span className={className}>{PLACEHOLDER}</span>;
   return (
     <span
@@ -26,7 +19,7 @@ export function RuneSigil({ className = "" }: { className?: string }) {
 }
 
 export function TopRunes() {
-  const hydrated = useHydrated();
+  const hydrated = useAppSelector(selectClientHydrated);
   if (!hydrated) return <div className="py-0.5">{PLACEHOLDER}</div>;
   return (
     <div className="font-runic text-center py-0.5 space-y-px opacity-50 select-none">
@@ -41,7 +34,7 @@ export function TopRunes() {
 }
 
 export function BottomRunes() {
-  const hydrated = useHydrated();
+  const hydrated = useAppSelector(selectClientHydrated);
   if (!hydrated) return <div className="py-0.5">{PLACEHOLDER}</div>;
   return (
     <div className="font-runic text-center py-0.5 space-y-px opacity-50 select-none">

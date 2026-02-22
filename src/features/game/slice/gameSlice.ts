@@ -1,7 +1,6 @@
 import { createSlice, createSelector, type PayloadAction } from '@reduxjs/toolkit';
 import { initialState } from './constants';
 import { addAllReducers } from './reducers';
-import type { GameState } from './types';
 import type { GameLogEntry } from '@/features/game/types';
 import type { RootState } from '@/features/core/store';
 
@@ -61,7 +60,7 @@ export {
   tradeBuy,
   tradeSell,
   pickUpGroundLoot,
-  useItem,
+  consumeItem,
   sacrificeItem,
   equipItem,
   unequipItem,

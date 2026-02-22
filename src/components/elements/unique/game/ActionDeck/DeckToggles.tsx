@@ -1,6 +1,6 @@
 "use client";
 
-import { Wand2, Award, Box, Users, Zap } from "lucide-react";
+import { Award, Box, Users, Zap } from "lucide-react";
 import type { AgentPlayer } from "@/features/game/types";
 
 export function DeckToggles({

@@ -1,4 +1,4 @@
-import type { Capability, StatsComponent } from "../../types";
+import type { Capability } from "../../types";
 
 export const MYSTICAL_CLASS_CAPABILITIES: Record<string, Capability> = {
     // Iron Armored Guardian

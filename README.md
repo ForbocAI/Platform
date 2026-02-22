@@ -18,9 +18,9 @@ The **Forboc AI Platform** is the window into the Neural Grid. It is the flagshi
 > *Reality is a protocol. We are the architects.*
 
 ### ⚡ System Specifications
-Built on **Next.js 15** and **Tailwind CSS**, designed for maximum visual impact and sub-millisecond responsiveness.
+Built on **Next.js 16** and **Tailwind CSS**, designed for maximum visual impact and sub-millisecond responsiveness.
 
-- **Neural Grid Integration**: Native hook into the `forbocai` SDK.
+- **Neural Grid Integration**: Native hook into the `forbocai` SDK using the multi-round protocol (`/directive` → `/context` → `/verdict`).
 - **Dynamic Simulation**: Real-time rendering of procedural environments and autonomous NPC behaviors.
 - **Vengeance UI**: A high-fidelity, grimdark aesthetic framework.
 
@@ -43,4 +43,3 @@ Strict adherence to the [Style Guide](./style-guide.md) is expected.
 
 ## License
 All rights reserved. © 2026 ForbocAI. See [LICENSE](./LICENSE) for full details.
-

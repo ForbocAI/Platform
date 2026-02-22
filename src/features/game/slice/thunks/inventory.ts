@@ -25,8 +25,8 @@ export const pickUpGroundLoot = createAsyncThunk(
   }
 );
 
-export const useItem = createAsyncThunk(
-  'game/useItem',
+export const consumeItem = createAsyncThunk(
+  'game/consumeItem',
   async ({ itemId }: { itemId: string }, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
     const { player } = state.game;

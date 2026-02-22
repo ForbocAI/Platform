@@ -39,8 +39,8 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
                 const cmpIndex = state.player.companions.findIndex(c => c.id === update.id);
                 if (cmpIndex !== -1) {
                     const cmp = state.player.companions[cmpIndex];
-                    cmp.hp -= update.damageTaken;
-                    if (cmp.hp <= 0) {
+                    cmp.stats.hp -= update.damageTaken;
+                    if (cmp.stats.hp <= 0) {
                         state.player.companions.splice(cmpIndex, 1);
                     }
                 }
@@ -50,7 +50,7 @@ function addEngageHostilesReducer(builder: ActionReducerMapBuilder<GameState>): 
         const npcs = state.currentArea.npcs.map(e => {
             // Process NPC Effects (DoT & Duration)
             let currentHp = e.stats.hp;
-            let currentEffects = e.activeEffects || [];
+            const currentEffects = e.activeEffects || [];
             const nextEffects: typeof currentEffects = [];
 
             for (const effect of currentEffects) {
@@ -150,7 +150,7 @@ function addCastCapabilityReducer(builder: ActionReducerMapBuilder<GameState>): 
             const update = updates?.find(u => u.npcId === e.id);
             if (update) {
                 const actualDamage = applyDamageDealtBonus(capabilities, state.player?.activeEffects, update.damage);
-                let newHp = e.stats.hp - actualDamage;
+                const newHp = e.stats.hp - actualDamage;
 
                 let newEffects = e.activeEffects || [];
                 if (update.statusEffects && update.statusEffects.length > 0) {

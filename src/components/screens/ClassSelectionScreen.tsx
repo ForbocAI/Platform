@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import { initializeGame } from "@/features/game/slice/gameSlice";
 import { selectSelectedClassId, setSelectedClassId } from "@/features/core/ui/slice/uiSlice";
 import { selectIsLoading } from "@/features/game/slice/gameSlice";
-import { User, Shield, Zap, Heart, Activity } from "lucide-react";
+import { User, Zap, Activity } from "lucide-react";
 
 export function ClassSelectionScreen() {
   const dispatch = useAppDispatch();

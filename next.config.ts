@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ['node-llama-cpp', '@lancedb/lancedb', 'onnxruntime-node'],
   turbopack: {
+    root: __dirname,
     resolveAlias: {
       'node-llama-cpp': './src/lib/sdk/empty.ts',
       '@lancedb/lancedb': './src/lib/sdk/empty.ts',

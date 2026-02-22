@@ -15,19 +15,35 @@ export const initializeGame = createAsyncThunk(
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     const player = initializePlayer(options?.classId) as any;
-    player.capabilities = getSkillsForLevels(player.agentClass, player.level);
+    player.capabilities = { learned: getSkillsForLevels(player.agentClass, player.stats.level ?? 1) };
     if (options?.lowHp) {
-      player.hp = 5;
+      player.stats.hp = 5;
     }
     if (options?.forceCompanion) {
       const companionHp = options.lowCompanionHp ? 1 : 100;
       player.companions = [{
         id: "test_companion_1",
+        type: "companion",
+        faction: "ally" as const,
         name: "Standard Unit",
-        role: "Warrior",
-        hp: companionHp,
-        maxHp: companionHp,
-        description: "A seasoned unit recruited for testing."
+        role: "Warrior" as const,
+        description: "A seasoned unit recruited for testing.",
+        stats: {
+          hp: companionHp,
+          maxHp: companionHp,
+          stress: 0,
+          maxStress: 100,
+          speed: 1,
+          defense: 10,
+          damage: 5,
+          invulnerable: 0,
+        },
+        inventory: { weapons: [], currentWeaponIndex: 0, items: [], equipment: {}, spirit: 0, blood: 0 },
+        capabilities: { learned: [] },
+        activeEffects: [],
+        x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,
+        isGrounded: true, facingRight: true,
+        state: "idle", frame: 0, animTimer: 0,
       }];
     }
     const initialArea = await sdkService.generateStartArea({
@@ -40,9 +56,9 @@ export const initializeGame = createAsyncThunk(
     dispatch(startVignette({ theme }));
 
     // Auto-scan initial area
-    const npcs = (initialArea.npcs || []).length > 0 ? initialArea.npcs.map(e => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
+    const npcs = (initialArea.npcs || []).length > 0 ? initialArea.npcs.map(e => `${e.name} (${e.stats?.hp ?? '?'} HP)`).join(', ') : 'None';
     const allies = initialArea.allies ? initialArea.allies.map(a => a.name).join(', ') : 'None';
-    const extra = player.capabilities?.includes('keen_senses') ? getKeenSensesScanExtra(initialArea as any) : '';
+    const extra = player.capabilities?.learned?.includes('keen_senses') ? getKeenSensesScanExtra(initialArea as any) : '';
     const message = `[SCAN RESULT] ${initialArea.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
 
     dispatch(addLog({ message: 'Scanning sector...', type: 'system' }));

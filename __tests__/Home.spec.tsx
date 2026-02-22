@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import Home from '../src/app/page'
 
 // Mock Next.js navigation if needed, though simple Home render might just work

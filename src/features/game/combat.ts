@@ -1,4 +1,4 @@
-import { StatsComponent, AgentNPC, AgentPlayer, Capability } from "./types";
+import { AgentNPC, AgentPlayer, Capability } from "./types";
 import { calculateEffectiveStats } from "./items";
 import { parseDiceString } from "./dice";
 import { CAPABILITIES } from "./mechanics";
@@ -43,7 +43,7 @@ export function resolveDuel(
     if (isHit) {
         const diff = attackerTotal - defenderTotal;
         // Base damage formula
-        let damageRoll = Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1;
+        const damageRoll = Math.floor(diff / 3) + Math.floor(Math.random() * 4) + 1;
         damage = Math.max(1, damageRoll);
         message = `You land a heavy blow on ${defender.name} for ${damage} damage. (${attackerTotal} vs ${defenderTotal})`;
     } else {

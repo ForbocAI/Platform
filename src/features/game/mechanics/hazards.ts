@@ -5,7 +5,7 @@
 export function calculateHazardEffects(hazards: string[]): { damage: number; stress: number; message?: string } {
     let damage = 0;
     let stress = 0;
-    let messages: string[] = [];
+    const messages: string[] = [];
 
     if (hazards.includes("Toxic Air")) {
         damage += 5;

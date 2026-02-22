@@ -11,7 +11,6 @@ import {
   selectActiveQuests,
   selectSessionScore,
   selectSessionComplete,
-  initializeGame,
   movePlayer,
   askInquiry,
   addLog,
@@ -22,10 +21,8 @@ import {
   selectCapability,
   equipItem,
   unequipItem,
-  useItem,
+  consumeItem,
   sacrificeItem,
-  tradeBuy,
-  tradeSell,
 } from "@/features/game/slice/gameSlice";
 import {
   selectInquiryInput,
@@ -201,7 +198,7 @@ export function GameScreen() {
         onAcceptConcession={(type) => dispatch(addLog({ message: `You accepted concession: ${type}`, type: "system" }))}
         onEquipItem={(id, slot) => dispatch(equipItem({ itemId: id, slot }))}
         onUnequipItem={(slot) => dispatch(unequipItem({ slot }))}
-        onUseItem={(id) => dispatch(useItem({ itemId: id }))}
+        onUseItem={(id) => dispatch(consumeItem({ itemId: id }))}
         activeVendor={activeVendor}
         onCloseTrade={() => dispatch(closeTrade())}
         onSelectCapability={(id) => dispatch(selectCapability(id))}

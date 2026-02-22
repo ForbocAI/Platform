@@ -38,7 +38,7 @@ export const performSystemInquiry = createAsyncThunk(
 
     const result = await sdkService.generateInquiryResponse('System Overview', state.game.player.stats.stress);
 
-    dispatch(addLog({ message: `Response: ${result.description}`, type: 'inquiry' }));
+    dispatch(addLog({ message: `Response: ${result.description}`, type: 'oracle' }));
     dispatch(
       addFact({
         text: `System Inquiry: ${result.description}`,

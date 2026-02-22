@@ -56,6 +56,22 @@
 > The game is **Qua'dar** — an esoteric single-player RPG running as a Next.js 16 app at `http://localhost:3000`.  
 > Reference the prompt at the bottom of `docs/PLAYTEST_AUTOMATION.md` for the full task description.
 
+## Current Status Update (Restart Handoff - 2026-02-20)
+
+**We are currently in the middle of Phase 0/3: Architecture Audit & Refactoring (Specifically Phase 1 & 4 - Universal Entity Model and Component Normalization).**
+
+**What was just completed:**
+- Standardized the core `Actor` interface (ECS Alignment).
+- Replaced deprecated `Stats` type with `StatsComponent` across all capability modules (`ashwalker.ts`, `doomguard.ts`, etc.).
+- Fixed property access errors across core Redux reducers and thunks (`combat.ts`, `inventory.ts`, `autoplay.ts`).
+- Standardized the `Companion` interface to extend `Actor` and updated companion generation in the inventory reducer to ensure full ECS reconciliation.
+
+**What is currently broken (Reason for stopping):**
+- **Build Errors in UI Components:** The ECS refactor (changing `hp` to `stats.hp`, `ac` to `defense`, etc.) has caused build failures in the UI layer.
+- **Immediate Next Step:** We were just beginning to fix `src/components/elements/unique/game/CompanionPanel.tsx` (changing `comp.hp` to `comp.stats.hp`).
+- **Following Steps:** Proceed with fixing any other UI components that access deprecated top-level actor properties. Run `npm run build` iteratively until the project compiles cleanly.
+- **After Build Succeeds:** Resume Phase 1 (Browser Playtest) by conducting a final soak test to verify no runtime errors were introduced by the ECS changes.
+
 ---
 
 ## What was just completed (2026-02-19)

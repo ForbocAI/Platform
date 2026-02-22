@@ -1,4 +1,3 @@
-import type { RegionalType } from "../../types";
 import { ASHWALKER_CAPABILITIES } from "./ashwalker";
 import { OBSIDIAN_WARDEN_CAPABILITIES } from "./obsidianWarden";
 import { DOOMGUARD_CAPABILITIES } from "./doomguard";

@@ -184,15 +184,32 @@ const createBaseCampArea = (id: string, biome: Biome): Area => ({
 const applyForcedNPC = (area: Area, forceNPC: boolean | string): Area => {
     if (!forceNPC) return area;
     const npcs = typeof forceNPC === 'string' && NPC_TEMPLATES[forceNPC]
-        ? [{
-            id: Math.random().toString(36).substring(7),
-            name: forceNPC,
-            ...NPC_TEMPLATES[forceNPC],
-            hp: NPC_TEMPLATES[forceNPC].maxHp || 10,
-            maxStress: 100,
-            stress: 0,
-            activeEffects: []
-        } as AgentNPC]
+        ? [(() => {
+            const template = NPC_TEMPLATES[forceNPC as string];
+            return {
+                id: Math.random().toString(36).substring(7),
+                type: template.type,
+                faction: 'enemy' as const,
+                name: forceNPC as string,
+                description: template.description || "A mysterious entity.",
+                stats: {
+                    hp: template.baseStats.maxHp || 10,
+                    maxHp: template.baseStats.maxHp || 10,
+                    stress: 0,
+                    maxStress: 100,
+                    speed: template.baseStats.speed || 1,
+                    defense: template.baseStats.defense || 0,
+                    damage: template.baseStats.damage || 1,
+                    invulnerable: 0,
+                },
+                capabilities: { learned: template.capabilities || [] },
+                inventory: { weapons: [], currentWeaponIndex: 0, items: [], equipment: {}, spirit: 0, blood: 0 },
+                activeEffects: [],
+                x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,
+                isGrounded: false, facingRight: true,
+                state: "idle", frame: 0, animTimer: 0,
+            } as AgentNPC;
+        })()]
         : [generateRandomAgentNPC()];
     return { ...area, npcs, isBaseCamp: false };
 };

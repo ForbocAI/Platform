@@ -149,7 +149,7 @@ export const narrativeSlice = createSlice({
         state.currentSceneId = null;
       }
     },
-    applyEnteringRed: (state) => {
+    applyEnteringRed: (_state) => {
       // Flag is consumed by game slice to add hazard/enemy. We just mark intent.
       // Actual application happens in gameSlice when processing Loom result.
       // No state change needed here; game slice will add hazard/enemy to room.

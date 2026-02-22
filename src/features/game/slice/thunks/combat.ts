@@ -70,7 +70,7 @@ export const castCapability = createAsyncThunk(
     const defeatedNPCs: string[] = [];
     const updates = targets.map(e => {
       const result = resolveCapabilityDuel(player, e, capability as any);
-      let damage = result.hit ? result.damage : 0;
+      const damage = result.hit ? result.damage : 0;
 
       // Life Steal Logic
       if (isLifeSteal && result.hit) {

@@ -17,7 +17,7 @@ export const movePlayer = createAsyncThunk(
     }
 
     const areasExplored = state.game.sessionScore?.areasExplored ?? 0;
-    const playerLevel = state.game.player?.level ?? 1;
+    const playerLevel = state.game.player?.stats.level ?? 1;
     const newArea = await sdkService.generateArea(undefined, undefined, {
       context: {
         previousArea: state.game.currentArea,
@@ -51,9 +51,9 @@ export const scanSector = createAsyncThunk(
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const npcs =
-      area.npcs.length > 0 ? area.npcs.map((e) => `${e.name} (${e.hp} HP)`).join(', ') : 'None';
+      area.npcs.length > 0 ? area.npcs.map((e) => `${e.name} (${e.stats.hp} HP)`).join(', ') : 'None';
     const allies = area.allies ? area.allies.map((a) => a.name).join(', ') : 'None';
-    const extra = state.game.player?.capabilities?.includes('keen_senses')
+    const extra = state.game.player?.capabilities?.learned?.includes('keen_senses')
       ? getKeenSensesScanExtra(area as any) // Cast for now
       : '';
     const message = `[SCAN RESULT] ${area.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;

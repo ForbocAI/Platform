@@ -31,7 +31,7 @@ import {
   askInquiry,
   tradeBuy,
   tradeSell,
-  useItem,
+  consumeItem,
   equipItem,
   craftItem,
   sacrificeItem,
@@ -112,7 +112,7 @@ async function actuate(
       const healingItem = player.inventory.items.find(
         i => i.type === 'consumable' && HEALING_ITEM_NAMES.some(n => i.name.includes(n)),
       );
-      if (healingItem) await dispatch(useItem({ itemId: healingItem.id }));
+      if (healingItem) await dispatch(consumeItem({ itemId: healingItem.id }));
       break;
     }
 
@@ -120,7 +120,7 @@ async function actuate(
       const stressItem = player.inventory.items.find(
         i => i.type === 'consumable' && (i.name.includes('Calm') || i.name.includes('Tonic') || i.name.includes('Serenity') || i.name.includes('Spore Clump'))
       );
-      if (stressItem) await dispatch(useItem({ itemId: stressItem.id }));
+      if (stressItem) await dispatch(consumeItem({ itemId: stressItem.id }));
       break;
     }
 
