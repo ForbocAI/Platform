@@ -4,12 +4,12 @@ import { Terminal } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/features/core/utils";
-import type { GameLogEntry } from "@/features/game/types";
+import type { SignalEntry } from "@/features/game/types";
 import { RuneSigil } from "../shared/Runes";
 
 import { TypewriterText } from "../../shared/TypewriterText";
 
-export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; children?: React.ReactNode }) {
+export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; children?: React.ReactNode }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function NeuralLogPanel({ logs, children }: { logs: GameLogEntry[]; child
     <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
       <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border bg-palette-bg-mid/20 shrink-0">
         <Terminal className="app-icon text-palette-accent-mid shrink-0 animate-ambient-breathe" />
-        <span className="font-bold tracking-widest text-palette-muted uppercase leading-tight" data-macro-scramble>Neural Log</span>
+        <span className="font-bold tracking-widest text-palette-muted uppercase leading-tight" data-macro-scramble>CHRONICLE</span>
         <RuneSigil className="ml-auto" />
       </div>
       <div

@@ -44,7 +44,7 @@ export const ITEMS: Item[] = [
         name: "Reinforced Plate",
         description: "Solid protection. +4 AC.",
         type: "armor",
-        bonus: { ac: 4 },
+        bonus: { defense: 4 },
         cost: { primary: 30 }
     },
     {
@@ -52,7 +52,7 @@ export const ITEMS: Item[] = [
         name: "Shadow Cloak",
         description: "Woven from shadows. +2 AC.",
         type: "armor",
-        bonus: { ac: 2 },
+        bonus: { defense: 2 },
         cost: { primary: 25 }
     },
     {

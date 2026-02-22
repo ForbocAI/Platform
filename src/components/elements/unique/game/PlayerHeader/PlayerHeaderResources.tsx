@@ -1,7 +1,7 @@
 import { Sparkles, Droplets, Activity } from "lucide-react";
-import type { AgentPlayer } from "@/features/game/types";
+import type { PlayerActor } from "@/features/game/types";
 
-export function PlayerHeaderResources({ player }: { player: AgentPlayer }) {
+export function PlayerHeaderResources({ player }: { player: PlayerActor }) {
   return (
     <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2" title="Spirit / Blood / Surge">
       <div className="flex items-center gap-1" title="Spirit">

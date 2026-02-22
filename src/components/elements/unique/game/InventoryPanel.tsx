@@ -1,9 +1,9 @@
 import { Shield, Sword, Gem, Package } from "lucide-react";
-import type { AgentPlayer, Item, EquipmentSlot } from "@/features/game/types";
+import type { PlayerActor, Item, EquipmentSlot } from "@/features/game/types";
 import { Modal, GameButton } from "@/components/elements/generic";
 
 interface InventoryPanelProps {
-    player: AgentPlayer;
+    player: PlayerActor;
     onEquip: (id: string, slot: EquipmentSlot) => void;
     onUnequip: (slot: EquipmentSlot) => void;
     onUse: (id: string) => void;

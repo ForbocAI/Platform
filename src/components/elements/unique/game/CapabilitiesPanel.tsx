@@ -2,12 +2,12 @@
 
 import React from "react";
 import { X, Zap } from "lucide-react";
-import { AgentPlayer } from "@/features/game/types";
+import { PlayerActor } from "@/features/game/types";
 import { CAPABILITIES } from "@/features/game/mechanics";
 import { GameButton } from "@/components/elements/generic/GameButton";
 
 interface CapabilitiesPanelProps {
-  player: AgentPlayer;
+  player: PlayerActor;
   onClose: () => void;
   onSelectCapability?: (id: string) => void;
 }

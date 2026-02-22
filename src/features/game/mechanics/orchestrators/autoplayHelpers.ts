@@ -5,7 +5,7 @@
  */
 
 import { CAPABILITIES } from '@/features/game/mechanics/capabilities';
-import type { Item, AgentNPC } from '@/features/game/types';
+import type { Item, NonPlayerActor } from '@/features/game/types';
 
 export const HEALING_ITEM_NAMES = [
   'Healing', 'Potion', 'Mushroom', 'Salve', 'Puffball', 'Cap', 'Morel', 'Truffle', 'Lichen',
@@ -82,7 +82,7 @@ export function pickWorstItem(inventory: Item[]): Item | null {
 }
 
 /** Pick the best capability to use based on situation (detailed heuristic) */
-export function pickBestCapability(capabilityIds: string[], npcs: AgentNPC[]): string | null {
+export function pickBestCapability(capabilityIds: string[], npcs: NonPlayerActor[]): string | null {
   if (!capabilityIds || capabilityIds.length === 0) return null;
 
   let best: { id: string; score: number } | null = null;

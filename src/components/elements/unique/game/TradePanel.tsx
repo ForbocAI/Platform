@@ -1,14 +1,14 @@
 "use client";
 
 import { ShoppingBag, Coins } from "lucide-react";
-import type { AgentPlayer, Vendor, Item } from "@/features/game/types";
+import type { PlayerActor, Vendor, Item } from "@/features/game/types";
 import { useAppDispatch } from "@/features/core/store";
 import { tradeBuy, tradeSell } from "@/features/game/store/gameSlice";
 import { playButtonSound } from "@/features/audio";
 import { Modal, GameButton } from "@/components/elements/generic";
 
 interface TradePanelProps {
-  player: AgentPlayer;
+  player: PlayerActor;
   vendor: Vendor;
   onClose: () => void;
 }

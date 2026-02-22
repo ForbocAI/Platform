@@ -1,4 +1,4 @@
-import type { Area } from "./types";
+import type { Area } from "../../types";
 
 /** Bonus damage dealt to enemies when player has battle_fervor. */
 const BATTLE_FERVOR_BONUS = 2;
@@ -9,7 +9,7 @@ const STONE_SKIN_REDUCTION = 2;
 /**
  * Apply skill-based bonus to damage dealt to enemies (e.g. battle_fervor).
  */
-import type { StatusEffect } from "./types";
+import type { StatusEffect } from "../../types";
 
 /**
  * Apply skill-based bonus to damage dealt to enemies (e.g. battle_fervor).

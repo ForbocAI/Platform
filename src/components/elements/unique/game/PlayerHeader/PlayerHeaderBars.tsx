@@ -1,10 +1,10 @@
-import type { AgentPlayer } from "@/features/game/types";
+import type { PlayerActor } from "@/features/game/types";
 
-export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
+export function PlayerHeaderBars({ player }: { player: PlayerActor }) {
   return (
     <div className="flex-1 flex flex-col gap-0.5 sm:gap-1 justify-center min-w-44">
-      <div className="min-w-0 flex items-center gap-1" title="HP">
-        <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>HP</span>
+      <div className="min-w-0 flex items-center gap-1" title="FLESH">
+        <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>FLESH</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
@@ -17,8 +17,8 @@ export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
           {player.stats.hp}/{player.stats.maxHp}
         </span>
       </div>
-      <div className="min-w-0 flex items-center gap-1" title="Stress">
-        <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Stress</span>
+      <div className="min-w-0 flex items-center gap-1" title="PRESSURE">
+        <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>PRESSURE</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
@@ -31,8 +31,8 @@ export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
           {player.stats.stress}/{player.stats.maxStress}
         </span>
       </div>
-      <div className="min-w-0 flex items-center gap-1" title="XP">
-        <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>XP</span>
+      <div className="min-w-0 flex items-center gap-1" title="LORE">
+        <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>LORE</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
             <div
@@ -42,7 +42,7 @@ export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.stats.xp ?? 0}/{player.stats.maxXp ?? 1} (Lvl {player.stats.level})
+          {player.stats.xp ?? 0}/{player.stats.maxXp ?? 1} (Echo {player.stats.level})
         </span>
       </div>
       <div className="min-w-0 flex items-center gap-1" title="Spirit">
@@ -71,11 +71,11 @@ export function PlayerHeaderBars({ player }: { player: AgentPlayer }) {
         <span className="hidden sm:inline text-palette-muted uppercase text-[10px] sm:text-xs tracking-wider shrink-0" aria-hidden>Surge</span>
         <div className="w-12 sm:w-16 lg:w-48 min-w-0">
           <div className="h-1 lg:h-2 w-full bg-palette-bg-dark/50 border border-palette-border">
-            <div className="h-full bg-palette-accent-lime transition-all duration-500 min-w-[2px]" style={{ width: player.surgeCount > 0 ? "100%" : "0%" }} />
+            <div className="h-full bg-palette-accent-lime transition-all duration-500 min-w-[2px]" style={{ width: player.entropyModifier > 0 ? "100%" : "0%" }} />
           </div>
         </div>
         <span className="hidden sm:inline text-palette-muted-light text-[10px] sm:text-xs shrink-0 tabular-nums">
-          {player.surgeCount}
+          {player.entropyModifier}
         </span>
       </div>
     </div>

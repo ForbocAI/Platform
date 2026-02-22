@@ -1,9 +1,9 @@
 import { Users, Sword, Shield, Eye } from "lucide-react";
-import type { AgentPlayer } from "@/features/game/types";
+import type { PlayerActor } from "@/features/game/types";
 import { Modal } from "@/components/elements/generic";
 
 interface CompanionPanelProps {
-  player: AgentPlayer;
+  player: PlayerActor;
   onClose: () => void;
 }
 

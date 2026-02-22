@@ -1,9 +1,9 @@
-import { AgentPlayer, StatsComponent, Item, EquipmentSlot, StatusEffect } from "./types";
+import { PlayerActor, StatsComponent, Item, EquipmentSlot, StatusEffect } from "../../types";
 
 /**
  * Calculates effective stats by summing base stats and equipment bonuses.
  */
-export function calculateEffectiveStats(player: AgentPlayer): StatsComponent {
+export function calculateEffectiveStats(player: PlayerActor): StatsComponent {
     const stats: StatsComponent = { ...player.stats };
 
     const slots: EquipmentSlot[] = ["mainHand", "armor", "relic"];
@@ -12,7 +12,7 @@ export function calculateEffectiveStats(player: AgentPlayer): StatsComponent {
         if (item && item.bonus) {
             stats.maxHp += item.bonus.maxHp || 0;
             stats.maxStress += item.bonus.maxStress || 0;
-            stats.defense = (stats.defense ?? 0) + (item.bonus.ac || 0);
+            stats.defense = (stats.defense ?? 0) + (item.bonus.defense || 0);
         }
     }
 
@@ -33,7 +33,7 @@ export function calculateEffectiveStats(player: AgentPlayer): StatsComponent {
  * Applies a consumable effect to the player.
  * Returns updated player and log message, or null if no effect.
  */
-export function useConsumable(player: AgentPlayer, item: Item): { updatedPlayer: AgentPlayer; message: string } | null {
+export function useConsumable(player: PlayerActor, item: Item): { updatedPlayer: PlayerActor; message: string } | null {
     if (item.type !== "consumable" || !item.effect) return null;
 
     const newPlayer = { ...player, stats: { ...player.stats } };

@@ -1,28 +1,28 @@
-import type { AgentPlayer, Area, GameLogEntry, ActiveQuest, SessionScore } from '@/features/game/types';
+import type { PlayerActor, Sector, SignalEntry, OperationalObjective, PerformanceMetrics } from '@/features/game/types';
 
-export interface AreaCoordinates {
+export interface SectorLocation {
   x: number;
   y: number;
 }
 
-export interface GameState {
-  player: AgentPlayer | null;
-  currentArea: Area | null;
-  exploredAreas: Record<string, Area>;
-  areaCoordinates: Record<string, AreaCoordinates>;
-  logs: GameLogEntry[];
+export interface SystemState {
+  player: PlayerActor | null;
+  currentArea: Sector | null;
+  exploredAreas: Record<string, Sector>;
+  areaCoordinates: Record<string, SectorLocation>;
+  logs: SignalEntry[];
   isInitialized: boolean;
   isLoading: boolean;
   error: string | null;
   selectedCapabilityId: string | null;
-  activeQuests: ActiveQuest[];
-  sessionScore: SessionScore | null;
+  activeQuests: OperationalObjective[];
+  sessionScore: PerformanceMetrics | null;
   sessionComplete: 'quests' | 'death' | null;
   pendingQuestFacts: string[];
   ponderingAgentIds: string[];
 }
 
-export interface InitializeGameOptions {
+export interface SystemBootOptions {
   forceVendor?: boolean;
   deterministic?: boolean;
   forceNPC?: boolean | string;

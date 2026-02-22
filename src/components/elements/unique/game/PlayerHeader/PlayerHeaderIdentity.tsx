@@ -1,7 +1,7 @@
 import Image from "next/image";
-import type { AgentPlayer } from "@/features/game/types";
+import type { PlayerActor } from "@/features/game/types";
 
-export function PlayerHeaderIdentity({ player }: { player: AgentPlayer }) {
+export function PlayerHeaderIdentity({ player }: { player: PlayerActor }) {
   return (
     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
       <Image src="/logo.png" alt="Forboc AI" width={48} height={48} className="logo-theme object-contain w-8 h-8 sm:w-10 sm:h-10" />

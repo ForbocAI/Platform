@@ -1,11 +1,11 @@
 import { Hammer } from "lucide-react";
-import type { AgentPlayer, CraftingFormula, Item } from "@/features/game/types";
+import type { PlayerActor, CraftingFormula, Item } from "@/features/game/types";
 import { Modal, GameButton } from "@/components/elements/generic";
 import { useAppDispatch } from "@/features/core/store";
 import { craftItem } from "@/features/game/store/gameSlice";
 
 interface CraftingPanelProps {
-    player: AgentPlayer;
+    player: PlayerActor;
     onClose: () => void;
 }
 

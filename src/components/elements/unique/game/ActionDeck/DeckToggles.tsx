@@ -1,7 +1,7 @@
 "use client";
 
 import { Award, Box, Users, Zap } from "lucide-react";
-import type { AgentPlayer, Item } from "@/features/game/types";
+import type { PlayerActor, Item } from "@/features/game/types";
 
 export function DeckToggles({
   player,
@@ -10,7 +10,7 @@ export function DeckToggles({
   onOpenInventory,
   onOpenCompanion,
 }: {
-  player: AgentPlayer;
+  player: PlayerActor;
   onOpenCapabilities?: () => void;
   onOpenSkills?: () => void;
   onOpenInventory?: () => void;

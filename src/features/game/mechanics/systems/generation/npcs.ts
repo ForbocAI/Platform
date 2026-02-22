@@ -1,4 +1,4 @@
-import type { AgentNPC } from '../../../types';
+import type { NonPlayerActor } from '../../../types';
 
 interface NPCTemplate {
     type: string;
@@ -93,7 +93,7 @@ export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     }
 };
 
-export function generateRandomAgentNPC(): AgentNPC {
+export function generateRandomNonPlayerActor(): NonPlayerActor {
     const npcNames = Object.keys(NPC_TEMPLATES);
     const npcName = npcNames[Math.floor(Math.random() * npcNames.length)];
     const template = NPC_TEMPLATES[npcName];

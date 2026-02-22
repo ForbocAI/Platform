@@ -1,4 +1,4 @@
-import type { Area } from "./types";
+import type { Area } from "../../types";
 
 export interface ExitDisplay {
   dir: string;

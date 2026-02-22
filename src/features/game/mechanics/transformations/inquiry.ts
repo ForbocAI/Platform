@@ -1,5 +1,5 @@
-import { UNEXPECTEDLY_TABLE } from "./mechanics/tables";
-import type { InquiryResponse } from "./types";
+import { UNEXPECTEDLY_TABLE } from "../tables";
+import type { InquiryResponse } from "../../types";
 
 export function simulateInquiryResponse(question: string, currentSystemStress: number): InquiryResponse {
     const d100 = Math.floor(Math.random() * 100) + 1;

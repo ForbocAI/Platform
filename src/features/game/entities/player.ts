@@ -1,7 +1,7 @@
-import type { AgentPlayer, AgentClass } from "../types";
+import type { PlayerActor, AgentClass } from "../types";
 import { CLASS_TEMPLATES } from "../mechanics";
 
-export function initializePlayer(classId?: string): AgentPlayer {
+export function initializePlayer(classId?: string): PlayerActor {
     // Valid player classes
     const validClasses: Partial<Record<string, boolean>> = {
         "Ashwalker": true,

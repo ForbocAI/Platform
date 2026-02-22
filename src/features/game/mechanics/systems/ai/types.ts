@@ -6,7 +6,7 @@
  * once integrated (see system-todo.md §1.2, Priority Node 0).
  */
 
-import type { AgentNPC, ActiveQuest } from '@/features/game/types';
+import type { NonPlayerActor, ActiveQuest } from '@/features/game/types';
 
 // ── Capabilities ──
 
@@ -53,7 +53,7 @@ export interface AgentConfig {
 export interface AwarenessResult {
     hasNPCs: boolean;
     npcCount: number;
-    primaryNPC: AgentNPC | null;
+    primaryNPC: NonPlayerActor | null;
     hasVendors: boolean;
     hasGroundLoot: boolean;
     hasReadyCrops: boolean;

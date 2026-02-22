@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getNPCLoot } from '@/features/game/engine';
-import { resolveDuel, resolveNPCAttack, resolveCapabilityDuel, resolveCompanionAttack, resolveNPCAttackOnCompanion } from '@/features/game/combat';
-import { CAPABILITIES } from '@/features/game/mechanics/capabilities';
+import { resolveDuel, resolveNPCAttack, resolveCapabilityDuel, resolveCompanionAttack, resolveNPCAttackOnCompanion } from '../systems/combat';
+import { calculateEffectiveStats } from '../systems/items';
+import { CAPABILITIES } from '../capabilities';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog, selectCapability } from '../../store/gameSlice';
 import { handleVignetteProgression } from '../../store/constants';

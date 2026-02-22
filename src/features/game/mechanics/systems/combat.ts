@@ -1,7 +1,7 @@
-import { AgentNPC, AgentPlayer, Capability } from "./types";
+import { NonPlayerActor, PlayerActor, Capability } from "../../types";
 import { calculateEffectiveStats } from "./items";
-import { parseDiceString } from "./dice";
-import { CAPABILITIES } from "./mechanics";
+import { parseDiceString } from "../utils/dice";
+import { CAPABILITIES } from "../index";
 
 export interface CombatResult {
     hit: boolean;
@@ -23,8 +23,8 @@ function rollCombatTotal(modifier = 0): number {
 }
 
 export function resolveDuel(
-    attacker: AgentPlayer,
-    defender: AgentNPC,
+    attacker: PlayerActor,
+    defender: NonPlayerActor,
     capabilityModifier = 0,
     groupScore?: GroupScoreModifier
 ): CombatResult {
@@ -60,8 +60,8 @@ export function resolveDuel(
 
 /** NPC attacks the player. Shadows of Fate: both roll d20 + Str + Agi + Arcane, higher wins. */
 export function resolveNPCAttack(
-    attacker: AgentNPC,
-    defender: AgentPlayer,
+    attacker: NonPlayerActor,
+    defender: PlayerActor,
     groupScore?: GroupScoreModifier
 ): CombatResult {
     const effectiveDefender = calculateEffectiveStats(defender);
@@ -128,8 +128,8 @@ export function resolveNPCAttack(
 }
 
 export function resolveCapabilityDuel(
-    attacker: AgentPlayer,
-    defender: AgentNPC,
+    attacker: PlayerActor,
+    defender: NonPlayerActor,
     capability: Capability,
     groupScore?: GroupScoreModifier
 ): CombatResult {
@@ -180,7 +180,7 @@ export function resolveCapabilityDuel(
 
 export function resolveCompanionAttack(
     companion: { name: string },
-    defender: AgentNPC,
+    defender: NonPlayerActor,
     groupScore?: GroupScoreModifier
 ): CombatResult {
     let attackerTotal = rollCombatTotal(0);
@@ -210,7 +210,7 @@ export interface SurvivorDefender {
 }
 
 export const resolveNPCAttackOnCompanion = (
-    attacker: AgentNPC,
+    attacker: NonPlayerActor,
     defender: SurvivorDefender
 ): { hit: boolean; damage: number; message: string } => {
     const attackerTotal = (attacker.stats.hp / attacker.stats.maxHp) * 20 + (Math.random() * 10);

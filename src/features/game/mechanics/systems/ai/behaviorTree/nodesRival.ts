@@ -1,6 +1,6 @@
 import type { AgentConfig, AgentAction, AwarenessResult, AgentCapability } from '../types';
 import type { GameState } from '../../../../store/types';
-import type { AgentNPC } from '../../../../types';
+import type { NonPlayerActor } from '../../../../types';
 
 /**
  * Rival Bot Logic extensions
@@ -13,7 +13,7 @@ import type { AgentNPC } from '../../../../types';
  */
 
 export const calculateRivalPriority = (
-    target: AgentNPC,
+    target: NonPlayerActor,
     playerPos: { x: number; y: number } | null, // Not used in simple dist check but good for future
     dist: number // Pre-calculated distance or mock 0 if not spatial
 ): number => {
@@ -59,7 +59,7 @@ export function nodeRival(
     if (!awareness.hasNPCs || !state.currentArea?.npcs) return null;
 
     const npcs = state.currentArea.npcs;
-    let bestTarget: AgentNPC | null = null;
+    let bestTarget: NonPlayerActor | null = null;
     let maxScore = -Infinity;
 
     // In Abstract Platform, we assume NPCs in `currentArea` are "nearby" (dist=0 or small)

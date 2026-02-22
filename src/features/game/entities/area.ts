@@ -1,5 +1,5 @@
-import type { Area, Biome, AgentNPC, Vendor } from "../types";
-import { selectNextBiome, generateGroundLoot, generateRandomAgentNPC, NPC_TEMPLATES, type AreaGenContext } from '../mechanics/systems/generation';
+import type { Area, Biome, NonPlayerActor, Vendor } from "../types";
+import { selectNextBiome, generateGroundLoot, generateRandomNonPlayerActor, NPC_TEMPLATES, type AreaGenContext } from '../mechanics/systems/generation';
 import { generateRandomVendor, generateMarketplace, generateWares } from "./vendor";
 
 // --- Immutable area-name data tables ---
@@ -88,9 +88,9 @@ const generateExits = () => ({
     West: Math.random() > 0.3 ? "new-area" as const : null,
 });
 
-const generateNPCs = (dangerFactor: number): AgentNPC[] => {
+const generateNPCs = (dangerFactor: number): NonPlayerActor[] => {
     const threshold = 70 / dangerFactor;
-    return Math.random() * 100 > threshold ? [generateRandomAgentNPC()] : [];
+    return Math.random() * 100 > threshold ? [generateRandomNonPlayerActor()] : [];
 };
 
 const generateVendors = (p1: string, biome: Biome): { vendors: Vendor[]; isMarketplace: boolean } => {
@@ -209,9 +209,9 @@ const applyForcedNPC = (area: Area, forceNPC: boolean | string): Area => {
                 isGrounded: false, facingRight: true,
                 state: "idle", frame: 0, animTimer: 0,
                 active: true,
-            } as AgentNPC;
+            } as NonPlayerActor;
         })()]
-        : [generateRandomAgentNPC()];
+        : [generateRandomNonPlayerActor()];
     return { ...area, npcs, isBaseCamp: false };
 };
 
@@ -244,6 +244,6 @@ export const generateStartArea = (opts?: GenerateStartAreaOptions): Area => {
         ...area,
         title: "Store Room",
         description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
-        npcs: area.npcs.length > 0 ? area.npcs : [generateRandomAgentNPC()],
+        npcs: area.npcs.length > 0 ? area.npcs : [generateRandomNonPlayerActor()],
     };
 };

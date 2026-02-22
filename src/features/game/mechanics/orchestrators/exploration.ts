@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { sdkService } from '@/features/game/sdk/cortexService';
-import { getKeenSensesScanExtra } from '@/features/game/skills';
+import { getKeenSensesScanExtra } from '../utils/skills';
 import { addLog } from '../../store/gameSlice';
 import type { GameState } from '../../store/types';
 

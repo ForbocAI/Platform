@@ -1,7 +1,7 @@
 "use client";
 
 import { InventoryPanel, CapabilitiesPanel, SkillsPanel, ConcessionModal, TradePanel, CompanionPanel, CraftingPanel } from "@/components/elements/unique";
-import type { AgentPlayer, EquipmentSlot, Vendor } from "@/features/game/types";
+import type { PlayerActor, EquipmentSlot, Vendor } from "@/features/game/types";
 
 export function GameScreenOverlays({
   inventoryOpen,
@@ -28,7 +28,7 @@ export function GameScreenOverlays({
   inventoryOpen: boolean;
   capabilitiesPanelOpen: boolean;
   skillsPanelOpen: boolean;
-  player: AgentPlayer;
+  player: PlayerActor;
   onCloseInventory: () => void;
   onCloseCapabilities: () => void;
   onCloseSkills: () => void;

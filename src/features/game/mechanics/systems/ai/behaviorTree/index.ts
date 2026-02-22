@@ -71,7 +71,7 @@ export const AUTOPLAY_CONFIG: AgentConfig = {
     },
 };
 
-/** NPC Fellow Ranger: combat-oriented ally */
+/** NPC Fellow Agent: combat-oriented ally */
 export const NPC_RANGER_CONFIG: AgentConfig = {
     id: 'npc-ranger',
     type: 'npc',

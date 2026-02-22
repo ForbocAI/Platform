@@ -3,10 +3,10 @@ import { createAction } from '@reduxjs/toolkit';
 import { initialSessionScore, seedQuests } from '../../store/constants';
 import * as thunks from '../orchestrators';
 import type { GameState } from '../../store/types';
-import type { AgentPlayer, Area } from '@/features/game/types';
+import type { PlayerActor, Area } from '@/features/game/types';
 import { resolveUnexpectedlyEffect } from '@/features/narrative/helpers';
 import { checkSurgeEvent } from '@/features/game/mechanics/surgeEvents';
-import { generateRandomAgentNPC, generateRandomVendor } from '@/features/game/engine';
+import { generateRandomNonPlayerActor, generateRandomVendor } from '@/features/game/engine';
 
 export const resetGame = createAction('game/reset');
 
@@ -15,7 +15,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
         state.isLoading = true;
         state.error = null;
     });
-    builder.addCase(thunks.initializeGame.fulfilled, (state, action: PayloadAction<{ player: AgentPlayer; initialArea: Area }>) => {
+    builder.addCase(thunks.initializeGame.fulfilled, (state, action: PayloadAction<{ player: PlayerActor; initialArea: Area }>) => {
         state.isLoading = false;
         state.isInitialized = true;
         state.player = action.payload.player;
@@ -47,7 +47,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
         if (result.unexpectedRoll) {
             const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
             if (effect.applyEnteringRed && state.currentArea) {
-                state.currentArea.npcs.push(generateRandomAgentNPC());
+                state.currentArea.npcs.push(generateRandomNonPlayerActor());
                 state.currentArea.hazards.push("Threat Imminent");
             }
             if (effect.applyEnterStageLeft && state.currentArea) {
@@ -112,7 +112,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
         if (result.unexpectedRoll) {
             const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
             if (effect.applyEnteringRed && state.currentArea) {
-                state.currentArea.npcs.push(generateRandomAgentNPC());
+                state.currentArea.npcs.push(generateRandomNonPlayerActor());
                 state.currentArea.hazards.push("Threat Imminent");
             }
             if (effect.applyEnterStageLeft && state.currentArea) {

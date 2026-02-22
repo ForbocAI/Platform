@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { initializePlayer } from '@/features/game/engine';
-import { getSkillsForLevels } from '@/features/game/mechanics';
-import { getKeenSensesScanExtra } from '@/features/game/skills';
+import { getSkillsForLevels } from '../levelUnlocks';
+import { getKeenSensesScanExtra } from '../utils/skills';
 import { sdkService } from '@/features/game/sdk/cortexService';
 import { startVignette } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
@@ -14,7 +14,7 @@ export const initializeGame = createAsyncThunk(
     dispatch(addLog({ message: 'SYSTEM: Establishing Neural Link...', type: 'system' }));
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const player = initializePlayer(options?.classId) as import('../../types').AgentPlayer;
+    const player = initializePlayer(options?.classId) as import('../../types').PlayerActor;
     player.capabilities = { learned: getSkillsForLevels(player.agentClass, player.stats.level ?? 1) };
     if (options?.lowHp) {
       player.stats.hp = 5;
@@ -64,7 +64,7 @@ export const initializeGame = createAsyncThunk(
 
     dispatch(addLog({ message: 'Scanning sector...', type: 'system' }));
     dispatch(addLog({ message, type: 'exploration' }));
-    dispatch(addLog({ message: "SYSTEM: Connection Stable. Welcome to Quadar Tower, Ranger.", type: "system" }));
+    dispatch(addLog({ message: "SYSTEM: Connection Stable. Welcome to Quadar Tower, Agent.", type: "system" }));
 
     return { player, initialArea };
   }

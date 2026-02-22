@@ -1,5 +1,134 @@
-import type { Actor, StatsComponent, InventoryComponent, AIComponent } from "./entities/types";
-export type { Actor, StatsComponent, InventoryComponent, AIComponent };
+/**
+ * Universal Entity Model (ECS Alignment)
+ * 
+ * Standardized interfaces for entities (Actors) and their components,
+ * following the Forboc ECS reference architecture.
+ */
+
+export type Faction = 'player' | 'enemy' | 'neutral' | 'ally';
+
+/**
+ * Effect Interface
+ * Standardized status effect/buff/debuff model.
+ */
+export interface Effect {
+    effectId: string;
+    type: string;
+    magnitude: number;
+    remainingDurationMs: number;
+    sourceEntityId: string;
+    [key: string]: unknown;
+}
+
+/**
+ * Stats Component
+ * CORE: Standard RPG attributes.
+ */
+export interface StatsComponent {
+    hp: number;
+    maxHp: number;
+    stress: number;
+    maxStress: number;
+    level?: number;
+    xp?: number;
+    maxXp?: number;
+    speed: number;
+    defense: number;
+    damage: number;
+    invulnerable: number;
+}
+
+/**
+ * Inventory Component
+ * OPTIONAL: For actors that can carry items and weapons.
+ */
+export interface InventoryComponent {
+    offensiveAssets: string[];
+    currentAssetIndex: number;
+    genericAssets: unknown[];
+    equipment: Record<string, unknown>;
+    primaryResource: number; // Primary currency
+    secondaryResource: number;  // Special currency
+}
+
+/**
+ * AI Component
+ * OPTIONAL: For autonomous actors (Bots, NPCs, Enemies).
+ */
+export interface AIComponent {
+    behaviorState: 'idle' | 'patrol' | 'combat' | 'flee' | 'search';
+    targetId?: string | null;
+    memory: Record<string, unknown>;
+    awareness: Record<string, unknown> | null;
+}
+
+/**
+ * Capability Component
+ * OPTIONAL: For actors that have learned abilities/skills.
+ */
+export interface CapabilityComponent {
+    learned: string[]; // IDs of learned capabilities
+}
+
+/**
+ * Universal Actor Interface
+ * A unified model that can represent any sentient or active entity in the game.
+ */
+export interface Actor {
+    // Identity
+    id: string;
+    type: string;
+    faction: Faction;
+
+    // Position (Componentized logically)
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    width: number;
+    height: number;
+    isGrounded: boolean;
+    facingRight: boolean;
+
+    // Visual State
+    state: string;
+    frame: number;
+    animTimer: number;
+
+    // Core Components
+    stats: StatsComponent;
+    inventory: InventoryComponent;
+    capabilities: CapabilityComponent;
+    activeEffects: Effect[]; // Status effects
+
+    // Optional Components
+    ai?: AIComponent;
+
+    // Flags
+    active: boolean;
+}
+
+// --- GAME SPECIFIC TYPES ORCHESTRATION ---
+
+export type ActorArchetype =
+    | "ArchetypeA"
+    | "ArchetypeB"
+    | "ArchetypeC"
+    | "ArchetypeD"
+    | "ArchetypeE"
+    | "ArchetypeF"
+    | "ArchetypeG"
+    | "ArchetypeH"
+    | "ArchetypeI"
+    | "ArchetypeJ"
+    | "ArchetypeK"
+    | "ArchetypeL"
+    | "ArchetypeM"
+    | "ArchetypeN"
+    | "ArchetypeO"
+    | "ArchetypeP"
+    | "ArchetypeQ"
+    | "ArchetypeR";
 
 export interface StatusEffect {
     id: string; // e.g. "shield_block"
@@ -12,39 +141,20 @@ export interface StatusEffect {
     damageBonus?: number;
 }
 
-export type AgentClass =
-    | "Ashwalker"
-    | "Obsidian Warden"
-    | "Doomguard"
-    | "Iron Armored Guardian"
-    | "Aether Spirit"
-    | "Thunder Trooper"
-    | "Cyberflux Guardian"
-    | "Voidwraith"
-    | "Storm Titan"
-    | "Flame Corps"
-    | "Byssalspawn"
-    | "Aksov Hexe-Spinne"
-    | "Twilight Weaver"
-    | "Gravewalker"
-    | "Shadowhorn Juggernaut"
-    | "Magma Leviathan"
-    | "Abyssal Overfiend"
-    | "Aetherwing Herald";
+export type Direction = "North" | "South" | "East" | "West";
 
-export interface AgentPlayer extends Omit<Actor, 'activeEffects'> {
-    // Note: Actor already contains id, faction, stats, inventory, capabilities, etc.
+export interface PlayerActor extends Omit<Actor, 'activeEffects'> {
     activeEffects?: StatusEffect[];
-    name: string; // To be moved to profile/metadata component
-    agentClass: AgentClass;
-    surgeCount: number;
+    name: string;
+    archetype: ActorArchetype;
+    entropyModifier: number;
     blueprints: CraftingFormula[];
     companions?: Companion[];
     justRespawned?: boolean;
 }
 
 export interface Companion extends Actor {
-    soulId?: string; // Neural signature record
+    signatureId?: string; // Neural signature record (formerly soulId)
     name: string;
     role: "Warrior" | "Scout" | "Mystic";
     description?: string;
@@ -53,26 +163,26 @@ export interface Companion extends Actor {
 export interface CraftingFormula {
     id: string;
     ingredients: { name: string; quantity: number }[];
-    produces: Item;
+    produces: Asset;
 }
 
-export interface AgentNPC extends Omit<Actor, 'activeEffects'> {
+export interface NonPlayerActor extends Omit<Actor, 'activeEffects'> {
     activeEffects?: StatusEffect[];
-    soulId?: string; // Neural signature record
+    signatureId?: string; // Neural signature record (formerly soulId)
     name: string;
     description: string;
     lastActionTime?: number;
     lastDamageTime?: number;
 }
 
-export type EquipmentSlot = "mainHand" | "armor" | "relic";
+export type AssetSlot = "mainHand" | "armor" | "relic";
 
-export interface Item {
+export interface Asset {
     id: string;
     name: string;
     description: string;
     type: "weapon" | "armor" | "consumable" | "relic" | "resource" | "contract";
-    bonus?: Partial<StatsComponent> & { ac?: number };
+    bonus?: Partial<StatsComponent> & { defense?: number };
     effect?: string;
     cost?: { primary: number; secondary?: number };
     contractDetails?: {
@@ -83,87 +193,66 @@ export interface Item {
     };
 }
 
-export interface Vendor {
+export interface ExchangeHub {
     id: string;
     name: string;
     description?: string;
     specialty?: string;
-    wares: Item[];
+    wares: Asset[];
 }
-export type Biome =
-    | "Ethereal Marshlands"
-    | "Toxic Wastes"
-    | "Haunted Chapel"
-    | "Obsidian Spire"
-    | "Quadar Tower"
-    | "Military Installation"
-    | "Eldritch Fortress"
-    | "Labyrinthine Dungeon"
-    | "Chromatic-Steel Fungi"
-    | "Chthonic Depths"
-    | "Static Sea of All Noise"
-    | "Twilight Alchemy Haven"
-    | "Abyss of Infernal Lore"
-    | "Precipice of the Shadowlands"
-    | "Rune Temples"
-    | "Crumbling Ruins"
-    | "Dimensional Nexus"
-    | "Cavernous Abyss"
-    | "The Sterile Chamber";
 
-export interface Area {
+export type EnvironmentType =
+    | "EnvironmentA"
+    | "EnvironmentB"
+    | "EnvironmentC"
+    | "EnvironmentD"
+    | "EnvironmentE"
+    | "EnvironmentF"
+    | "EnvironmentG"
+    | "EnvironmentH"
+    | "EnvironmentI"
+    | "EnvironmentJ"
+    | "EnvironmentK"
+    | "EnvironmentL"
+    | "EnvironmentM"
+    | "EnvironmentN"
+    | "EnvironmentO"
+    | "EnvironmentP"
+    | "EnvironmentQ"
+    | "EnvironmentR"
+    | "EnvironmentS";
+
+export interface Sector {
     id: string;
     title: string;
     description: string;
-    biome: Biome;
+    environment: EnvironmentType;
     regionalType: string;
     hazards: string[];
-    exits: Record<Direction, string | null>;
-    npcs: AgentNPC[];
+    exits: Record<string, string | null>;
+    npcs: NonPlayerActor[];
     allies?: { id: string; name: string }[];
-    vendors?: Vendor[];
-    groundLoot?: Item[];
+    vendors?: ExchangeHub[];
+    groundLoot?: Asset[];
     isBaseCamp?: boolean;
-    features?: AreaFeature[];
+    features?: SiteFeature[];
     isMarketplace?: boolean;
 }
 
-export type AreaFeature =
+export type SiteFeature =
     | { type: "resource_plot"; resourceId?: string; progress: number; ready: boolean }
     | { type: "work_station"; kind: string };
-
-export type RegionalType =
-    | "Marshlands"
-    | "Toxic Wastes"
-    | "Chapel"
-    | "Spire"
-    | "Tower"
-    | "Installation"
-    | "Fortress"
-    | "Dungeon"
-    | "Metal Fungi"
-    | "Depths"
-    | "Static Sea"
-    | "Alchemy Haven"
-    | "Lore Abyss"
-    | "Shadowlands"
-    | "Temple"
-    | "Ruins"
-    | "Nexus"
-    | "Abyss"
-    | "Chamber";
-export type Direction = "North" | "South" | "East" | "West";
 
 export interface Capability {
     id: string;
     name: string;
     description: string;
-    agentClass: AgentClass;
+    archetype: ActorArchetype;
     magnitude?: string; // e.g. "2d6"
     effect: (attacker: StatsComponent, defender: StatsComponent) => string;
 }
 
-export interface GameLogEntry {
+export interface SignalEntry {
     id: string;
     timestamp: number;
     message: string;
@@ -171,47 +260,47 @@ export interface GameLogEntry {
     portraitUrl?: string;
 }
 
-/** Quest kinds from playtest scope: reconnaissance, rescue, hostiles, merchant. */
-export type QuestKind = "reconnaissance" | "rescue" | "hostiles" | "vendor";
+/** Objective categories from playtest scope. */
+export type ObjectiveCategory = "reconnaissance" | "rescue" | "hostiles" | "vendor";
 
-export interface ActiveQuest {
+export interface OperationalObjective {
     id: string;
-    kind: QuestKind;
-    /** Short label for UI (e.g. "Scan 5 sectors"). */
+    kind: ObjectiveCategory;
+    /** Short label for UI. */
     label: string;
-    /** Target value to complete (e.g. 5 scans, 3 hostiles cleared, or 1 ally found). */
+    /** Target value to complete. */
     target: number;
     /** Current progress. */
     progress: number;
-    /** When target is met, quest is complete. */
+    /** When target is met, objective is complete. */
     complete: boolean;
 }
 
-export interface SessionScore {
-    areasExplored: number;
-    areasScanned: number;
-    npcsDefeated: number;
-    vendorTrades: number;
-    questsCompleted: number;
+export interface PerformanceMetrics {
+    sectorsExplored: number;
+    sectorsScanned: number;
+    actorsDefeated: number;
+    hubTrades: number;
+    objectivesCompleted: number;
     resourcesEarned: number;
     startTime: number;
     endTime: number | null;
 }
 
-export interface InquiryResponse {
+export interface QueryResult {
     answer: "Yes" | "No";
     qualifier?: "and" | "but" | "unexpectedly";
     description: string;
     roll: number;
-    surgeUpdate: number;
-    unexpectedRoll?: number;
-    unexpectedEvent?: string;
+    entropyUpdate: number;
+    mutationRoll?: number;
+    mutationEvent?: string;
 }
 
-export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";
-export type VignetteStage = "Exposition" | "Rising Action" | "Climax" | "Epilogue";
+export type ProgressionPhase = "PhaseA" | "PhaseB" | "PhaseC";
+export type EpisodePhase = "Exposition" | "Rising Action" | "Climax" | "Epilogue";
 
-export type UnexpectedlyEffectType =
+export type MutationType =
     | "foreshadowing"
     | "tying_off"
     | "to_conflict"
@@ -231,16 +320,16 @@ export type UnexpectedlyEffectType =
     | "six_degrees"
     | "reroll_reserved";
 
-export interface UnexpectedlyEffect {
-    type: UnexpectedlyEffectType;
+export interface MutationModifier {
+    type: MutationType;
     label: string;
     applySetChange?: boolean;
     applyEnteringRed?: boolean;
     applyEnterStageLeft?: boolean;
-    suggestNextStage?: StageOfScene;
+    suggestNextPhase?: ProgressionPhase;
 }
 
-export interface Fact {
+export interface DataPoint {
     id: string;
     sourceQuestion?: string;
     sourceAnswer?: string;
@@ -250,31 +339,31 @@ export interface Fact {
     timestamp: number;
 }
 
-export interface Thread {
+export interface NarrativeStream {
     id: string;
     name: string;
-    stage: StageOfScene;
-    visitedSceneIds: string[];
-    relatedNpcIds: string[];
-    facts: string[];
+    phase: ProgressionPhase;
+    visitedSegmentIds: string[];
+    relatedActorIds: string[];
+    dataPoints: string[];
     createdAt: number;
 }
 
-export interface SceneRecord {
+export interface SegmentRecord {
     id: string;
-    locationAreaId: string;
-    mainThreadId: string;
-    stageOfScene: StageOfScene;
+    locationSectorId: string;
+    mainStreamId: string;
+    progressionPhase: ProgressionPhase;
     participantIds: string[];
     status: "active" | "faded";
     openedAt: number;
     closedAt?: number;
 }
 
-export interface Vignette {
+export interface NarrativeNode {
     id: string;
     theme: string;
-    stage: VignetteStage;
-    threadIds: string[];
+    phase: EpisodePhase;
+    streamIds: string[];
     createdAt: number;
 }

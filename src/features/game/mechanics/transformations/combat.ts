@@ -1,5 +1,5 @@
 import type { ActionReducerMapBuilder } from '@reduxjs/toolkit';
-import { applyDamageDealtBonus, applyDamageTakenReduction } from '@/features/game/skills';
+import { applyDamageDealtBonus, applyDamageTakenReduction } from '../utils/skills';
 import type { Item, StatusEffect } from '@/features/game/types';
 import * as thunks from '../orchestrators';
 import type { GameState } from '../../store/types';

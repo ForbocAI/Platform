@@ -105,7 +105,7 @@ Act as an expert Game Developer and QA Engineer. Fully test all single-player ga
 **Scope:**
 - Test and improve **all** single-player gameplay (movement, combat, level generation, hazards, NPCs, wares, quests, skills, spells, upgrades, weapons, inventory, level progression, experience, session/scoring). **Exclude multiplayer.**
 
-do a deep audit of `/Users/seandinwiddie/GitHub/Forboc.AI/Platform` before making any plans.
+do a deep audit of `/Users/seandinwiddie/GitHub/Forboc.AI/Platform` before making any plans or edits.
 
 **Deliverables:**
 1. Systematic playthrough of all single-player mechanics.
@@ -120,10 +120,12 @@ do a deep audit of `/Users/seandinwiddie/GitHub/Forboc.AI/Platform` before makin
 
 **Suggested next steps:**
 0. Have all file names, folder names, function names, variable names, etc to be lore agnostic. Keep all lore in the ui and ux.
+0.25. Make sure the ux and ui are filled with lore and world building from `~/GitHub/Forboc/notes/quadar.md`, `~/GitHub/Forboc/notes/quadar_familiar.md`, `~/Documents/GitHub/forboc.github.io`, `~/Documents/GitHub/qvht.github.io`
 0.5. Make sure the folder/file/function/engineering architecture represents a clear Entity-Component System. reference @Forboc/client/src
 0.75. Refactor files into subdomains prioritiezed by line count. keep the top level folder structure of /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/components/elements/generic, /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/components/elements/unique, /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/components/screens, /Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features. all screen components should be composed of generic and unique components. all unique components should be composed of generic components. refactor as much unique components into generic components as possible. make sure the feature directory uses a Entity-Component System sub organized by domain.
-1. Read PLAYTEST_AUTOMATION.md (Known issues) and the referenced design docs.
+1. Read PLAYTEST_AUTOMATION.md (Known issues) and the referenced design/planning docs in @classified/.
 2. **MANDATORY:** Use the browser tools (e.g. cursor-ide-browser) to open `http://localhost:3000` and verify flows: Init, Movement, SCAN, ENGAGE, COMMUNE, Oracle, Facts, Vignette, Concession, Merchants/Trading/Inventory, Level generation, Hazards, NPCs, autoplay, spells, abilities, weapons, player development, etc. Use the autoplay to test the game and improve the autoplays intelegence of using all features of the game. Autoplay and  npcs should use the same logic, see: /Users/seandinwiddie/GitHub/Forboc/client/src/features. Take a fresh snapshot before each interaction (refs go stale after actions). Take screenshots to confirm UI state. keep /Users/seandinwiddie/GitHub/Forboc.AI/Platform/docs/bot.md up to date as you go along
 3. Identify discrepancies vs quadar_ familiar.md and quadar.md.
 4. Implement fixes or enhancements (always be improving the gameplay and design); update the doc after each change.
 5. Constantly be adding and improving the lore ux from Quadar, Forboc, Qvht.
+6. make sure vignette, stages, oracle are tied into the game play and world building. not just narrative flavor text.

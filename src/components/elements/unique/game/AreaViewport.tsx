@@ -1,5 +1,5 @@
 import { Activity, Skull, ShoppingBag, Clapperboard, Hash } from "lucide-react";
-import type { Area, AgentNPC, Vendor, AreaFeature } from "@/features/game/types";
+import type { Area, NonPlayerActor, Vendor, AreaFeature } from "@/features/game/types";
 import { RuneSigil } from "../shared/Runes";
 import { useAppSelector } from "@/features/core/store";
 import { GameButton } from "@/components/elements/generic";
@@ -93,7 +93,7 @@ export function AreaViewport({
         )}
         {area.npcs && area.npcs.length > 0 && (
           <div className="mt-2 sm:mt-3 grid grid-cols-1 gap-1 sm:gap-1.5 w-full">
-            {area.npcs.map((npc: AgentNPC) => {
+            {area.npcs.map((npc: NonPlayerActor) => {
               const lastAttack = npc.lastActionTime || 0;
               const lastDamage = npc.lastDamageTime || 0;
               const latestActionTime = Math.max(lastAttack, lastDamage);

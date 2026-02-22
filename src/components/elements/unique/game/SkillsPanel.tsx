@@ -1,7 +1,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
-import type { AgentPlayer } from "@/features/game/types";
+import type { PlayerActor } from "@/features/game/types";
 import { Modal } from "@/components/elements/generic";
 
 /** Format skill id for display (e.g. keen_senses -> Keen Senses). */
@@ -13,7 +13,7 @@ function formatSkillLabel(skillId: string): string {
 }
 
 interface SkillsPanelProps {
-  player: AgentPlayer;
+  player: PlayerActor;
   onClose: () => void;
 }
 

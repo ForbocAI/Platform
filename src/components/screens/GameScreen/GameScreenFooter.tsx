@@ -1,7 +1,7 @@
 "use client";
 
 import { InquiryForm, ActionDeck } from "@/components/elements/unique";
-import type { AgentPlayer, Area } from "@/features/game/types";
+import type { PlayerActor, Area } from "@/features/game/types";
 
 export function GameScreenFooter({
   inquiryInput,
@@ -24,7 +24,7 @@ export function GameScreenFooter({
   inquiryInput: string;
   onInquiryChange: (v: string) => void;
   onInquirySubmit: (e: React.FormEvent) => void;
-  player: AgentPlayer;
+  player: PlayerActor;
   currentArea: Area;
   onMove: (dir: string) => void;
   onMapClick: () => void;

@@ -1,6 +1,6 @@
 "use client";
 
-import type { AgentPlayer, Area } from "@/features/game/types";
+import type { PlayerActor, Area } from "@/features/game/types";
 import { ActionButtons } from "./ActionButtons";
 import { DeckToggles } from "./DeckToggles";
 
@@ -19,7 +19,7 @@ export function ActionDeck({
   autoPlay,
   onToggleAutoPlay,
 }: {
-  player: AgentPlayer;
+  player: PlayerActor;
   currentArea: Area;
   onMove: (direction: string) => void;
   onMapClick: () => void;

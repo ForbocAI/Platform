@@ -10,7 +10,7 @@ export type { GenerateAreaOptions, GenerateStartAreaOptions } from "./entities/a
 // Generation (passthrough)
 export type { AreaGenContext } from './mechanics/systems/generation';
 export { getNPCLoot } from './mechanics/systems/generation/loot';
-export { generateRandomAgentNPC } from './mechanics/systems/generation';
+export { generateRandomNonPlayerActor } from './mechanics/systems/generation';
 
 // Inquiry (passthrough)
-export { simulateInquiryResponse } from "./inquiry";
+export { simulateInquiryResponse } from "./mechanics/transformations/inquiry";
