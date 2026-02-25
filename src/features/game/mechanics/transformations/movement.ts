@@ -28,7 +28,7 @@ export function addMovementReducers(builder: ActionReducerMapBuilder<GameState>)
                 state.pendingQuestFacts.push(`Completed quest: ${rescue.label}.`);
                 if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
                     state.sessionComplete = "quests";
-                    state.sessionScore.endTime = (action.payload as any).now ?? Date.now(); // Fallback but thunk should pass it
+                    state.sessionScore.endTime = (action.payload as { now?: number }).now ?? Date.now(); // Fallback but thunk should pass it
                 }
             }
         }
@@ -45,7 +45,7 @@ export function addMovementReducers(builder: ActionReducerMapBuilder<GameState>)
                 state.pendingQuestFacts.push(`Completed quest: ${recon.label}.`);
                 if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
                     state.sessionComplete = "quests";
-                    state.sessionScore.endTime = (action.payload as any).now ?? Date.now();
+                    state.sessionScore.endTime = (action.payload as { now?: number }).now ?? Date.now();
                 }
             }
         }

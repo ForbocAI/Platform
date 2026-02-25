@@ -22,7 +22,7 @@ export function addTradeReducers(builder: ActionReducerMapBuilder<GameState>): v
                     state.pendingQuestFacts.push(`Completed quest: ${vendorQuest.label}.`);
                     if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
                         state.sessionComplete = "quests";
-                        state.sessionScore.endTime = (action.payload as any).now ?? Date.now();
+                        state.sessionScore.endTime = (action.payload as { now?: number }).now ?? Date.now();
                     }
                 }
             }
@@ -47,7 +47,7 @@ export function addTradeReducers(builder: ActionReducerMapBuilder<GameState>): v
                     state.pendingQuestFacts.push(`Completed quest: ${vendorQuest.label}.`);
                     if (state.activeQuests.every(q => q.complete) && state.sessionScore) {
                         state.sessionComplete = "quests";
-                        state.sessionScore.endTime = (action.payload as any).now ?? Date.now();
+                        state.sessionScore.endTime = (action.payload as { now?: number }).now ?? Date.now();
                     }
                 }
             }

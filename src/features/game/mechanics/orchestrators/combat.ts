@@ -1,7 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getNPCLoot } from '@/features/game/engine';
 import { resolveDuel, resolveNPCAttack, resolveCapabilityDuel, resolveCompanionAttack, resolveNPCAttackOnCompanion } from '../systems/combat';
-import { calculateEffectiveStats } from '../systems/items';
 import { CAPABILITIES } from '../capabilities';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog, selectCapability } from '../../store/gameSlice';
@@ -223,13 +222,13 @@ export const engageHostiles = createAsyncThunk(
         dispatch(addLog({ message: `${targetNPC.name} is stunned and cannot counter!`, type: 'combat' }));
       } else {
         // Determine Target: Player or Companion
-        let targetId = 'player';
+        let _targetId = 'player';
         const validCompanions = player.companions?.filter(c => c.stats.hp > 0) || [];
 
         // 25% chance to target a companion if any exist
         if (validCompanions.length > 0 && Math.random() < 0.25) {
           const victim = validCompanions[Math.floor(Math.random() * validCompanions.length)];
-          targetId = victim.id;
+          _targetId = victim.id;
 
           const victimDefender = {
             name: victim.name,

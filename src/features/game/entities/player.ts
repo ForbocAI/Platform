@@ -34,6 +34,8 @@ export function initializePlayer(classId?: string): PlayerActor {
         faction: 'player',
         name: "Kamenal", // Lore preserved in metadata for now
         agentClass: selectedClass,
+        archetype: selectedClass as any,
+        entropyModifier: 0,
 
         // Core Components
         stats: {
@@ -64,6 +66,11 @@ export function initializePlayer(classId?: string): PlayerActor {
             },
             spirit: 20, // resourcePrimary mapping
             blood: 0,   // resourceSecondary mapping
+            offensiveAssets: ["rogue_blade"],
+            currentAssetIndex: 0,
+            genericAssets: [],
+            primaryResource: 20,
+            secondaryResource: 0,
         },
 
         // Capability Component

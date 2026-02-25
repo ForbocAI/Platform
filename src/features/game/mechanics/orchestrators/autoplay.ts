@@ -35,7 +35,6 @@ import {
   consumeItem,
   equipItem,
   craftItem,
-  sacrificeItem,
   performSystemInquiry,
 } from './index';
 import { handleVignetteProgression } from '../../store/constants';

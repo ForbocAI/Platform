@@ -1,11 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { GameState } from '../../store/types';
 import { sdkService } from '@/features/game/sdk/cortexService';
-import { toObservation, toCortexDirective } from '@/features/game/sdk/mappers';
-import { addLog, setAgentPondering, clearAgentPondering } from '@/features/game/store/gameSlice';
 import { computeAwareness } from '@/features/game/mechanics/systems/ai/awareness';
-import { runBehaviorTree, AUTOPLAY_CONFIG } from '@/features/game/mechanics/systems/ai/behaviorTree';
 import { getPortraitForAgent } from '@/features/game/sdk/portraits';
+import { setAgentPondering, clearAgentPondering, addLog } from '../../store/gameSlice';
+import { toObservation } from '../../sdk/mappers';
 
 /**
  * Generic Agent Tick Thunk.
@@ -19,7 +18,8 @@ export const runAgentTick = createAsyncThunk(
         const { agentId, type, persona, soulId } = arg;
 
         // 1. OBSERVE
-        const awareness = computeAwareness(rootState.game);
+        // Not using awareness currently in standard agency tick, kept for future expansions
+        computeAwareness(rootState.game);
 
         // 2. SDK DECISION
         let instruction = 'IDLE';

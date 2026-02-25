@@ -40,7 +40,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
         const result = action.payload;
         const player = state.player;
 
-        let newSurge = player.surgeCount;
+        let newSurge = player.surgeCount ?? 0;
         if (result.surgeUpdate === -1) { newSurge = 0; } else { newSurge += result.surgeUpdate; }
         player.surgeCount = newSurge;
 
@@ -105,7 +105,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
         const result = action.payload;
         const player = state.player;
 
-        let newSurge = player.surgeCount;
+        let newSurge = player.surgeCount ?? 0;
         if (result.surgeUpdate === -1) { newSurge = 0; } else { newSurge += result.surgeUpdate; }
         player.surgeCount = newSurge;
 

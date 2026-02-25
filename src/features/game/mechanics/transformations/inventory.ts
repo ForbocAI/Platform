@@ -37,6 +37,11 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
                         equipment: {},
                         spirit: 0,
                         blood: 0,
+                        offensiveAssets: [],
+                        currentAssetIndex: 0,
+                        genericAssets: [],
+                        primaryResource: 0,
+                        secondaryResource: 0,
                     },
                     capabilities: {
                         learned: [],

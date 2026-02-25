@@ -5,7 +5,7 @@ import type { CortexDirective, AgentActionType } from '@/features/game/mechanics
 /**
  * Maps Qua'dar GameState to ForbocAI SDK Observation
  */
-export function toObservation(gameState: GameState): any {
+export function toObservation(gameState: GameState): { type: string; timestamp: number; agentId: string; content: string; data: Record<string, unknown> } {
     const { player, currentArea } = gameState;
 
     const parts: string[] = [];

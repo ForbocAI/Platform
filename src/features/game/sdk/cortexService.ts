@@ -1,30 +1,33 @@
 // lib/sdk/cortexService.ts
 // Environment-aware SDK Service to prevent native Node modules leaking to browser bundle.
+// Refactored to functional factory per FP mandate.
 
 import type { IAgent, ICortex, IBridge, IMemory } from '@forbocai/core';
+import { createBridge, createAgent, importSoulFromArweave, fromSoul } from '@forbocai/core';
+import { createCortex, createMemory } from '@forbocai/browser';
 import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
 import type { GenerateStartAreaOptions } from '@/features/game/entities/area';
 
-class SDKService {
-    private agents: Map<string, IAgent> = new Map();
-    private cortex: ICortex | null = null;
-    private bridge: IBridge | null = null;
-    private memory: IMemory | null = null;
-    private initialized = false;
+export const createSDKService = () => {
+    const agents: Map<string, IAgent> = new Map();
+    let cortex: ICortex | null = null;
+    let bridge: IBridge | null = null;
+    let memory: IMemory | null = null;
+    let initialized = false;
 
-    private getApiUrl(): string {
+    const getApiUrl = (): string => {
         return process.env.NEXT_PUBLIC_FORBOC_API_URL || 'https://api.forboc.ai';
-    }
+    };
 
-    async init() {
-        if (this.initialized) return;
+    const init = async () => {
+        if (initialized) return;
         if (typeof window === 'undefined') return;
 
         // --- Feature Gate: SDK is OFF by default ---
         const params = new URLSearchParams(window.location.search);
         if (params.get('FORBOCAI_SDK') !== 'ON') {
             console.log('SDKService: FORBOCAI_SDK is OFF. Skipping SDK initialization.');
-            this.initialized = true;
+            initialized = true;
             return;
         }
 
@@ -33,32 +36,28 @@ class SDKService {
             const hasGpu = typeof navigator !== 'undefined' && 'gpu' in navigator;
             if (!hasGpu) {
                 console.warn('SDKService: No WebGPU support detected. Falling back to Local AI.');
-                this.initialized = true;
+                initialized = true;
                 return;
             }
 
             console.log('SDKService: Initializing...');
-            const [browserModule, coreModule] = await Promise.all([
-                import('@forbocai/browser').catch(() => null),
-                import('@forbocai/core').catch(() => null)
-            ]);
 
-            const apiUrl = this.getApiUrl();
+            const apiUrl = getApiUrl();
 
-            if (!browserModule?.createCortex || !coreModule?.createBridge) {
+            if (!createCortex || !createBridge) {
                 console.warn('SDKService: Modules failed to load. Operating in Fallback mode.');
-                this.initialized = true;
+                initialized = true;
                 return;
             }
 
-            this.cortex = browserModule.createCortex({ apiUrl });
-            this.memory = (browserModule.createMemory?.({}) as IMemory) ?? null;
-            this.bridge = coreModule.createBridge({ apiUrl, strictMode: true });
+            cortex = createCortex({ apiUrl });
+            memory = (createMemory?.({}) as IMemory) ?? null;
+            bridge = createBridge({ apiUrl, strictMode: true });
 
-            if (this.cortex) {
+            if (cortex) {
                 try {
                     const CORTEX_INIT_TIMEOUT = 10000;
-                    const initPromise = this.cortex.init();
+                    const initPromise = cortex.init();
                     const timeoutPromise = new Promise<never>((_, reject) =>
                         setTimeout(() => reject(new Error('Timeout')), CORTEX_INIT_TIMEOUT)
                     );
@@ -66,81 +65,75 @@ class SDKService {
                     console.log('ForbocAI SDK: Initialized.');
                 } catch (_ce) {
                     console.warn('ForbocAI SDK: Initialization failed or timed out. Using Fallback mode.', _ce);
-                    this.cortex = null;
+                    cortex = null;
                 }
             }
 
-            this.initialized = true;
+            initialized = true;
         } catch (_error) {
             console.error('SDKService: Initialization error:', _error);
-            this.initialized = true;
+            initialized = true;
         }
-    }
+    };
 
-    /** Returns true if the Cortex engine initialized successfully. */
-    isCortexReady(): boolean {
-        return this.initialized && this.cortex !== null;
-    }
+    const isCortexReady = (): boolean => {
+        return initialized && cortex !== null;
+    };
 
-    /** Returns an existing agent or creates a new one. */
-    async getAgent(id: string = 'player-autoplay', persona: string = 'Neutral Agent'): Promise<IAgent> {
-        if (!this.initialized) await this.init();
-        if (!this.cortex) throw new Error('Cortex not available (SDK disabled)');
+    const getAgent = async (id: string = 'player-autoplay', persona: string = 'Neutral Agent'): Promise<IAgent> => {
+        if (!initialized) await init();
+        if (!cortex) throw new Error('Cortex not available (SDK disabled)');
 
-        if (!this.agents.has(id)) {
-            const apiUrl = this.getApiUrl();
-            const core = await import('@forbocai/core');
+        if (!agents.has(id)) {
+            const apiUrl = getApiUrl();
 
-            const agent = core.createAgent({
+            const agent = createAgent({
                 id,
                 persona,
-                cortex: this.cortex!,
-                memory: this.memory,
+                cortex: cortex!,
+                memory: memory,
                 apiUrl
             });
-            this.agents.set(id, agent);
+            agents.set(id, agent);
         }
 
-        return this.agents.get(id)!;
-    }
+        return agents.get(id)!;
+    };
 
-    private async getWorldgenAgent(): Promise<IAgent> {
-        return this.getAgent(
+    const getWorldgenAgent = async (): Promise<IAgent> => {
+        return getAgent(
             'worldgen-agent',
             'You generate structured area data for a game world. Return only JSON.'
         );
-    }
+    };
 
-    private async getInquiryAgent(): Promise<IAgent> {
-        return this.getAgent(
+    const getInquiryAgent = async (): Promise<IAgent> => {
+        return getAgent(
             'oracle-agent',
             'You answer inquiries with structured JSON responses. Return only JSON.'
         );
-    }
+    };
 
-    getBridge(): IBridge {
-        if (!this.bridge) throw new Error('SDK not initialized');
-        return this.bridge;
-    }
+    const getBridge = (): IBridge => {
+        if (!bridge) throw new Error('SDK not initialized');
+        return bridge;
+    };
 
-    /** Rehydrates an agent from a neural signature. */
-    async rehydrateAgent(txId: string): Promise<IAgent> {
-        if (!this.initialized) await this.init();
+    const rehydrateAgent = async (txId: string): Promise<IAgent> => {
+        if (!initialized) await init();
 
         // Check if already rehydrated
-        if (this.agents.has(txId)) return this.agents.get(txId)!;
-
-        const core = await import('@forbocai/core');
+        if (agents.has(txId)) return agents.get(txId)!;
 
         try {
             // 1. Fetch data from persistent layer
-            const soul = await core.importSoulFromArweave(txId);
+            const soul = await importSoulFromArweave(txId);
 
             // 2. Hydrate Agent
-            const agent = await core.fromSoul(soul, this.cortex!, this.memory);
+            const agent = await fromSoul(soul, cortex!, memory);
 
-            this.agents.set(txId, agent);
-            this.agents.set(soul.id, agent); // Also set by internal ID
+            agents.set(txId, agent);
+            agents.set(soul.id, agent); // Also set by internal ID
 
             console.log(`SDKService: Rehydrated Agent [${soul.id}] from signature [${txId}]`);
             return agent;
@@ -148,19 +141,18 @@ class SDKService {
             console.error(`SDKService: Failed to rehydrate agent from signature [${txId}]:`, _e);
             throw _e;
         }
-    }
+    };
 
     // --- COMPATIBILITY WRAPPERS ---
 
-    async generateStartRoom(options?: GenerateStartAreaOptions) { return this.generateStartArea(options); }
-    async generateStartArea(options?: GenerateStartAreaOptions): Promise<Area> {
-        if (!this.cortex) {
+    const generateStartArea = async (options?: GenerateStartAreaOptions): Promise<Area> => {
+        if (!cortex) {
             const { generateStartArea } = await import('@/features/game/entities/area');
             return generateStartArea(options);
         }
 
         try {
-            const agent = await this.getWorldgenAgent();
+            const agent = await getWorldgenAgent();
             const response = await agent.process('WORLDGEN_REQUEST', {
                 kind: 'worldgen',
                 options
@@ -170,16 +162,17 @@ class SDKService {
             const { generateStartArea } = await import('@/features/game/entities/area');
             return generateStartArea(options);
         }
-    }
+    };
 
-    async generateRoom(regionalType?: string, magnitude?: number, context?: Record<string, unknown>) { return this.generateArea(regionalType, magnitude, context); }
-    async generateArea(regionalType?: string, magnitude?: number, context?: Record<string, unknown>): Promise<Area> {
-        if (!this.cortex) {
+    const generateStartRoom = async (options?: GenerateStartAreaOptions) => generateStartArea(options);
+
+    const generateArea = async (regionalType?: string, magnitude?: number, context?: Record<string, unknown>): Promise<Area> => {
+        if (!cortex) {
             const { generateArea } = await import('@/features/game/entities/area');
             return generateArea();
         }
         try {
-            const agent = await this.getWorldgenAgent();
+            const agent = await getWorldgenAgent();
             const response = await agent.process('WORLDGEN_REQUEST', {
                 kind: 'worldgen',
                 regionalType: regionalType || 'Random',
@@ -191,10 +184,12 @@ class SDKService {
             const { generateArea } = await import('@/features/game/entities/area');
             return generateArea(); // Use native procedural generation
         }
-    }
+    };
 
-    async generateInquiryResponse(question: string, surgeCount: number, stage?: StageOfScene): Promise<InquiryResponse> {
-        if (!this.cortex) {
+    const generateRoom = async (regionalType?: string, magnitude?: number, context?: Record<string, unknown>) => generateArea(regionalType, magnitude, context);
+
+    const generateInquiryResponse = async (question: string, surgeCount: number, stage?: StageOfScene): Promise<InquiryResponse> => {
+        if (!cortex) {
             return {
                 answer: Math.random() > 0.5 ? "Yes" : "No",
                 description: "The SDK is not enabled. The Oracle remains silent.",
@@ -203,7 +198,7 @@ class SDKService {
             };
         }
         try {
-            const agent = await this.getInquiryAgent();
+            const agent = await getInquiryAgent();
             const response = await agent.process('INQUIRY_REQUEST', {
                 kind: 'inquiry',
                 question,
@@ -219,16 +214,30 @@ class SDKService {
                 surgeUpdate: 0
             };
         }
-    }
+    };
 
-    async validateMove(area: Area, direction: string): Promise<boolean> {
-        if (!this.bridge) return false;
-        const result = await this.bridge.validate({
+    const validateMove = async (area: Area, direction: string): Promise<boolean> => {
+        if (!bridge) return false;
+        const result = await bridge.validate({
             type: 'MOVE',
             payload: { direction, currentArea: area.id }
         }, { worldState: { currentArea: area } });
         return result.valid;
-    }
-}
+    };
 
-export const sdkService = new SDKService();
+    return {
+        init,
+        isCortexReady,
+        getAgent,
+        getBridge,
+        rehydrateAgent,
+        generateStartRoom,
+        generateStartArea,
+        generateRoom,
+        generateArea,
+        generateInquiryResponse,
+        validateMove
+    };
+};
+
+export const sdkService = createSDKService();

@@ -43,12 +43,19 @@ export interface StatsComponent {
  * OPTIONAL: For actors that can carry items and weapons.
  */
 export interface InventoryComponent {
-    offensiveAssets: string[];
-    currentAssetIndex: number;
-    genericAssets: unknown[];
+    offensiveAssets?: string[];
+    currentAssetIndex?: number;
+    genericAssets?: unknown[];
     equipment: Record<string, unknown>;
-    primaryResource: number; // Primary currency
-    secondaryResource: number;  // Special currency
+    primaryResource?: number; // Primary currency
+    secondaryResource?: number;  // Special currency
+
+    // Legacy Migration Fields
+    weapons: any[];
+    currentWeaponIndex: number;
+    items: any[];
+    spirit: number;
+    blood: number;
 }
 
 /**
@@ -79,6 +86,7 @@ export interface Actor {
     id: string;
     type: string;
     faction: Faction;
+    soulId?: string; // Legacy Migration
 
     // Position (Componentized logically)
     x: number;
@@ -110,25 +118,7 @@ export interface Actor {
 
 // --- GAME SPECIFIC TYPES ORCHESTRATION ---
 
-export type ActorArchetype =
-    | "ArchetypeA"
-    | "ArchetypeB"
-    | "ArchetypeC"
-    | "ArchetypeD"
-    | "ArchetypeE"
-    | "ArchetypeF"
-    | "ArchetypeG"
-    | "ArchetypeH"
-    | "ArchetypeI"
-    | "ArchetypeJ"
-    | "ArchetypeK"
-    | "ArchetypeL"
-    | "ArchetypeM"
-    | "ArchetypeN"
-    | "ArchetypeO"
-    | "ArchetypeP"
-    | "ArchetypeQ"
-    | "ArchetypeR";
+export type ActorArchetype = string;
 
 export interface StatusEffect {
     id: string; // e.g. "shield_block"
@@ -151,6 +141,8 @@ export interface PlayerActor extends Omit<Actor, 'activeEffects'> {
     blueprints: CraftingFormula[];
     companions?: Companion[];
     justRespawned?: boolean;
+    agentClass?: string; // Legacy Migration
+    surgeCount?: number; // Legacy Migration
 }
 
 export interface Companion extends Actor {
@@ -173,6 +165,7 @@ export interface NonPlayerActor extends Omit<Actor, 'activeEffects'> {
     description: string;
     lastActionTime?: number;
     lastDamageTime?: number;
+    agentClass?: string; // Legacy Migration
 }
 
 export type AssetSlot = "mainHand" | "armor" | "relic";
@@ -202,31 +195,31 @@ export interface ExchangeHub {
 }
 
 export type EnvironmentType =
-    | "EnvironmentA"
-    | "EnvironmentB"
-    | "EnvironmentC"
-    | "EnvironmentD"
-    | "EnvironmentE"
-    | "EnvironmentF"
-    | "EnvironmentG"
-    | "EnvironmentH"
-    | "EnvironmentI"
-    | "EnvironmentJ"
-    | "EnvironmentK"
-    | "EnvironmentL"
-    | "EnvironmentM"
-    | "EnvironmentN"
-    | "EnvironmentO"
-    | "EnvironmentP"
-    | "EnvironmentQ"
-    | "EnvironmentR"
-    | "EnvironmentS";
+    | "Ethereal Marshlands"
+    | "Toxic Wastes"
+    | "Haunted Chapel"
+    | "Obsidian Spire"
+    | "Quadar Tower"
+    | "Military Installation"
+    | "Eldritch Fortress"
+    | "Labyrinthine Dungeon"
+    | "Chromatic-Steel Fungi"
+    | "Chthonic Depths"
+    | "Static Sea of All Noise"
+    | "Twilight Alchemy Haven"
+    | "Abyss of Infernal Lore"
+    | "Precipice of the Shadowlands"
+    | "Rune Temples"
+    | "Crumbling Ruins"
+    | "Dimensional Nexus"
+    | "Cavernous Abyss"
+    | "The Sterile Chamber";
 
 export interface Sector {
     id: string;
     title: string;
     description: string;
-    environment: EnvironmentType;
+    environment?: EnvironmentType; // Optional for Legacy Migration
     regionalType: string;
     hazards: string[];
     exits: Record<string, string | null>;
@@ -237,6 +230,7 @@ export interface Sector {
     isBaseCamp?: boolean;
     features?: SiteFeature[];
     isMarketplace?: boolean;
+    biome?: string; // Legacy Migration
 }
 
 export type SiteFeature =
@@ -247,7 +241,8 @@ export interface Capability {
     id: string;
     name: string;
     description: string;
-    archetype: ActorArchetype;
+    archetype?: ActorArchetype; // Optional for Legacy Migration
+    agentClass?: string; // Legacy Migration
     magnitude?: string; // e.g. "2d6"
     effect: (attacker: StatsComponent, defender: StatsComponent) => string;
 }
@@ -258,6 +253,21 @@ export interface SignalEntry {
     message: string;
     type: "combat" | "exploration" | "system" | "oracle" | "dialogue";
     portraitUrl?: string;
+}
+
+export interface Bark {
+    id: string;
+    actorId: string; // The ID of the NPC or Player
+    text: string;
+    type: 'combat' | 'ambient' | 'system';
+    createdAt: number;
+}
+
+export interface DialogueSession {
+    agentId: string;
+    persona: string;
+    transcript: { speaker: 'agent' | 'player'; text: string; timestamp: number }[];
+    isPondering: boolean;
 }
 
 /** Objective categories from playtest scope. */
@@ -277,22 +287,31 @@ export interface OperationalObjective {
 }
 
 export interface PerformanceMetrics {
-    sectorsExplored: number;
-    sectorsScanned: number;
-    actorsDefeated: number;
-    hubTrades: number;
-    objectivesCompleted: number;
+    [key: string]: any; // Legacy Migration
+    sectorsExplored?: number;
+    sectorsScanned?: number;
+    actorsDefeated?: number;
+    hubTrades?: number;
+    objectivesCompleted?: number;
     resourcesEarned: number;
     startTime: number;
     endTime: number | null;
+
+    // Legacy Migration Fields
+    areasExplored: number;
+    areasScanned: number;
+    npcsDefeated: number;
+    vendorTrades: number;
+    questsCompleted: number;
 }
 
 export interface QueryResult {
+    [key: string]: any; // Legacy Migration
     answer: "Yes" | "No";
     qualifier?: "and" | "but" | "unexpectedly";
     description: string;
     roll: number;
-    entropyUpdate: number;
+    entropyUpdate?: number; // Optional for Legacy Migration
     mutationRoll?: number;
     mutationEvent?: string;
 }
@@ -321,6 +340,7 @@ export type MutationType =
     | "reroll_reserved";
 
 export interface MutationModifier {
+    [key: string]: any; // Legacy Migration
     type: MutationType;
     label: string;
     applySetChange?: boolean;
@@ -340,30 +360,54 @@ export interface DataPoint {
 }
 
 export interface NarrativeStream {
+    [key: string]: any; // Legacy Migration
     id: string;
-    name: string;
-    phase: ProgressionPhase;
-    visitedSegmentIds: string[];
-    relatedActorIds: string[];
-    dataPoints: string[];
-    createdAt: number;
+    name?: string;
+    phase?: ProgressionPhase;
+    visitedSegmentIds?: string[];
+    relatedActorIds?: string[];
+    dataPoints?: string[];
+    createdAt?: number;
 }
 
 export interface SegmentRecord {
+    [key: string]: any; // Legacy Migration
     id: string;
-    locationSectorId: string;
-    mainStreamId: string;
-    progressionPhase: ProgressionPhase;
-    participantIds: string[];
-    status: "active" | "faded";
-    openedAt: number;
+    locationSectorId?: string;
+    mainStreamId?: string;
+    progressionPhase?: ProgressionPhase;
+    participantIds?: string[];
+    status?: "active" | "faded";
+    openedAt?: number;
     closedAt?: number;
 }
 
 export interface NarrativeNode {
+    [key: string]: any; // Legacy Migration
     id: string;
-    theme: string;
-    phase: EpisodePhase;
-    streamIds: string[];
-    createdAt: number;
+    theme?: string;
+    phase?: EpisodePhase;
+    streamIds?: string[];
+    createdAt?: number;
 }
+
+// --- LEGACY TYPE MIGRATION ALIASES ---
+export type Area = Sector;
+export type Biome = string;
+export type Vendor = ExchangeHub;
+export type Item = Asset;
+export type AreaFeature = SiteFeature;
+export type EquipmentSlot = AssetSlot;
+export type AgentClass = string;
+export type ActiveQuest = OperationalObjective;
+export type SessionScore = PerformanceMetrics;
+export type Fact = DataPoint;
+export type GameLogEntry = SignalEntry;
+export type InquiryResponse = QueryResult;
+export type SceneRecord = SegmentRecord;
+export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";
+export type Thread = NarrativeStream;
+export type UnexpectedlyEffect = MutationModifier;
+export type Vignette = NarrativeNode;
+export type VignetteStage = EpisodePhase;
+export type AreaCoordinates = { x: number, y: number };

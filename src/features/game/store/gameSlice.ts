@@ -1,7 +1,7 @@
 import { createSlice, createSelector, type PayloadAction } from '@reduxjs/toolkit';
 import { initialState } from './constants';
 import { addAllReducers } from '../mechanics/transformations';
-import type { GameLogEntry } from '@/features/game/types';
+import type { GameLogEntry, Bark } from '@/features/game/types';
 import type { RootState } from '@/features/core/store';
 
 export type { AreaCoordinates, InitializeGameOptions } from './types';
@@ -40,13 +40,19 @@ export const gameSlice = createSlice({
     clearAgentPondering: (state, action: PayloadAction<string>) => {
       state.ponderingAgentIds = state.ponderingAgentIds.filter(id => id !== action.payload);
     },
+    addBark: (state, action: PayloadAction<Bark>) => {
+      state.activeBarks.push(action.payload);
+    },
+    removeBark: (state, action: PayloadAction<string>) => {
+      state.activeBarks = state.activeBarks.filter(b => b.id !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     addAllReducers(builder);
   },
 });
 
-export const { addLog, selectCapability, clearPendingQuestFacts, setAgentPondering, clearAgentPondering } = gameSlice.actions;
+export const { addLog, selectCapability, clearPendingQuestFacts, setAgentPondering, clearAgentPondering, addBark, removeBark } = gameSlice.actions;
 
 export {
   initializeGame,
@@ -124,6 +130,10 @@ export const selectPendingQuestFacts = createSelector(
 export const selectPonderingAgentIds = createSelector(
   [selectGameState],
   (game) => game.ponderingAgentIds
+);
+export const selectActiveBarks = createSelector(
+  [selectGameState],
+  (game) => game.activeBarks
 );
 
 export default gameSlice.reducer;

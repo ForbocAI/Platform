@@ -5,6 +5,14 @@ export interface SectorLocation {
   y: number;
 }
 
+export interface Bark {
+  id: string;
+  actorId: string; // The ID of the NPC or Player
+  text: string;
+  type: 'combat' | 'ambient' | 'system';
+  createdAt: number;
+}
+
 export interface SystemState {
   player: PlayerActor | null;
   currentArea: Sector | null;
@@ -20,6 +28,7 @@ export interface SystemState {
   sessionComplete: 'quests' | 'death' | null;
   pendingQuestFacts: string[];
   ponderingAgentIds: string[];
+  activeBarks: Bark[];
 }
 
 export interface SystemBootOptions {
@@ -37,3 +46,8 @@ export interface SystemBootOptions {
   /** Auto-enable autoplay on load (?autoStart=1). */
   autoStart?: boolean;
 }
+
+// --- LEGACY MAPPINGS ---
+export type GameState = SystemState;
+export type InitializeGameOptions = SystemBootOptions;
+export type AreaCoordinates = SectorLocation;

@@ -76,8 +76,8 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
 
                 {/* Inventory Bag */}
                 <div>
-                    <h3 className="text-xs uppercase text-palette-muted-light font-bold mb-2">Backpack ({player.inventory.items.length} items)</h3>
-                    {player.inventory.items.length === 0 ? (
+                    <h3 className="text-xs uppercase text-palette-muted-light font-bold mb-2">Backpack ({(player.inventory.items || []).length} items)</h3>
+                    {(player.inventory.items || []).length === 0 ? (
                         <div className="text-palette-muted italic text-sm p-4 text-center border border-dashed border-palette-border rounded">Empty</div>
                     ) : (
                         <div className="grid gap-2">

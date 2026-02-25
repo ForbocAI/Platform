@@ -203,7 +203,10 @@ const applyForcedNPC = (area: Area, forceNPC: boolean | string): Area => {
                     invulnerable: 0,
                 },
                 capabilities: { learned: template.capabilities || [] },
-                inventory: { weapons: [], currentWeaponIndex: 0, items: [], equipment: {}, spirit: 0, blood: 0 },
+                inventory: {
+                    weapons: [], currentWeaponIndex: 0, items: [], equipment: {}, spirit: 0, blood: 0,
+                    offensiveAssets: [], currentAssetIndex: 0, genericAssets: [], primaryResource: 0, secondaryResource: 0
+                },
                 activeEffects: [],
                 x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,
                 isGrounded: false, facingRight: true,

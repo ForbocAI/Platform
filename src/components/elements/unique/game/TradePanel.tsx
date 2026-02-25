@@ -110,7 +110,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
                 </GameButton>
               </div>
             ))}
-            {player.inventory.items.length === 0 && <p className="text-palette-text-muted italic">Inventory empty.</p>}
+            {(player.inventory.items || []).length === 0 && <p className="text-palette-text-muted italic">Inventory empty.</p>}
           </div>
         </div>
       </div>

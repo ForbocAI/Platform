@@ -65,4 +65,5 @@ export const initialState: GameState = {
   sessionComplete: null,
   pendingQuestFacts: [],
   ponderingAgentIds: [],
+  activeBarks: [],
 };

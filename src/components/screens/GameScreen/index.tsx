@@ -145,7 +145,7 @@ export function GameScreen() {
         mainThreadId={mainThreadId}
         onSetMainThread={(id) => dispatch(setMainThread(id))}
         facts={facts}
-        vignette={vignette ? { theme: vignette.theme, stage: vignette.stage, threadIds: vignette.threadIds } : null}
+        vignette={vignette ? { theme: vignette.theme || "Unknown", stage: vignette.stage, threadIds: vignette.threadIds } : null}
         onStartVignette={(theme) => {
           dispatch(startVignette({ theme }));
           const threadId = mainThreadId ?? threads[0]?.id;

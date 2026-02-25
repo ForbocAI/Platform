@@ -8,43 +8,32 @@ This log tracks the engineering requirements for the flagship Forboc AI consumer
 
 ---
 
-## 1. SDK Integration (Core Neural Link) ⚠️
-*Objective: Replace the mock engine with the actual ForbocAI SDK.*
+## SDK Integration Strategy
 
-- [ ] **Install ForbocAI SDK**: `pnpm install forbocai`.
-- [ ] **Initialize Cortex**: Set up `Cortex.init()` in `src/app/layout.tsx` to pre-load local SLM weights (WebGPU).
-- [ ] **Create SDK Service**: Implement `src/lib/sdk/cortexService.ts` to manage agent instances.
-- [ ] **Pipe Awareness to SDK**: Connect the current Quadar engine observations to `SDK.Memory.store()`.
+> **Principle:** Platform MUST run without the SDK. SDK integration is feature-gated via `?FORBOCAI_SDK=ON` and is implemented incrementally. Platform code fixes come AFTER SDK + API are stabilized.
 
-## 2. Neuro-Symbolic Interaction 🧠
-*Objective: Transform static text logs into living dialogue.*
+### Completed ✅
+- [x] **SDK Dependencies Installed**: `@forbocai/core@^0.5.6`, `@forbocai/browser@^0.5.6` in `package.json`.
+- [x] **Feature Gate**: `?FORBOCAI_SDK=ON` query param controls SDK activation. Default: OFF (uses local procedural logic).
+- [x] **SDK Service Scaffolded**: `sdkService.init()` via `BootstrapGate` (only runs when gate is ON).
+- [x] **Soul Re-hydration**: Load NPC personas from Arweave Transaction IDs (via `sdkService.rehydrateAgent` and `BotOrchestrator`).
 
-- [ ] **Generative Dialogue UI**: Bind `Cortex.on('token')` to the VOX-LOG Receptacle for real-time typewriter effects.
-- [ ] **Agent Directive Loop**: Implement `Agent.process()` calls during combat and exploration to determine NPC intent.
-- [ ] **Pondering Animations**: Trigger NPC "Thinking" states in the UI based on `Cortex.on('thinking')`.
+### Blocked on SDK+API Stabilization ⏳
+- [ ] **Fix SDK Init Crash**: `@forbocai/browser` import causes "Cannot convert undefined or null to object" — resolve after SDK browser package is stable.
+- [ ] **Cortex Integration**: Bind `Cortex.on('token')` to VOX-LOG for real-time typewriter effects (requires working Cortex).
+- [ ] **Agent Directive Loop**: `Agent.process()` calls during combat/exploration for NPC intent (requires working multi-round protocol).
+- [ ] **Bridge Validation**: Pipe actions through `SDK.Bridge.validate()` before updating store (requires working Bridge).
+- [ ] **Memory Persistence**: Configure SDK to persist LanceDB memories to IndexedDB.
+- [ ] **Replace SDK Placeholder**: Once SDK is stable, swap `src/lib/sdk-placeholder` with real `forbocai` calls (keep same interface shape).
 
-## 3. The Bridge (Action Validation) ⚔️
-*Objective: Ensure AI actions obey the laws of physics.*
-
-- [ ] **Action Schema Definition**: Define `ProtocolAction` types in `src/lib/quadar/types.ts`.
-- [ ] **Validate Actuation**: Pipe user and AI actions through `SDK.Bridge.validate()` before updating Redux/Zustand store.
-- [ ] **System Correction**: Implement UI feedback for "Corrected Actions" returned by the Bridge.
-
-## 4. World State Persistence 💾
-*Objective: Ensure memories endure the void.*
-
-- [ ] **IndexedDB Vector Sync**: Configure SDK to persist LanceDB memories to `IndexedDB`.
-- [x] **Soul re-hydration** — Load NPC personas from Arweave Transaction IDs (Implemented via `sdkService.rehydrateAgent` and `BotOrchestrator`)
-- [ ] **SDK Replacement**: Replace `src/lib/sdk-placeholder` with real `forbocai` SDK when v1.0 is ready.
-
-## 5. Qua'dar System Implementation (The Law of the Spire) ᛒ
+## Qua'dar System Implementation (The Law of the Spire) ᛒ
 *Objective: Instantiate the grimdark TTRPG rules within the digital engine.*
 
-- [x] **Class & Spell Mechanics**: Port the attributes and unique spell architectures (e.g., *Obsidian Surge*, *Hellfire Explosion*) from `quadar.md`.
-- [x] **Starting Initiation**: Implement the Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `quadar_familiar.md`.
-- [x] **Loom of Fate Logic**: Integrate the `Surge Count` and narrative modifier tables for determining world-event consequences.
-- [x] **Narrative Momentum**: Implement the "Chipping vs. Cutting" questioning heuristics in the SDK's directive synthesis to maintain genre consistency.
-- [x] **Level Progression**: Implement XP gain, level up thresholds, and stat scaling (MaxHP) for character advancement.
+- [x] **Class & Spell Mechanics**: Port the attributes and unique spell architectures from `quadar.md`.
+- [x] **Starting Initiation**: Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `quadar_familiar.md`.
+- [x] **Loom of Fate Logic**: `Surge Count` and narrative modifier tables for world-event consequences.
+- [x] **Narrative Momentum**: "Chipping vs. Cutting" questioning heuristics in directive synthesis.
+- [x] **Level Progression**: XP gain, level up thresholds, stat scaling (MaxHP).
 
 ---
 

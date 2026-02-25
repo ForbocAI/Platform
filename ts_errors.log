@@ -1,0 +1,289 @@
+src/components/elements/unique/narrative/StageSelector.tsx(3,15): error TS2305: Module '"@/features/game/types"' has no exported member 'StageOfScene'.
+src/components/elements/unique/narrative/ThreadList.tsx(3,15): error TS2305: Module '"@/features/game/types"' has no exported member 'Thread'.
+src/components/elements/unique/narrative/VignetteControls.tsx(3,15): error TS2305: Module '"@/features/game/types"' has no exported member 'VignetteStage'.
+src/components/screens/GameScreen/GameScreenHeader.tsx(5,15): error TS2305: Module '"@/features/game/types"' has no exported member 'StageOfScene'.
+src/components/screens/GameScreen/GameScreenMain.tsx(4,27): error TS2305: Module '"@/features/game/types"' has no exported member 'GameLogEntry'.
+src/components/screens/GameScreen/GameScreenMain.tsx(4,41): error TS2305: Module '"@/features/game/types"' has no exported member 'Thread'.
+src/components/screens/GameScreen/GameScreenMain.tsx(4,76): error TS2305: Module '"@/features/game/types"' has no exported member 'VignetteStage'.
+src/components/screens/GameScreen/index.tsx(72,15): error TS2305: Module '"@/features/game/types"' has no exported member 'VignetteStage'.
+src/components/screens/GameScreen/index.tsx(96,84): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/features/core/api/gameApi.ts(3,21): error TS2305: Module '"@/features/game/types"' has no exported member 'InquiryResponse'.
+src/features/core/api/gameApi.ts(3,38): error TS2305: Module '"@/features/game/types"' has no exported member 'StageOfScene'.
+src/features/core/store/getInitOptions.ts(1,15): error TS2305: Module '"@/features/game/store/types"' has no exported member 'InitializeGameOptions'.
+src/features/core/store/listeners.ts(60,24): error TS7006: Parameter 'text' implicitly has an 'any' type.
+src/features/core/ui/slice/uiSlice.ts(1,15): error TS2305: Module '"@/features/game/types"' has no exported member 'StageOfScene'.
+src/features/core/ui/slice/uiSlice.ts(5,7): error TS2322: Type '"Ashwalker"' is not assignable to type 'ActorArchetype'.
+src/features/game/entities/area.ts(8,5): error TS2353: Object literal may only specify known properties, and '"Ethereal Marshlands"' does not exist in type 'Readonly<Record<EnvironmentType, readonly string[]>>'.
+src/features/game/entities/area.ts(30,5): error TS2353: Object literal may only specify known properties, and '"Ethereal Marshlands"' does not exist in type 'Readonly<Record<EnvironmentType, string>>'.
+src/features/game/entities/area.ts(53,5): error TS2322: Type '"Chthonic Depths"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(53,24): error TS2322: Type '"Cavernous Abyss"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(53,43): error TS2322: Type '"Abyss of Infernal Lore"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(54,5): error TS2322: Type '"Dimensional Nexus"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(54,26): error TS2322: Type '"Static Sea of All Noise"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(54,53): error TS2322: Type '"Twilight Alchemy Haven"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(55,5): error TS2322: Type '"Precipice of the Shadowlands"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(55,37): error TS2322: Type '"Chromatic-Steel Fungi"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(55,62): error TS2322: Type '"The Sterile Chamber"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(56,5): error TS2322: Type '"Labyrinthine Dungeon"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(56,29): error TS2322: Type '"Eldritch Fortress"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(60,5): error TS2353: Object literal may only specify known properties, and '"Ethereal Marshlands"' does not exist in type 'Record<EnvironmentType, string>'.
+src/features/game/entities/area.ts(121,9): error TS2353: Object literal may only specify known properties, and 'biome' does not exist in type 'Sector'.
+src/features/game/entities/area.ts(149,43): error TS2339: Property 'biome' does not exist on type 'Sector'.
+src/features/game/entities/area.ts(174,5): error TS2353: Object literal may only specify known properties, and 'biome' does not exist in type 'Sector'.
+src/features/game/entities/area.ts(189,20): error TS2352: Conversion of type '{ id: string; type: string; faction: "enemy"; name: string; description: string; stats: { hp: number; maxHp: number; stress: number; maxStress: number; speed: number; defense: number; damage: number; invulnerable: number; }; ... 14 more ...; active: true; }' to type 'NonPlayerActor' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'inventory' are incompatible.
+    Type '{ weapons: never[]; currentWeaponIndex: number; items: never[]; equipment: {}; spirit: number; blood: number; }' is missing the following properties from type 'InventoryComponent': offensiveAssets, currentAssetIndex, genericAssets, primaryResource, secondaryResource
+src/features/game/entities/area.ts(223,49): error TS2345: Argument of type 'EnvironmentType | "Quadar Tower"' is not assignable to parameter of type 'EnvironmentType'.
+  Type '"Quadar Tower"' is not assignable to type 'EnvironmentType'.
+src/features/game/entities/area.ts(225,57): error TS2345: Argument of type 'EnvironmentType | "Quadar Tower"' is not assignable to parameter of type 'EnvironmentType | undefined'.
+  Type '"Quadar Tower"' is not assignable to type 'EnvironmentType | undefined'.
+src/features/game/entities/area.ts(230,50): error TS2345: Argument of type 'EnvironmentType | "Quadar Tower"' is not assignable to parameter of type 'EnvironmentType | undefined'.
+  Type '"Quadar Tower"' is not assignable to type 'EnvironmentType | undefined'.
+src/features/game/entities/player.ts(28,22): error TS7053: Element implicitly has an 'any' type because expression of type 'ActorArchetype | "Ashwalker"' can't be used to index type 'Record<ActorArchetype, ClassTemplate>'.
+  Property 'Ashwalker' does not exist on type 'Record<ActorArchetype, ClassTemplate>'.
+src/features/game/entities/player.ts(53,9): error TS2739: Type '{ weapons: string[]; currentWeaponIndex: number; items: { id: string; name: string; type: string; description: string; cost: { primary: number; }; }[]; equipment: { mainHand: { id: string; name: string; type: string; description: string; cost: { ...; }; }; armor: { ...; }; }; spirit: number; blood: number; }' is missing the following properties from type 'InventoryComponent': offensiveAssets, currentAssetIndex, genericAssets, primaryResource, secondaryResource
+src/features/game/mechanics/capabilities/ashwalker.ts(7,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/ashwalker.ts(15,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/ashwalker.ts(22,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/ashwalker.ts(29,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/ashwalker.ts(37,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/ashwalker.ts(44,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/ashwalker.ts(51,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(7,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(15,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(23,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(31,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(39,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(47,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(54,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(61,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(68,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(75,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(82,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/doomguard.ts(89,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(8,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(16,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(24,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(33,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(41,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(49,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(58,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(66,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(74,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(83,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(91,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(99,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(108,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(116,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/enemies.ts(124,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(8,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(16,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(23,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(31,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(39,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(46,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(54,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(62,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(69,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(76,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(84,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(91,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(99,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(107,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(116,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(124,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(131,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(138,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(147,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(155,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(163,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(172,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(180,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(188,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(196,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(204,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(212,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(220,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/mysticalClasses.ts(227,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(7,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(14,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(21,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(28,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(36,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(43,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(50,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(57,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(64,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/obsidianWarden.ts(71,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(8,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(16,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(23,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(31,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(40,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(48,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(56,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(64,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(71,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(79,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(87,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(94,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(102,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/capabilities/techClasses.ts(110,9): error TS2353: Object literal may only specify known properties, and 'agentClass' does not exist in type 'Capability'.
+src/features/game/mechanics/classes.ts(5,3): error TS2322: Type '"Ashwalker"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(6,3): error TS2322: Type '"Obsidian Warden"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(7,3): error TS2322: Type '"Doomguard"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(8,3): error TS2322: Type '"Iron Armored Guardian"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(9,3): error TS2322: Type '"Aether Spirit"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(10,3): error TS2322: Type '"Thunder Trooper"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(11,3): error TS2322: Type '"Cyberflux Guardian"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(12,3): error TS2322: Type '"Voidwraith"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(13,3): error TS2322: Type '"Storm Titan"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(14,3): error TS2322: Type '"Flame Corps"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(15,3): error TS2322: Type '"Byssalspawn"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(16,3): error TS2322: Type '"Aksov Hexe-Spinne"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(17,3): error TS2322: Type '"Twilight Weaver"' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/classes.ts(36,3): error TS2353: Object literal may only specify known properties, and '"Ashwalker"' does not exist in type 'Record<ActorArchetype, ClassTemplate>'.
+src/features/game/mechanics/levelUnlocks.ts(4,5): error TS2353: Object literal may only specify known properties, and 'Ashwalker' does not exist in type 'Partial<Record<ActorArchetype, Partial<Record<number, string>>>>'.
+src/features/game/mechanics/orchestrators/agency.ts(2,10): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/agency.ts(35,22): error TS2304: Cannot find name 'setAgentPondering'.
+src/features/game/mechanics/orchestrators/agency.ts(38,33): error TS2552: Cannot find name 'toObservation'. Did you mean 'observation'?
+src/features/game/mechanics/orchestrators/agency.ts(42,22): error TS2304: Cannot find name 'clearAgentPondering'.
+src/features/game/mechanics/orchestrators/agency.ts(46,26): error TS2304: Cannot find name 'addLog'.
+src/features/game/mechanics/orchestrators/agency.ts(55,22): error TS2304: Cannot find name 'clearAgentPondering'.
+src/features/game/mechanics/orchestrators/autoplay.ts(41,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/baseCamp.ts(5,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/baseCamp.ts(60,45): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/baseCamp.ts(66,55): error TS7006: Parameter 'ing' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(8,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/combat.ts(71,33): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(88,45): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(100,21): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(106,42): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(125,47): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(129,43): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(130,70): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(144,39): error TS7006: Parameter 'en' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(219,55): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/combat.ts(226,59): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/exploration.ts(5,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/exploration.ts(54,45): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/exploration.ts(55,51): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/init.ts(9,15): error TS2305: Module '"../../store/types"' has no exported member 'InitializeGameOptions'.
+src/features/game/mechanics/orchestrators/init.ts(18,57): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'ActorArchetype'.
+  Type 'undefined' is not assignable to type 'ActorArchetype'.
+src/features/game/mechanics/orchestrators/init.ts(41,9): error TS2739: Type '{ weapons: never[]; currentWeaponIndex: number; items: never[]; equipment: {}; spirit: number; blood: number; }' is missing the following properties from type 'InventoryComponent': offensiveAssets, currentAssetIndex, genericAssets, primaryResource, secondaryResource
+src/features/game/mechanics/orchestrators/inquiry.ts(5,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/inventory.ts(4,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/inventory.ts(13,47): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/inventory.ts(104,69): error TS2694: Namespace '"/Users/seandinwiddie/GitHub/Forboc.AI/Platform/src/features/game/store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/trade.ts(5,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/orchestrators/trade.ts(16,47): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/features/game/mechanics/orchestrators/trade.ts(18,37): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(8,15): error TS2305: Module '"../../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/systems/ai/awareness.ts(102,9): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(104,64): error TS7006: Parameter 'recipe' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(106,13): error TS7006: Parameter 'ing' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(143,75): error TS7006: Parameter 'h' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(161,9): error TS7006: Parameter 'l' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(168,9): error TS7006: Parameter 'l' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(180,9): error TS7006: Parameter 'l' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(193,42): error TS7006: Parameter 'h' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/awareness.ts(249,58): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/behaviorTree/helpers.ts(1,15): error TS2305: Module '"../../../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/systems/ai/behaviorTree/index.ts(12,15): error TS2305: Module '"../../../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/systems/ai/behaviorTree/nodesAction.ts(2,15): error TS2305: Module '"../../../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/systems/ai/behaviorTree/nodesQuest.ts(9,15): error TS2305: Module '"../../../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/systems/ai/behaviorTree/nodesRival.ts(2,15): error TS2305: Module '"../../../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/systems/ai/behaviorTree/nodesSurvival.ts(2,15): error TS2305: Module '"../../../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/systems/ai/behaviorTree/nodesSurvival.ts(133,62): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/behaviorTree/nodesSurvival.ts(140,59): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/features/game/mechanics/systems/ai/behaviorTree/nodesSurvival.ts(142,21): error TS7006: Parameter 'ing' implicitly has an 'any' type.
+src/features/game/mechanics/systems/generation/biomes.ts(13,5): error TS2353: Object literal may only specify known properties, and '"Quadar Tower"' does not exist in type 'Partial<Record<EnvironmentType, TransitionEntry[]>>'.
+src/features/game/mechanics/systems/generation/biomes.ts(35,5): error TS2322: Type '"Ethereal Marshlands"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(35,28): error TS2322: Type '"Toxic Wastes"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(35,44): error TS2322: Type '"Haunted Chapel"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(35,62): error TS2322: Type '"Obsidian Spire"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(36,5): error TS2322: Type '"Quadar Tower"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(36,21): error TS2322: Type '"Military Installation"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(36,46): error TS2322: Type '"Eldritch Fortress"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(36,67): error TS2322: Type '"Labyrinthine Dungeon"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(37,5): error TS2322: Type '"Chromatic-Steel Fungi"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(37,30): error TS2322: Type '"Chthonic Depths"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(37,49): error TS2322: Type '"Static Sea of All Noise"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(37,76): error TS2322: Type '"Twilight Alchemy Haven"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(38,5): error TS2322: Type '"Abyss of Infernal Lore"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(38,31): error TS2322: Type '"Precipice of the Shadowlands"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(38,63): error TS2322: Type '"Rune Temples"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(38,79): error TS2322: Type '"Crumbling Ruins"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(39,5): error TS2322: Type '"Dimensional Nexus"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(39,26): error TS2322: Type '"Cavernous Abyss"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(39,45): error TS2322: Type '"The Sterile Chamber"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,32): error TS2322: Type '"Chthonic Depths"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,51): error TS2322: Type '"Cavernous Abyss"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,70): error TS2322: Type '"Abyss of Infernal Lore"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,96): error TS2322: Type '"Dimensional Nexus"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,117): error TS2322: Type '"Static Sea of All Noise"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,144): error TS2322: Type '"Twilight Alchemy Haven"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,170): error TS2322: Type '"Precipice of the Shadowlands"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,202): error TS2322: Type '"Chromatic-Steel Fungi"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(42,227): error TS2322: Type '"The Sterile Chamber"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(43,35): error TS2322: Type '"Quadar Tower"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(43,51): error TS2322: Type '"Haunted Chapel"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(43,69): error TS2322: Type '"Military Installation"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(43,94): error TS2322: Type '"Ethereal Marshlands"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(43,117): error TS2322: Type '"Crumbling Ruins"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(46,46): error TS2339: Property 'biome' does not exist on type 'Sector'.
+src/features/game/mechanics/systems/generation/biomes.ts(47,37): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Partial<Record<EnvironmentType, TransitionEntry[]>>'.
+src/features/game/mechanics/systems/generation/biomes.ts(48,51): error TS2322: Type '"Quadar Tower"' is not assignable to type 'EnvironmentType'.
+src/features/game/mechanics/systems/generation/biomes.ts(65,39): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/systems/generation/biomes.ts(66,36): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/game/mechanics/systems/generation/biomes.ts(66,39): error TS7006: Parameter 'x' implicitly has an 'any' type.
+src/features/game/mechanics/systems/generation/loot.ts(5,5): error TS2353: Object literal may only specify known properties, and '"Quadar Tower"' does not exist in type 'Partial<Record<EnvironmentType, { materialId: string; chance: number; minQty?: number | undefined; maxQty?: number | undefined; }[]>>'.
+src/features/game/mechanics/systems/generation/npcs.ts(126,9): error TS2739: Type '{ weapons: never[]; currentWeaponIndex: number; items: never[]; equipment: {}; spirit: number; blood: number; }' is missing the following properties from type 'InventoryComponent': offensiveAssets, currentAssetIndex, genericAssets, primaryResource, secondaryResource
+src/features/game/mechanics/transformations/autoplay.ts(3,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/autoplay.ts(8,48): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/combat.ts(5,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/combat.ts(39,68): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/combat.ts(50,49): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/combat.ts(85,50): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/combat.ts(133,80): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/combat.ts(149,59): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/combat.ts(158,56): error TS7006: Parameter 'ef' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/combat.ts(175,50): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/death.ts(3,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/index.ts(8,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/init.ts(5,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/inquiry.ts(2,15): error TS2305: Module '"../../types"' has no exported member 'InquiryResponse'.
+src/features/game/mechanics/transformations/inventory.ts(3,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/inventory.ts(33,21): error TS2739: Type '{ weapons: never[]; currentWeaponIndex: number; items: never[]; equipment: {}; spirit: number; blood: number; }' is missing the following properties from type 'InventoryComponent': offensiveAssets, currentAssetIndex, genericAssets, primaryResource, secondaryResource
+src/features/game/mechanics/transformations/inventory.ts(120,77): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/loot.ts(1,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/loot.ts(30,55): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/loot.ts(43,46): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/movement.ts(3,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/movement.ts(23,52): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/movement.ts(29,46): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/movement.ts(39,47): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/movement.ts(46,46): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/trade.ts(3,15): error TS2305: Module '"../../store/types"' has no exported member 'GameState'.
+src/features/game/mechanics/transformations/trade.ts(16,57): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/trade.ts(23,50): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/trade.ts(41,57): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/mechanics/transformations/trade.ts(48,50): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/features/game/sdk/cortexService.ts(6,21): error TS2305: Module '"@/features/game/types"' has no exported member 'InquiryResponse'.
+src/features/game/sdk/cortexService.ts(6,38): error TS2305: Module '"@/features/game/types"' has no exported member 'StageOfScene'.
+src/features/game/sdk/mappers.ts(2,15): error TS2305: Module '"@/features/game/store/types"' has no exported member 'GameState'.
+src/features/game/store/constants.ts(1,42): error TS2305: Module '"@/features/game/types"' has no exported member 'VignetteStage'.
+src/features/game/store/constants.ts(3,15): error TS2305: Module '"./types"' has no exported member 'GameState'.
+src/features/game/store/constants.ts(6,57): error TS2739: Type '{ areasExplored: number; areasScanned: number; npcsDefeated: number; vendorTrades: number; questsCompleted: number; resourcesEarned: number; startTime: number; endTime: null; }' is missing the following properties from type 'PerformanceMetrics': sectorsExplored, sectorsScanned, actorsDefeated, hubTrades, objectivesCompleted
+src/features/game/store/gameSlice.ts(4,15): error TS2305: Module '"@/features/game/types"' has no exported member 'GameLogEntry'.
+src/features/game/store/gameSlice.ts(7,15): error TS2305: Module '"./types"' has no exported member 'AreaCoordinates'.
+src/features/game/store/gameSlice.ts(7,32): error TS2305: Module '"./types"' has no exported member 'InitializeGameOptions'.
+src/features/game/store/gameSlice.ts(41,64): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/features/narrative/helpers.ts(1,15): error TS2305: Module '"@/features/game/types"' has no exported member 'InquiryResponse'.
+src/features/narrative/helpers.ts(1,32): error TS2305: Module '"@/features/game/types"' has no exported member 'UnexpectedlyEffect'.
+src/features/narrative/slice/narrativeSlice.ts(7,3): error TS2305: Module '"@/features/game/types"' has no exported member 'Thread'.
+src/features/narrative/slice/narrativeSlice.ts(8,3): error TS2305: Module '"@/features/game/types"' has no exported member 'SceneRecord'.
+src/features/narrative/slice/narrativeSlice.ts(10,3): error TS2305: Module '"@/features/game/types"' has no exported member 'Vignette'.
+src/features/narrative/slice/narrativeSlice.ts(11,3): error TS2305: Module '"@/features/game/types"' has no exported member 'StageOfScene'.
+src/features/narrative/slice/narrativeSlice.ts(12,3): error TS2305: Module '"@/features/game/types"' has no exported member 'VignetteStage'.

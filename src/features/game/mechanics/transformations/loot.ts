@@ -62,7 +62,7 @@ export function applyXpGain(state: GameState, xpGain: number): void {
         state.player.stats.hp = state.player.stats.maxHp;
         state.player.stats.stress = 0;
 
-        const newCapabilityId = getCapabilityUnlockForLevel(state.player.agentClass, state.player.stats.level ?? 1);
+        const newCapabilityId = getCapabilityUnlockForLevel(state.player.agentClass || "Unknown", state.player.stats.level ?? 1);
 
         if (newCapabilityId && !state.player.capabilities.learned.includes(newCapabilityId)) {
             state.player.capabilities.learned = [...state.player.capabilities.learned, newCapabilityId];

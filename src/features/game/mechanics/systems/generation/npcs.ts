@@ -124,12 +124,8 @@ export function generateRandomNonPlayerActor(): NonPlayerActor {
 
         // Inventory Component (Empty for NPCs by default)
         inventory: {
-            weapons: [],
-            currentWeaponIndex: 0,
-            items: [],
-            equipment: {},
-            spirit: 0,
-            blood: 0,
+            weapons: [], currentWeaponIndex: 0, items: [], equipment: {}, spirit: 0, blood: 0,
+            offensiveAssets: [], currentAssetIndex: 0, genericAssets: [], primaryResource: 0, secondaryResource: 0
         },
 
         // AI Component

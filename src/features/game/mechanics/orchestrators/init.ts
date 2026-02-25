@@ -6,7 +6,7 @@ import { sdkService } from '@/features/game/sdk/cortexService';
 import { startVignette } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
 import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
-import type { GameState, InitializeGameOptions } from '../../store/types';
+import type { InitializeGameOptions } from '../../store/types';
 
 export const initializeGame = createAsyncThunk(
   'game/initialize',
@@ -15,7 +15,7 @@ export const initializeGame = createAsyncThunk(
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     const player = initializePlayer(options?.classId) as import('../../types').PlayerActor;
-    player.capabilities = { learned: getSkillsForLevels(player.agentClass, player.stats.level ?? 1) };
+    player.capabilities = { learned: getSkillsForLevels(player.agentClass ?? 'Rogue', player.stats.level ?? 1) };
     if (options?.lowHp) {
       player.stats.hp = 5;
     }
@@ -38,7 +38,10 @@ export const initializeGame = createAsyncThunk(
           damage: 5,
           invulnerable: 0,
         },
-        inventory: { weapons: [], currentWeaponIndex: 0, items: [], equipment: {}, spirit: 0, blood: 0 },
+        inventory: {
+          weapons: [], currentWeaponIndex: 0, items: [], spirit: 0, blood: 0,
+          offensiveAssets: [], currentAssetIndex: 0, genericAssets: [], equipment: {}, primaryResource: 0, secondaryResource: 0
+        },
         capabilities: { learned: [] },
         activeEffects: [],
         x: 0, y: 0, vx: 0, vy: 0, width: 14, height: 24,

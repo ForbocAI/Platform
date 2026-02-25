@@ -84,7 +84,7 @@ export function GameScreenMain({
           theme={vignette?.theme ?? ""}
           stage={vignette?.stage ?? "Exposition"}
           threadIds={vignette?.threadIds}
-          threads={threads}
+          threads={threads.map(t => ({ id: t.id, name: t.name ?? "Unnamed Thread" }))}
           onStart={onStartVignette}
           onAdvance={onAdvanceVignette}
           onEnd={onEndVignette}
