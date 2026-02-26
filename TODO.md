@@ -17,9 +17,7 @@ This log tracks the engineering requirements for the flagship Forboc AI consumer
 - [x] **Feature Gate**: `?FORBOCAI_SDK=ON` query param controls SDK activation. Default: OFF (uses local procedural logic).
 - [x] **SDK Service Scaffolded**: `sdkService.init()` via `BootstrapGate` (only runs when gate is ON).
 - [x] **Soul Re-hydration**: Load NPC personas from Arweave Transaction IDs (via `sdkService.rehydrateAgent` and `BotOrchestrator`).
-
-### Blocked on SDK+API Stabilization ⏳
-- [ ] **Fix SDK Init Crash**: `@forbocai/browser` import causes "Cannot convert undefined or null to object" — resolve after SDK browser package is stable.
+- [x] **Fix SDK Init Crash**: Resolved via Next.js Turbopack `resolveAlias` that safely stubs `web-llm`, `orama`, and `transformers` on the SSR environment.
 - [ ] **Cortex Integration**: Bind `Cortex.on('token')` to VOX-LOG for real-time typewriter effects (requires working Cortex).
 - [ ] **Agent Directive Loop**: `Agent.process()` calls during combat/exploration for NPC intent (requires working multi-round protocol).
 - [ ] **Bridge Validation**: Pipe actions through `SDK.Bridge.validate()` before updating store (requires working Bridge).
