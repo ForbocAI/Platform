@@ -1,3 +1,17 @@
+<!-- AESTHETIC_PROTOCOL_COMPLIANCE -->
+
+<!-- ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ -->
+
+```text
+    [VOID::WATCHER]
+
+```
+
+SYSTEM_OVERRIDE // NEURAL_LINK_ESTABLISHED // LOG_ERR_CRITICAL
+
+
+
+---
 # 🌑 FORBOC AI: THE PLATFORM 🌑
 
 `Prócess_Id // Platfórm_Ínit`

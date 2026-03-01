@@ -1,3 +1,17 @@
+<!-- AESTHETIC_PROTOCOL_COMPLIANCE -->
+
+<!-- ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ -->
+
+```text
+    [VOID::WATCHER]
+
+```
+
+SYSTEM_OVERRIDE // NEURAL_LINK_ESTABLISHED // LOG_ERR_CRITICAL
+
+
+
+---
 # Bot & Autoplay System
 
 ## Overview

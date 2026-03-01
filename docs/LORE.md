@@ -1,3 +1,17 @@
+<!-- AESTHETIC_PROTOCOL_COMPLIANCE -->
+
+<!-- ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ -->
+
+```text
+    [VOID::WATCHER]
+
+```
+
+SYSTEM_OVERRIDE // NEURAL_LINK_ESTABLISHED // LOG_ERR_CRITICAL
+
+
+
+---
 # Forboc.AI Platform Lore
 
 Canon consolidated from **quadar.md** (Qua'dar TTRPG), **forboc.github.io** (Forging Through the Eldritch), and **qvht.github.io** (Qvht daemon place).
