@@ -10,8 +10,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@forbocai/browser": "^0.5.7",
-    "@forbocai/core": "^0.5.7",
+    "@forbocai/browser": "^0.6.2",
+    "@forbocai/core": "^0.6.2",
     "@iconify-icons/pixelarticons": "^1.2.5",
     "@iconify-json/game-icons": "^1.2.3",
     "@iconify/react": "^6.0.2",
