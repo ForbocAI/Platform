@@ -3,6 +3,14 @@ import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
 import type { GameState } from '../../store/types';
 
+const CONSUMABLE_EFFECT_MAP = {
+  heal_hp_20: 'heal_hp_20',
+  heal_stress_10: 'heal_stress_10',
+  heal_20_stress_10: 'heal_20_stress_10',
+  stress_30: 'stress_30',
+  heal_50_stress_add_10: 'heal_50_stress_add_10',
+} as const;
+
 export const pickUpGroundLoot = createAsyncThunk(
   'game/pickUpGroundLoot',
   async ({ itemId }: { itemId: string }, { getState, dispatch }) => {
@@ -13,10 +21,10 @@ export const pickUpGroundLoot = createAsyncThunk(
     const item = currentArea.groundLoot.find((i) => i.id === itemId);
     if (!item) return;
 
-    dispatch(addLog({ message: `Picked up ${item.name}.`, type: 'system' }));
+    dispatch(addLog({ message: `Gathered ${item.name}.`, type: 'system' }));
     dispatch(
       addFact({
-        text: `Picked up ${item.name} from the ground.`,
+        text: `Gathered ${item.name} along the path.`,
         questionKind: 'loot',
         isFollowUp: false,
       })
@@ -45,13 +53,20 @@ export const consumeItem = createAsyncThunk(
 
     dispatch(addLog({ message: `Used ${item.name}.`, type: 'system' }));
 
-    if (item.name.includes('Healing') || item.name.includes('Potion')) {
-      dispatch(addLog({ message: 'Health restored.', type: 'system' }));
-      return { itemIndex, effect: 'heal_hp_20' as const };
-    }
-    if (item.name.includes('Clarity') || item.name.includes('Elixir')) {
-      dispatch(addLog({ message: 'Stress reduced.', type: 'system' }));
-      return { itemIndex, effect: 'heal_stress_10' as const };
+    const mappedEffect = item.effect ? CONSUMABLE_EFFECT_MAP[item.effect as keyof typeof CONSUMABLE_EFFECT_MAP] : undefined;
+    if (mappedEffect) {
+      if (mappedEffect === 'heal_hp_20') {
+        dispatch(addLog({ message: 'Health restored.', type: 'system' }));
+      } else if (mappedEffect === 'heal_stress_10') {
+        dispatch(addLog({ message: 'Worry eased.', type: 'system' }));
+      } else if (mappedEffect === 'heal_20_stress_10') {
+        dispatch(addLog({ message: 'You feel steadier and a little stronger.', type: 'system' }));
+      } else if (mappedEffect === 'stress_30') {
+        dispatch(addLog({ message: 'Your nerves settle.', type: 'system' }));
+      } else if (mappedEffect === 'heal_50_stress_add_10') {
+        dispatch(addLog({ message: 'You recover quickly, but the rush leaves you rattled.', type: 'system' }));
+      }
+      return { itemIndex, effect: mappedEffect };
     }
 
     return { itemIndex, effect: 'unknown' as const };
@@ -115,10 +130,10 @@ export const sacrificeItem = createAsyncThunk(
 
     const gain = Math.max(1, Math.floor(value / 2));
 
-    dispatch(addLog({ message: `Sacrificed ${item.name} for ${gain} Primary.`, type: 'system' }));
+    dispatch(addLog({ message: `Repurposed ${item.name} into ${gain} Pollen.`, type: 'system' }));
     dispatch(
       addFact({
-        text: `Sacrificed ${item.name} to the void.`,
+        text: `Repurposed ${item.name} into shared supplies.`,
         questionKind: 'sacrifice',
         isFollowUp: false,
       })

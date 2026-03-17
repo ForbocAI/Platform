@@ -24,22 +24,22 @@ This file tracks active repo-level work. Classified docs hold broader planning, 
 
 ## Lanternbough Identity Reset
 
-- [ ] Replace Qua'dar branding in `src/app/layout.tsx`.
+- [x] Replace Qua'dar branding in `src/app/layout.tsx`.
 - [ ] Replace old class roster in `src/features/game/mechanics/classes.ts`.
-- [ ] Rewrite visible lore strings across `src/features/game/content.ts` and related data sources.
-- [ ] Update UI labels from grimdark economy language to Lanternbough economy language.
+- [x] Rewrite visible lore strings across `src/features/game/content.ts` and related data sources.
+- [x] Update UI labels from grimdark economy language to Lanternbough economy language.
 - [ ] Rewrite `docs/LORE.md`-aligned runtime copy so the repo and docs stop disagreeing.
 
 ## Gameplay and Systems
 
 - [ ] Revisit autoplay priorities after the new economy and class roster are in place.
-- [ ] Replace old narrative thread seeds like `Reconnaissance` with Lanternbough equivalents.
+- [x] Replace old narrative thread seeds like `Reconnaissance` with Lanternbough equivalents.
 - [ ] Audit trade, crafting, and companion copy for cozy-fantasy tone.
-- [ ] Review hazard naming so challenge remains readable without grimdark framing.
+- [x] Review hazard naming so challenge remains readable without grimdark framing.
 
 ## UI and UX
 
-- [ ] Update metadata, title, and structured data to match the new game identity.
+- [x] Update metadata, title, and structured data to match the new game identity.
 - [ ] Replace old aesthetic cues in shared presentation where they conflict with the cozy direction.
 - [ ] Keep component APIs lore-agnostic while moving story specificity into content and copy.
 

@@ -24,13 +24,13 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
         }}
         className="w-full flex items-center gap-1 p-1.5 h-auto text-left justify-start border-transparent bg-transparent text-palette-muted-light hover:text-palette-muted uppercase tracking-wider hover:bg-transparent"
         data-testid="facts-toggle"
-        aria-label={open ? "Close Facts" : "Open Facts"}
-        title="Facts gathered in the field — Qua'dar reconnaissance."
+        aria-label={open ? "Close Field Notes" : "Open Field Notes"}
+        title="Facts gathered on the path — Lanternbough field notes."
       >
-        <span className="normal-case">Facts ({facts.length})</span>
+        <span className="normal-case">Field Notes ({facts.length})</span>
       </GameButton>
       {open && (
-        <ul className="max-h-32 overflow-y-auto p-1.5 space-y-1 text-sm animate-in fade-in duration-200" role="region" aria-label="Facts list">
+        <ul className="max-h-32 overflow-y-auto p-1.5 space-y-1 text-sm animate-in fade-in duration-200" role="region" aria-label="Field notes list">
           {display.map((f) => (
             <li
               key={f.id}

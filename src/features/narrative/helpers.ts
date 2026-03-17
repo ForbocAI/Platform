@@ -2,18 +2,18 @@ import type { InquiryResponse, UnexpectedlyEffect } from "@/features/game/types"
 import { LORE_VIGNETTE_THEMES } from "@/features/game/content";
 
 export const VIGNETTE_THEMES = [
-  "Shadows of the Past",
-  "Lost Technology",
-  "Betrayal",
-  "Hope in Darkness",
-  "The Void Calls",
-  "Ancient Rituals",
-  "Technomancer's Dream",
-  "Cyber-Organic Fusion",
-  "Echoes of Silence",
-  "Forbidden Knowledge",
-  "The Machine God",
-  "Flesh and Steel",
+  "Lantern Weather",
+  "Missing Couriers",
+  "Bridge Supper",
+  "Creek Riddles",
+  "Festival Preparations",
+  "Borrowed Seeds",
+  "Mushroom Market",
+  "Moonpetal Routes",
+  "Neighborly Mischief",
+  "Tea and Repair",
+  "Rootsong Whispers",
+  "Firefly Cartography",
   ...LORE_VIGNETTE_THEMES,
 ];
 
@@ -41,7 +41,7 @@ export function generateFollowUpFacts(
     else facts.push("No obvious observer is present.");
   }
   if (q.includes("danger") || q.includes("enemy") || q.includes("hostile")) {
-    if (answer === "Yes") facts.push("Threat is present; the scene is in the red.");
+    if (answer === "Yes") facts.push("Threat is present; tread carefully.");
     else facts.push("The immediate area seems clear of that threat.");
   }
   if (q.includes("inhabit") || q.includes("someone") || q.includes("people")) {

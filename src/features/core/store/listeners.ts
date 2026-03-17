@@ -72,7 +72,7 @@ export function registerGameListeners(
       const state = listenerApi.getState();
       if (state.narrative.threads.length > 0) return;
       listenerApi.dispatch(
-        addThread({ name: 'Reconnaissance', stage: 'To Knowledge' })
+        addThread({ name: 'Wayfinding', stage: 'To Knowledge' })
       );
     },
   });

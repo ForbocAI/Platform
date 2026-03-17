@@ -257,7 +257,7 @@ export const engageHostiles = createAsyncThunk(
 
 
 export const respawnPlayer = createAsyncThunk('game/respawn', async (_, { dispatch }) => {
-  dispatch(addLog({ message: 'Resurrecting...', type: 'system' }));
-  dispatch(addLog({ message: 'You gasp for breath as the void releases you.', type: 'system' }));
-  dispatch(addFact({ text: 'Died and returned from the void.', questionKind: 'respawn', isFollowUp: false }));
+  dispatch(addLog({ message: 'Returning to the lantern paths...', type: 'system' }));
+  dispatch(addLog({ message: 'You wake with a start, guided back by the Rootsong.', type: 'system' }));
+  dispatch(addFact({ text: 'Collapsed, then found your way back with help from the Rootsong.', questionKind: 'respawn', isFollowUp: false }));
 });

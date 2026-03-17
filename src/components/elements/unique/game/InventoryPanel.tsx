@@ -12,6 +12,15 @@ interface InventoryPanelProps {
     onClose: () => void;
 }
 
+const ITEM_TYPE_LABELS: Record<Item["type"], string> = {
+    weapon: "Tool",
+    armor: "Gear",
+    consumable: "Supply",
+    relic: "Keepsake",
+    resource: "Material",
+    contract: "Writ",
+};
+
 export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice, onDrop: _onDrop, onClose }: InventoryPanelProps) {
     const renderItemBonus = (item: Item) => {
         if (!item.bonus) return null;
@@ -34,7 +43,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                     <div className="flex flex-col">
                         <span className="text-xs text-palette-muted uppercase">{label}</span>
                         <span className={`text-sm ${item ? 'text-palette-white' : 'text-palette-muted/50'}`}>
-                            {item ? item.name : "Empty"}
+                            {item ? item.name : "Open Slot"}
                         </span>
                     </div>
                 </div>
@@ -46,7 +55,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                             onClick={() => onUnequip(slot)}
                             data-testid={`inventory-unequip-${slot}`}
                         >
-                            Unequip
+                            Pack Away
                         </GameButton>
                     </div>
                 )}
@@ -56,7 +65,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
 
     return (
         <Modal
-            title="Inventory & Equipment"
+            title="Pack & Gear"
             titleIcon={<Package className="w-5 h-5 text-palette-accent-bright" />}
             onClose={onClose}
             maxWidth="2xl"
@@ -66,19 +75,19 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
 
                 {/* Equipment */}
                 <div className="space-y-2">
-                    <h3 className="text-xs uppercase text-palette-muted-light font-bold">Equipment</h3>
+                    <h3 className="text-xs uppercase text-palette-muted-light font-bold">Gear</h3>
                     <div className="space-y-2">
                         {renderEquippedItem("mainHand", <Sword className="w-4 h-4 text-palette-accent-dim" />, "Main Hand")}
                         {renderEquippedItem("armor", <Shield className="w-4 h-4 text-palette-accent-bright" />, "Armor")}
-                        {renderEquippedItem("relic", <Gem className="w-4 h-4 text-palette-accent-soft" />, "Relic")}
+                        {renderEquippedItem("relic", <Gem className="w-4 h-4 text-palette-accent-soft" />, "Keepsake")}
                     </div>
                 </div>
 
                 {/* Inventory Bag */}
                 <div>
-                    <h3 className="text-xs uppercase text-palette-muted-light font-bold mb-2">Backpack ({(player.inventory.items || []).length} items)</h3>
+                    <h3 className="text-xs uppercase text-palette-muted-light font-bold mb-2">Pack ({(player.inventory.items || []).length} items)</h3>
                     {(player.inventory.items || []).length === 0 ? (
-                        <div className="text-palette-muted italic text-sm p-4 text-center border border-dashed border-palette-border rounded">Empty</div>
+                        <div className="text-palette-muted italic text-sm p-4 text-center border border-dashed border-palette-border rounded">Your pack is empty.</div>
                     ) : (
                         <div className="grid gap-2">
                             {(player.inventory.items as Item[]).map((item) => (
@@ -87,7 +96,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                                         <div className="flex items-center gap-2">
                                             <span className="text-palette-white font-medium truncate">{item.name}</span>
                                             <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-palette-bg-dark border border-palette-border text-palette-muted">
-                                                {item.type}
+                                                {ITEM_TYPE_LABELS[item.type]}
                                             </span>
                                         </div>
                                         <span className="text-xs text-palette-muted truncate">{item.description}</span>
@@ -111,7 +120,7 @@ export function InventoryPanel({ player, onEquip, onUnequip, onUse, onSacrifice,
                                         )}
                                         {item.cost?.primary && item.cost.primary > 0 && (
                                             <GameButton variant="magic" onClick={() => onSacrifice(item.id)} data-testid={`inventory-sacrifice-${item.id}`}>
-                                                Sacrifice ({Math.max(1, Math.floor(item.cost.primary / 2))})
+                                                Repurpose ({Math.max(1, Math.floor(item.cost.primary / 2))})
                                             </GameButton>
                                         )}
                                     </div>

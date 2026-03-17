@@ -21,11 +21,11 @@ export const tradeBuy = createAsyncThunk(
     const primaryCost = cost.primary || 0;
     const secondaryCost = cost.secondary || 0;
     if ((player.inventory.spirit || 0) < primaryCost || (player.inventory.blood || 0) < secondaryCost) {
-      dispatch(addLog({ message: 'Insufficient currency.', type: 'system' }));
+      dispatch(addLog({ message: 'Not enough supplies to barter for that.', type: 'system' }));
       return;
     }
-    dispatch(addLog({ message: `Purchased ${item.name} from ${vendor.name}.`, type: 'system' }));
-    dispatch(addFact({ text: `Purchased ${item.name} from ${vendor.name}.`, questionKind: 'trade', isFollowUp: false }));
+    dispatch(addLog({ message: `Brought home ${item.name} from ${vendor.name}.`, type: 'system' }));
+    dispatch(addFact({ text: `Brought home ${item.name} from ${vendor.name}.`, questionKind: 'trade', isFollowUp: false }));
     const now = Date.now();
     handleVignetteProgression(dispatch, getState);
     return { item, primaryCost, secondaryCost, now };
@@ -44,8 +44,8 @@ export const tradeSell = createAsyncThunk(
     const cost = item.cost || { primary: 10 };
     const value = Math.max(1, Math.floor((cost.primary || 0) / 2));
     const now = Date.now();
-    dispatch(addLog({ message: `Sold ${item.name} for ${value} Spirit.`, type: 'system' }));
-    dispatch(addFact({ text: `Sold ${item.name}.`, questionKind: 'trade', isFollowUp: false }));
+    dispatch(addLog({ message: `Bartered away ${item.name} for ${value} supplies.`, type: 'system' }));
+    dispatch(addFact({ text: `Bartered away ${item.name}.`, questionKind: 'trade', isFollowUp: false }));
     handleVignetteProgression(dispatch, getState);
     return { itemIndex, value, now };
   }

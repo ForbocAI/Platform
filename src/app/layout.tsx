@@ -6,16 +6,16 @@ import BootstrapGate from "./BootstrapGate";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://platform.forboc.ai"),
-  title: "QUA'DAR | Platform.Forboc.ai",
-  description: "A Cyber-Grimdark RPG Experience in the Qua'dar Universe. Powered by Forboc AI.",
+  title: "Lanternbough | Platform.Forboc.ai",
+  description: "A cozy fantasy world prototype for living characters, companions, and story-rich play. Powered by Forboc AI.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "QUA'DAR | Forboc Platform",
-    description: "A Cyber-Grimdark RPG Experience.",
+    title: "Lanternbough | Forboc Platform",
+    description: "A cozy fantasy world prototype for living characters and companions.",
     url: "https://platform.forboc.ai",
-    siteName: "Qua'dar",
+    siteName: "Lanternbough",
     images: [
       {
         url: "/logo.png",
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "QUA'DAR | Forboc Platform",
-    description: "A Cyber-Grimdark RPG Experience.",
+    title: "Lanternbough | Forboc Platform",
+    description: "A cozy fantasy world prototype for living characters and companions.",
     images: ["/logo.png"],
   },
   icons: {
@@ -49,10 +49,10 @@ const jsonLd = {
     },
     {
       "@type": "SoftwareApplication",
-      "name": "Qua'dar Platform",
+      "name": "Lanternbough Platform",
       "operatingSystem": "Web",
       "applicationCategory": "GameApplication",
-      "description": "Cyber-grimdark RPG platform powered by Forboc AI.",
+      "description": "Cozy fantasy RPG platform powered by Forboc AI.",
       "url": "https://platform.forboc.ai",
       "publisher": {
         "@id": "https://forboc.ai/#organization"
@@ -69,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#131313" />
+        <meta name="theme-color" content="#263127" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

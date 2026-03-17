@@ -17,20 +17,170 @@ export const CHARACTER_CLASSES: AgentClass[] = [
   "Twilight Weaver",
 ];
 
-/** Normalize URL param (e.g. "Flame Corps", "Flame%20Corps", "flame_corps") to valid AgentClass or undefined. */
-export function normalizeClassIdFromParam(param: string): AgentClass | undefined {
-  const normalized = param.replace(/_/g, " ").toLowerCase();
-  return CHARACTER_CLASSES.find(
-    (c) => c.toLowerCase() === param.toLowerCase() || c.toLowerCase() === normalized
-  );
-}
-
 import { StatsComponent } from "../types";
 
 type ClassTemplate = {
   baseStats: Partial<StatsComponent> & { Str: number; Agi: number; Arcane: number; maxHp: number; maxStress: number };
   startingCapabilities: string[];
 };
+
+export type ClassPresentation = {
+  name: string;
+  folk: string;
+  role: string;
+  blurb: string;
+  signatureTalents: string[];
+};
+
+/**
+ * Public-facing Lanternbough copy layered on top of legacy class ids.
+ * The internal ids remain stable for mechanics until the deeper migration lands.
+ */
+export const CLASS_PRESENTATION: Record<AgentClass, ClassPresentation> = {
+  "Ashwalker": {
+    name: "Fairy Courier",
+    folk: "Fairy routes",
+    role: "Quick scout and lantern runner",
+    blurb: "A fast-moving messenger who rides pollen winds, maps shortcuts, and keeps Lanternbough's routes stitched together.",
+    signatureTalents: ["Pollen dash", "Shortcut sense", "Lantern spark"],
+  },
+  "Obsidian Warden": {
+    name: "Gnome Burrowkeeper",
+    folk: "Gnome workshops",
+    role: "Sturdy builder and shelter guard",
+    blurb: "A careful craftsperson who fortifies bridges, braces walkways, and turns small spaces into reliable havens.",
+    signatureTalents: ["Stone brace", "Pocket workshop", "Warm ward"],
+  },
+  "Doomguard": {
+    name: "Hearth Troll",
+    folk: "Troll bridgeholds",
+    role: "Big-hearted protector",
+    blurb: "A reliable giant who carries supplies, steadies the frightened, and turns rough weather into a manageable inconvenience.",
+    signatureTalents: ["Bridge shove", "Rain shelter", "Steadying roar"],
+  },
+  "Iron Armored Guardian": {
+    name: "Bridgekeeper",
+    folk: "Market watch",
+    role: "Defender of busy paths",
+    blurb: "A practical guardian who keeps crowded lanes safe, guides arrivals, and absorbs the first hit when trouble shows up.",
+    signatureTalents: ["Rail guard", "Lantern shield", "Hold the crossing"],
+  },
+  "Aether Spirit": {
+    name: "Brook Nymph",
+    folk: "Creek songs",
+    role: "Mist guide and water whisperer",
+    blurb: "A lyrical guide who reads water moods, eases crossings, and turns reflective pools into routes and clues.",
+    signatureTalents: ["Mist drift", "Brook pulse", "Ripple charm"],
+  },
+  "Thunder Trooper": {
+    name: "Stormwing Scout",
+    folk: "High canopy patrols",
+    role: "Weather rider and lookout",
+    blurb: "A daring scout who glides above the branches, reads sudden weather, and clears dangerous gusts for the rest of the valley.",
+    signatureTalents: ["Gust hop", "Cloud marker", "Sky warning"],
+  },
+  "Cyberflux Guardian": {
+    name: "Mossforged Tender",
+    folk: "Workshop gardens",
+    role: "Caretaker and repair hand",
+    blurb: "A calm steward who mends tools, coaxes growth, and keeps the practical magic of daily life running smoothly.",
+    signatureTalents: ["Patchwork bloom", "Sap charge", "Garden mend"],
+  },
+  "Voidwraith": {
+    name: "Moonpetal Whisperer",
+    folk: "Night bloom circles",
+    role: "Subtle charm-worker",
+    blurb: "A quiet guide who slips through hush and shimmer, notices what others miss, and keeps strange glades from becoming dangerous.",
+    signatureTalents: ["Moonstep", "Soft veil", "Whisper pull"],
+  },
+  "Storm Titan": {
+    name: "Canopy Giant",
+    folk: "Upper bough guardians",
+    role: "Massive path clearer",
+    blurb: "A towering helper who moves fallen limbs, stabilizes lifts, and opens blocked routes with patient strength.",
+    signatureTalents: ["Branch breaker", "Thunder stomp", "Lift carry"],
+  },
+  "Flame Corps": {
+    name: "Kettle Spark",
+    folk: "Tea stalls and kitchens",
+    role: "Warmth maker and morale keeper",
+    blurb: "A bright kitchen caster who turns embers, spice, and cheer into buffs, comfort, and dependable momentum.",
+    signatureTalents: ["Tea flare", "Comfort broth", "Ember toss"],
+  },
+  "Byssalspawn": {
+    name: "Rootsong Caller",
+    folk: "Old grove memory",
+    role: "Deep listener and harmonist",
+    blurb: "A mystic tuned to bark, stone, and root memory, able to calm tangled places and hear where the valley has gone out of tune.",
+    signatureTalents: ["Root hum", "Hollow echo", "Harmony draw"],
+  },
+  "Aksov Hexe-Spinne": {
+    name: "Spindle Weaver",
+    folk: "Silk lofts",
+    role: "Trap setter and route maker",
+    blurb: "A nimble artisan who spins walkable lines, anchors swinging paths, and turns clutter into clever movement.",
+    signatureTalents: ["Silk line", "Nest snag", "Thread vault"],
+  },
+  "Twilight Weaver": {
+    name: "Lantern Dryad",
+    folk: "Garden circles",
+    role: "Grove keeper and dusk mage",
+    blurb: "A patient keeper of roots and glowfruit who nurtures safe clearings, living shelter, and restorative ritual spaces.",
+    signatureTalents: ["Glowbloom", "Bramble hush", "Root cradle"],
+  },
+  "Gravewalker": {
+    name: "Rootpath Keeper",
+    folk: "Under-root archives",
+    role: "Quiet tunnel guide",
+    blurb: "A careful guide of old passages who prefers memory, maintenance, and patient route recovery over spectacle.",
+    signatureTalents: ["Hollow lantern", "Archive step", "Path recall"],
+  },
+  "Shadowhorn Juggernaut": {
+    name: "Mosshorn Rambler",
+    folk: "Fern meadows",
+    role: "Fast bruiser and charger",
+    blurb: "A powerful traveler who clears thickets, guards caravans, and scatters nuisances with momentum rather than malice.",
+    signatureTalents: ["Fern charge", "Stone kick", "Moss rush"],
+  },
+  "Magma Leviathan": {
+    name: "Kilnback Guardian",
+    folk: "Warm caverns",
+    role: "Heavy defender and furnace heart",
+    blurb: "A heat-bearing guardian from the deeper hollows who powers workshops and withstands trouble that would overwhelm smaller folk.",
+    signatureTalents: ["Kiln breath", "Forge slam", "Warm shell"],
+  },
+  "Abyssal Overfiend": {
+    name: "Great Willow Warden",
+    folk: "Ancient vale myths",
+    role: "Epic protector",
+    blurb: "A towering legend of the old grove called on only when the whole valley needs shelter, strength, and impossible patience.",
+    signatureTalents: ["Willow sweep", "Shelter call", "Vale roar"],
+  },
+  "Aetherwing Herald": {
+    name: "Dew Herald",
+    folk: "Morning watch",
+    role: "Dawn signaler and aerial guide",
+    blurb: "An early-rising flier who carries news between districts and uses light, breeze, and timing to keep communities connected.",
+    signatureTalents: ["Sunbeam ping", "Dew drift", "Morning flare"],
+  },
+};
+
+const normalizeClassToken = (value: string): string =>
+  value.replace(/[_-]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+
+/** Normalize URL param to valid AgentClass or undefined. Supports both legacy ids and Lanternbough display names. */
+export function normalizeClassIdFromParam(param: string): AgentClass | undefined {
+  const normalized = normalizeClassToken(param);
+
+  const byId = CHARACTER_CLASSES.find((classId) => normalizeClassToken(classId) === normalized);
+  if (byId) return byId;
+
+  const byPresentation = Object.entries(CLASS_PRESENTATION).find(([, presentation]) =>
+    normalizeClassToken(presentation.name) === normalized
+  );
+
+  return byPresentation?.[0] as AgentClass | undefined;
+}
 
 export const CLASS_TEMPLATES: Record<AgentClass, ClassTemplate> = {
   "Ashwalker": { baseStats: { Str: 12, Agi: 16, Arcane: 14, maxHp: 120, maxStress: 100 }, startingCapabilities: ["relic_strike", "ember_dash", "ignition_burst"] },

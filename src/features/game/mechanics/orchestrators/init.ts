@@ -11,7 +11,7 @@ import type { InitializeGameOptions } from '../../store/types';
 export const initializeGame = createAsyncThunk(
   'game/initialize',
   async (options: InitializeGameOptions | undefined, { dispatch }) => {
-    dispatch(addLog({ message: 'SYSTEM: Establishing Neural Link...', type: 'system' }));
+    dispatch(addLog({ message: 'SYSTEM: Lighting the lantern link...', type: 'system' }));
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     const player = initializePlayer(options?.classId) as import('../../types').PlayerActor;
@@ -65,9 +65,9 @@ export const initializeGame = createAsyncThunk(
     const extra = player.capabilities?.learned?.includes('keen_senses') ? getKeenSensesScanExtra(initialArea) : '';
     const message = `[SCAN RESULT] ${initialArea.title}: Agents: ${npcs}. Allies: ${allies}.${extra ? ` ${extra}` : ''}`;
 
-    dispatch(addLog({ message: 'Scanning sector...', type: 'system' }));
+    dispatch(addLog({ message: 'Surveying nearby paths...', type: 'system' }));
     dispatch(addLog({ message, type: 'exploration' }));
-    dispatch(addLog({ message: "SYSTEM: Connection Stable. Welcome to Quadar Tower, Agent.", type: "system" }));
+    dispatch(addLog({ message: "SYSTEM: Lantern link stable. Welcome to Lanternbough, Wayfinder.", type: "system" }));
 
     return { player, initialArea };
   }

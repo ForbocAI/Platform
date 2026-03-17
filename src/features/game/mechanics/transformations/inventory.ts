@@ -62,6 +62,14 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
             state.player.stats.hp = Math.min(state.player.stats.maxHp, state.player.stats.hp + 20);
         } else if (effect === "heal_stress_10") {
             state.player.stats.stress = Math.max(0, state.player.stats.stress - 10);
+        } else if (effect === "heal_20_stress_10") {
+            state.player.stats.hp = Math.min(state.player.stats.maxHp, state.player.stats.hp + 20);
+            state.player.stats.stress = Math.max(0, state.player.stats.stress - 10);
+        } else if (effect === "stress_30") {
+            state.player.stats.stress = Math.max(0, state.player.stats.stress - 30);
+        } else if (effect === "heal_50_stress_add_10") {
+            state.player.stats.hp = Math.min(state.player.stats.maxHp, state.player.stats.hp + 50);
+            state.player.stats.stress = Math.min(state.player.stats.maxStress, state.player.stats.stress + 10);
         }
     });
 

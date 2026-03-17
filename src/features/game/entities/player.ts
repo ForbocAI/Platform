@@ -56,13 +56,13 @@ export function initializePlayer(classId?: string): PlayerActor {
             weapons: ["rogue_blade"],
             currentWeaponIndex: 0,
             items: [
-                { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword.", cost: { primary: 5 } },
-                { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor.", cost: { primary: 5 } },
-                { id: "relic_shard", name: "Relic Shard", type: "relic", description: "A buzzing shard of old tech.", cost: { primary: 10 } }
+                { id: "rogue_blade", name: "Brambleknife", type: "weapon", description: "A dependable trail blade for roots, rope, and rough surprises.", cost: { primary: 5 } },
+                { id: "scout_garb", name: "Mossstep Cloak", type: "armor", description: "Light travel gear stitched for fast routes and damp weather.", cost: { primary: 5 } },
+                { id: "relic_shard", name: "Keepsake Shard", type: "relic", description: "A small humming keepsake that still holds a trace of light.", cost: { primary: 10 } }
             ],
             equipment: {
-                mainHand: { id: "rogue_blade", name: "Rogue's Blade", type: "weapon", description: "Standard issue shortsword.", cost: { primary: 5 } },
-                armor: { id: "scout_garb", name: "Scout Garb", type: "armor", description: "Light leather armor.", cost: { primary: 5 } }
+                mainHand: { id: "rogue_blade", name: "Brambleknife", type: "weapon", description: "A dependable trail blade for roots, rope, and rough surprises.", cost: { primary: 5 } },
+                armor: { id: "scout_garb", name: "Mossstep Cloak", type: "armor", description: "Light travel gear stitched for fast routes and damp weather.", cost: { primary: 5 } }
             },
             spirit: 20, // resourcePrimary mapping
             blood: 0,   // resourceSecondary mapping
@@ -104,10 +104,10 @@ export function initializePlayer(classId?: string): PlayerActor {
                 ingredients: [{ name: "Glowing Mushroom", quantity: 2 }],
                 produces: {
                     id: "minor_healing_potion_crafted",
-                    name: "Minor Healing Potion",
+                    name: "Hearth Poultice",
                     type: "consumable",
-                    description: "A small vial of healing liquid.",
-                    effect: "heal_hp_20",
+                    description: "A warm herbal dressing for cuts, aches, and frayed nerves.",
+                    effect: "heal_20_stress_10",
                     cost: { primary: 5 }
                 }
             }

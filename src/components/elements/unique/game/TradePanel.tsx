@@ -39,7 +39,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
 
   return (
     <Modal
-      title={`${vendor.name} — Trade`}
+      title={`${vendor.name} — Barter`}
       titleIcon={<ShoppingBag className="w-5 h-5" />}
       onClose={onClose}
       maxWidth="4xl"
@@ -48,7 +48,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
       <div className="flex flex-col md:flex-row gap-4 min-h-0">
         <div className="md:w-1/2 flex flex-col min-h-0">
           <h3 className="text-sm font-bold uppercase tracking-widest text-palette-accent mb-2 flex items-center gap-2">
-            <ShoppingBag className="w-4 h-4" /> Wares
+            <ShoppingBag className="w-4 h-4" /> Stall Goods
           </h3>
           <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-palette-border min-h-0">
             {vendor.wares.map((item) => (
@@ -73,17 +73,17 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
                   className="mt-1 w-full"
                   data-testid={`trade-buy-${item.id}`}
                 >
-                  Buy
+                  Bring Home
                 </GameButton>
               </div>
             ))}
-            {vendor.wares.length === 0 && <p className="text-palette-text-muted italic">No wares available.</p>}
+            {vendor.wares.length === 0 && <p className="text-palette-text-muted italic">No stall goods today.</p>}
           </div>
         </div>
 
         <div className="md:w-1/2 flex flex-col min-h-0 border-t md:border-t-0 md:border-l border-palette-border pt-4 md:pt-0 md:pl-4">
           <h3 className="text-sm font-bold uppercase tracking-widest text-palette-accent mb-2 flex items-center gap-2">
-            <Coins className="w-4 h-4" /> Your Inventory
+            <Coins className="w-4 h-4" /> Your Pack
           </h3>
           <div className="mb-2 text-sm flex gap-4">
             <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
@@ -106,11 +106,11 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
                   className="mt-1 w-full border-palette-accent-bright/50 text-palette-accent-bright hover:bg-palette-accent-bright/10"
                   data-testid={`trade-sell-${item.id}`}
                 >
-                  Sell
+                  Barter Away
                 </GameButton>
               </div>
             ))}
-            {(player.inventory.items || []).length === 0 && <p className="text-palette-text-muted italic">Inventory empty.</p>}
+            {(player.inventory.items || []).length === 0 && <p className="text-palette-text-muted italic">Your pack is empty.</p>}
           </div>
         </div>
       </div>

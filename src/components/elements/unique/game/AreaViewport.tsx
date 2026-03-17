@@ -51,10 +51,20 @@ export function AreaViewport({
           </div>
         )}
         {area.hazards && area.hazards.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-1 mt-1.5">
+          <div className="flex flex-col items-center gap-1 mt-1.5">
             <div className="p-1 sm:p-1.5 bg-palette-border-dim/30 border border-palette-border-dim/50 inline-flex items-center gap-1 animate-pulse">
               <Activity className="app-icon text-palette-accent-mid" />
-              <span className="text-palette-accent-mid font-bold tracking-widest">HAZARD!</span>
+              <span className="text-palette-accent-mid font-bold tracking-widest">PATH WARNING</span>
+            </div>
+            <div className="flex flex-wrap justify-center gap-1">
+              {area.hazards.map((hazard) => (
+                <span
+                  key={hazard}
+                  className="px-2 py-0.5 bg-palette-accent-mid/10 border border-palette-accent-mid/30 text-palette-accent-mid text-[10px] uppercase tracking-[0.2em]"
+                >
+                  {hazard}
+                </span>
+              ))}
             </div>
           </div>
         )}
@@ -73,7 +83,7 @@ export function AreaViewport({
         {area.vendors && area.vendors.length > 0 && (
           <div className="mt-1.5 flex flex-col items-center gap-1">
             {area.isMarketplace && (
-              <span className="text-palette-accent-bright font-bold text-xs uppercase tracking-[0.3em] mb-0.5 animate-pulse">⚜ Marketplace ⚜</span>
+              <span className="text-palette-accent-bright font-bold text-xs uppercase tracking-[0.3em] mb-0.5 animate-pulse">⚜ Market Stalls ⚜</span>
             )}
             <div className="flex flex-wrap justify-center gap-1">
               {area.vendors.map((vendor: Vendor) => (
@@ -82,10 +92,10 @@ export function AreaViewport({
                   icon={<ShoppingBag className="app-icon" />}
                   onClick={() => onTradeVendor?.(vendor.id)}
                   data-testid={`trade-vendor-${vendor.id}`}
-                  aria-label={`Trade with ${vendor.name}`}
+                  aria-label={`Visit ${vendor.name}`}
                   className="px-2 py-0.5 h-auto bg-palette-accent-bright/20 border-palette-accent-bright/50 text-palette-accent-bright text-xs hover:bg-palette-accent-bright/30"
                 >
-                  {vendor.name}{vendor.specialty ? ` [${vendor.specialty}]` : ""} — Trade
+                  {vendor.name}{vendor.specialty ? ` [${vendor.specialty}]` : ""} — Visit Stall
                 </GameButton>
               ))}
             </div>
@@ -126,14 +136,14 @@ export function AreaViewport({
         {/* Base Camp Features */}
         {area.isBaseCamp && area.features && (
           <div className="mt-4 w-full border-t border-palette-border pt-3">
-            <h3 className="text-palette-accent-mid font-bold uppercase tracking-widest text-xs mb-2">Base Camp Operations</h3>
+            <h3 className="text-palette-accent-mid font-bold uppercase tracking-widest text-xs mb-2">Market Nook Workboard</h3>
             <div className="flex flex-wrap gap-2 justify-center">
               {area.features.map((feature: AreaFeature, idx: number) => {
                 if (feature.type === 'resource_plot') {
                   return (
                     <div key={idx} className="p-2 border border-palette-accent-soft/30 bg-palette-accent-soft/5 rounded flex flex-col items-center min-w-[120px]">
-                      <span className="text-xs text-palette-muted uppercase">Hydroponics</span>
-                      <span className="font-bold text-palette-white capitalize">{feature.resourceId ?? 'Unknown'}</span>
+                      <span className="text-xs text-palette-muted uppercase">Garden Plot</span>
+                      <span className="font-bold text-palette-white capitalize">{feature.resourceId ?? 'Seasonal Crop'}</span>
                       <div className="w-full h-1 bg-palette-bg-dark mt-1 mb-1 rounded overflow-hidden">
                         <div className="h-full bg-palette-accent-soft transition-all duration-500" style={{ width: `${feature.progress}%` }} />
                       </div>
@@ -143,10 +153,10 @@ export function AreaViewport({
                           className="text-xs px-2 py-0.5 h-auto"
                           onClick={() => window.dispatchEvent(new CustomEvent('harvest_crop', { detail: { index: idx } }))}
                         >
-                          Harvest
+                          Gather
                         </GameButton>
                       ) : (
-                        <span className="text-[10px] text-palette-muted-light">Growing... ({feature.progress}%)</span>
+                        <span className="text-[10px] text-palette-muted-light">Growing quietly... ({feature.progress}%)</span>
                       )}
                     </div>
                   );
@@ -154,13 +164,13 @@ export function AreaViewport({
                 if (feature.type === 'work_station') {
                   return (
                     <div key={idx} className="p-2 border border-palette-accent-bright/30 bg-palette-accent-bright/5 rounded flex flex-col items-center min-w-[120px]">
-                      <span className="text-xs text-palette-muted uppercase">Station</span>
+                      <span className="text-xs text-palette-muted uppercase">Workshop</span>
                       <span className="font-bold text-palette-white capitalize">{feature.kind}</span>
                       <GameButton
                         className="mt-2 text-xs px-2 py-0.5 h-auto"
                         onClick={() => window.dispatchEvent(new CustomEvent('open_crafting', { detail: { kind: feature.kind } }))}
                       >
-                        Access
+                        Open
                       </GameButton>
                     </div>
                   );

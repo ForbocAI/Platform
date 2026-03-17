@@ -10,8 +10,8 @@ const HARVESTABLE_MUSHROOMS: { id: string; name: string; description: string; co
   { id: "chromatic_cap", name: "Chromatic Cap", description: "Iridescent fungus from chromatic-steel growths. Shifts hue when touched.", cost: { primary: 8 }, weight: 20 },
   { id: "ember_puffball", name: "Ember Puffball", description: "Smoldering orange puffball that radiates faint warmth. Used in pyrokinetic compounds.", cost: { primary: 7 }, weight: 18 },
   { id: "static_lichen", name: "Static Lichen", description: "Lichen crackling with residual noise from the Static Sea. Disrupts nearby enchantments.", cost: { primary: 10 }, weight: 12 },
-  { id: "void_morel", name: "Void Morel", description: "A pitch-black morel that hums with dimensional resonance. Potent in rift alchemy.", cost: { primary: 12 }, weight: 10 },
-  { id: "chthonic_truffle", name: "Chthonic Truffle", description: "Subterranean truffle veined with crimson. Whispers of the deep cling to it.", cost: { primary: 14, secondary: 1 }, weight: 6 },
+  { id: "void_morel", name: "Midnight Morel", description: "A dusk-dark morel prized for slow-brew tonics and rainy-evening stews.", cost: { primary: 12 }, weight: 10 },
+  { id: "chthonic_truffle", name: "Root Truffle", description: "A rich underground truffle with warm spice notes and a faint lantern sheen.", cost: { primary: 14, secondary: 1 }, weight: 6 },
   { id: "spore_clump", name: "Spore Clump", description: "Soft grey cluster that soothes the mind. Calms stress and mild anxiety when prepared correctly.", cost: { primary: 6 }, weight: 14 },
   { id: "rust_spindle", name: "Rust Spindle", description: "Copper-toned spindle that bonds with metal. Used in reinforcement and repair alchemy.", cost: { primary: 9 }, weight: 8 },
 ];
@@ -44,8 +44,8 @@ export const harvestCrop = createAsyncThunk(
       cost: mushroom.cost,
     };
 
-    dispatch(addLog({ message: `Harvested ${cropItem.name}.`, type: 'system' }));
-    dispatch(addFact({ text: `Harvested ${cropItem.name} from Base Camp.`, questionKind: 'basecamp', isFollowUp: false }));
+    dispatch(addLog({ message: `Gathered ${cropItem.name} from the garden plot.`, type: 'system' }));
+    dispatch(addFact({ text: `Gathered ${cropItem.name} from Thimble Market's garden plot.`, questionKind: 'basecamp', isFollowUp: false }));
     return { featureIndex: arg.featureIndex, item: cropItem };
   }
 );
@@ -59,7 +59,7 @@ export const craftItem = createAsyncThunk(
 
     const formula = player.blueprints.find((f) => f.id === arg.formulaId);
     if (!formula) {
-      dispatch(addLog({ message: 'Unknown blueprint.', type: 'system' }));
+      dispatch(addLog({ message: 'Unknown recipe.', type: 'system' }));
       return;
     }
 
@@ -68,7 +68,7 @@ export const craftItem = createAsyncThunk(
       return count >= ing.quantity;
     });
     if (!hasIngredients) {
-      dispatch(addLog({ message: 'Insufficient ingredients.', type: 'system' }));
+      dispatch(addLog({ message: 'You do not have the right ingredients yet.', type: 'system' }));
       return;
     }
 
@@ -81,10 +81,10 @@ export const craftItem = createAsyncThunk(
       cost: formula.produces.cost,
     };
 
-    dispatch(addLog({ message: `Crafted ${craftedItem.name}.`, type: 'system' }));
+    dispatch(addLog({ message: `Prepared ${craftedItem.name}.`, type: 'system' }));
     dispatch(
       addFact({
-        text: `Crafted ${craftedItem.name} at Base Camp.`,
+        text: `Prepared ${craftedItem.name} at Thimble Market.`,
         questionKind: 'basecamp',
         isFollowUp: false,
       })

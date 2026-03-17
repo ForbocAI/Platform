@@ -12,11 +12,11 @@ export const MATERIALS: Item[] = [
     { id: "scrap_metal", name: "Scrap Metal", type: "resource", description: "Salvaged metal for smithing.", cost: { primary: 4 } },
     { id: "leather_scraps", name: "Leather Scraps", type: "resource", description: "Tough hide for armor and gear.", cost: { primary: 4 } },
     // ── Tech & Arcane ──
-    { id: "relic_shard", name: "Relic Shard", type: "resource", description: "A buzzing shard of old tech.", cost: { primary: 12 } },
+    { id: "relic_shard", name: "Keepsake Shard", type: "resource", description: "A humming keepsake fragment still holding a trace of stored light.", cost: { primary: 12 } },
     { id: "acid_vial", name: "Acid Vial", type: "resource", description: "Corrosive fluid for alchemy.", cost: { primary: 6 } },
     { id: "rune_stone", name: "Rune Stone", type: "resource", description: "Inscribed stone with latent power.", cost: { primary: 15 } },
     { id: "obsidian_shard", name: "Obsidian Shard", type: "resource", description: "Volcanic glass shard.", cost: { primary: 10 } },
     { id: "chromatic_spore", name: "Chromatic Spore", type: "resource", description: "Spore from chromatic-steel fungi.", cost: { primary: 14 } },
-    { id: "blood_crystal", name: "Blood Crystal", type: "resource", description: "Crystallized essence from the abyss.", cost: { primary: 18, secondary: 2 } },
+    { id: "blood_crystal", name: "Glowstone Cluster", type: "resource", description: "A bright mineral cluster used for charms, routes, and careful upgrades.", cost: { primary: 18, secondary: 2 } },
     { id: "void_dust", name: "Void Dust", type: "resource", description: "Residue from dimensional rifts.", cost: { primary: 20 } },
 ];

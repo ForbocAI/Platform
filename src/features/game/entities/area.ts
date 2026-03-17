@@ -1,51 +1,51 @@
 import type { Area, Biome, NonPlayerActor, Vendor } from "../types";
 import { selectNextBiome, generateGroundLoot, generateRandomNonPlayerActor, NPC_TEMPLATES, type AreaGenContext } from '../mechanics/systems/generation';
-import { generateRandomVendor, generateMarketplace, generateWares } from "./vendor";
+import { generateRandomVendor, generateMarketplace } from "./vendor";
 
 // --- Immutable area-name data tables ---
 
 const BIOME_NAME_PARTS: Readonly<Record<Biome, readonly string[]>> = {
-    "Ethereal Marshlands": ["Ghost", "Mist", "Dread", "Swamp", "Veil"],
-    "Toxic Wastes": ["Sludge", "Rust", "Acid", "Wastes", "Pit"],
-    "Haunted Chapel": ["Altar", "Pews", "Sanctum", "Nave", "Vault"],
-    "Obsidian Spire": ["Peak", "Shaft", "Core", "Spire", "Edge"],
-    "Quadar Tower": ["Corridor", "Nexus", "Store Room", "Bunker", "Market"],
-    "Military Installation": ["Barracks", "Armory", "Terminal", "Hangar", "Command"],
-    "Eldritch Fortress": ["Bastion", "Stronghold", "Tower", "Gate", "Keep"],
-    "Labyrinthine Dungeon": ["Maze", "Passage", "Cell", "Catacomb", "Oubliette"],
-    "Chromatic-Steel Fungi": ["Pillar", "Spire", "Growth", "Canopy", "Nexus"],
-    "Chthonic Depths": ["Labyrinth", "Chamber", "Tunnel", "Grotto", "Crypt"],
-    "Static Sea of All Noise": ["Drift", "Shore", "Current", "Eddy", "Reef"],
-    "Twilight Alchemy Haven": ["Cauldron", "Still", "Garden", "Hearth", "Sanctum"],
-    "Abyss of Infernal Lore": ["Throat", "Maw", "Conduit", "Altar", "Shrine"],
-    "Precipice of the Shadowlands": ["Edge", "Brink", "Threshold", "Border", "Gate"],
-    "Rune Temples": ["Sanctum", "Altar", "Nave", "Crypt", "Shrine"],
-    "Crumbling Ruins": ["Vault", "Hulk", "Spire", "Bastion", "Keep"],
-    "Dimensional Nexus": ["Gate", "Vortex", "Conduit", "Threshold", "Fold"],
-    "Cavernous Abyss": ["Chasm", "Maw", "Hollow", "Pit", "Depth"],
-    "The Sterile Chamber": ["Theater", "Table", "Sanctum", "Vault", "Archives"],
+    "Ethereal Marshlands": ["Willow", "Mist", "Reed", "Moth", "Glade"],
+    "Toxic Wastes": ["Copper", "Patch", "Steam", "Moss", "Tinker"],
+    "Haunted Chapel": ["Bell", "Candle", "Choir", "Vesper", "Sanctum"],
+    "Obsidian Spire": ["Moon", "Lantern", "Heartwood", "Spire", "Lookout"],
+    "Quadar Tower": ["Lantern", "Thimble", "Market", "Nook", "Hollow"],
+    "Military Installation": ["Workshop", "Bridge", "Pulley", "Depot", "Engine"],
+    "Eldritch Fortress": ["Rootwatch", "Hearth", "Gate", "Keep", "Bastion"],
+    "Labyrinthine Dungeon": ["Burrow", "Warren", "Tunnel", "Hall", "Passage"],
+    "Chromatic-Steel Fungi": ["Candlecap", "Spore", "Gleam", "Canopy", "Grotto"],
+    "Chthonic Depths": ["Root", "Hollow", "Lantern", "Glen", "Grotto"],
+    "Static Sea of All Noise": ["Drift", "Chime", "Current", "Song", "Reed"],
+    "Twilight Alchemy Haven": ["Still", "Garden", "Tea", "Petal", "Hearth"],
+    "Abyss of Infernal Lore": ["Archive", "Page", "Hollow", "Root", "Shrine"],
+    "Precipice of the Shadowlands": ["Mist", "Brink", "Moon", "Bridge", "Edge"],
+    "Rune Temples": ["Rune", "Bell", "Lantern", "Shrine", "Sanctum"],
+    "Crumbling Ruins": ["Oldstone", "Arch", "Hearth", "Vault", "Keep"],
+    "Dimensional Nexus": ["Fold", "Gate", "Bridge", "Spiral", "Vortex"],
+    "Cavernous Abyss": ["Cavern", "Pool", "Hollow", "Echo", "Grotto"],
+    "The Sterile Chamber": ["Herbarium", "Atrium", "Archives", "Table", "Sanctum"],
 } as const;
 
 const BIOME_DESCRIPTIONS: Readonly<Record<Biome, string>> = {
-    "Ethereal Marshlands": "The air is thick with malevolence, and the murky waters echo with alien wails.",
-    "Toxic Wastes": "A ghastly mire of desolation, oozing with ichorous sludge and corrosive maladies.",
-    "Haunted Chapel": "Abandoned and hopeless, these derelict edifices are steeped in the corrupt embrace of arcane powers.",
-    "Obsidian Spire": "Sharp peaks of volcanic glass pierce the gloom, humming with latent energy.",
-    "Quadar Tower": "The central monolith of the realm, where reality itself seems to warp and decay.",
-    "Military Installation": "Relics of a bygone era entwine with industrial machinations and complex alien tech.",
-    "Eldritch Fortress": "Imposing structures of supernatural evil, eternally veiled in hatred and forbidden energies.",
-    "Labyrinthine Dungeon": "Convoluted mazes of winding corridors, illuminated by sickly, pallid lights.",
-    "Chromatic-Steel Fungi": "Colossal pillars of chromatic-steel rise like organic growth in cyberspace; neon reflections play upon shifting surfaces.",
-    "Chthonic Depths": "Subterranean labyrinths where echoes of forgotten whispers reverberate through ancient tunnels. Luminescent fungi illuminate the path.",
-    "Static Sea of All Noise": "A decaying land gripped by the enigmatic static. The very air hums with cosmic interference.",
-    "Twilight Alchemy Haven": "Verses of prose generate gnarled trees; holographic projections bathe the surroundings in an ethereal fusion of lore and twilight.",
-    "Abyss of Infernal Lore": "Conjured flames lick obsidian pillars. An intricate weave of cloned souls writhes along the data streams.",
-    "Precipice of the Shadowlands": "The boundaries between the known and the unknown blur. The horizon is an ever-shifting tapestry of twilight and dawn.",
-    "Rune Temples": "Ancient structures decorated with arcane symbols and mystical runes. The ambient glow casts shadowy tendrils that writhe in unearthly pollution.",
-    "Crumbling Ruins": "Forsaken remnants of erstwhile splendor. Decaying edifices bear witness to manifold demise. Power-laden artifacts and lore fragments may yet linger.",
-    "Dimensional Nexus": "A surreal sphere where reality is distorted and spatial anomalies abound. Platforms float in the void; pathways defy conventional physics.",
-    "Cavernous Abyss": "A subterranean network of twisting tunnels and sprawling caverns. Jagged rocks, pulsating lava pools, and the constant echo of distant rumblings.",
-    "The Sterile Chamber": "An operating table inscribed with ancient sigils pulsates in eerie half-light. Incisions pierce the veil between worlds; specters emerge from fissures. Entities ageless and vast scrutinize from beyond.",
+    "Ethereal Marshlands": "Soft fog drifts over reed beds and lantern moss, carrying frog song and the occasional misplaced parcel.",
+    "Toxic Wastes": "A reclaimed patch of copper runoff, salvage gardens, and careful footpaths where clever tinkerers still find useful scraps.",
+    "Haunted Chapel": "An old chapel of bells and candlelight where echoes linger kindly and every bench seems to remember a song.",
+    "Obsidian Spire": "A glossy lookout of dark glass and moonlit steps, prized for weather signs, long views, and hanging lanterns.",
+    "Quadar Tower": "The heart of Lanternbough's trunk routes, full of market nooks, lift pulleys, and neighbors coming and going with armfuls of supplies.",
+    "Military Installation": "An old practical quarter of pulleys, depots, and bridge tools now reused by patient makers and route keepers.",
+    "Eldritch Fortress": "A heavy old stronghold turned warding post, where rootwardens keep maps, ropes, and weather bells ready by the door.",
+    "Labyrinthine Dungeon": "Twisting burrows and storage halls lit by friendly sconces, ideal for hide-and-seek until you lose your bearings.",
+    "Chromatic-Steel Fungi": "Towering mushroom caps shimmer with rainbow sheen, sheltering food stalls, rare spores, and tiny market festivals.",
+    "Chthonic Depths": "Quiet root caverns full of dripstone, glow moss, and thoughtful paths beneath the village.",
+    "Static Sea of All Noise": "A windy stretch of humming reeds and chimes where gossip, weather, and wayward songs all travel at once.",
+    "Twilight Alchemy Haven": "A tea-and-tincture district scented with herbs, warm glass, and simmering experiments.",
+    "Abyss of Infernal Lore": "An old archive hollow where warm lanterns, annotated maps, and stubborn mysteries wait to be sorted.",
+    "Precipice of the Shadowlands": "A cliffside of mist bridges and sunset lookouts where the valley feels wide and wonderfully uncertain.",
+    "Rune Temples": "Carved shrines of patient symbols, low lamps, and weathered steps that invite quiet observation.",
+    "Crumbling Ruins": "Old arches and garden walls softened by moss, perfect for scavenging useful bits and telling stories.",
+    "Dimensional Nexus": "A knot of footbridges, folds, and peculiar shortcuts where space behaves more like a suggestion than a rule.",
+    "Cavernous Abyss": "Broad caverns with echoing pools and stepping stones, cooler and calmer than the upper boughs.",
+    "The Sterile Chamber": "A pristine herbarium and recovery room where careful tools, labeled drawers, and hush-soft lanterns keep order.",
 } as const;
 
 /** Biomes with elevated danger — higher NPC/hazard spawn rates. */
@@ -57,25 +57,25 @@ const DEEP_BIOMES: readonly Biome[] = [
 ] as const;
 
 const BIOME_TO_REGIONAL: Record<Biome, string> = {
-    "Ethereal Marshlands": "Marshlands",
-    "Toxic Wastes": "Toxic Wastes",
-    "Haunted Chapel": "Chapel",
-    "Obsidian Spire": "Spire",
-    "Quadar Tower": "Tower",
-    "Military Installation": "Installation",
-    "Eldritch Fortress": "Fortress",
-    "Labyrinthine Dungeon": "Dungeon",
-    "Chromatic-Steel Fungi": "Metal Fungi",
-    "Chthonic Depths": "Depths",
-    "Static Sea of All Noise": "Static Sea",
-    "Twilight Alchemy Haven": "Alchemy Haven",
-    "Abyss of Infernal Lore": "Lore Abyss",
-    "Precipice of the Shadowlands": "Shadowlands",
-    "Rune Temples": "Temple",
-    "Crumbling Ruins": "Ruins",
-    "Dimensional Nexus": "Nexus",
-    "Cavernous Abyss": "Abyss",
-    "The Sterile Chamber": "Chamber",
+    "Ethereal Marshlands": "Misty Marsh",
+    "Toxic Wastes": "Copperpatch",
+    "Haunted Chapel": "Bell Chapel",
+    "Obsidian Spire": "Moon Spire",
+    "Quadar Tower": "Lanternbough",
+    "Military Installation": "Maker Depot",
+    "Eldritch Fortress": "Rootwatch",
+    "Labyrinthine Dungeon": "Burrow Maze",
+    "Chromatic-Steel Fungi": "Candlecap Commons",
+    "Chthonic Depths": "Root Hollows",
+    "Static Sea of All Noise": "Chime Current",
+    "Twilight Alchemy Haven": "Tea Garden",
+    "Abyss of Infernal Lore": "Old Hollow Archive",
+    "Precipice of the Shadowlands": "Mist Brinks",
+    "Rune Temples": "Rune Shrine",
+    "Crumbling Ruins": "Oldstone Ruins",
+    "Dimensional Nexus": "Foldgate",
+    "Cavernous Abyss": "Echo Caverns",
+    "The Sterile Chamber": "Quiet Herbarium",
 };
 
 const pickFrom = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -97,7 +97,7 @@ const generateVendors = (p1: string, biome: Biome): { vendors: Vendor[]; isMarke
     if (p1.includes("Market") && Math.random() < 0.90) {
         return { vendors: generateMarketplace(biome), isMarketplace: true };
     }
-    const vendorChance = (p1.includes("Store") || p1.includes("Shop")) ? 0.60 : 0.15;
+    const vendorChance = (p1.includes("Store") || p1.includes("Shop") || p1.includes("Stall") || p1.includes("Nook")) ? 0.60 : 0.15;
     return Math.random() < vendorChance
         ? { vendors: [generateRandomVendor(biome)], isMarketplace: false }
         : { vendors: [], isMarketplace: false };
@@ -120,7 +120,7 @@ export const generateArea = (id?: string, biomeOverride?: Biome, context?: AreaG
         description: BIOME_DESCRIPTIONS[biome] || "You stand in a strange, uncharted area.",
         biome,
         regionalType: BIOME_TO_REGIONAL[biome] || "Area",
-        hazards: Math.random() * 100 < hazardThreshold ? ["Anomalous Flux"] : [],
+        hazards: Math.random() * 100 < hazardThreshold ? ["Wayward Rootsong"] : [],
         exits: generateExits(),
         npcs: generateNPCs(dangerFactor),
         vendors,
@@ -142,12 +142,7 @@ export const generateAreaWithOptions = (id?: string, biomeOverride?: Biome, opti
         const type = pickFrom(vendorTypes);
         return {
             ...area,
-            vendors: [{
-                id: Math.random().toString(36).substring(7),
-                name: `${type} ${Math.floor(Math.random() * 100)}`,
-                description: "A wandering soul with items to trade.",
-                wares: generateWares(area.biome, type)
-            }]
+            vendors: [generateRandomVendor(area.biome, type)]
         };
     }
     return area;
@@ -167,12 +162,15 @@ const BASE_CAMP_FEATURES = [
     { type: "work_station" as const, kind: "fabrication" }
 ] as const;
 
+const THIMBLE_MARKET_TITLE = "Thimble Market";
+const THIMBLE_MARKET_DESCRIPTION = "A cheerful nook carved into the trunk, with tea steaming beside the provisioning counter and fresh notices pinned near the route board.";
+
 const createBaseCampArea = (id: string, biome: Biome): Area => ({
     id,
-    title: "Store Room",
-    description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
+    title: THIMBLE_MARKET_TITLE,
+    description: THIMBLE_MARKET_DESCRIPTION,
     biome,
-    regionalType: "Operations Base",
+    regionalType: "Lanternbough Hub",
     hazards: [],
     exits: { North: "new-area", South: "new-area", East: "new-area", West: "new-area" },
     npcs: [],
@@ -235,18 +233,20 @@ export const generateStartArea = (opts?: GenerateStartAreaOptions): Area => {
     if (!opts?.forceNPC) {
         return {
             ...area,
-            title: "Store Room",
-            description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
+            title: THIMBLE_MARKET_TITLE,
+            description: THIMBLE_MARKET_DESCRIPTION,
             npcs: [],
             isBaseCamp: true,
+            regionalType: "Lanternbough Hub",
             features: [...BASE_CAMP_FEATURES],
         };
     }
 
     return {
         ...area,
-        title: "Store Room",
-        description: "A hardened perimeter established within the structure. A localized resource plot hums with energy, and a tactical workbench sits ready.",
+        title: THIMBLE_MARKET_TITLE,
+        description: THIMBLE_MARKET_DESCRIPTION,
+        regionalType: "Lanternbough Hub",
         npcs: area.npcs.length > 0 ? area.npcs : [generateRandomNonPlayerActor()],
     };
 };

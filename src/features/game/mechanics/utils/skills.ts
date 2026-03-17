@@ -44,19 +44,19 @@ export function applyDamageTakenReduction(skills: string[], damage: number): num
 export function getKeenSensesScanExtra(room: Area): string {
     const parts: string[] = [];
     if (room.hazards.length > 0) {
-        parts.push(`Hazard intensity: heightened in this sector.`);
+        parts.push(`Path warning: conditions feel unsettled here.`);
     }
     if (room.npcs.length > 0) {
-        parts.push(`You sense the combat readiness of ${room.npcs.length} hostile(s).`);
+        parts.push(`You sense ${room.npcs.length} dangerous presence${room.npcs.length === 1 ? "" : "s"} nearby.`);
     }
     if (room.vendors && room.vendors.length > 0) {
-        parts.push(`Faint trade signatures detected.`);
+        parts.push(`Lantern stalls and barter tables are close by.`);
     }
     if (room.allies && room.allies.length > 0) {
-        parts.push(`Allied presence: friendly.`);
+        parts.push(`Friendly help is nearby.`);
     }
     if (parts.length === 0) {
-        parts.push(`Ambient void-stability: nominal.`);
+        parts.push(`The path feels calm and steady.`);
     }
     return `[Keen Senses] ${parts.join(" ")}`;
 }

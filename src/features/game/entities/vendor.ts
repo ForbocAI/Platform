@@ -17,17 +17,28 @@ const pickRandom = <T>(pool: readonly T[], count: number): T[] =>
 // --- Specialist data tables (immutable) ---
 
 const SPECIALIST_NAMES: Readonly<Record<string, readonly string[]>> = {
-    "Weaponsmith": ["Ironmaw", "Steelheart", "Gornak", "Voss"],
-    "Alchemist": ["Mordecai", "Sylphine", "Ashbloom", "Phex"],
-    "Relic Hunter": ["Korrin", "Sable", "Thresh", "Xandric"],
-    "Mercenary Captain": ["Captain"],
+    "Weaponsmith": ["Bramblewick", "Copperettle", "Mosspin", "Thistlehand"],
+    "Alchemist": ["Marigold", "Puddlefern", "Teasel", "Celandine"],
+    "Relic Hunter": ["Brindle", "Piproot", "Larkspur", "Acorn"],
+    "Mercenary Captain": ["Bridgemarshal"],
 } as const;
 
 const SPECIALIST_DESCRIPTIONS: Readonly<Record<string, string>> = {
-    "Weaponsmith": "A burly artisan who hammers blades from obsidian and starfall.",
-    "Alchemist": "A cloaked brewer surrounded by bubbling vials and noxious fumes.",
-    "Relic Hunter": "A scarred scavenger who trades in dangerous artifacts.",
-    "Mercenary Captain": "A battle-hardened veteran looking for clients.",
+    "Weaponsmith": "A cheerful forge-tender who keeps lantern hooks, kettle tools, and sturdy trail gear in working order.",
+    "Alchemist": "A patient brewer of teas, tonics, and weather charms whose stall smells of herbs and citrus peel.",
+    "Relic Hunter": "A careful forager of old curios, polished keepsakes, and useful treasures rescued from forgotten nooks.",
+    "Mercenary Captain": "A dependable bridge marshal who hires escorts, route guides, and shelter guards for rough weather.",
+} as const;
+
+const VENDOR_DISPLAY_TYPES: Readonly<Record<string, string>> = {
+    "Scavenger": "Lantern Peddler",
+    "Nomad": "Moss Caravaner",
+    "Tech-Trader": "Tinker Trader",
+    "Mystic": "Rootsong Reader",
+    "Mercenary Captain": "Bridge Marshal",
+    "Weaponsmith": "Kettle Smith",
+    "Alchemist": "Tea Alchemist",
+    "Relic Hunter": "Curio Forager",
 } as const;
 
 const SPECIALIST_TYPES = ["Weaponsmith", "Alchemist", "Relic Hunter"] as const;
@@ -108,13 +119,14 @@ export const generateWares = (biome?: Biome, vendorType?: string): Item[] => {
 export const generateRandomVendor = (biome?: Biome, forcedType?: string): Vendor => {
     const type = forcedType ?? VENDOR_TYPES[Math.floor(Math.random() * VENDOR_TYPES.length)];
     const wares = generateWares(biome, type);
+    const displayType = VENDOR_DISPLAY_TYPES[type] ?? type;
 
     const namePool = SPECIALIST_NAMES[type];
     const name = namePool
         ? `${namePool[Math.floor(Math.random() * namePool.length)]} ${Math.floor(Math.random() * 100)}`
-        : `${type} ${Math.floor(Math.random() * 100)}`;
-    const description = SPECIALIST_DESCRIPTIONS[type] ?? "A wandering soul with goods to trade.";
-    const specialty = (SPECIALIST_TYPES as readonly string[]).includes(type) ? type : undefined;
+        : `${displayType} ${Math.floor(Math.random() * 100)}`;
+    const description = SPECIALIST_DESCRIPTIONS[type] ?? "A friendly traveler with practical goods, bright gossip, and trail supplies to barter.";
+    const specialty = (SPECIALIST_TYPES as readonly string[]).includes(type) ? displayType : undefined;
 
     return { id: Math.random().toString(36).substring(7), name, description, specialty, wares };
 };

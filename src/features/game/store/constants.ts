@@ -43,10 +43,10 @@ export function handleVignetteProgression(dispatch: (a: unknown) => void, getSta
 
 export function seedQuests(): ActiveQuest[] {
   return [
-    { id: 'recon-1', kind: 'reconnaissance', label: 'Scan 5 sectors', target: 5, progress: 0, complete: false },
-    { id: 'rescue-1', kind: 'rescue', label: 'Find a Fellow Agent', target: 1, progress: 0, complete: false },
-    { id: 'hostiles-1', kind: 'hostiles', label: 'Defeat 3 hostiles', target: 3, progress: 0, complete: false },
-    { id: 'vendor-1', kind: 'vendor', label: 'Trade with 2 vendors', target: 2, progress: 0, complete: false },
+    { id: 'recon-1', kind: 'reconnaissance', label: 'Survey 5 nearby paths', target: 5, progress: 0, complete: false },
+    { id: 'rescue-1', kind: 'rescue', label: 'Find a missing neighbor', target: 1, progress: 0, complete: false },
+    { id: 'hostiles-1', kind: 'hostiles', label: 'Clear 3 hazards', target: 3, progress: 0, complete: false },
+    { id: 'vendor-1', kind: 'vendor', label: 'Barter at 2 market stalls', target: 2, progress: 0, complete: false },
   ];
 }
 

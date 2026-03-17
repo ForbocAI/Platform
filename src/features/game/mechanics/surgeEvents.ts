@@ -1,6 +1,6 @@
 /**
- * Surge Events — negative outcomes triggered when the player's surge count is high.
- * Called after each Oracle consultation when surge ≥ 5.
+ * Spark events — setbacks triggered when the player's spark count runs too high.
+ * Called after each inquiry when spark ≥ 5.
  */
 
 export interface SurgeEvent {
@@ -16,43 +16,43 @@ export interface SurgeEvent {
 export const SURGE_EVENTS: SurgeEvent[] = [
     {
         id: "system_strain",
-        name: "System Strain",
-        description: "The accumulated stress tears at your psyche. Data floods your neural link.",
+        name: "Frayed Nerves",
+        description: "Too much spark at once leaves you overstimulated and tense.",
         effectType: "stress",
         magnitude: 15,
     },
     {
         id: "hardware_feedback",
-        name: "Hardware Feedback",
-        description: "Power surges course through your chassis, draining your vitality.",
+        name: "Lantern Feedback",
+        description: "A bright feedback pulse rattles through your gear and leaves you winded.",
         effectType: "hp_drain",
         magnitude: 10,
     },
     {
         id: "data_decay",
-        name: "Data Decay",
-        description: "A random item in your inventory suffers catastrophic data corruption.",
+        name: "Lost Keepsake",
+        description: "A random item in your pack is shaken loose, spoiled, or otherwise ruined.",
         effectType: "item_corrupt",
         magnitude: 1,
     },
     {
         id: "interference_resonance",
-        name: "Interference Resonance",
-        description: "Nearby hostiles absorb the system surge, growing stronger.",
+        name: "Trouble Stirs",
+        description: "Nearby troublemakers find their footing while the sparkstorm distracts you.",
         effectType: "enemy_empower",
         magnitude: 10,
     },
     {
         id: "rift_hazard",
-        name: "Regional Hazard",
-        description: "An environmental rupture opens, flooding the area with toxic energy.",
+        name: "Weather Shift",
+        description: "The local route buckles into a fresh hazard and the air turns jumpy.",
         effectType: "hazard_spawn",
         magnitude: 1,
     },
     {
         id: "inquiry_lockout",
-        name: "Inquiry Lockout",
-        description: "The inquiry engine recoils from the surge. It refuses to answer for a time.",
+        name: "Quiet Spell",
+        description: "The inquiry line goes still for a moment, as if waiting for the valley to settle.",
         effectType: "inquiry_lockout",
         magnitude: 1,
     },

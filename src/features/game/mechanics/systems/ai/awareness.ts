@@ -10,7 +10,7 @@ import type { AwarenessResult, AgentActionType } from './types';
 import type { Item } from '../../../types';
 
 const DIRECTIONS = ['North', 'South', 'East', 'West'] as const;
-const DANGEROUS_HAZARDS = ['Toxic Air', 'Radioactive Decay', 'Void Instability', 'Extreme Cold', 'Scorching Heat'];
+const DANGEROUS_HAZARDS = ['Wayward Rootsong', 'Lantern Flare', 'Toxic Air', 'Radioactive Decay', 'Void Instability', 'Extreme Cold', 'Scorching Heat'];
 
 /**
  * Compute awareness of the current game environment.
@@ -165,7 +165,11 @@ export function computeAwareness(
     // Check if player just respawned (within last 3 log entries)
     const veryRecentLogs = (logs || []).slice(-3);
     const justRespawned = veryRecentLogs.some(
-        l => l.message.includes('Resurrecting') || l.message.includes('void releases you')
+        l =>
+            l.message.includes('Resurrecting') ||
+            l.message.includes('void releases you') ||
+            l.message.includes('Returning to the lantern paths') ||
+            l.message.includes('guided back by the Rootsong')
     ) || player.justRespawned === true;
 
     // Clear the flag after detection (one-time check)

@@ -48,13 +48,13 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
             const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
             if (effect.applyEnteringRed && state.currentArea) {
                 state.currentArea.npcs.push(generateRandomNonPlayerActor());
-                state.currentArea.hazards.push("Threat Imminent");
+                state.currentArea.hazards.push("Path Trouble");
             }
             if (effect.applyEnterStageLeft && state.currentArea) {
                 if (!state.currentArea.vendors) state.currentArea.vendors = [];
                 state.currentArea.vendors.push(generateRandomVendor());
                 if (!state.currentArea.allies) state.currentArea.allies = [];
-                state.currentArea.allies.push({ id: Date.now().toString(), name: "Fellow Agent" });
+                state.currentArea.allies.push({ id: Date.now().toString(), name: "Helpful Neighbor" });
             }
         }
 
@@ -84,7 +84,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
                     break;
                 case "hazard_spawn":
                     if (state.currentArea) {
-                        state.currentArea.hazards.push("Anomalous Surge");
+                        state.currentArea.hazards.push("Lantern Flare");
                     }
                     break;
                 case "inquiry_lockout":
@@ -94,7 +94,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
             state.logs.push({
                 id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 timestamp: Date.now(),
-                message: `⚡ SYSTEM EVENT: ${surgeEvent.name} — ${surgeEvent.description}`,
+                message: `Lantern Event: ${surgeEvent.name} — ${surgeEvent.description}`,
                 type: "system"
             });
         }
@@ -113,13 +113,13 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
             const effect = resolveUnexpectedlyEffect(result.unexpectedRoll, result.unexpectedEvent || "");
             if (effect.applyEnteringRed && state.currentArea) {
                 state.currentArea.npcs.push(generateRandomNonPlayerActor());
-                state.currentArea.hazards.push("Threat Imminent");
+                state.currentArea.hazards.push("Path Trouble");
             }
             if (effect.applyEnterStageLeft && state.currentArea) {
                 if (!state.currentArea.vendors) state.currentArea.vendors = [];
                 state.currentArea.vendors.push(generateRandomVendor());
                 if (!state.currentArea.allies) state.currentArea.allies = [];
-                state.currentArea.allies.push({ id: Date.now().toString(), name: "Fellow Agent" });
+                state.currentArea.allies.push({ id: Date.now().toString(), name: "Helpful Neighbor" });
             }
         }
 
@@ -149,7 +149,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
                     break;
                 case "hazard_spawn":
                     if (state.currentArea) {
-                        state.currentArea.hazards.push("Anomalous Surge");
+                        state.currentArea.hazards.push("Lantern Flare");
                     }
                     break;
                 case "inquiry_lockout":
@@ -158,7 +158,7 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
             state.logs.push({
                 id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 timestamp: Date.now(),
-                message: `⚡ SYSTEM EVENT: ${surgeEvent.name} — ${surgeEvent.description}`,
+                message: `Lantern Event: ${surgeEvent.name} — ${surgeEvent.description}`,
                 type: "system"
             });
         }
