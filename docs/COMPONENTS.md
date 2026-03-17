@@ -1,43 +1,144 @@
-<!-- AESTHETIC_PROTOCOL_COMPLIANCE -->
-
-<!-- ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ -->
+<!-- COZY_CANOPY_PROTOCOL -->
 
 ```text
-    [VOID::WATCHER]
-
+   .-.
+  /___\
+  |o o|
+  |_^_|
+ /|   |\
 ```
 
-SYSTEM_OVERRIDE // NEURAL_LINK_ESTABLISHED // LOG_ERR_CRITICAL
-
-
-
 ---
-# Component structure
+# Platform Component Structure
 
-## Folder layout
+Last verified: 2026-03-17
 
-**Maintain this folder structure** under `src/components/`:
+## Layering Rule
 
-- **components/elements/generic** — Reusable primitives; no game/narrative domain. Examples: `GameButton`, `NavButton`, `Modal`, `LoadingOverlay`, `StatBox`.
-- **components/elements/unique** — Domain-specific components. Subfolders by subdomain: `game/`, `narrative/`, `shared/`. Examples: `ActionDeck`, `RoomViewport`, `PlayerHeader`, `FactsPanel`, `OracleForm`, `Runes`, `VolumeControls`.
-- **components/screens** — Full-page screens. One folder per screen (e.g. `GameScreen/` with `index.tsx`, `GameScreenHeader.tsx`, etc.). No subdomain folders under `screens/`.
+The UI should stay compositional:
 
-## Composition
+- screens compose unique and generic components
+- unique components compose generic components where possible
+- generic components stay domain-neutral
 
-- **Screens** — As much as possible, screen components are made of **unique** and **generic** components. Prefer screen sub-components (e.g. `GameScreenHeader`, `GameScreenMain`) that use unique/generic elements. Extract inline UI blocks into unique components.
-- **Unique** — As much as possible, unique components are made of **generic** components (Modal, GameButton, NavButton, StatBox, LoadingOverlay). Use raw elements only when no generic fits.
-- **Generic** — Stay domain-agnostic. No imports from `features/game` or `features/narrative`; no domain types.
+## Current Folder Layout
 
-## Imports
+### `src/components/elements/generic/`
 
-- Screens: import from `@/components/elements/unique` and `@/components/elements/generic` (or specific files).
-- Unique: import from `@/components/elements/generic` and other unique elements as needed.
-- Generic: no component imports from `components/`; only `lib/`, `features/` for non-domain utils if needed.
+Reusable primitives with no game-specific story knowledge.
 
-## Summary
+Current examples:
 
-| Layer    | Uses                    | Avoid                          |
-|----------|-------------------------|--------------------------------|
-| Screens  | unique + generic        | Inline domain UI, raw markup   |
-| Unique   | generic + other unique  | Large inline blocks            |
-| Generic  | (none from components)  | Domain types or feature imports |
+- `GameButton.tsx`
+- `NavButton.tsx`
+- `Modal.tsx`
+- `LoadingOverlay.tsx`
+- `StatBox.tsx`
+
+### `src/components/elements/shared/`
+
+Small cross-domain UI helpers that are still presentation-first.
+
+Current example:
+
+- `TypewriterText.tsx`
+
+### `src/components/elements/unique/`
+
+Domain-specific UI grouped by subdomain.
+
+Current subfolders:
+
+- `game/`
+  - `ActionDeck/`
+  - `PlayerHeader/`
+  - `AreaViewport.tsx`
+  - `TradePanel.tsx`
+  - `InventoryPanel.tsx`
+  - `CraftingPanel.tsx`
+  - `CompanionPanel.tsx`
+  - `ConcessionModal.tsx`
+  - `MapView.tsx`
+  - `NeuralLogPanel.tsx`
+  - `QuestsPanel.tsx`
+  - `SkillsPanel.tsx`
+- `narrative/`
+  - `FactsPanel.tsx`
+  - `InquiryForm.tsx`
+  - `StageSelector.tsx`
+  - `ThreadList.tsx`
+  - `VignetteControls.tsx`
+- `shared/`
+  - `Runes.tsx`
+  - `VolumeControls.tsx`
+
+### `src/components/screens/`
+
+Page-level assemblies.
+
+Current examples:
+
+- `ClassSelectionScreen.tsx`
+- `GameScreen/`
+  - `GameScreenHeader.tsx`
+  - `GameScreenMain.tsx`
+  - `GameScreenFooter.tsx`
+  - `GameScreenOverlays.tsx`
+
+## Composition Guidance
+
+### Screens
+
+Screens should:
+
+- orchestrate layout and dispatch handlers
+- avoid owning low-level visual controls directly
+- pull specialized UI from `elements/unique`
+
+### Unique Components
+
+Unique components should:
+
+- own domain presentation
+- stay reusable within the game
+- prefer `GameButton`, `NavButton`, `Modal`, and `StatBox` instead of reimplementing common controls
+
+### Generic Components
+
+Generic components should:
+
+- not import game lore tables
+- avoid depending on class names, faction names, or biome names
+- accept props that can be reused across multiple themes
+
+## Naming Rule for the Rewrite
+
+Keep engineering names neutral.
+
+Good:
+
+- `InquiryForm`
+- `PlayerHeader`
+- `TradePanel`
+- `CompanionPanel`
+- `AreaViewport`
+
+Avoid introducing new names like:
+
+- `DryadBlessingPanel`
+- `GnomeBridgeButton`
+- `LanternboughQuestBox`
+
+Those specifics should live in copy and data, not the component API.
+
+## Current UI Debt
+
+- some visible labels and content still carry Quadar/grimdark language
+- `Runes.tsx` and some related styling choices still encode the old aesthetic
+- the screen structure is solid, but the content pipeline is not yet Lanternbough-native
+
+## Immediate UI Focus
+
+1. Replace app-level branding and metadata.
+2. Replace class and lore copy visible in the screen flow.
+3. Keep component boundaries intact while swapping presentation and content.

@@ -1,99 +1,255 @@
-<!-- AESTHETIC_PROTOCOL_COMPLIANCE -->
-
-<!-- ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ -->
+<!-- COZY_CANOPY_PROTOCOL -->
 
 ```text
-    [VOID::WATCHER]
-
+      .-^^-.
+    .'  ..  '.
+   /  (____)  \
+  ;   / || \   ;
+  |  /  ||  \  |
+  ;  \__/ \__/ ;
+   \    /\    /
+    '._/__\_.'
 ```
 
-SYSTEM_OVERRIDE // NEURAL_LINK_ESTABLISHED // LOG_ERR_CRITICAL
-
-
-
 ---
-# Forboc.AI Platform Lore
+# Platform Lore
 
-Canon consolidated from **quadar.md** (Qua'dar TTRPG), **forboc.github.io** (Forging Through the Eldritch), and **qvht.github.io** (Qvht daemon place).
+This document is the current canon target for `/Users/seandinwiddie/GitHub/Forboc.AI/Platform`.
 
-## quadar.md — Qua'dar TTRPG Canon
+It is inspired by structural ideas found in:
 
-### Core Lore
-- **Umbralyn** — The fallen dimension; once pinnacle of ancient gnosis and forbidden sciences. The Astral Empire grew in harmony with chthonic frequencies. When advanced Umbralyn shattered, the Abyssal Void invaded.
-- **Goetéian Chthonica** — The chthonic force watching and waiting. Steady voices guiding the chronicler. *"Yet living on in other reaches, Goetéian Chthonica watches and waits."*
-- **Qua'dar Tower (Migdal Kudar)** — Central monolith, beating heart of Umbralyn's circuitry. The Quadrangle is the central hub where the Merchant dwells.
-- **Kamenal** — The protagonist: interloper, ranger, nomadic chronicler, starweaver with affinity for dimensional anomalies. *Guided by the lingering echoes, driven by the steady voices of Goetéian Chthonica.*
-- **the churning of ages and eons past and yet to come** — Recurring temporal phrase.
-- **Rift-laden Realm, the Many** — World of the disaffected.
-- **Ethereal Towerlands** — High places, vineyards of the alien tower.
-- **Abyssal Murk** — Watery northern expanse echoing with alien wails.
+- `~/GitHub/Forboc/notes/quadar.md`
+- `~/GitHub/Forboc/notes/quadar_ familiar.md`
+- `~/Documents/GitHub/forboc.github.io`
+- `~/Documents/GitHub/qvht.github.io`
 
----
+But it is not Quadar canon. Platform now aims at a distinct cozy-fantasy identity.
 
-## GoeteianChthonica.md — The Sterile Chamber
+## Canon Reset
 
-*Source: Transcribed from Facebook Page Posts (September 15, 2023)*
+Platform is no longer a cyber-grimdark nightmare setting.
 
-The **Sterile Chamber** is an operating theater where clinical precision meets chthonic revelation. An operating table etched with archaic glyphs pulsates with silent power. When the scalpel meets skin, it perforates not merely tissue but the veil between worlds—whispers of the abyss seep through, and ethereal specters born of forgotten eras emerge.
+Retired for Platform canon:
 
-- Layers traversed are not of flesh but of time and space; each stratum reveals deeper abysses.
-- Mournful cries of trapped spirits reverberate. Entities, ageless and vast, scrutinize from beyond.
-- The inscribed floor resonates with energies bridging clinical methodology and forbidden rites.
-- Instruments hum with otherworldly resonance; anatomy, spirit, and the arcane intertwine.
-- As the final suture seals not just an incision but a portal, the cosmos holds its breath.
-- The ensuing silence bears the heaviness of aeons—truths too vast for the human psyche to comprehend.
+- Umbralyn
+- Qua'dar Tower
+- Goetéian Chthonica
+- abyssal punishment cosmology
+- blood-soaked revelation framing
+- noir metropolis / chrome-horror atmosphere
 
-### Environments (quadar.md)
-- Ethereal Marshlands and Abyssal Murk
-- Toxic Wastes and Desolate Places
-- Haunted Chapels
-- Military Facilities and Installations
-- The Tower (Migdal Kudar)
-- Fortresses and Strongholds of Eldritch
-- Dungeons
-- Temples (Rune Temples, Runic Houses)
-- Crumbling Ruins
-- Narrow Paths, Raised Platforms
-- Ether (Ethereal Divide)
-- Crypts of Goetia
-- Abyssal Pits
-- Mud Slides, Glades
-- Portals (Vortex, the Field)
-- Dimensional Nexus
-- Outerworldly Realms
+Those sources remain useful as structural inspiration only.
 
-### Merchant Economy
-- Spirit and Blood as trade commodities
-- Wares: tomes, spell books, spells, rations, food, booze, gear, weapons, items, upgrades
-- Accumulate spirit by defeating enemies; spend at Merchant in the Quadrangle
+## Core Setting
 
----
+Platform takes place in **Lanternbough**, a vertical village grown through the trunk, roots, hollows, and canopy of an ancient tree.
 
-## forboc.github.io — Forging Through the Eldritch
+The settlement spreads across:
 
-- **Inner All / Outer All** — we emerge as living embodiment of inner all, juxtaposed against the outer all static macrocosm
-- **Static Sea of All Noise** — a decaying land gripped by enigmatic static
-- **Slipgates / Timevoids** — rifts in the fabric of reality; stepping in suspends time
-- **Armor fragments** — scattered across the twilight's expanse, coalescing around the seeker
-- **Inner Firmament / Outer Firmament** — mind and heart; the microcosm and macrocosm
+- root-lane cottages
+- mushroom terraces
+- creek bridges
+- canopy lifts
+- lantern balconies
+- grove libraries
 
----
+Lanternbough feels hand-built, lived-in, and seasonally magical.
 
-## qvht.github.io — Qvht Daemon Place
+## Guiding Mystery
 
-- **Qvht** — clandestine daemon place in the noir heart of the metropolis; domain and labyrinth
-- **Chthonica** — the Chthonica's domain; secrets paid in blood and sacrifice
-- **Chromatic-Steel Fungi** — colossal pillars rising like organic growth in cyberspace
-- **Void Maw / Abyssal Maw** — the deepest realms of the imagination
-- **Twilight Alchemy Haven** — verses of prose generate gnarled trees; ethereal fusion of lore and twilight
+The valley is quietly held together by **the Rootsong**.
 
----
+The Rootsong is not a tyrant or horror. It is a living harmony that moves through:
 
-## Chants & Verses
+- bark
+- brookwater
+- hanging bells
+- pollen wind
+- petal drift
+- old roots
 
-- *Be our vengeance, avenge us.*
-- *Stop faking your pulse, we are already dead.*
-- *There is no time, only churning.*
-- *We are the embodiment of the division that forges wholeness.*
-- *Praise be.*
-- *In twilight's realm where shadows dance, we step into a mystic trance.*
+When the Rootsong falls out of tune, paths wander, bridges misbehave, lanterns dim, and neighbors go missing in the soft chaos.
+
+## Player Fantasy
+
+The player is a **Wayfinder of Lanternbough**.
+
+This role blends:
+
+- scout
+- courier
+- caretaker
+- tinkerer
+- merchant helper
+- story-collector
+
+The player does not begin as a doomed survivor. The fantasy is becoming the dependable person others trust when the valley needs mending.
+
+## Starting Hub
+
+The player begins in **Thimble Market**, a cheerful nook carved into the trunk.
+
+Thimble Market is:
+
+- part tea counter
+- part supply room
+- part bulletin board
+- part neighborhood checkpoint
+
+It serves as the systems anchor for:
+
+- provisioning
+- trading
+- rumors
+- companion arrivals
+- route assignments
+- recovery after rough expeditions
+
+## Peoples of Lanternbough
+
+### Fairies
+
+Fast couriers, pollinators, lamp-lighters, and weather-watchers. Quick, bright, and sometimes distractible.
+
+### Gnomes
+
+Bridge-fixers, bakers, kettle engineers, clock-menders, and market organizers. Practical and deeply proud of craft.
+
+### Trolls
+
+Stoneworkers, ferry haulers, rain shelter keepers, and path wardens. Large, gentle, and stubborn in kind ways.
+
+### Dryads
+
+Grovetenders, orchard keepers, root librarians, and guardians of place memory. Patient and seasonal.
+
+### Nymphs
+
+Caretakers of springs, reflective pools, fog routes, and mood-weather. They govern water crossings and emotional weather around streams.
+
+Supporting folk may include:
+
+- brownies
+- beetle mail carriers
+- moth archivists
+- frog choristers
+- pocket dragons
+
+## Main Regions
+
+### Thimble Market
+
+The welcoming trunk hub.
+
+### Mossstep Lanes
+
+Root paths, stone arches, cottage stoops, and puddle bridges.
+
+### Candlecap Commons
+
+Glowing mushroom district full of food stalls, festivals, and neighborly errands.
+
+### Brookwhisper Runs
+
+Creeks, ferries, stepping stones, water riddles, and drifting mist passages.
+
+### Briarsoft Gardens
+
+Dryad groves, herbal plots, weaving circles, and overgrown shortcuts.
+
+### Moonpetal Canopy
+
+Fairy wind routes, lantern lifts, suspended walkways, and pollen streams.
+
+### Hushglen Hollows
+
+Quiet, mysterious clearings where the valley grows still but not cruel.
+
+## Core Conflict
+
+The valley is not collapsing into horror. It is becoming disordered.
+
+Recent troubles include:
+
+- moon gusts pushing travelers off-route
+- drifting pollen currents scrambling familiar paths
+- sleepy gates opening in the wrong places
+- root bridges sulking shut
+- creatures and neighbors getting scattered during seasonal disturbances
+
+The goal is to reconnect people, reopen routes, and help the valley feel whole again.
+
+## Companions
+
+Companions should feel helpful and charming rather than militarized.
+
+Examples:
+
+- a moth archivist that remembers routes
+- a thistle-hedgehog that finds hidden materials
+- a brook sprite that reveals safe crossings
+- a kettle homunculus that brews temporary buffs
+- a pebble troll child who can shift obstacles
+
+## Inquiry and Discovery
+
+Platform keeps the question-driven spirit from the older source material, but with gentle wonder rather than dread.
+
+The guiding pattern is **the Wonderloom**:
+
+- ask a local question
+- reveal a useful truth
+- open a route, relationship, recipe, or event
+
+Example questions:
+
+- Why is this lantern unlit during market hours?
+- Who keeps leaving polished stones on the troll bridge?
+- What does the brook want before it allows passage?
+- Where did the missing fairy courier stop before dusk?
+
+## Tone Guide
+
+The tone should be:
+
+- cute
+- warm
+- playful
+- rainy-evening cozy
+- magical but grounded
+
+The tone should not be:
+
+- cruel
+- nihilistic
+- blood-soaked
+- prison-like
+- chrome-noir oppressive
+
+## Visual Guide
+
+Favorable materials and images:
+
+- carved wood
+- brass fittings
+- lantern glass
+- stitched fabric
+- wet stone
+- leaf translucency
+- fireflies
+- rain shimmer
+- glowing mushroom caps
+
+Preferred palette:
+
+- honey gold
+- moss green
+- creek blue
+- bark brown
+- moon-silver
+- petal pink
+- mushroom red
+
+## Canon Rule Going Forward
+
+If a runtime string or design decision conflicts with this document, this Lanternbough brief wins. Quadar text that still exists in code should be treated as migration debt.

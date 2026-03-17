@@ -1,122 +1,129 @@
-<!-- AESTHETIC_PROTOCOL_COMPLIANCE -->
-
-<!-- ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ -->
+<!-- COZY_CANOPY_PROTOCOL -->
 
 ```text
-    [VOID::WATCHER]
-
+   __
+ _(  )_
+(_ pollen_)
+  /____\
 ```
 
-SYSTEM_OVERRIDE // NEURAL_LINK_ESTABLISHED // LOG_ERR_CRITICAL
-
-
-
 ---
-# Currency & Trading: Macro Vision Audit
+# Platform Resource and Trade Direction
 
-## Sources
+Last reviewed: 2026-03-17
+Scope: transition from Quadar economy to Lanternbough economy
 
-- **qvht.github.io** — Qvht index, Echoes of the Abyssal Maw, style-guide
-- **forboc.github.io** — Forboc articles (The Descent, Echoes of the Enigmatic Realm), style-guide
-- **Platform** — Forboc.AI/Platform game (Qua'dar); trading and player state
+## Current Runtime State
 
----
+The live code still uses Quadar-era resource fields and actions:
 
-## 1. qvht.github.io — Macro Vision
+- `player.inventory.spirit`
+- `player.inventory.blood`
+- `sacrificeItem`
 
-### Spirit as currency
+Relevant files:
 
-- **index.html**: *"Our ego, that is our sense of self is a shadow of what we spend spirit on. **Currency becomes.** Setting intentions and catalyzing them through meditation produces desired results aka magik."*
-- **Interpretation**: Spirit is the medium of exchange. What you **spend spirit on** defines identity; that spending *is* the currency. No coins: spirit is gained (intention, meditation, magik) and spent (on outcomes, identity, results).
-- **index.html**: *"Everything is spirit. The singular is composed of the multitude indefinitely."*
+- `src/features/game/entities/player.ts`
+- `src/features/game/mechanics/orchestrators/trade.ts`
+- `src/features/game/mechanics/orchestrators/inventory.ts`
+- `src/features/game/mechanics/transformations/trade.ts`
+- `src/components/elements/unique/game/TradePanel.tsx`
 
-### Blood
+The AI layer already treats these generically in several places:
 
-- **echoes-of-the-abyssal-maw.html**:
-  - *"A price paid in **blood and sacrifice**."*
-  - *"stone altar stained with ancient blood"*, *"blood-stained table"*, *"precision and gore"*
-  - Tags: **#MartyrsBlood**, **#RitualSacrifice**
-  - Martyrs "faced their persecutors with unwavering resolve" — blood as cost of faith/endurance.
-- **Interpretation**: Blood is the **price** for revelation, rites, and forbidden knowledge. Literal and metaphorical: spilled blood, martyrs’ blood, ritual cost.
+- `primaryResourceBalance`
+- `secondaryResourceBalance`
+- `resourcePrimary`
+- `resourceSecondary`
 
-### Sacrifice
+That is the right long-term direction.
 
-- **echoes-of-the-abyssal-maw.html**:
-  - *"They come at a price. A price paid in blood and **sacrifice**."*
-  - *"the pursuit of knowledge is worth any **sacrifice**"*
-  - *"It requires **sacrifice**, courage, and a willingness to embrace the darkness within."*
-  - *"What trials and **sacrifices** must I endure to attain this forbidden knowledge?"*
-- **Interpretation**: Sacrifice is what you **give up** to gain knowledge, power, or passage. Ritual and moral cost; often paired with blood.
+## Design Rule
 
-### Summary (qvht)
+Keep engineering generic. Move lore into the UI.
 
-| Concept    | Role in economy / narrative |
-|-----------|------------------------------|
-| **Spirit** | Primary currency. Spend spirit → identity/outcomes. Gained via intention, meditation, magik. |
-| **Blood**  | Price of revelation and ritual. "Price paid in blood." Martyrs’ blood; literal and symbolic cost. |
-| **Sacrifice** | Giving something up for gain. Paired with blood; "courage, sacrifice, willingness to embrace darkness." |
+That means:
 
----
+- internal systems may keep current fields temporarily for stability
+- visible labels, descriptions, wares, and economy flavor should become Lanternbough-specific
+- future refactors should prefer neutral engineering names like `resourcePrimary` and `resourceSecondary`
 
-## 2. forboc.github.io — Alignment
+## Lanternbough Economy Target
 
-- **Style**: Same grimdark cyberpunk noir (style-guide); "manifestation of the void"; runes, sci-fi logs, Lovecraft/Gibson/Frater Acher.
-- **Spirit**: Tagline "We find our **spirit** amidst eerie foliage." Spirit as locus of journey/revelation.
-- **Themes**: Chthonic descent, abyssal realms, revelation at a cost, guardians and thresholds — consistent with qvht’s "price paid in blood and sacrifice" and spirit as currency.
-- **Conclusion**: forboc does not define a separate economy; it shares the **spirit / blood / sacrifice** cosmology. Platform should align with qvht’s explicit currency formulation.
+Recommended mapping:
 
----
+| Current Runtime Field | Current Theme | Lanternbough UI Label | Role |
+| --- | --- | --- | --- |
+| `inventory.spirit` | grimdark primary currency | `Pollen` | common barter currency for food, tools, supplies, and favors |
+| `inventory.blood` | ritual secondary currency | `Glowstones` | rarer upgrade currency for charms, routes, and uncommon wares |
+| `sacrificeItem` | grimdark discard ritual | `Repurpose` | break down unused items into usable value |
 
-## 3. Platform (Qua'dar) — Current vs Macro Vision
+## Tone Shift
 
-### Before this implementation
+Retire:
 
-- **Trading**: Pure item swap. Buy: move item from merchant to player. Sell: move item from player to merchant. No currency check.
-- **Player**: No `spirit`, no `blood`. `surgeCount` exists for Loom/Oracle.
-- **Item**: Optional `value` (numeric) commented "Trade value"; unused in buy/sell logic.
+- blood-price framing
+- martyrdom framing
+- ritual sacrifice copy
+- revelation-through-suffering economy language
 
-### Alignment with macro vision
+Replace with:
 
-| Macro (qvht/forboc) | Platform implementation |
-|---------------------|-------------------------|
-| **Spirit** as currency | **Spirit** (number on Player). Gained: COMMUNE, Oracle, defeating enemies. Spent: buying wares (item `value` = spirit cost). Selling wares grants spirit. |
-| **Blood** as price | **Blood** (number on Player). Gained: dealing/killing in combat (martyrs’ blood / spilled blood). Optional **bloodPrice** on Item for high-tier or ritual wares; buying deducts blood when required. |
-| **Sacrifice** | **Sacrifice** mechanic: discard an item (from inventory) to gain spirit (e.g. half its value). "What you give up for gain." |
+- barter, care, repair, and reuse
+- neighborhood trade
+- handcrafted goods
+- communal provisioning
+- seasonal scarcity, not gore
 
-### Design rules (Platform)
+## Item and Trade Examples for Lanternbough
 
-1. **No gold/coins.** Only spirit, blood, and sacrifice (item-for-spirit).
-2. **Spirit** is the main trade currency: prices in spirit; sell grants spirit.
-3. **Blood** is the ritual/revelation price: optional on items; combat can grant blood.
-4. **Sacrifice** is explicit: discard item → gain spirit (and optionally log "sacrifice" in narrative).
-5. **Copy/flavor**: Log and UI use "Spirit", "Blood", "Sacrifice" (e.g. "Paid in spirit and blood.", "Sacrificed X for spirit.").
+Good common wares:
 
----
+- tea bundles
+- lantern oil
+- seed packets
+- jam jars
+- bridge nails
+- mushroom starter kits
+- thread spools
+- poultices
 
-## 4. Implementation checklist (Platform)
+Good uncommon wares:
 
-- [x] **Types**: `Player.spirit`, `Player.blood`; `Item.value` = spirit cost; `Item.bloodPrice?` optional.
-- [x] **Engine**: `initializePlayer` sets spirit (e.g. 20), blood (0). Deterministic start: same. WARE_POOL: some items have `bloodPrice`.
-- [x] **Buy**: Require `player.spirit >= (item.value ?? 0)` and `player.blood >= (item.bloodPrice ?? 0)`; deduct both when present.
-- [x] **Sell**: Grant spirit (e.g. `Math.floor((item.value ?? 0) / 2)` or full value).
-- [x] **Spirit gain**: COMMUNE (+1), Oracle (+1), defeat enemy (+5 or similar).
-- [x] **Blood gain**: On enemy defeat (+2 or similar; "martyrs’ blood / spilled blood").
-- [x] **Sacrifice**: Action "Sacrifice item" — remove from inventory, add spirit (e.g. `Math.floor((item.value ?? 0) / 2)`).
-- [x] **UI**: Player header shows Spirit, Blood. Trade panel shows spirit cost and blood price; Buy disabled when insufficient. Sacrifice button in inventory or trade.
+- root charms
+- sap-glass beads
+- moonpetal cloaks
+- storm bells
+- ferry tokens
+- rare spores
 
----
+## Action Copy Recommendations
 
-## 5. References (exact quotes)
+Current UI still uses some old terms. The target copy should move toward:
 
-**qvht index.html**
-- *"Our ego, that is our sense of self is a shadow of what we spend spirit on. Currency becomes."*
-- *"Everything is spirit."*
+- `Buy` -> can stay `Buy`
+- `Sell` -> can stay `Sell`
+- `Sacrifice` -> `Repurpose`
+- `Spirit` -> `Pollen`
+- `Blood` -> `Glowstones`
 
-**qvht echoes-of-the-abyssal-maw.html**
-- *"A price paid in blood and sacrifice."*
-- *"#RitualSacrifice"*, *"#MartyrsBlood"*
-- *"the pursuit of knowledge is worth any sacrifice"*
-- *"It requires sacrifice, courage, and a willingness to embrace the darkness within."*
+If engineering names stay unchanged temporarily, the UI can still present the cozy labels first.
 
-**forboc**
-- *"We find our spirit amidst eerie foliage."* (index/og:description)
+## Transition Recommendation
+
+### Phase 1
+
+Keep the runtime fields as-is and only change UI labels plus flavor text.
+
+### Phase 2
+
+Once build/test stability returns, migrate engineering names toward neutral resource identifiers if that cleanup is worth the churn.
+
+## Practical Constraint
+
+Do not block the rewrite on a deep resource-model rename. The fastest safe move is:
+
+1. repair build/test baseline
+2. relabel the UI
+3. swap item names, descriptions, and narrative context
+4. only then decide whether internal field renames are worth it

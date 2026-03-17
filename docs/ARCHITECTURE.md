@@ -1,46 +1,138 @@
-<!-- AESTHETIC_PROTOCOL_COMPLIANCE -->
-
-<!-- ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ -->
+<!-- COZY_CANOPY_PROTOCOL -->
 
 ```text
-    [VOID::WATCHER]
-
+      /\        
+     /**\       
+    /****\   /\ 
+   /      \ /**\
+  /  /\    /    \
+ /__/  \__/______\
 ```
 
-SYSTEM_OVERRIDE // NEURAL_LINK_ESTABLISHED // LOG_ERR_CRITICAL
-
-
-
 ---
-# Platform src architecture
+# Platform Architecture
 
-## Top-level layout (TLDs)
+Last verified: 2026-03-17
+Project: `/Users/seandinwiddie/GitHub/Forboc.AI/Platform`
+Design target: Lanternbough cozy-fantasy rewrite
 
-Under `src/` we keep exactly five top-level directories:
+## Core Rule
 
-- **app/** — Next.js app router (pages, layout).
-- **components/** — UI: `elements/generic`, `elements/unique`, `screens`. Subdomain folders exist only under `elements/unique` (e.g. `game/`, `narrative/`, `shared/`).
-- **features/** — Domain logic: game, audio, narrative, core. All reducible logic and domain helpers live here.
-- **hooks/** — Removed. Former hook behavior (e.g. `useDecryptText`) lives under `features/core/hooks/`.
-- **lib/** — Cross-cutting, non-Redux code only: `utils.ts`, `sneakers.ts`, `sdk-placeholder/`. No `lib/game/`; game logic is in `features/game/`.
+Engineering should stay lore-agnostic.
 
-## Reducer-first convention (lib/hooks → features)
+- file names, folders, functions, state fields, and internal identifiers should describe mechanics
+- lore belongs in UI copy, content data, docs, art, and presentation
+- the current codebase still contains Quadar-era names in some places, but that is transition debt, not the target standard
 
-- **Game logic:** Engine, combat, mechanics, generation, content, types, and narrative helpers live in **features/game/** (and **features/narrative/**). Pure reducer helpers and thunks own all domain logic; no domain imports from `lib/game` or `hooks/`.
-- **Hooks:** Shared hooks (e.g. `useDecryptText`) are implemented under **features/core/hooks/**. Redux typed hooks (`useAppDispatch`, `useAppSelector`) are in **features/core/store/hooks.ts**. Components use these or thin wrappers from features.
-- **lib/** holds only non-Redux utilities; **features/** do not depend on lib for domain behavior.
+## Top-Level `src/` Layout
 
-## Features subdomains
+- `app/`
+  - Next.js app router entrypoints, layout, providers, and bootstrap gate
+- `components/`
+  - UI only
+  - split into `elements/generic`, `elements/unique`, and `screens`
+- `features/`
+  - domain logic, state, thunks, reducers, listeners, AI, and content
+- `lib/`
+  - cross-cutting helpers and browser-safe SDK placeholders only
 
-- **features/game/** — Slice (with `slice/reducers/` split: init, movement, combat, trade, inventory, autoplay), thunks, engine, types, combat, mechanics, generation, content, etc.
-- **features/audio/** — Slice, music (patterns + playback), sfx, core context.
-- **features/narrative/** — Slice, helpers (e.g. vignette themes, unexpectedly effects, follow-up facts).
-- **features/core/** — Store, api (baseApi, gameApi), ui slice, hooks (e.g. useDecryptText).
+## Current Runtime Composition
 
-## Components
+### App Layer
 
-- **elements/generic** — Reusable primitives (buttons, modals, stat box, etc.). No domain types.
-- **elements/unique** — Domain components by subdomain: **game/** (ActionDeck, RoomViewport, panels, PlayerHeader, QuestsPanel, …), **narrative/** (FactsPanel, OracleForm, StageSelector, ThreadList, VignetteControls), **shared/** (Runes, VolumeControls).
-- **screens** — Full-page compositions; one folder per screen. Built only from unique and generic components.
+- `src/app/layout.tsx`
+  - root metadata, analytics, providers, and app shell
+- `src/app/StoreProvider.tsx`
+  - Redux provider wiring
+- `src/app/BootstrapGate.tsx`
+  - client-side startup hook that currently triggers SDK init
+- `src/app/page.tsx`
+  - renders `GameScreen`
 
-Screens → unique + generic. Unique → generic (and other unique) where possible. See **docs/COMPONENTS.md** for folder layout and composition rules.
+### Component Layer
+
+- `src/components/elements/generic/`
+  - reusable primitives like buttons, modals, stat displays, and loading overlay
+- `src/components/elements/unique/`
+  - game, narrative, and shared UI built from generic elements
+- `src/components/screens/`
+  - page-level compositions such as `GameScreen` and `ClassSelectionScreen`
+
+### Feature Layer
+
+- `src/features/core/`
+  - store setup, RTK Query base API, shared hooks, UI slice
+- `src/features/game/`
+  - entities, mechanics, store, middleware, SDK bridge, content
+- `src/features/audio/`
+  - audio slice, listeners, playback, and browser audio context helpers
+- `src/features/narrative/`
+  - thread/fact/vignette state and helpers
+
+## Game Feature Layering
+
+The current `features/game` structure is already close to the right separation:
+
+- `entities/`
+  - area, player, vendor, and related world-model construction
+- `store/`
+  - slice, selectors, and state type exports
+- `mechanics/orchestrators/`
+  - async thunks and multi-step gameplay flows
+- `mechanics/transformations/`
+  - reducer-side state changes
+- `mechanics/systems/`
+  - AI, combat helpers, item behavior, world generation
+- `sdk/`
+  - runtime bridge to `@forbocai/*`
+- `middleware/`
+  - autoplay orchestration and listener wiring
+
+This is the architecture to keep. The main work is cleaning identity drift, not inventing a different runtime shape.
+
+## Boot Flow
+
+1. `src/app/layout.tsx` renders the provider stack.
+2. `src/features/core/store/index.ts` dispatches `app/bootstrap` on the client.
+3. `src/features/core/store/listeners.ts` responds to bootstrap and may initialize the game.
+4. `src/features/game/middleware/autoplayListener.ts` initializes `BotOrchestrator`, starts a poll loop, and also triggers SDK init.
+5. `src/app/BootstrapGate.tsx` separately triggers SDK init again.
+
+## Current Architecture Risks
+
+### 1. SDK Build Contract Is Broken
+
+`src/features/game/sdk/cortexService.ts` imports exports that are not present in the installed `@forbocai/core` and `@forbocai/browser` packages. This currently breaks `npm run build`.
+
+### 2. Duplicate SDK Initialization
+
+SDK init currently happens in both:
+
+- `src/app/BootstrapGate.tsx`
+- `src/features/game/middleware/autoplayListener.ts`
+
+That should be reduced to one clear entrypoint.
+
+### 3. Duplicate Poll Risk
+
+`autoplayListener.ts` starts a `setInterval` on both bootstrap and initialize fulfillment without a singleton guard. Repeated triggers can create multiple poll loops.
+
+### 4. URL Boot Parsing Stub
+
+`src/features/core/store/getInitOptions.ts` still returns `{}`. Listener logic assumes richer boot options exist, but they are inactive until parsing is reimplemented.
+
+## Lanternbough Architecture Rules
+
+As the rewrite continues:
+
+- keep `features/` organized by mechanic, not by lore faction
+- keep resource handling generic at the engineering layer
+- avoid file or function names tied to specific classes, gods, or biomes
+- put cozy/fairy-tale specificity in content tables, copy, portraits, and UI labels
+
+## Practical Next Steps
+
+1. Fix `cortexService.ts` so the repo builds again.
+2. Remove duplicate SDK init and duplicate poll registration.
+3. Replace Quadar branding in `src/app/layout.tsx`.
+4. Keep the current reducer/thunk/system split while swapping in Lanternbough content.
