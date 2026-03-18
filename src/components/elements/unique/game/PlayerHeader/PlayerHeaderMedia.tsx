@@ -21,8 +21,8 @@ export function PlayerHeaderMedia() {
             dispatch(toggleTextToSpeech());
           }}
           className={textToSpeech
-            ? "p-1 sm:p-1.5 rounded border border-palette-accent-mid/50 bg-palette-accent-mid/20 text-palette-accent-mid hover:bg-palette-accent-mid/30 transition-colors"
-            : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-mid text-palette-muted hover:text-palette-accent-mid transition-colors"
+            ? "p-1 sm:p-1.5 rounded-full border border-palette-accent-mid/55 bg-palette-accent-mid/18 text-palette-accent-bright hover:bg-palette-accent-mid/26 transition-colors"
+            : "p-1 sm:p-1.5 rounded-full border border-palette-border/60 hover:border-palette-accent-mid text-palette-muted hover:text-palette-accent-bright transition-colors"
           }
           data-testid="text-to-speech-toggle"
           aria-label={textToSpeech ? "Turn off text-to-speech" : "Turn on text-to-speech"}
@@ -37,8 +37,8 @@ export function PlayerHeaderMedia() {
             dispatch(musicPlaying ? stopMusic() : startMusic());
           }}
           className={musicPlaying
-            ? "p-1 sm:p-1.5 rounded border border-palette-accent-mid/50 bg-palette-accent-mid/20 text-palette-accent-mid hover:bg-palette-accent-mid/30 transition-colors"
-            : "p-1 sm:p-1.5 rounded border border-palette-border hover:border-palette-accent-mid text-palette-muted hover:text-palette-accent-mid transition-colors"
+            ? "p-1 sm:p-1.5 rounded-full border border-palette-accent-soft/55 bg-palette-accent-soft/18 text-palette-accent-bright hover:bg-palette-accent-soft/26 transition-colors"
+            : "p-1 sm:p-1.5 rounded-full border border-palette-border/60 hover:border-palette-accent-soft text-palette-muted hover:text-palette-accent-bright transition-colors"
           }
           data-testid="music-toggle"
           aria-label={musicPlaying ? "Pause music" : "Play music"}

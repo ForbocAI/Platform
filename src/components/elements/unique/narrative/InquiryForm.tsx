@@ -44,10 +44,10 @@ export function InquiryForm({
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => formContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
           onKeyDown={handleKeyDown}
-          placeholder="System Inquiry… (Enter to send)"
-          className="w-full bg-palette-bg-dark border border-palette-border text-palette-accent-soft px-1.5 sm:px-2 py-1 sm:py-1.5 leading-relaxed focus:outline-none focus:border-palette-accent-mid/50 placeholder:text-palette-muted min-w-0"
+          placeholder="Ask the Wonderloom... (Enter to send)"
+          className="w-full bg-palette-bg-dark/80 border border-palette-border/70 rounded-full text-palette-accent-bright px-1.5 sm:px-2 py-1 sm:py-1.5 leading-relaxed focus:outline-none focus:border-palette-accent-mid/60 placeholder:text-palette-muted-light min-w-0"
           data-testid="inquiry-input"
-          aria-label="System Inquiry (press Enter to send)"
+          aria-label="Ask the Wonderloom (press Enter to send)"
         />
         <GameButton
           type="submit"

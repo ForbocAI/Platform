@@ -23,7 +23,7 @@ export function DirectionalPad({
         variant="magic"
         icon={<MapIcon className="app-icon" />}
         onClick={onMapClick}
-        className="size-full! min-w-0 min-h-0 rounded-sm"
+        className="size-full! min-w-0 min-h-0 rounded-2xl"
         title="Toggle map"
         data-testid="map-toggle"
       />

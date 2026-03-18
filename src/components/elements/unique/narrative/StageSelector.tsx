@@ -8,9 +8,9 @@ import { RuneSigil } from "../shared/Runes";
 import { GameButton } from "@/components/elements/generic";
 
 const STAGES: { value: StageOfScene; label: string }[] = [
-  { value: "To Knowledge", label: "Knowledge" },
-  { value: "To Conflict", label: "Conflict" },
-  { value: "To Endings", label: "Endings" },
+  { value: "To Knowledge", label: "Wonder" },
+  { value: "To Conflict", label: "Trouble" },
+  { value: "To Endings", label: "Homecoming" },
 ];
 
 export function StageSelector({
@@ -24,7 +24,8 @@ export function StageSelector({
   return (
     <div className="flex items-center gap-1 p-1 sm:p-1.5 border-b border-palette-border bg-palette-bg-mid/10 shrink-0 overflow-x-auto min-w-0" data-testid="stage-selector">
       <RuneSigil className="shrink-0" />
-      <span className="text-palette-muted-light uppercase tracking-wider mr-0.5 shrink-0 leading-tight">Stage:</span>
+      <span className="font-runic text-palette-accent-mid shrink-0">ᚱᚢᚾ</span>
+      <span className="text-palette-muted-light uppercase tracking-[0.16em] mr-0.5 shrink-0 leading-tight">Story Path:</span>
       {STAGES.map(({ value, label }) => (
         <GameButton
           key={value}
@@ -34,12 +35,12 @@ export function StageSelector({
             onStageChange(value);
           }}
           data-testid={`stage-${value.replace(/\s+/g, "-").toLowerCase()}`}
-          aria-label={`Stage: ${label}`}
+          aria-label={`Story path: ${label}`}
           className={cn(
             "px-1.5 sm:px-2 py-0.5 h-auto leading-tight",
             stage === value
-              ? "bg-palette-accent-soft/50 text-palette-accent-soft border-palette-accent-mid/50"
-              : "text-palette-muted hover:text-palette-muted-light border-transparent"
+              ? "bg-palette-accent-soft/45 text-palette-accent-bright border-palette-accent-soft/60"
+              : "text-palette-muted-light hover:text-palette-accent-bright border-transparent"
           )}
         >
           {label}

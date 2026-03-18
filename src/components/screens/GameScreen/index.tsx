@@ -104,7 +104,7 @@ export function GameScreen() {
     if (isLoading) {
       return (
         <LoadingOverlay
-          message="INITIALIZING..."
+          message="Lanterns are waking..."
           onRetry={() => dispatch(retryInitialize)}
         />
       );
@@ -115,7 +115,7 @@ export function GameScreen() {
   if (!player || !currentArea) {
     return (
       <LoadingOverlay
-        message="INITIALIZING..."
+        message="Lanterns are waking..."
         onRetry={() => dispatch(retryInitialize)}
       />
     );

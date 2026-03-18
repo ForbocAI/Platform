@@ -33,14 +33,14 @@ export function ActionButtons({
           onClick={onToggleAutoPlay}
           className="shrink-0 p-1.5 h-6 sm:h-7"
           data-testid="auto-play-toggle"
-          aria-label={autoPlay ? "Stop auto-play" : "Start auto-play"}
-          title={autoPlay ? "Stop auto-play" : "Start auto-play"}
+          aria-label={autoPlay ? "Call helpers back" : "Let helpers roam"}
+          title={autoPlay ? "Call helpers back" : "Let helpers roam"}
         />
       )}
       <DirectionalPad currentArea={currentArea} onMove={onMove} onMapClick={onMapClick} />
       <div className="grid grid-cols-3 lg:flex gap-1 min-w-0 shrink-0">
         <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan">
-          OBSERVE
+          SCOUT
         </GameButton>
         <GameButton
           onClick={onEngage}
@@ -49,7 +49,7 @@ export function ActionButtons({
           data-testid="action-engage"
           disabled={!currentArea.npcs || currentArea.npcs.length === 0}
         >
-          CONFRONT
+          FACE TROUBLE
         </GameButton>
         <GameButton
           onClick={onPerformInquiry}
@@ -57,7 +57,7 @@ export function ActionButtons({
           icon={<MessageCircle className="app-icon" />}
           data-testid="action-perform-inquiry"
         >
-          COMMUNE
+          ASK
         </GameButton>
       </div>
     </div>

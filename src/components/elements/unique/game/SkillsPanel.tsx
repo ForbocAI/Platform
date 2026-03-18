@@ -21,18 +21,18 @@ export function SkillsPanel({ player, onClose }: SkillsPanelProps) {
   const skills = player.capabilities.learned ?? [];
   return (
     <Modal
-      title="Unlocked Skills"
+      title="Knacks"
       titleIcon={<Sparkles className="w-5 h-5 text-palette-accent-bright" />}
       onClose={onClose}
       data-testid="skills-panel"
     >
       {skills.length === 0 ? (
-        <p className="text-palette-muted text-sm">No skills unlocked yet. Level up to unlock class skills.</p>
+        <p className="text-palette-muted-light text-sm">No knacks have bloomed yet. Keep traveling to uncover more class talents.</p>
       ) : (
         <ul className="space-y-2">
           {skills.map((skillId) => (
             <li key={skillId}>
-              <div className="flex items-center gap-2 p-3 bg-palette-bg-mid/30 border border-palette-border rounded text-palette-white">
+              <div className="flex items-center gap-2 p-3 bg-palette-bg-mid/30 border border-palette-border/70 rounded-[22px] text-palette-white">
                 <Sparkles className="w-4 h-4 text-palette-accent-bright shrink-0" />
                 <span className="font-medium flex-1">{formatSkillLabel(skillId)}</span>
               </div>

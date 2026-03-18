@@ -56,8 +56,8 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>
                   <div className="text-right text-xs">
-                    <div className="text-palette-accent-mid">{item.cost?.primary ?? 0} Primary</div>
-                    {item.cost?.secondary ? <div className="text-palette-accent-mid">{item.cost.secondary} Secondary</div> : null}
+                    <div className="text-palette-accent-mid">{item.cost?.primary ?? 0} Pollen</div>
+                    {item.cost?.secondary ? <div className="text-palette-accent-mid">{item.cost.secondary} Glowstones</div> : null}
                   </div>
                 </div>
                 <p className="text-xs text-palette-text-muted italic">{item.description}</p>
@@ -87,10 +87,10 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
           </h3>
           <div className="mb-2 text-sm flex gap-4">
             <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
-              <span>Primary:</span> {player.inventory.spirit ?? 0}
+              <span>Pollen:</span> {player.inventory.spirit ?? 0}
             </div>
             <div className="flex items-center gap-1 text-palette-accent-mid font-bold">
-              <span>Secondary:</span> {player.inventory.blood ?? 0}
+              <span>Glowstones:</span> {player.inventory.blood ?? 0}
             </div>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-palette-border min-h-0">
@@ -98,7 +98,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
               <div key={item.id} className="p-2 border border-palette-border/50 bg-palette-bg-mid/20 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-bold text-palette-white">{item.name}</span>
-                  <span className="text-xs text-palette-accent-mid">Sell: {getSellValue(item)} Primary</span>
+                  <span className="text-xs text-palette-accent-mid">Sell: {getSellValue(item)} Pollen</span>
                 </div>
                 <p className="text-xs text-palette-text-muted italic">{item.description}</p>
                 <GameButton

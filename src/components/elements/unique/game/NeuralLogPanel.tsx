@@ -1,6 +1,6 @@
 "use client";
 
-import { Terminal } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/features/core/utils";
@@ -21,9 +21,9 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
 
   return (
     <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
-      <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border bg-palette-bg-mid/20 shrink-0">
-        <Terminal className="app-icon text-palette-accent-mid shrink-0 animate-ambient-breathe" />
-        <span className="font-bold tracking-widest text-palette-muted uppercase leading-tight" data-macro-scramble>CHRONICLE</span>
+      <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border/60 bg-palette-bg-mid/20 shrink-0">
+        <BookOpen className="app-icon text-palette-accent-mid shrink-0 animate-ambient-breathe" />
+        <span className="font-display font-bold tracking-[0.18em] text-palette-accent-bright uppercase leading-tight">Lantern Chronicle</span>
         <RuneSigil className="ml-auto" />
       </div>
       <div
@@ -39,7 +39,7 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
                   alt="Agent Portrait"
                   width={40}
                   height={40}
-                  className="w-10 h-10 rounded-sm border border-palette-border object-cover opacity-80"
+                  className="w-10 h-10 rounded-2xl border border-palette-border/60 object-cover opacity-90"
                   unoptimized
                 />
               </div>
@@ -47,11 +47,11 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
             <p
               className={cn(
                 "leading-relaxed pl-1.5 border-l-2 wrap-break-word flex-1",
-                log.type === "combat" && "text-palette-accent-mid border-palette-border-dim",
-                log.type === "system" && "text-palette-accent-mid border-palette-border",
-                log.type === "oracle" && "text-palette-accent-soft border-palette-border bg-palette-accent-soft/10 p-1 italic",
-                log.type === "exploration" && "text-palette-muted-light border-palette-border",
-                log.type === "dialogue" && "text-palette-accent-bright border-palette-accent-mid bg-palette-accent-mid/5 p-1.5 rounded-sm font-medium"
+                log.type === "combat" && "text-palette-accent-dim border-palette-accent-dim/50",
+                log.type === "system" && "text-palette-accent-mid border-palette-border-light/45",
+                log.type === "oracle" && "text-palette-accent-soft border-palette-accent-soft/50 bg-palette-accent-soft/10 p-1 italic rounded-r-2xl",
+                log.type === "exploration" && "text-palette-muted-light border-palette-border/60",
+                log.type === "dialogue" && "text-palette-accent-bright border-palette-accent-mid/55 bg-palette-accent-mid/7 p-1.5 rounded-r-2xl font-medium"
               )}
             >
               <span className="opacity-50 mr-2 shrink-0">

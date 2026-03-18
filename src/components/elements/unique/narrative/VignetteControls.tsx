@@ -27,7 +27,7 @@ export function VignetteControls({
   return (
     <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5 space-y-1.5" data-testid="vignette-controls">
       <div className="flex items-center justify-between">
-        <span className="text-palette-muted uppercase tracking-wider text-xs block">Vignette</span>
+        <span className="text-palette-muted-light uppercase tracking-[0.16em] text-xs block">Lantern Scene</span>
         {currentSceneId && onFadeOutScene && (
           <GameButton
             onClick={onFadeOutScene}
@@ -35,20 +35,20 @@ export function VignetteControls({
             data-testid="fade-out-scene"
             aria-label="Fade out scene"
           >
-            Fade out
+            Fold Away
           </GameButton>
         )}
       </div>
 
       {theme ? (
-        <p className="text-xs text-palette-muted animate-in fade-in slide-in-from-top-1 duration-300">
-          <span className="text-palette-accent-soft font-bold">Acting:</span> {theme} <span className="opacity-50">·</span> {stage}
+        <p className="text-xs text-palette-muted-light animate-in fade-in slide-in-from-top-1 duration-300">
+          <span className="text-palette-accent-soft font-bold">On the bough:</span> {theme} <span className="opacity-50">·</span> {stage}
           {threadIds?.length && threads.length
-            ? <span className="block mt-0.5 text-palette-text-muted/70">Threads: {threadIds.map((id) => threads.find((t) => t.id === id)?.name ?? id).join(", ")}</span>
+            ? <span className="block mt-0.5 text-palette-text-muted/70">Story threads: {threadIds.map((id) => threads.find((t) => t.id === id)?.name ?? id).join(", ")}</span>
             : null}
         </p>
       ) : (
-        <p className="text-xs text-palette-muted italic">No active vignette.</p>
+        <p className="text-xs text-palette-muted italic">No lantern scene is active.</p>
       )}
     </div>
   );

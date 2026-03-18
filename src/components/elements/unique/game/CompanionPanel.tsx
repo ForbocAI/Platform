@@ -33,29 +33,29 @@ export function CompanionPanel({ player, onClose }: CompanionPanelProps) {
     >
       <div className="space-y-4">
         {companions.length === 0 ? (
-          <div className="text-center p-8 border border-dashed border-palette-border rounded text-palette-muted">
-            <p>You have no companions.</p>
-            <p className="text-xs mt-2">Hire mercenaries from Captains in the tower.</p>
+          <div className="text-center p-8 border border-dashed border-palette-border rounded-[24px] text-palette-muted-light bg-palette-bg-dark/30">
+            <p>No companions are traveling with you yet.</p>
+            <p className="text-xs mt-2">Invite neighbors and familiars from Thimble Market as new routes reopen.</p>
           </div>
         ) : (
           <div className="grid gap-3">
             {companions.map((comp) => (
-              <div key={comp.id} className="p-3 border border-palette-border bg-palette-bg-mid/10 rounded flex flex-col gap-2">
+              <div key={comp.id} className="p-3 border border-palette-border/60 bg-palette-bg-mid/20 rounded-[24px] flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {getRoleIcon(comp.role)}
                     <span className="font-bold text-palette-white">{comp.name}</span>
-                    <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-palette-bg-dark border border-palette-border text-palette-muted">
+                    <span className="text-[10px] uppercase px-1.5 py-0.5 rounded-full bg-palette-bg-dark border border-palette-border/70 text-palette-muted-light">
                       {comp.role}
                     </span>
                   </div>
-                  <div className="text-xs text-palette-muted">
-                    HP: {comp.stats.hp} / {comp.stats.maxHp}
+                  <div className="text-xs text-palette-muted-light">
+                    Health: {comp.stats.hp} / {comp.stats.maxHp}
                   </div>
                 </div>
                 <div className="h-1.5 w-full bg-palette-bg-dark rounded-full overflow-hidden border border-palette-border/50">
                   <div
-                    className="h-full bg-palette-accent-dim transition-all duration-300"
+                    className="h-full bg-palette-accent-soft transition-all duration-300"
                     style={{ width: `${Math.max(0, Math.min(100, (comp.stats.hp / comp.stats.maxHp) * 100))}%` }}
                   />
                 </div>

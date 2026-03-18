@@ -1,408 +1,336 @@
-@import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Noto+Sans+Runic&family=Nunito+Sans:wght@400;600;700;800&display=swap");
 @import "tailwindcss";
 
-/* Michroma — grimdark cyberpunk UI. Single font for consistency. */
 @theme {
-  --font-sans: "Michroma", sans-serif;
-  --font-mono: "Michroma", monospace;
-  --font-display: "Michroma", sans-serif;
-  --font-runic: "Michroma", sans-serif;
-  /* Monochrome palette — grayscale only */
-  --color-palette-bg: #0f0f0f;
-  --color-palette-bg-dark: #000000;
-  --color-palette-bg-mid: #1f1f1f;
-  --color-palette-panel: #2f2f2f;
-  --color-palette-muted: #4b4b4b;
-  --color-palette-muted-light: #5b5b5b;
-  --color-palette-border: #2f2f2f;
-  --color-palette-accent-mid: #b0b0b0;
-  --color-palette-border-dim: #4b4b4b;
-  --color-palette-accent-soft: #a0a0a0;
-  --color-palette-accent-dim: #909090;
-  --color-palette-accent-bright: #c0c0c0;
-  --color-palette-white: #ffffff;
-  --color-palette-foreground: #ebebeb;
+  --font-sans: "Nunito Sans", sans-serif;
+  --font-mono: "Nunito Sans", sans-serif;
+  --font-display: "Fraunces", serif;
+  --font-runic: "Noto Sans Runic", "Fraunces", serif;
+
+  --color-palette-bg: #1b1511;
+  --color-palette-bg-dark: #120d0a;
+  --color-palette-bg-mid: #2d241d;
+  --color-palette-bg-light: #43362a;
+  --color-palette-bg-panel: #544335;
+  --color-palette-panel: #544335;
+
+  --color-palette-border: #8e7459;
+  --color-palette-border-dim: #68513f;
+  --color-palette-border-light: #c5aa84;
+
+  --color-palette-accent: #ddb36a;
+  --color-palette-accent-mid: #e4c16c;
+  --color-palette-accent-soft: #92b47d;
+  --color-palette-accent-dim: #cf9274;
+  --color-palette-accent-bright: #f8e7b5;
+  --color-palette-accent-green: #87b76a;
+  --color-palette-accent-lime: #b9d87b;
+  --color-palette-highlight: #f9efcf;
+
+  --color-palette-muted: #bca892;
+  --color-palette-muted-light: #e4d3bf;
+  --color-palette-text-muted: #cbb8a2;
+  --color-palette-foreground: #fff7eb;
+  --color-palette-white: #fffdf8;
 }
 
-/* Runes — Michroma. Style-guide: ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ */
-.font-runic {
-  font-family: var(--font-runic);
-}
-
-/* Display font — headings / titles */
-.font-display {
-  font-family: var(--font-display);
-}
-
-/* Monochrome palette — grayscale only */
 :root {
-  --background: #0f0f0f;
-  --foreground: #ebebeb;
-  --accent-mid: #b0b0b0;
-  --border-dim: #4b4b4b;
-  --palette-bg-dark: #000000;
-  --palette-bg-mid: #1f1f1f;
-  --palette-bg-panel: #2f2f2f;
-  --palette-muted: #4b4b4b;
-  --palette-muted-light: #5b5b5b;
-  --palette-border: #2f2f2f;
-  --palette-border-light: #4b4b4b;
-  --palette-accent-soft: #a0a0a0;
-  --palette-accent-dim: #909090;
-  --palette-accent-bright: #c0c0c0;
-  --palette-white: #ffffff;
-  --color-rune-ink: #4b4b4b;
-  /* Single font and icon size — all text and icons use these globally */
-  --font-size-base: 0.6rem;
-  --icon-size: 1.4em;
+  --background: #1b1511;
+  --foreground: #fff7eb;
+  --accent: #ddb36a;
+  --accent-mid: #e4c16c;
+  --accent-soft: #92b47d;
+  --accent-dim: #cf9274;
+  --accent-bright: #f8e7b5;
+  --accent-green: #87b76a;
+  --accent-lime: #b9d87b;
+  --highlight: #f9efcf;
+  --border-dim: #68513f;
+  --palette-bg-dark: #120d0a;
+  --palette-bg-mid: #2d241d;
+  --palette-bg-light: #43362a;
+  --palette-bg-panel: #544335;
+  --palette-muted: #bca892;
+  --palette-muted-light: #e4d3bf;
+  --palette-text-muted: #cbb8a2;
+  --palette-border: #8e7459;
+  --palette-border-light: #c5aa84;
+  --palette-accent: #ddb36a;
+  --palette-accent-soft: #92b47d;
+  --palette-accent-dim: #cf9274;
+  --palette-accent-bright: #f8e7b5;
+  --palette-accent-green: #87b76a;
+  --palette-accent-lime: #b9d87b;
+  --palette-highlight: #f9efcf;
+  --palette-white: #fffdf8;
+  --color-rune-ink: #efd8ab;
+  --font-size-base: 0.68rem;
+  --icon-size: 1.35em;
 }
 
 @media (max-width: 640px) {
   :root {
-    --font-size-base: 0.4rem;
+    --font-size-base: 0.54rem;
   }
 }
 
 @layer base {
-  body {
+  html {
     background-color: var(--background);
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top, rgba(248, 231, 181, 0.14), transparent 28%),
+      radial-gradient(circle at 18% 20%, rgba(146, 180, 125, 0.12), transparent 25%),
+      radial-gradient(circle at 82% 10%, rgba(221, 179, 106, 0.18), transparent 24%),
+      linear-gradient(180deg, #261b15 0%, #1a1410 44%, #120d0a 100%);
     color: var(--foreground);
     min-height: 100vh;
     overflow-x: hidden;
+    position: relative;
     font-family: var(--font-sans);
     font-size: var(--font-size-base);
-    line-height: 1.4;
-    letter-spacing: 0.02em;
+    line-height: 1.45;
+    letter-spacing: 0.015em;
   }
 
-  /* All text inherits same size; components must not set font-size */
   * {
     font-size: inherit;
   }
 
-  /* All icons same size — use .app-icon on Lucide (or any) icons */
+  a {
+    color: inherit;
+  }
+
   .app-icon {
     width: var(--icon-size);
     height: var(--icon-size);
     flex-shrink: 0;
   }
 
-  /* SAVE FOR LATER: CRT Scanline Effect — palette: #000000, #ff0000, #172317, #0000ff */
   body::before {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: linear-gradient(rgba(15, 15, 15, 0) 25%, rgba(0, 0, 0, 0.25) 25%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(23, 35, 23, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 100;
-    background-size: 100% 4px, 3px 100%;
+    content: "";
+    position: fixed;
+    inset: 0;
     pointer-events: none;
+    background:
+      radial-gradient(circle at 14% 28%, rgba(248, 231, 181, 0.14), transparent 8%),
+      radial-gradient(circle at 72% 18%, rgba(248, 231, 181, 0.12), transparent 9%),
+      radial-gradient(circle at 62% 66%, rgba(146, 180, 125, 0.08), transparent 14%),
+      radial-gradient(circle at 24% 78%, rgba(221, 179, 106, 0.08), transparent 12%);
+    opacity: 0.9;
+    z-index: 0;
+    animation: lantern-drift 18s ease-in-out infinite;
   }
 
-  /* CRT Flicker Overlay — palette #0f0f0f */
   body::after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: rgba(15, 15, 15, 0.1);
-    opacity: 0;
-    z-index: 101;
+    content: "";
+    position: fixed;
+    inset: 0;
     pointer-events: none;
-    animation: flicker 0.15s infinite;
+    background-image:
+      linear-gradient(rgba(255, 248, 235, 0.025), rgba(255, 248, 235, 0)),
+      radial-gradient(circle at 1px 1px, rgba(255, 248, 235, 0.075) 1px, transparent 0);
+    background-size: 100% 100%, 18px 18px;
+    opacity: 0.22;
+    z-index: 0;
   }
 }
 
-@keyframes flicker {
-  0% { opacity: 0.27861; }
-  5% { opacity: 0.34769; }
-  10% { opacity: 0.23604; }
-  15% { opacity: 0.90626; }
-  20% { opacity: 0.18128; }
-  25% { opacity: 0.83891; }
-  30% { opacity: 0.65583; }
-  35% { opacity: 0.57807; }
-  40% { opacity: 0.26559; }
-  45% { opacity: 0.84693; }
-  50% { opacity: 0.96019; }
-  55% { opacity: 0.08523; }
-  60% { opacity: 0.71313; }
-  65% { opacity: 0.09047; }
-  70% { opacity: 0.47033; }
-  75% { opacity: 0.81093; }
-  80% { opacity: 0.58391; }
-  85% { opacity: 0.65573; }
-  90% { opacity: 0.31925; }
-  95% { opacity: 0.35813; }
-  100% { opacity: 0.32204; }
-}
-
-/* ─── ANIMATIONS: forbocai.github.io legacy ──────────────────────────────────── */
-
-/* Status LED / ambient breathe — pulsing opacity */
 @keyframes ambient-breathe {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.72; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
 }
 
-/* Holographic flicker — subtle opacity drop */
-@keyframes holo-flicker {
-  0%, 100% { opacity: 1; }
-  93% { opacity: 0.85; }
-  94% { opacity: 1; }
+@keyframes lantern-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.25%); }
 }
 
-/* Cursor blink — terminal underscore */
-@keyframes cursor-blink {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
+@keyframes lantern-float {
+  0%, 100% { transform: translateY(0); opacity: 0.88; }
+  50% { transform: translateY(-2px); opacity: 1; }
 }
 
-/* Glitch text — clip + skew distortion (use with data-text attr) */
-@keyframes glitch-anim {
-  0% { clip: rect(31px, 9999px, 94px, 0); transform: skew(0.85deg); }
-  5% { clip: rect(70px, 9999px, 11px, 0); transform: skew(0.24deg); }
-  10% { clip: rect(6px, 9999px, 83px, 0); transform: skew(0.73deg); }
-  15% { clip: rect(25px, 9999px, 93px, 0); transform: skew(0.18deg); }
-  20% { clip: rect(2px, 9999px, 3px, 0); transform: skew(0.19deg); }
-  25% { clip: rect(98px, 9999px, 50px, 0); transform: skew(0.35deg); }
-  30% { clip: rect(80px, 9999px, 59px, 0); transform: skew(0.95deg); }
-  35% { clip: rect(50px, 9999px, 78px, 0); transform: skew(0.67deg); }
-  40% { clip: rect(37px, 9999px, 59px, 0); transform: skew(0.97deg); }
-  45% { clip: rect(10px, 9999px, 63px, 0); transform: skew(0.04deg); }
-  50% { clip: rect(44px, 9999px, 98px, 0); transform: skew(0.53deg); }
-  55% { clip: rect(81px, 9999px, 63px, 0); transform: skew(0.5deg); }
-  60% { clip: rect(76px, 9999px, 12px, 0); transform: skew(0.39deg); }
-  65% { clip: rect(85px, 9999px, 35px, 0); transform: skew(0.34deg); }
-  70% { clip: rect(2px, 9999px, 33px, 0); transform: skew(0.97deg); }
-  75% { clip: rect(52px, 9999px, 83px, 0); transform: skew(0.48deg); }
-  80% { clip: rect(49px, 9999px, 75px, 0); transform: skew(0.18deg); }
-  85% { clip: rect(100px, 9999px, 6px, 0); transform: skew(0.94deg); }
-  90% { clip: rect(35px, 9999px, 16px, 0); transform: skew(0.03deg); }
-  95% { clip: rect(66px, 9999px, 67px, 0); transform: skew(0.24deg); }
-  100% { clip: rect(19px, 9999px, 64px, 0); transform: skew(0.93deg); }
+@keyframes rune-glow {
+  0%, 100% { opacity: 0.75; text-shadow: 0 0 8px rgba(248, 231, 181, 0.15); }
+  50% { opacity: 1; text-shadow: 0 0 14px rgba(248, 231, 181, 0.35); }
 }
 
-@keyframes glitch-anim2 {
-  0% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.85deg); }
-  5% { clip: rect(52px, 9999px, 74px, 0); transform: skew(0.24deg); }
-  10% { clip: rect(79px, 9999px, 85px, 0); transform: skew(0.73deg); }
-  15% { clip: rect(75px, 9999px, 5px, 0); transform: skew(0.18deg); }
-  20% { clip: rect(67px, 9999px, 91px, 0); transform: skew(0.19deg); }
-  25% { clip: rect(14px, 9999px, 51px, 0); transform: skew(0.35deg); }
-  30% { clip: rect(18px, 9999px, 75px, 0); transform: skew(0.95deg); }
-  35% { clip: rect(86px, 9999px, 90px, 0); transform: skew(0.67deg); }
-  40% { clip: rect(64px, 9999px, 6px, 0); transform: skew(0.97deg); }
-  45% { clip: rect(62px, 9999px, 49px, 0); transform: skew(0.04deg); }
-  50% { clip: rect(10px, 9999px, 9px, 0); transform: skew(0.53deg); }
-  55% { clip: rect(3px, 9999px, 5px, 0); transform: skew(0.5deg); }
-  60% { clip: rect(5px, 9999px, 81px, 0); transform: skew(0.39deg); }
-  65% { clip: rect(52px, 9999px, 18px, 0); transform: skew(0.34deg); }
-  70% { clip: rect(67px, 9999px, 6px, 0); transform: skew(0.97deg); }
-  75% { clip: rect(21px, 9999px, 58px, 0); transform: skew(0.48deg); }
-  80% { clip: rect(98px, 9999px, 14px, 0); transform: skew(0.18deg); }
-  85% { clip: rect(16px, 9999px, 57px, 0); transform: skew(0.94deg); }
-  90% { clip: rect(8px, 9999px, 69px, 0); transform: skew(0.03deg); }
-  95% { clip: rect(22px, 9999px, 47px, 0); transform: skew(0.24deg); }
-  100% { clip: rect(4px, 9999px, 9px, 0); transform: skew(0.93deg); }
-}
-
-/* Enemy Animations */
 @keyframes enemy-flash-attack {
   0%, 100% { filter: brightness(1) sepia(0); }
-  50% { filter: brightness(2) red(255); box-shadow: 0 0 15px var(--accent-mid); transform: scale(1.02); }
+  50% { filter: brightness(1.2); box-shadow: 0 0 18px rgba(221, 179, 106, 0.28); transform: scale(1.01); }
 }
 
 @keyframes enemy-flash-damage {
   0%, 100% { opacity: 1; filter: brightness(1); }
-  25% { opacity: 0.5; filter: brightness(3) invert(1); }
+  25% { opacity: 0.72; filter: brightness(1.22); }
   50% { opacity: 1; filter: brightness(1); }
-  75% { opacity: 0.5; filter: brightness(3) invert(1); }
+  75% { opacity: 0.72; filter: brightness(1.22); }
 }
 
 .animate-enemy-attack {
-  animation: enemy-flash-attack 0.3s ease-out forwards;
+  animation: enemy-flash-attack 0.35s ease-out forwards;
 }
 
 .animate-enemy-damage {
   animation: enemy-flash-damage 0.5s ease-out forwards;
 }
 
-/* Status LED — monochrome pulse (use animation: ambient-breathe) */
-.status-led {
-  width: 5px;
-  height: 5px;
-  min-width: 5px;
-  min-height: 5px;
-  background: var(--accent-mid);
-  border-radius: 50%;
-  box-shadow: 0 0 6px var(--accent-mid), 0 0 8px var(--accent-mid);
-  margin-left: 0.5rem;
-  position: relative;
-  opacity: 0.9;
-  animation: ambient-breathe 2s ease-in-out infinite;
+.font-runic {
+  font-family: var(--font-runic);
+  letter-spacing: 0.14em;
 }
 
-/* Glitch text — requires data-text="Your Text" */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.status-led {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  min-height: 6px;
+  background: var(--accent-bright);
+  border-radius: 999px;
+  box-shadow: 0 0 6px rgba(248, 231, 181, 0.7), 0 0 10px rgba(248, 231, 181, 0.42);
+  margin-left: 0.5rem;
+  position: relative;
+  animation: ambient-breathe 2.4s ease-in-out infinite;
+}
+
 .glitch-text {
   position: relative;
   display: inline-block;
+  text-shadow: 0 0 12px rgba(248, 231, 181, 0.16);
 }
 
 .glitch-text::before,
 .glitch-text::after {
   content: attr(data-text);
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--background);
+  inset: 0;
   pointer-events: none;
+  opacity: 0.18;
 }
 
 .glitch-text::before {
-  left: 2px;
-  text-shadow: -1px 0 var(--palette-muted-light), 1px 0 var(--palette-muted-light);
-  clip: rect(0, 9999px, 0.5em, 0);
-  animation: glitch-anim 3s infinite linear alternate-reverse;
+  color: var(--palette-accent-soft);
+  transform: translate(0.05em, -0.03em);
 }
 
 .glitch-text::after {
-  left: -2px;
-  text-shadow: -1px 0 var(--palette-muted);
-  clip: rect(44px, 450px, 56px, 0);
-  animation: glitch-anim2 5s infinite linear alternate-reverse;
+  color: var(--palette-accent-bright);
+  transform: translate(-0.04em, 0.04em);
 }
 
-/* Macro scramble / terminal cursor — blinking underscore */
 [data-macro-scramble] {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   color: var(--foreground);
-  text-shadow: 0 0 5px rgba(176, 176, 176, 0.4);
-  position: relative;
   display: inline-block;
+  letter-spacing: 0.12em;
 }
 
 [data-macro-scramble]::after {
-  content: "_";
-  opacity: 0;
-  animation: cursor-blink 0.8s step-end infinite;
-  margin-left: 2px;
-  color: var(--accent-mid);
+  content: " ᚭ";
+  color: var(--color-rune-ink);
+  animation: rune-glow 3s ease-in-out infinite;
 }
 
-/* Encrypted text — JS hook for Sneakers decrypt effect */
 .encrypted-text {
   display: inline-block;
 }
 
-/* Holo-flicker — apply to elements for subtle flicker */
 .animate-holo-flicker {
-  animation: holo-flicker 3s ease-in-out infinite;
+  animation: lantern-float 5s ease-in-out infinite;
 }
 
-/* Ambient breathe — apply for pulsing opacity */
 .animate-ambient-breathe {
   animation: ambient-breathe 2.5s ease-in-out infinite;
 }
 
 .vengeance-border {
-  border: 1px solid var(--border-dim);
-  box-shadow: 0 0 10px rgba(75, 75, 75, 0.3), inset 0 0 10px rgba(75, 75, 75, 0.2);
-  clip-path: polygon(
-    0 5px, 
-    5px 0, 
-    calc(100% - 5px) 0, 
-    100% 5px, 
-    100% calc(100% - 5px), 
-    calc(100% - 5px) 100%, 
-    5px 100%, 
-    0 calc(100% - 5px)
-  );
+  border: 1px solid rgba(197, 170, 132, 0.42);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(67, 54, 42, 0.38), rgba(18, 13, 10, 0.62));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 248, 235, 0.08),
+    inset 0 0 0 1px rgba(248, 231, 181, 0.04);
+  backdrop-filter: blur(14px);
 }
 
 .vengeance-button {
   @apply transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
-  background: rgba(75, 75, 75, 0.2);
-  border: 1px solid var(--border-dim);
-  color: var(--accent-mid);
+  background: linear-gradient(180deg, rgba(67, 54, 42, 0.7), rgba(45, 36, 29, 0.9));
+  border: 1px solid rgba(197, 170, 132, 0.4);
+  border-radius: 999px;
+  color: var(--accent-bright);
   text-transform: uppercase;
-  font-weight: bold;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
 
 .vengeance-button:hover:not(:disabled) {
-  background: rgba(75, 75, 75, 0.4);
-  box-shadow: 0 0 15px rgba(176, 176, 176, 0.3);
+  background: linear-gradient(180deg, rgba(84, 67, 53, 0.78), rgba(52, 41, 33, 0.95));
+  box-shadow: 0 0 18px rgba(221, 179, 106, 0.18);
   color: var(--palette-white);
 }
 
 .text-mid {
   color: var(--accent-mid);
-  text-shadow: 0 0 5px rgba(176, 176, 176, 0.5);
+  text-shadow: 0 0 10px rgba(228, 193, 108, 0.22);
 }
 
-/* Logo — monochrome (grayscale) */
 .logo-theme {
-  filter: grayscale(1) brightness(0.9) contrast(1.1)
-          drop-shadow(0 0 5px rgba(176, 176, 176, 0.4));
+  filter: sepia(0.18) saturate(1) brightness(0.98)
+          drop-shadow(0 0 10px rgba(248, 231, 181, 0.28));
   transition: all 0.3s ease;
-  animation: logo-pulse 4s ease-in-out infinite;
+  animation: logo-pulse 4.5s ease-in-out infinite;
 }
 
 .logo-theme:hover {
-  filter: grayscale(1) brightness(1.05) contrast(1.1)
-          drop-shadow(0 0 12px rgba(176, 176, 176, 0.5));
-  transform: scale(1.05);
+  filter: sepia(0.2) saturate(1.08) brightness(1.04)
+          drop-shadow(0 0 16px rgba(248, 231, 181, 0.34));
+  transform: scale(1.04);
 }
 
 @keyframes logo-pulse {
   0%, 100% {
-    filter: grayscale(1) brightness(0.9) contrast(1.1)
-            drop-shadow(0 0 5px rgba(176, 176, 176, 0.4));
+    filter: sepia(0.18) saturate(1) brightness(0.98)
+            drop-shadow(0 0 10px rgba(248, 231, 181, 0.28));
   }
   50% {
-    filter: grayscale(1) brightness(1) contrast(1.1)
-            drop-shadow(0 0 10px rgba(176, 176, 176, 0.5));
+    filter: sepia(0.22) saturate(1.04) brightness(1.02)
+            drop-shadow(0 0 14px rgba(248, 231, 181, 0.34));
   }
 }
 
-/* ─── SCROLLBARS: grimdark monochrome ───────────────────────────────────────
- * Track: void. Thumb: muted with gray outline. Matches vengeance-border palette.
- */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--palette-muted) var(--palette-bg-dark);
+  scrollbar-color: rgba(197, 170, 132, 0.65) rgba(18, 13, 10, 0.6);
 }
 
 *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 *::-webkit-scrollbar-track {
-  background: var(--palette-bg-dark);
+  background: rgba(18, 13, 10, 0.68);
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--palette-muted);
-  border: 1px solid var(--border-dim);
-  border-radius: 0;
+  background: linear-gradient(180deg, rgba(221, 179, 106, 0.85), rgba(146, 180, 125, 0.72));
+  border: 1px solid rgba(197, 170, 132, 0.45);
+  border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--palette-muted-light);
-  box-shadow: 0 0 6px rgba(75, 75, 75, 0.4);
+  box-shadow: 0 0 10px rgba(221, 179, 106, 0.24);
 }
 
 *::-webkit-scrollbar-corner {
-  background: var(--palette-bg-dark);
+  background: rgba(18, 13, 10, 0.68);
 }

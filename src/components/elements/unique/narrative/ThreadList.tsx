@@ -20,7 +20,7 @@ export function ThreadList({
 
   return (
     <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5" data-testid="thread-list">
-      <span className="text-palette-muted uppercase tracking-wider text-xs block mb-1">Threads</span>
+      <span className="text-palette-muted-light uppercase tracking-[0.16em] text-xs block mb-1">Story Threads</span>
       <div className="flex flex-wrap gap-1">
         {threads.map((t) => (
           <GameButton
@@ -31,12 +31,12 @@ export function ThreadList({
               onSetMain(t.id);
             }}
             data-testid={`thread-${t.id}`}
-            aria-label={mainThreadId === t.id ? `Main thread: ${t.name}` : `Set main thread: ${t.name}`}
+            aria-label={mainThreadId === t.id ? `Main story thread: ${t.name}` : `Set main story thread: ${t.name}`}
             className={cn(
               "px-2 py-0.5 text-xs h-auto",
               mainThreadId === t.id
-                ? "bg-palette-accent-soft/50 border-palette-accent-mid/50 text-palette-accent-mid"
-                : "border-palette-border text-palette-muted hover:text-palette-muted-light"
+                ? "bg-palette-accent-soft/45 border-palette-accent-soft/60 text-palette-accent-bright"
+                : "border-palette-border/60 text-palette-muted-light hover:text-palette-accent-bright"
             )}
           >
             {t.name}
