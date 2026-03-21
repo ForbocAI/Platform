@@ -25,7 +25,7 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
         className="w-full flex items-center gap-1 p-1.5 h-auto text-left justify-start border-transparent bg-transparent text-palette-muted-light hover:text-palette-muted uppercase tracking-wider hover:bg-transparent"
         data-testid="facts-toggle"
         aria-label={open ? "Close Field Notes" : "Open Field Notes"}
-        title="Facts gathered on the path — Lanternbough field notes."
+        title="Field notes gathered along the way."
       >
         <span className="normal-case">Field Notes ({facts.length})</span>
       </GameButton>

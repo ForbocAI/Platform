@@ -9,18 +9,18 @@
 ---
 # Platform TODO
 
-Last updated: 2026-03-17
+Last updated: 2026-03-21
 
 This file tracks active repo-level work. Classified docs hold broader planning, but this file should remain useful on its own inside the Platform repo.
 
-## Immediate Blockers
+## Technical Baseline (Resolved 2026-03-21)
 
-- [ ] Fix `src/features/game/sdk/cortexService.ts` so `npm run build` succeeds.
-- [ ] Fix `__tests__/Home.spec.tsx` to render with Redux `Provider`.
-- [ ] Guard or mock `AudioContext` so Vitest does not log runtime listener failures.
-- [ ] Add a singleton guard to `src/features/game/middleware/autoplayListener.ts`.
-- [ ] Remove duplicate SDK init between `BootstrapGate.tsx` and `autoplayListener.ts`.
-- [ ] Re-implement `src/features/core/store/getInitOptions.ts`.
+- [x] Fix `src/features/game/sdk/cortexService.ts` so `npm run build` succeeds — uses dynamic imports with `.catch(() => null)` fallback.
+- [x] Fix `__tests__/Home.spec.tsx` to render with Redux `Provider` — `renderWithStore()` helper added.
+- [x] Guard or mock `AudioContext` so Vitest does not log runtime listener failures.
+- [x] Remove duplicate SDK init between `BootstrapGate.tsx` and `autoplayListener.ts`.
+- [x] Re-implement `src/features/core/store/getInitOptions.ts` — now parses all 9 URL parameters.
+- [ ] Add teardown (`clearInterval`) to `src/features/game/middleware/autoplayListener.ts` — `pollStarted` flag prevents duplicates but interval is never cleared.
 
 ## Lanternbough Identity Reset
 
@@ -49,9 +49,9 @@ This file tracks active repo-level work. Classified docs hold broader planning, 
 - [ ] Keep `docs/PLAYTEST_AUTOMATION.md` honest about real selectors and real blockers.
 - [ ] Keep `docs/bot.md` aligned with the actual AI file layout.
 
-## Verification Gate
+## Verification Gate (Passing 2026-03-21)
 
-- [ ] `npm run lint`
-- [ ] `npm run build`
-- [ ] `./node_modules/.bin/vitest run`
+- [x] `npm run lint` -> pass (11 warnings)
+- [x] `npm run build` -> pass
+- [x] `./node_modules/.bin/vitest run` -> pass (2 files, 4 tests)
 - [ ] Manual smoke check after the identity reset starts landing

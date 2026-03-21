@@ -9,41 +9,36 @@
 ---
 # Playtest Automation
 
-Last verified: 2026-03-17
+Last verified: 2026-03-21
 Project: `/Users/seandinwiddie/GitHub/Forboc.AI/Platform`
 
 This document describes the current automation surface and the real blockers in the repo. It is no longer a standing prompt to continue legacy playtesting.
 
 ## Current Baseline
 
-Verified locally:
+Verified on 2026-03-21:
 
-- `npm run lint` -> pass with 9 warnings
-- `npm run build` -> fail
-- `./node_modules/.bin/vitest run` -> fail
+- `npm run lint` -> pass with 11 warnings
+- `npm run build` -> pass
+- `./node_modules/.bin/vitest run` -> pass (2 files, 4 tests)
 
-## Current Known Blockers
+## Previously Resolved Blockers
 
-### Build
+- `cortexService.ts` SDK import break — now uses dynamic imports with graceful fallback.
+- `Home.spec.tsx` missing Redux `Provider` — now wrapped via `renderWithStore()`.
+- Audio `AudioContext` test errors — guarded.
 
-- `src/features/game/sdk/cortexService.ts` imports SDK exports that are not present in the installed `@forbocai/core` / `@forbocai/browser` packages.
-- This blocks a clean production build and any trustworthy full-stack automation pass.
+## URL Boot Options
 
-### Tests
+All URL parameters are now active. `getInitOptionsFromUrl()` parses:
 
-- `__tests__/Home.spec.tsx` renders `src/app/page.tsx` without Redux `Provider`.
-- audio boot touches `AudioContext`, which causes test-environment errors.
+- `FORBOCAI_SDK` — SDK enablement
+- `deterministic`, `forceVendor`, `forceNPC`, `lowHp`, `forceCompanion`, `lowCompanionHp` — debug/test scenarios
+- `reset` — state reset
+- `classId` — class override
+- `autoStart` — autoplay
 
-### URL Boot Options
-
-Only `FORBOCAI_SDK=ON` is currently active from URL state.
-
-The rest of the old automation-style query parameters are effectively inactive because:
-
-- `src/features/core/store/getInitOptions.ts` returns `{}`
-- `src/features/game/sdk/config.ts` returns fixed autoplay defaults
-
-Do not rely on old docs or old assumptions about `deterministic`, `autoStart`, `autoFocus`, `autoSpeed`, or similar params until the parser is restored.
+`src/features/game/sdk/config.ts` still returns fixed autoplay defaults (`focus: 'full'`, `speed: 'normal'`, `autoStart: false`).
 
 ## Browser Automation Rule
 
@@ -127,9 +122,9 @@ The following test ids are present in the current UI and are safe to target.
 - `explored-map`
 - `quests-panel`
 
-## What To Validate Once Baseline Is Restored
+## What To Validate Next
 
-After build/test health is repaired, the next meaningful automation pass should verify:
+With build/test health restored, the next meaningful automation pass should verify:
 
 1. init flow and class selection
 2. movement and map updates
@@ -143,8 +138,6 @@ After build/test health is repaired, the next meaningful automation pass should 
    - lore panels and logs
 
 ## Current Manual Smoke Sequence
-
-Use this order after the technical baseline is fixed:
 
 1. load the home route
 2. initialize a run from class selection

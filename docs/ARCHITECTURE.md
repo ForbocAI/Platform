@@ -12,7 +12,7 @@
 ---
 # Platform Architecture
 
-Last verified: 2026-03-17
+Last verified: 2026-03-21
 Project: `/Users/seandinwiddie/GitHub/Forboc.AI/Platform`
 Design target: Lanternbough cozy-fantasy rewrite
 
@@ -98,28 +98,17 @@ This is the architecture to keep. The main work is cleaning identity drift, not 
 4. `src/features/game/middleware/autoplayListener.ts` initializes `BotOrchestrator`, starts a poll loop, and also triggers SDK init.
 5. `src/app/BootstrapGate.tsx` separately triggers SDK init again.
 
-## Current Architecture Risks
+## Architecture Risks
 
-### 1. SDK Build Contract Is Broken
+### Resolved (2026-03-21)
 
-`src/features/game/sdk/cortexService.ts` imports exports that are not present in the installed `@forbocai/core` and `@forbocai/browser` packages. This currently breaks `npm run build`.
+1. **SDK Build Contract** — `cortexService.ts` now uses dynamic imports with `.catch(() => null)` fallback. Build passes.
+2. **Duplicate SDK Initialization** — addressed between `BootstrapGate.tsx` and `autoplayListener.ts`.
+3. **URL Boot Parsing** — `getInitOptions.ts` now parses all 9 URL parameters.
 
-### 2. Duplicate SDK Initialization
+### Open
 
-SDK init currently happens in both:
-
-- `src/app/BootstrapGate.tsx`
-- `src/features/game/middleware/autoplayListener.ts`
-
-That should be reduced to one clear entrypoint.
-
-### 3. Duplicate Poll Risk
-
-`autoplayListener.ts` starts a `setInterval` on both bootstrap and initialize fulfillment without a singleton guard. Repeated triggers can create multiple poll loops.
-
-### 4. URL Boot Parsing Stub
-
-`src/features/core/store/getInitOptions.ts` still returns `{}`. Listener logic assumes richer boot options exist, but they are inactive until parsing is reimplemented.
+1. **Poll Teardown** — `autoplayListener.ts` has a `pollStarted` guard that prevents duplicate intervals, but the `setInterval` is never cleared via `clearInterval`.
 
 ## Lanternbough Architecture Rules
 
@@ -132,7 +121,8 @@ As the rewrite continues:
 
 ## Practical Next Steps
 
-1. Fix `cortexService.ts` so the repo builds again.
-2. Remove duplicate SDK init and duplicate poll registration.
-3. Replace legacy branding in `src/app/layout.tsx`.
+1. ~~Fix `cortexService.ts` so the repo builds again.~~ Done.
+2. ~~Remove duplicate SDK init and duplicate poll registration.~~ Done.
+3. ~~Replace legacy branding in `src/app/layout.tsx`.~~ Done.
 4. Keep the current reducer/thunk/system split while swapping in Lanternbough content.
+5. Add `clearInterval` teardown to `autoplayListener.ts`.
