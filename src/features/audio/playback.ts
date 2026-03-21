@@ -37,6 +37,7 @@ export function setMusicStateGetter(
 function playLute(freq: number, musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const gain = ctx.createGain();
   const filter = ctx.createBiquadFilter();
@@ -76,6 +77,7 @@ function playLute(freq: number, musicVolume: number) {
 function playDrone(freq: number, musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const gain = ctx.createGain();
   const filter = ctx.createBiquadFilter();
@@ -104,6 +106,7 @@ function playDrone(freq: number, musicVolume: number) {
 function playBass(freq: number, musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const gain = ctx.createGain();
   const filter = ctx.createBiquadFilter();
@@ -135,6 +138,7 @@ function playBass(freq: number, musicVolume: number) {
 function playGrowl(musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const gain = ctx.createGain();
   const filter = ctx.createBiquadFilter();
@@ -172,6 +176,7 @@ function playGrowl(musicVolume: number) {
 function playDrum(type: number, musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const gain = ctx.createGain();
   gain.connect(ctx.destination);
@@ -265,6 +270,7 @@ function playDrum(type: number, musicVolume: number) {
 function playWail(musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const gain = ctx.createGain();
   const bandpass = ctx.createBiquadFilter();
@@ -305,6 +311,7 @@ function playWail(musicVolume: number) {
 function playHowl(musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const gain = ctx.createGain();
   const bandpass = ctx.createBiquadFilter();
@@ -345,6 +352,7 @@ function playHowl(musicVolume: number) {
 function playLowCrunch(musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
   const dur = 0.06 + Math.random() * 0.04;
   const size = Math.ceil(ctx.sampleRate * dur);
@@ -373,6 +381,7 @@ function playLowCrunch(musicVolume: number) {
 function playGlitch(musicVolume: number) {
   if (musicVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
 
   const hissDur = 0.15 + Math.random() * 0.18;
@@ -490,6 +499,7 @@ function tick() {
 
 export function startMusic() {
   const ctx = getAudioContext();
+  if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
   step = 0;
   if (musicTimeoutId) clearTimeout(musicTimeoutId);

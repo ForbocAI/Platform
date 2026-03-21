@@ -2,6 +2,7 @@ import { NonPlayerActor, PlayerActor, Capability } from "../../types";
 import { calculateEffectiveStats } from "./items";
 import { parseDiceString } from "../utils/dice";
 import { CAPABILITIES } from "../index";
+import { softenEffectLabel } from "../orchestrators/combat/helpers";
 
 export interface CombatResult {
     hit: boolean;
@@ -104,7 +105,7 @@ export function resolveNPCAttack(
             if (capability.effect) {
                 effectMsg = capability.effect(attacker.stats, effectiveDefender);
             }
-            message = `${attacker.name} activates ${capability.name}! It hits you for ${damage} damage! ${effectMsg ? `(${effectMsg})` : ""}`;
+            message = `${attacker.name} activates ${capability.name}! It hits you for ${damage} damage! ${effectMsg ? `(${softenEffectLabel(effectMsg)})` : ""}`;
         } else {
             // Basic Attack
             const diff = attackerTotal - defenderTotal;
@@ -164,7 +165,7 @@ export function resolveCapabilityDuel(
             effectMsg = capability.effect(effectiveAttacker, defender.stats);
         }
 
-        message = `You activate ${capability.name}! It hits for ${damage} damage. ${effectMsg ? `(${effectMsg})` : ""}`;
+        message = `You activate ${capability.name}! It hits for ${damage} damage. ${effectMsg ? `(${softenEffectLabel(effectMsg)})` : ""}`;
 
     } else {
         message = `You activate ${capability.name} but ${defender.name} resists! Miss! (${attackerTotal} vs ${defenderTotal})`;

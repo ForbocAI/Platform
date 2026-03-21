@@ -30,7 +30,7 @@ export const LORE_ETHEREAL_TOWERLANDS = "Moonpetal Canopy";
 /** Water-rich pathing district. */
 export const LORE_ABYSSAL_MURK = "Brookwhisper Runs";
 
-/** Seasonal cadence replacing grim churn. */
+/** Seasonal cadence and warm rhythm. */
 export const LORE_CHURNING_PHRASE =
   "the turning of seasons and lantern light";
 

@@ -48,9 +48,10 @@ export const runAgentTick = createAsyncThunk(
                 dispatch(addLog({ message: `[${agentId}] ${response.dialogue}`, type: 'dialogue', portraitUrl }));
             }
 
-            if (response.action) {
-                instruction = response.action.type;
-                reason = response.action.reason || reason;
+            const action = (response as Record<string, unknown>).action as { type?: string; reason?: string } | undefined;
+            if (action) {
+                instruction = action.type ?? instruction;
+                reason = action.reason ?? reason;
             }
         } catch (e) {
             console.warn(`Agency: Tick failed for agent [${agentId}]:`, e);

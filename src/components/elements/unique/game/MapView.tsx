@@ -46,7 +46,7 @@ export function MapView({
 
   return (
     <section
-      className="flex-1 min-h-0 vengeance-border bg-palette-bg-mid/10 flex flex-col relative overflow-hidden"
+      className="flex-1 min-h-0 cozy-panel bg-palette-bg-mid/10 flex flex-col relative overflow-hidden"
       data-testid="explored-map"
     >
       <div className="absolute inset-0 opacity-25 pointer-events-none bg-[radial-gradient(circle_at_top,rgba(248,231,181,0.12),transparent_34%),radial-gradient(circle_at_20%_80%,rgba(146,180,125,0.08),transparent_24%)]" />

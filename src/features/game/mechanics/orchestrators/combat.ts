@@ -6,7 +6,7 @@ import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog, selectCapability } from '../../store/gameSlice';
 import { handleVignetteProgression } from '../../store/constants';
 import type { GameState } from '../../store/types';
-import { parseCapabilityEffect, createPlayerStatusUpdate, createNPCStatusEffects } from './combat/helpers';
+import { parseCapabilityEffect, createPlayerStatusUpdate, createNPCStatusEffects, softenEffectLabel } from './combat/helpers';
 
 export const castCapability = createAsyncThunk(
   'game/castCapability',
@@ -32,7 +32,7 @@ export const castCapability = createAsyncThunk(
     // 1. Buffs / Healing / Self-Target
     if (isBuff || isInvuln) {
       playerStatusUpdates.push(...createPlayerStatusUpdate(effectStr));
-      dispatch(addLog({ message: `You activate ${capability.name}. ${effectStr}!`, type: 'combat' }));
+      dispatch(addLog({ message: `You activate ${capability.name}. ${softenEffectLabel(effectStr)}!`, type: 'combat' }));
     }
 
     if (isHeal) {

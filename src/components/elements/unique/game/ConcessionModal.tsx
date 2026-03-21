@@ -16,23 +16,23 @@ export function ConcessionModal({
   if (!open) return null;
 
   return (
-    <Modal title="Concession Required" onClose={() => {}}>
+    <Modal title="A Difficult Moment" onClose={() => {}}>
       <div className="space-y-4" data-testid="concession-modal">
-        <p>You have been bested in combat. The shadows claim you.</p>
+        <p>You have been bested. The lantern paths await your return.</p>
         <div className="flex flex-col gap-2">
           <GameButton
             onClick={() => onAccept("flee")}
             data-testid="concession-accept-flee"
             className="w-full text-left justify-start"
           >
-            Flee (Lose progress, keep life)
+            Slip Away (Lose progress, keep going)
           </GameButton>
           <GameButton
             onClick={() => onAccept("capture")}
             data-testid="concession-accept-capture"
             className="w-full text-left justify-start"
           >
-            Surrender (captured, lose items)
+            Yield (Captured, lose belongings)
           </GameButton>
           <div className="border-t border-palette-border my-2" />
           <GameButton
@@ -41,7 +41,7 @@ export function ConcessionModal({
             data-testid="concession-reject"
             className="w-full"
           >
-            Reject (Die and Respawn)
+            Fall and Respawn
           </GameButton>
         </div>
       </div>

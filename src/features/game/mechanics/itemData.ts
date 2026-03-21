@@ -70,7 +70,7 @@ export const ITEMS: Item[] = [
         cost: { primary: 50 },
         contractDetails: {
             targetName: "Mossstep Scout",
-            role: "Guide",
+            role: "Scout",
             description: "A nimble courier who knows the side paths.",
             maxHp: 40
         }
@@ -83,7 +83,7 @@ export const ITEMS: Item[] = [
         cost: { primary: 75, secondary: 10 },
         contractDetails: {
             targetName: "Bridge Warden",
-            role: "Warden",
+            role: "Warrior",
             description: "A sturdy pathkeeper who keeps lantern routes safe.",
             maxHp: 80
         }

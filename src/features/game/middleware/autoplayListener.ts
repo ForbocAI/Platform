@@ -5,6 +5,7 @@ import { getAutoplayConfig, getTickInterval } from '@/features/game/sdk/config';
 import { botOrchestrator } from '@/features/game/mechanics/systems/ai/BotOrchestrator';
 
 const POLL_MS = 100;
+let pollStarted = false;
 
 export const autoplayListener = {
   startListening: (startListening: TypedStartListening<RootState, AppDispatch>) => {
@@ -15,15 +16,13 @@ export const autoplayListener = {
         console.log(`autoplayListener: Triggered by ${action.type}. Initializing Orchestrator.`);
         botOrchestrator.init(listenerApi.dispatch, listenerApi.getState);
 
-        // Start SDK initialization in background (non-blocking)
-        import('@/features/game/sdk/cortexService').then(({ sdkService }) => {
-          sdkService.init();
-        });
-
-        // Single central poll for all AI systems
-        setInterval(() => {
-          botOrchestrator.update();
-        }, POLL_MS);
+        // Single central poll for all AI systems (guard against duplicate registration)
+        if (!pollStarted) {
+          pollStarted = true;
+          setInterval(() => {
+            botOrchestrator.update();
+          }, POLL_MS);
+        }
       },
     });
 

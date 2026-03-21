@@ -15,7 +15,7 @@ export const initializeGame = createAsyncThunk(
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     const player = initializePlayer(options?.classId) as import('../../types').PlayerActor;
-    player.capabilities = { learned: getSkillsForLevels(player.agentClass ?? 'Rogue', player.stats.level ?? 1) };
+    player.capabilities = { learned: getSkillsForLevels(player.agentClass ?? 'Wayfinder', player.stats.level ?? 1) };
     if (options?.lowHp) {
       player.stats.hp = 5;
     }

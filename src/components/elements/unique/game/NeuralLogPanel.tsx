@@ -20,7 +20,7 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
   }, [logs]);
 
   return (
-    <aside className="vengeance-border bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
+    <aside className="cozy-panel bg-palette-bg-dark flex flex-col h-full min-h-0 w-full min-w-0">
       <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border/60 bg-palette-bg-mid/20 shrink-0">
         <BookOpen className="app-icon text-palette-accent-mid shrink-0 animate-ambient-breathe" />
         <span className="font-display font-bold tracking-[0.18em] text-palette-accent-bright uppercase leading-tight">Lantern Chronicle</span>

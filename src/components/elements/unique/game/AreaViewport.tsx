@@ -19,14 +19,14 @@ export function AreaViewport({
   const isSceneHere = currentScene?.locationAreaId === area.id;
 
   return (
-    <section className="flex-1 min-h-0 vengeance-border bg-palette-bg-mid/10 flex flex-col items-center justify-center p-1.5 sm:p-3 relative overflow-hidden group">
+    <section className="flex-1 min-h-0 cozy-panel bg-palette-bg-mid/10 flex flex-col items-center justify-center p-1.5 sm:p-3 relative overflow-hidden group">
       <div className="absolute inset-0 opacity-30 pointer-events-none bg-[radial-gradient(circle_at_top,rgba(248,231,181,0.14),transparent_40%),radial-gradient(circle_at_20%_80%,rgba(146,180,125,0.12),transparent_28%)]" />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-palette-bg-dark/70 pointer-events-none" />
       <div className="w-full max-w-2xl text-center z-10 relative overflow-y-auto max-h-full scrollbar-hide">
         <RuneSigil className="block mb-1.5 sm:mb-2" />
         <span className="font-runic text-palette-accent-mid/80 tracking-[0.28em] uppercase mb-1 block leading-tight animate-holo-flicker">ᚠ ᚢ ᚦ ᚨ ᚱ</span>
         <span className="text-palette-accent-mid/70 tracking-[0.22em] uppercase mb-1 block leading-tight">{area.regionalType}</span>
-        <h2 className="font-display font-black text-palette-white mb-1.5 sm:mb-2 tracking-[0.14em] uppercase contrast-125 drop-shadow-md leading-tight glitch-text" data-text={area.title}>
+        <h2 className="font-display font-black text-palette-white mb-1.5 sm:mb-2 tracking-[0.14em] uppercase contrast-125 drop-shadow-md leading-tight lantern-glyph" data-text={area.title}>
           {area.title}
         </h2>
         <div className="w-8 sm:w-12 h-px bg-palette-border-light/60 mx-auto mb-1.5 sm:mb-2" />

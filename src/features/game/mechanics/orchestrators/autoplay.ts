@@ -267,8 +267,9 @@ export const runAutoplayTick = createAsyncThunk(
           dispatch(addLog({ message: response.dialogue, type: 'dialogue', portraitUrl }));
         }
 
-        if (response.action) {
-          cortexDirective = toCortexDirective(response.action);
+        const action = (response as Record<string, unknown>).action as { type: string; payload?: Record<string, unknown> } | undefined;
+        if (action) {
+          cortexDirective = toCortexDirective(action);
         }
       } catch (e) {
         console.warn('SDK Decision failed, falling back to pure Behavior Tree:', e);

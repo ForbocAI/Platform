@@ -1,22 +1,67 @@
 // lib/sdk/cortexService.ts
 // Environment-aware SDK Service to prevent native Node modules leaking to browser bundle.
 // Refactored to functional factory per FP mandate.
+//
+// SDK exports are loaded dynamically at init() time so the build never breaks
+// when the installed @forbocai/* packages lack the expected factory functions.
 
-import type { IAgent, ICortex, IBridge, IMemory } from '@forbocai/core';
-import { createBridge, createAgent, importSoulFromArweave, fromSoul } from '@forbocai/core';
-import { createCortex, createMemory } from '@forbocai/browser';
 import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
 import type { GenerateStartAreaOptions } from '@/features/game/entities/area';
 
+// Minimal local interfaces so the rest of the file compiles without importing
+// types from @forbocai/* that may not exist in the installed version.
+interface SDKAgent {
+    process(signal: string, payload: Record<string, unknown>): Promise<{ dialogue: string }>;
+}
+interface SDKCortex {
+    init(): Promise<void>;
+}
+interface SDKBridge {
+    validate(action: Record<string, unknown>, ctx: Record<string, unknown>): Promise<{ valid: boolean }>;
+}
+interface SDKMemory {
+    [key: string]: unknown;
+}
+
 export const createSDKService = () => {
-    const agents: Map<string, IAgent> = new Map();
-    let cortex: ICortex | null = null;
-    let bridge: IBridge | null = null;
-    let memory: IMemory | null = null;
+    const agents: Map<string, SDKAgent> = new Map();
+    let cortex: SDKCortex | null = null;
+    let bridge: SDKBridge | null = null;
+    let memory: SDKMemory | null = null;
     let initialized = false;
+
+    // SDK factory functions resolved at init() time via dynamic import.
+    let _createCortex: ((opts: { apiUrl: string }) => SDKCortex) | null = null;
+    let _createMemory: ((opts: Record<string, unknown>) => SDKMemory) | null = null;
+    let _createBridge: ((opts: { apiUrl: string; strictMode: boolean }) => SDKBridge) | null = null;
+    let _createAgent: ((opts: Record<string, unknown>) => SDKAgent) | null = null;
+    let _importSoulFromArweave: ((txId: string) => Promise<{ id: string }>) | null = null;
+    let _fromSoul: ((soul: { id: string }, cortex: SDKCortex, memory: SDKMemory | null) => Promise<SDKAgent>) | null = null;
 
     const getApiUrl = (): string => {
         return process.env.NEXT_PUBLIC_FORBOC_API_URL || 'https://api.forboc.ai';
+    };
+
+    /** Attempt to load SDK factory functions. Returns true if all resolved. */
+    const loadSDKModules = async (): Promise<boolean> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const [coreMod, browserMod]: [any, any] = await Promise.all([
+                import('@forbocai/core').catch(() => null),
+                import('@forbocai/browser').catch(() => null),
+            ]);
+
+            _createBridge = coreMod?.createBridge ?? null;
+            _createAgent = coreMod?.createAgent ?? null;
+            _importSoulFromArweave = coreMod?.importSoulFromArweave ?? null;
+            _fromSoul = coreMod?.fromSoul ?? null;
+            _createCortex = browserMod?.createCortex ?? null;
+            _createMemory = browserMod?.createMemory ?? null;
+
+            return !!(_createCortex && _createBridge);
+        } catch {
+            return false;
+        }
     };
 
     const init = async () => {
@@ -42,17 +87,18 @@ export const createSDKService = () => {
 
             console.log('SDKService: Initializing...');
 
-            const apiUrl = getApiUrl();
-
-            if (!createCortex || !createBridge) {
+            const modulesLoaded = await loadSDKModules();
+            if (!modulesLoaded || !_createCortex || !_createBridge) {
                 console.warn('SDKService: Modules failed to load. Operating in Fallback mode.');
                 initialized = true;
                 return;
             }
 
-            cortex = createCortex({ apiUrl });
-            memory = (createMemory?.({}) as IMemory) ?? null;
-            bridge = createBridge({ apiUrl, strictMode: true });
+            const apiUrl = getApiUrl();
+
+            cortex = _createCortex({ apiUrl });
+            memory = (_createMemory?.({}) as SDKMemory) ?? null;
+            bridge = _createBridge({ apiUrl, strictMode: true });
 
             if (cortex) {
                 try {
@@ -80,14 +126,14 @@ export const createSDKService = () => {
         return initialized && cortex !== null;
     };
 
-    const getAgent = async (id: string = 'player-autoplay', persona: string = 'Neutral Agent'): Promise<IAgent> => {
+    const getAgent = async (id: string = 'player-autoplay', persona: string = 'Neutral Agent'): Promise<SDKAgent> => {
         if (!initialized) await init();
-        if (!cortex) throw new Error('Cortex not available (SDK disabled)');
+        if (!cortex || !_createAgent) throw new Error('Cortex not available (SDK disabled)');
 
         if (!agents.has(id)) {
             const apiUrl = getApiUrl();
 
-            const agent = createAgent({
+            const agent = _createAgent({
                 id,
                 persona,
                 cortex: cortex!,
@@ -100,37 +146,41 @@ export const createSDKService = () => {
         return agents.get(id)!;
     };
 
-    const getWorldgenAgent = async (): Promise<IAgent> => {
+    const getWorldgenAgent = async (): Promise<SDKAgent> => {
         return getAgent(
             'worldgen-agent',
             'You generate structured area data for a game world. Return only JSON.'
         );
     };
 
-    const getInquiryAgent = async (): Promise<IAgent> => {
+    const getInquiryAgent = async (): Promise<SDKAgent> => {
         return getAgent(
             'oracle-agent',
             'You answer inquiries with structured JSON responses. Return only JSON.'
         );
     };
 
-    const getBridge = (): IBridge => {
+    const getBridge = (): SDKBridge => {
         if (!bridge) throw new Error('SDK not initialized');
         return bridge;
     };
 
-    const rehydrateAgent = async (txId: string): Promise<IAgent> => {
+    const rehydrateAgent = async (txId: string): Promise<SDKAgent> => {
         if (!initialized) await init();
 
         // Check if already rehydrated
         if (agents.has(txId)) return agents.get(txId)!;
 
+        if (!_importSoulFromArweave || !_fromSoul || !cortex) {
+            throw new Error('SDK not available for rehydration');
+        }
+
         try {
             // 1. Fetch data from persistent layer
-            const soul = await importSoulFromArweave(txId);
+            const soul = await _importSoulFromArweave(txId);
 
             // 2. Hydrate Agent
-            const agent = await fromSoul(soul, cortex!, memory);
+            const agent = await _fromSoul(soul, cortex!, memory);
 
             agents.set(txId, agent);
             agents.set(soul.id, agent); // Also set by internal ID
@@ -155,7 +205,7 @@ export const createSDKService = () => {
             const agent = await getWorldgenAgent();
             const response = await agent.process('WORLDGEN_REQUEST', {
                 kind: 'worldgen',
-                options
+                options: options as Record<string, unknown>
             });
             return JSON.parse(response.dialogue) as Area;
         } catch (_e) {

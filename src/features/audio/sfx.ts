@@ -8,6 +8,7 @@ function beep(
 ) {
   if (masterVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.connect(gain);
@@ -27,6 +28,7 @@ export function playShoot(masterVolume: number) {
 export function playHit(masterVolume: number) {
   if (masterVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.connect(gain);
@@ -43,6 +45,7 @@ export function playHit(masterVolume: number) {
 export function playButtonClick(masterVolume: number) {
   if (masterVolume <= 0) return;
   const ctx = getAudioContext();
+  if (!ctx) return;
   const t = ctx.currentTime;
 
   const gain = ctx.createGain();

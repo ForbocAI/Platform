@@ -35,7 +35,7 @@ export function ActionDeck({
 }) {
   return (
     <footer
-      className="shrink-0 vengeance-border bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-row gap-1.5 sm:gap-2 items-center justify-start overflow-x-auto min-h-0"
+      className="shrink-0 cozy-panel bg-palette-bg-mid/80 p-1.5 sm:p-2 flex flex-row gap-1.5 sm:gap-2 items-center justify-start overflow-x-auto min-h-0"
       style={{ WebkitOverflowScrolling: "touch" }}
     >
       <ActionButtons

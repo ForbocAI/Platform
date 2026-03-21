@@ -67,7 +67,7 @@ export interface AwarenessResult {
     inCombat: boolean;            // Are we mid-fight? (looked at recent combat logs)
     recentDamage: number;         // Total damage taken from recent log entries
     areaHazardCount: number;      // Number of active hazards in the area
-    isDangerousArea: boolean;     // Area has damage-dealing hazards (Toxic Air, etc.)
+    isDangerousArea: boolean;     // Area has damage-dealing hazards (Sporepuff Haze, etc.)
     hpRatio: number;              // 0-1
     stressRatio: number;          // 0-1
     hasHealingItem: boolean;

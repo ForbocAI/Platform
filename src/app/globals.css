@@ -200,14 +200,14 @@
   animation: ambient-breathe 2.4s ease-in-out infinite;
 }
 
-.glitch-text {
+.lantern-glyph {
   position: relative;
   display: inline-block;
   text-shadow: 0 0 12px rgba(248, 231, 181, 0.16);
 }
 
-.glitch-text::before,
-.glitch-text::after {
+.lantern-glyph::before,
+.lantern-glyph::after {
   content: attr(data-text);
   position: absolute;
   inset: 0;
@@ -215,12 +215,12 @@
   opacity: 0.18;
 }
 
-.glitch-text::before {
+.lantern-glyph::before {
   color: var(--palette-accent-soft);
   transform: translate(0.05em, -0.03em);
 }
 
-.glitch-text::after {
+.lantern-glyph::after {
   color: var(--palette-accent-bright);
   transform: translate(-0.04em, 0.04em);
 }
@@ -250,7 +250,7 @@
   animation: ambient-breathe 2.5s ease-in-out infinite;
 }
 
-.vengeance-border {
+.cozy-panel {
   border: 1px solid rgba(197, 170, 132, 0.42);
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(67, 54, 42, 0.38), rgba(18, 13, 10, 0.62));
@@ -261,7 +261,7 @@
   backdrop-filter: blur(14px);
 }
 
-.vengeance-button {
+.cozy-button {
   @apply transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   background: linear-gradient(180deg, rgba(67, 54, 42, 0.7), rgba(45, 36, 29, 0.9));
   border: 1px solid rgba(197, 170, 132, 0.4);
@@ -272,7 +272,7 @@
   letter-spacing: 0.14em;
 }
 
-.vengeance-button:hover:not(:disabled) {
+.cozy-button:hover:not(:disabled) {
   background: linear-gradient(180deg, rgba(84, 67, 53, 0.78), rgba(52, 41, 33, 0.95));
   box-shadow: 0 0 18px rgba(221, 179, 106, 0.18);
   color: var(--palette-white);

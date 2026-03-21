@@ -3,8 +3,9 @@ import type { PlayerActor } from "@/features/game/types";
 import { CLASS_PRESENTATION } from "@/features/game/mechanics/classes";
 
 export function PlayerHeaderIdentity({ player }: { player: PlayerActor }) {
-  const presentation = CLASS_PRESENTATION[player.agentClass];
-  const folkLabel = presentation?.name ?? player.agentClass;
+  const classKey = player.agentClass as keyof typeof CLASS_PRESENTATION | undefined;
+  const presentation = classKey ? CLASS_PRESENTATION[classKey] : undefined;
+  const folkLabel = presentation?.name ?? player.agentClass ?? 'Unknown';
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">

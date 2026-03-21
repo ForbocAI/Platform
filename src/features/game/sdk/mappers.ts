@@ -1,6 +1,8 @@
-import type { AgentAction } from '@forbocai/core';
 import type { GameState } from '@/features/game/store/types';
 import type { CortexDirective, AgentActionType } from '@/features/game/mechanics/systems/ai/types';
+
+/** Local stub — the real type lives in @forbocai/core which may not export it. */
+interface AgentAction { type: string; payload?: Record<string, unknown> }
 
 /**
  * Maps Lanternbough GameState to ForbocAI SDK Observation
