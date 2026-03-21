@@ -4,27 +4,27 @@ import { CLASS_TEMPLATES } from "../mechanics";
 export function initializePlayer(classId?: string): PlayerActor {
     // Valid player classes
     const validClasses: Partial<Record<string, boolean>> = {
-        "Ashwalker": true,
-        "Obsidian Warden": true,
-        "Doomguard": true,
-        "Iron Armored Guardian": true,
-        "Aether Spirit": true,
-        "Thunder Trooper": true,
-        "Cyberflux Guardian": true,
-        "Voidwraith": true,
-        "Storm Titan": true,
-        "Flame Corps": true,
-        "Twilight Weaver": true,
-        "Byssalspawn": true,
-        "Aksov Hexe-Spinne": true,
-        "Gravewalker": true,
-        "Shadowhorn Juggernaut": true,
-        "Magma Leviathan": true,
-        "Abyssal Overfiend": true,
-        "Aetherwing Herald": true
+        "Wayfinder": true,
+        "Bridgekeeper": true,
+        "Thornwarden": true,
+        "Ironbark Sentinel": true,
+        "Mist Drifter": true,
+        "Windguard Scout": true,
+        "Glow Sentry": true,
+        "Fog Wanderer": true,
+        "Thunderoak Elder": true,
+        "Hearthkeeper": true,
+        "Dew Weaver": true,
+        "Tanglevine": true,
+        "Silkspinner Scout": true,
+        "Rootwalker": true,
+        "Mosshorn Charger": true,
+        "Bramble Colossus": true,
+        "The Briarking": true,
+        "Petalwing Herald": true
     };
 
-    const selectedClass = (classId && validClasses[classId]) ? classId as AgentClass : "Ashwalker";
+    const selectedClass = (classId && validClasses[classId]) ? classId as AgentClass : "Wayfinder";
     const template = CLASS_TEMPLATES[selectedClass];
 
     return {

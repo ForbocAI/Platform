@@ -12,7 +12,7 @@
 Last verified: 2026-03-17
 Project: `/Users/seandinwiddie/GitHub/Forboc.AI/Platform`
 
-This document describes the current automation surface and the real blockers in the repo. It is no longer a standing prompt to continue Quadar-specific playtesting.
+This document describes the current automation surface and the real blockers in the repo. It is no longer a standing prompt to continue legacy playtesting.
 
 ## Current Baseline
 

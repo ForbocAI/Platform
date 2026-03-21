@@ -5,77 +5,77 @@ import { generateRandomVendor, generateMarketplace } from "./vendor";
 // --- Immutable area-name data tables ---
 
 const BIOME_NAME_PARTS: Readonly<Record<Biome, readonly string[]>> = {
-    "Ethereal Marshlands": ["Willow", "Mist", "Reed", "Moth", "Glade"],
-    "Toxic Wastes": ["Copper", "Patch", "Steam", "Moss", "Tinker"],
-    "Haunted Chapel": ["Bell", "Candle", "Choir", "Vesper", "Sanctum"],
-    "Obsidian Spire": ["Moon", "Lantern", "Heartwood", "Spire", "Lookout"],
-    "Quadar Tower": ["Lantern", "Thimble", "Market", "Nook", "Hollow"],
-    "Military Installation": ["Workshop", "Bridge", "Pulley", "Depot", "Engine"],
-    "Eldritch Fortress": ["Rootwatch", "Hearth", "Gate", "Keep", "Bastion"],
-    "Labyrinthine Dungeon": ["Burrow", "Warren", "Tunnel", "Hall", "Passage"],
-    "Chromatic-Steel Fungi": ["Candlecap", "Spore", "Gleam", "Canopy", "Grotto"],
-    "Chthonic Depths": ["Root", "Hollow", "Lantern", "Glen", "Grotto"],
-    "Static Sea of All Noise": ["Drift", "Chime", "Current", "Song", "Reed"],
-    "Twilight Alchemy Haven": ["Still", "Garden", "Tea", "Petal", "Hearth"],
-    "Abyss of Infernal Lore": ["Archive", "Page", "Hollow", "Root", "Shrine"],
-    "Precipice of the Shadowlands": ["Mist", "Brink", "Moon", "Bridge", "Edge"],
-    "Rune Temples": ["Rune", "Bell", "Lantern", "Shrine", "Sanctum"],
-    "Crumbling Ruins": ["Oldstone", "Arch", "Hearth", "Vault", "Keep"],
-    "Dimensional Nexus": ["Fold", "Gate", "Bridge", "Spiral", "Vortex"],
-    "Cavernous Abyss": ["Cavern", "Pool", "Hollow", "Echo", "Grotto"],
-    "The Sterile Chamber": ["Herbarium", "Atrium", "Archives", "Table", "Sanctum"],
+    "Meadows": ["Willow", "Mist", "Reed", "Moth", "Glade"],
+    "Mud Paths": ["Copper", "Patch", "Steam", "Moss", "Tinker"],
+    "Rune Stones": ["Bell", "Candle", "Choir", "Vesper", "Sanctum"],
+    "The Tree": ["Moon", "Lantern", "Heartwood", "Spire", "Lookout"],
+    "Lanternbough": ["Lantern", "Thimble", "Market", "Nook", "Hollow"],
+    "Trading Posts": ["Workshop", "Bridge", "Pulley", "Depot", "Engine"],
+    "Mushroom Chapel": ["Rootwatch", "Hearth", "Gate", "Keep", "Bastion"],
+    "Root Warrens": ["Burrow", "Warren", "Tunnel", "Hall", "Passage"],
+    "Mushroom Rings": ["Candlecap", "Spore", "Gleam", "Canopy", "Grotto"],
+    "Underground Springs": ["Root", "Hollow", "Lantern", "Glen", "Grotto"],
+    "Creek Crossings": ["Drift", "Chime", "Current", "Song", "Reed"],
+    "Herb Gardens": ["Still", "Garden", "Tea", "Petal", "Hearth"],
+    "Overgrown Ruins": ["Archive", "Page", "Hollow", "Root", "Shrine"],
+    "Narrow Paths": ["Mist", "Brink", "Moon", "Bridge", "Edge"],
+    "Canopy Platforms": ["Rune", "Bell", "Lantern", "Shrine", "Sanctum"],
+    "Troll Bridges": ["Oldstone", "Arch", "Hearth", "Vault", "Keep"],
+    "Otherwild Reaches": ["Fold", "Gate", "Bridge", "Spiral", "Vortex"],
+    "Root Drops": ["Cavern", "Pool", "Hollow", "Echo", "Grotto"],
+    "Seasonal Shifts": ["Herbarium", "Atrium", "Archives", "Table", "Sanctum"],
 } as const;
 
 const BIOME_DESCRIPTIONS: Readonly<Record<Biome, string>> = {
-    "Ethereal Marshlands": "Soft fog drifts over reed beds and lantern moss, carrying frog song and the occasional misplaced parcel.",
-    "Toxic Wastes": "A reclaimed patch of copper runoff, salvage gardens, and careful footpaths where clever tinkerers still find useful scraps.",
-    "Haunted Chapel": "An old chapel of bells and candlelight where echoes linger kindly and every bench seems to remember a song.",
-    "Obsidian Spire": "A glossy lookout of dark glass and moonlit steps, prized for weather signs, long views, and hanging lanterns.",
-    "Quadar Tower": "The heart of Lanternbough's trunk routes, full of market nooks, lift pulleys, and neighbors coming and going with armfuls of supplies.",
-    "Military Installation": "An old practical quarter of pulleys, depots, and bridge tools now reused by patient makers and route keepers.",
-    "Eldritch Fortress": "A heavy old stronghold turned warding post, where rootwardens keep maps, ropes, and weather bells ready by the door.",
-    "Labyrinthine Dungeon": "Twisting burrows and storage halls lit by friendly sconces, ideal for hide-and-seek until you lose your bearings.",
-    "Chromatic-Steel Fungi": "Towering mushroom caps shimmer with rainbow sheen, sheltering food stalls, rare spores, and tiny market festivals.",
-    "Chthonic Depths": "Quiet root caverns full of dripstone, glow moss, and thoughtful paths beneath the village.",
-    "Static Sea of All Noise": "A windy stretch of humming reeds and chimes where gossip, weather, and wayward songs all travel at once.",
-    "Twilight Alchemy Haven": "A tea-and-tincture district scented with herbs, warm glass, and simmering experiments.",
-    "Abyss of Infernal Lore": "An old archive hollow where warm lanterns, annotated maps, and stubborn mysteries wait to be sorted.",
-    "Precipice of the Shadowlands": "A cliffside of mist bridges and sunset lookouts where the valley feels wide and wonderfully uncertain.",
-    "Rune Temples": "Carved shrines of patient symbols, low lamps, and weathered steps that invite quiet observation.",
-    "Crumbling Ruins": "Old arches and garden walls softened by moss, perfect for scavenging useful bits and telling stories.",
-    "Dimensional Nexus": "A knot of footbridges, folds, and peculiar shortcuts where space behaves more like a suggestion than a rule.",
-    "Cavernous Abyss": "Broad caverns with echoing pools and stepping stones, cooler and calmer than the upper boughs.",
-    "The Sterile Chamber": "A pristine herbarium and recovery room where careful tools, labeled drawers, and hush-soft lanterns keep order.",
+    "Meadows": "Soft fog drifts over reed beds and lantern moss, carrying frog song and the occasional misplaced parcel.",
+    "Mud Paths": "A reclaimed patch of copper runoff, salvage gardens, and careful footpaths where clever tinkerers still find useful scraps.",
+    "Rune Stones": "An old chapel of bells and candlelight where echoes linger kindly and every bench seems to remember a song.",
+    "The Tree": "A glossy lookout of moonlit steps, prized for weather signs, long views, and hanging lanterns.",
+    "Lanternbough": "The heart of Lanternbough's trunk routes, full of market nooks, lift pulleys, and neighbors coming and going with armfuls of supplies.",
+    "Trading Posts": "An old practical quarter of pulleys, depots, and bridge tools now reused by patient makers and route keepers.",
+    "Mushroom Chapel": "A heavy old stronghold turned warding post, where rootwardens keep maps, ropes, and weather bells ready by the door.",
+    "Root Warrens": "Twisting burrows and storage halls lit by friendly sconces, ideal for hide-and-seek until you lose your bearings.",
+    "Mushroom Rings": "Towering mushroom caps shimmer with rainbow sheen, sheltering food stalls, rare spores, and tiny market festivals.",
+    "Underground Springs": "Quiet root caverns full of dripstone, glow moss, and thoughtful paths beneath the village.",
+    "Creek Crossings": "A windy stretch of humming reeds and chimes where gossip, weather, and wayward songs all travel at once.",
+    "Herb Gardens": "A tea-and-tincture district scented with herbs, warm glass, and simmering experiments.",
+    "Overgrown Ruins": "An old archive hollow where warm lanterns, annotated maps, and stubborn mysteries wait to be sorted.",
+    "Narrow Paths": "A cliffside of mist bridges and sunset lookouts where the valley feels wide and wonderfully uncertain.",
+    "Canopy Platforms": "Carved shrines of patient symbols, low lamps, and weathered steps that invite quiet observation.",
+    "Troll Bridges": "Old arches and garden walls softened by moss, perfect for scavenging useful bits and telling stories.",
+    "Otherwild Reaches": "A knot of footbridges, folds, and peculiar shortcuts where space behaves more like a suggestion than a rule.",
+    "Root Drops": "Broad caverns with echoing pools and stepping stones, cooler and calmer than the upper boughs.",
+    "Seasonal Shifts": "A pristine herbarium and recovery room where careful tools, labeled drawers, and hush-soft lanterns keep order.",
 } as const;
 
-/** Biomes with elevated danger — higher NPC/hazard spawn rates. */
+/** Biomes with elevated challenge — higher NPC/hazard spawn rates. */
 const DEEP_BIOMES: readonly Biome[] = [
-    "Chthonic Depths", "Cavernous Abyss", "Abyss of Infernal Lore",
-    "Dimensional Nexus", "Static Sea of All Noise", "Twilight Alchemy Haven",
-    "Precipice of the Shadowlands", "Chromatic-Steel Fungi", "The Sterile Chamber",
-    "Labyrinthine Dungeon", "Eldritch Fortress"
+    "Underground Springs", "Root Drops", "Overgrown Ruins",
+    "Otherwild Reaches", "Creek Crossings", "Herb Gardens",
+    "Narrow Paths", "Mushroom Rings", "Seasonal Shifts",
+    "Root Warrens", "Mushroom Chapel"
 ] as const;
 
 const BIOME_TO_REGIONAL: Record<Biome, string> = {
-    "Ethereal Marshlands": "Misty Marsh",
-    "Toxic Wastes": "Copperpatch",
-    "Haunted Chapel": "Bell Chapel",
-    "Obsidian Spire": "Moon Spire",
-    "Quadar Tower": "Lanternbough",
-    "Military Installation": "Maker Depot",
-    "Eldritch Fortress": "Rootwatch",
-    "Labyrinthine Dungeon": "Burrow Maze",
-    "Chromatic-Steel Fungi": "Candlecap Commons",
-    "Chthonic Depths": "Root Hollows",
-    "Static Sea of All Noise": "Chime Current",
-    "Twilight Alchemy Haven": "Tea Garden",
-    "Abyss of Infernal Lore": "Old Hollow Archive",
-    "Precipice of the Shadowlands": "Mist Brinks",
-    "Rune Temples": "Rune Shrine",
-    "Crumbling Ruins": "Oldstone Ruins",
-    "Dimensional Nexus": "Foldgate",
-    "Cavernous Abyss": "Echo Caverns",
-    "The Sterile Chamber": "Quiet Herbarium",
+    "Meadows": "Misty Marsh",
+    "Mud Paths": "Copperpatch",
+    "Rune Stones": "Bell Chapel",
+    "The Tree": "Moon Spire",
+    "Lanternbough": "Lanternbough",
+    "Trading Posts": "Maker Depot",
+    "Mushroom Chapel": "Rootwatch",
+    "Root Warrens": "Burrow Maze",
+    "Mushroom Rings": "Candlecap Commons",
+    "Underground Springs": "Root Hollows",
+    "Creek Crossings": "Chime Current",
+    "Herb Gardens": "Tea Garden",
+    "Overgrown Ruins": "Old Hollow Archive",
+    "Narrow Paths": "Mist Brinks",
+    "Canopy Platforms": "Rune Shrine",
+    "Troll Bridges": "Oldstone Ruins",
+    "Otherwild Reaches": "Foldgate",
+    "Root Drops": "Echo Caverns",
+    "Seasonal Shifts": "Quiet Herbarium",
 };
 
 const pickFrom = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -218,7 +218,7 @@ const applyForcedNPC = (area: Area, forceNPC: boolean | string): Area => {
 
 export const generateStartArea = (opts?: GenerateStartAreaOptions): Area => {
     const areaId = opts?.id ?? "start_area";
-    const biome = opts?.biome ?? "Quadar Tower";
+    const biome = opts?.biome ?? "Lanternbough";
 
     if (opts?.deterministic) {
         const base = createBaseCampArea(areaId, biome);

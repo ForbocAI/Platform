@@ -9,9 +9,9 @@ const HARVESTABLE_MUSHROOMS: { id: string; name: string; description: string; co
   { id: "glowing_mushroom", name: "Glowing Mushroom", description: "A faint blue fungus with regenerative properties.", cost: { primary: 5 }, weight: 28 },
   { id: "chromatic_cap", name: "Chromatic Cap", description: "Iridescent fungus from chromatic-steel growths. Shifts hue when touched.", cost: { primary: 8 }, weight: 20 },
   { id: "ember_puffball", name: "Ember Puffball", description: "Smoldering orange puffball that radiates faint warmth. Used in pyrokinetic compounds.", cost: { primary: 7 }, weight: 18 },
-  { id: "static_lichen", name: "Static Lichen", description: "Lichen crackling with residual noise from the Static Sea. Disrupts nearby enchantments.", cost: { primary: 10 }, weight: 12 },
-  { id: "void_morel", name: "Midnight Morel", description: "A dusk-dark morel prized for slow-brew tonics and rainy-evening stews.", cost: { primary: 12 }, weight: 10 },
-  { id: "chthonic_truffle", name: "Root Truffle", description: "A rich underground truffle with warm spice notes and a faint lantern sheen.", cost: { primary: 14, secondary: 1 }, weight: 6 },
+  { id: "static_lichen", name: "Static Lichen", description: "Lichen crackling with residual hum from the creek crossings. Disrupts nearby enchantments.", cost: { primary: 10 }, weight: 12 },
+  { id: "dewdrop_morel", name: "Midnight Morel", description: "A dusk-dark morel prized for slow-brew tonics and rainy-evening stews.", cost: { primary: 12 }, weight: 10 },
+  { id: "root_truffle", name: "Root Truffle", description: "A rich underground truffle with warm spice notes and a faint lantern sheen.", cost: { primary: 14, secondary: 1 }, weight: 6 },
   { id: "spore_clump", name: "Spore Clump", description: "Soft grey cluster that soothes the mind. Calms stress and mild anxiety when prepared correctly.", cost: { primary: 6 }, weight: 14 },
   { id: "rust_spindle", name: "Rust Spindle", description: "Copper-toned spindle that bonds with metal. Used in reinforcement and repair alchemy.", cost: { primary: 9 }, weight: 8 },
 ];

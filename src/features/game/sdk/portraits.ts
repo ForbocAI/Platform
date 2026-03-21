@@ -7,7 +7,7 @@ export const PORTRAIT_MAP: Record<string, string> = {
     'servitor': 'https://api.dicebear.com/7.x/identicon/svg?seed=servitor&backgroundColor=0a0a0a',
     'Hostile Entity': 'https://api.dicebear.com/7.x/bottts/svg?seed=monster&backgroundColor=330000',
     'Loyal Servitor': 'https://api.dicebear.com/7.x/identicon/svg?seed=ghost&backgroundColor=003366',
-    'Qua\'dar Adventurer': 'https://api.dicebear.com/7.x/adventurer/svg?seed=hero&backgroundColor=0a0a0a',
+    'Vale Wayfinder': 'https://api.dicebear.com/7.x/adventurer/svg?seed=hero&backgroundColor=0a0a0a',
 };
 
 export function getPortraitForAgent(type: string, persona?: string): string {

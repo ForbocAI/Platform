@@ -111,7 +111,7 @@ This should be reduced to one clear initialization path.
 
 ### Old Identity Leakage
 
-Some bot config names and comments still carry Quadar-era identity:
+Some bot config names and comments still carry legacy identity:
 
 - `NPC_RANGER_CONFIG`
 - resource assumptions tied to Spirit/Blood
@@ -124,12 +124,12 @@ These should become more neutral over time.
 - keep the bot files mechanic-focused, not lore-focused
 - prefer generic resource and role concepts at the AI layer
 - put cozy fantasy specificity in data, copy, and content tables
-- avoid teaching the AI with hard-coded grimdark assumptions in comments or naming
+- avoid teaching the AI with hard-coded legacy-aesthetic assumptions in comments or naming
 
 ## Practical Next Steps
 
 1. repair the SDK import contract
 2. add a singleton guard around autoplay polling
 3. remove duplicate SDK init
-4. update config naming away from Quadar-specific role assumptions
+4. update config naming away from legacy role assumptions
 5. revisit behavior priorities once Lanternbough classes and economy are defined

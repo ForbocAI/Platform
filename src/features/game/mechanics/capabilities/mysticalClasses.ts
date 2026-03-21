@@ -1,232 +1,232 @@
 import type { Capability } from "../../types";
 
 export const MYSTICAL_CLASS_CAPABILITIES: Record<string, Capability> = {
-    // Iron Armored Guardian
-    "ironclad_charge": {
-        id: "ironclad_charge",
-        name: "Ironclad Charge",
-        agentClass: "Iron Armored Guardian",
+    // Ironbark Sentinel
+    "ironbark_charge": {
+        id: "ironbark_charge",
+        name: "Ironbark Charge",
+        agentClass: "Ironbark Sentinel",
         description: "Powerful charge causing knockback and stun.",
         magnitude: "1d10",
         effect: () => "Knockback/Stun"
     },
-    "steel_shield_block": {
-        id: "steel_shield_block",
-        name: "Steel Shield Block",
-        agentClass: "Iron Armored Guardian",
-        description: "Block projectiles and reduce damage.",
+    "root_shield_block": {
+        id: "root_shield_block",
+        name: "Root Shield Block",
+        agentClass: "Ironbark Sentinel",
+        description: "Block projectiles and reduce damage with root shield.",
         effect: () => "Block/DR"
     },
-    "sword_sweeps": {
-        id: "sword_sweeps",
-        name: "Sword Sweeps",
-        agentClass: "Iron Armored Guardian",
+    "staff_sweeps_sentinel": {
+        id: "staff_sweeps_sentinel",
+        name: "Staff Sweeps",
+        agentClass: "Ironbark Sentinel",
         description: "Sweep attack hitting multiple adversaries.",
         magnitude: "1d8",
         effect: () => "AoE Melee"
     },
-    "guardian_explosive_barrage": {
-        id: "guardian_explosive_barrage",
-        name: "Explosive Barrage (Guardian)",
-        agentClass: "Iron Armored Guardian",
-        description: "Launch explosive projectiles at distant foes.",
+    "seed_scatter_volley": {
+        id: "seed_scatter_volley",
+        name: "Seed Scatter Volley",
+        agentClass: "Ironbark Sentinel",
+        description: "Launch seed projectiles at distant foes.",
         magnitude: "2d6",
         effect: () => "AoE Ranged"
     },
-    "stalwart_formation": {
-        id: "stalwart_formation",
-        name: "Stalwart Formation",
-        agentClass: "Iron Armored Guardian",
+    "steadfast_formation": {
+        id: "steadfast_formation",
+        name: "Steadfast Formation",
+        agentClass: "Ironbark Sentinel",
         description: "Defensive formation, reduce damage.",
         effect: () => "Defense Buff"
     },
-    "lance_thrust": {
-        id: "lance_thrust",
-        name: "Lance Thrust",
-        agentClass: "Iron Armored Guardian",
-        description: "Precise thrust piercing armor.",
+    "lance_root_thrust": {
+        id: "lance_root_thrust",
+        name: "Lance Root Thrust",
+        agentClass: "Ironbark Sentinel",
+        description: "Precise thrust piercing defenses with root lance.",
         magnitude: "1d10",
         effect: () => "Piercing"
     },
-    "siege_breaker_slam": {
-        id: "siege_breaker_slam",
-        name: "Siege Breaker Slam",
-        agentClass: "Iron Armored Guardian",
-        description: "Devastating ground slam, causing tremors.",
+    "ground_stomp": {
+        id: "ground_stomp",
+        name: "Ground Stomp",
+        agentClass: "Ironbark Sentinel",
+        description: "Ground slam causing tremors and knockback.",
         magnitude: "2d8",
         effect: () => "AoE Stun"
     },
-    "fortified_resilience": {
-        id: "fortified_resilience",
-        name: "Fortified Resilience",
-        agentClass: "Iron Armored Guardian",
-        description: "Reduce effectiveness of debuffs.",
+    "fortified_bark": {
+        id: "fortified_bark",
+        name: "Fortified Bark",
+        agentClass: "Ironbark Sentinel",
+        description: "Reduce effectiveness of debuffs with hardened bark.",
         effect: () => "Resist Debuffs"
     },
-    "ironforge_bastion": {
-        id: "ironforge_bastion",
-        name: "Ironforge Bastion",
-        agentClass: "Iron Armored Guardian",
-        description: "Impenetrable barrier, temporary invulnerability.",
+    "oaken_bastion": {
+        id: "oaken_bastion",
+        name: "Oaken Bastion",
+        agentClass: "Ironbark Sentinel",
+        description: "Impenetrable oaken barrier, temporary invulnerability.",
         effect: () => "Invulnerability"
     },
-    "warforged_determination": {
-        id: "warforged_determination",
-        name: "Warforged Determination",
-        agentClass: "Iron Armored Guardian",
-        description: "Increase offensive and defensive capabilities.",
+    "heartwood_determination": {
+        id: "heartwood_determination",
+        name: "Heartwood Determination",
+        agentClass: "Ironbark Sentinel",
+        description: "Increase offensive and defensive capabilities through heartwood resolve.",
         effect: () => "Buff All"
     },
-    // Aether Spirit
-    "ethereal_phasing": {
-        id: "ethereal_phasing",
-        name: "Ethereal Phasing",
-        agentClass: "Aether Spirit",
-        description: "Phase in/out of material plane.",
+    // Mist Drifter
+    "mistfade_drift": {
+        id: "mistfade_drift",
+        name: "Mistfade Drift",
+        agentClass: "Mist Drifter",
+        description: "Phase in and out of mist banks.",
         effect: () => "Immunity"
     },
-    "astral_bolt": {
-        id: "astral_bolt",
-        name: "Astral Bolt",
-        agentClass: "Aether Spirit",
-        description: "Bolt of dark energy.",
+    "wisp_grasp": {
+        id: "wisp_grasp",
+        name: "Wisp Grasp",
+        agentClass: "Mist Drifter",
+        description: "Bolt of gentle mist energy.",
         magnitude: "2d6",
         effect: () => "Slow"
     },
-    "abysmal_burst": {
-        id: "abysmal_burst",
-        name: "Abysmal Burst",
-        agentClass: "Aether Spirit",
-        description: "Unleash void energy, damaging and confusing foes.",
+    "breeze_dash": {
+        id: "breeze_dash",
+        name: "Breeze Dash",
+        agentClass: "Mist Drifter",
+        description: "Unleash a gust of breeze, disorienting foes.",
         magnitude: "2d6",
         effect: () => "AoE Confuse"
     },
-    "spectral_wail": {
-        id: "spectral_wail",
-        name: "Spectral Wail",
-        agentClass: "Aether Spirit",
-        description: "A horrifying scream that terrifies enemies.",
+    "lullaby_hum": {
+        id: "lullaby_hum",
+        name: "Lullaby Hum",
+        agentClass: "Mist Drifter",
+        description: "A soothing hum that calms enemies.",
         magnitude: "1d4",
         effect: () => "AoE Fear"
     },
-    // Voidwraith
-    "spectral_grasp": {
-        id: "spectral_grasp",
-        name: "Spectral Grasp",
-        agentClass: "Voidwraith",
-        description: "Ensnare and immobilize enemies.",
+    // Fog Wanderer
+    "mistfade_walk": {
+        id: "mistfade_walk",
+        name: "Mistfade Walk",
+        agentClass: "Fog Wanderer",
+        description: "Ensnare and slow enemies with fog tendrils.",
         magnitude: "1d6",
         effect: () => "Immobilize"
     },
-    "haunting_moan": {
-        id: "haunting_moan",
-        name: "Haunting Moan",
-        agentClass: "Voidwraith",
-        description: "Instill fear and reduce efficiency.",
+    "nostalgia_hum": {
+        id: "nostalgia_hum",
+        name: "Nostalgia Hum",
+        agentClass: "Fog Wanderer",
+        description: "Instill wistfulness, reducing enemy efficiency.",
         effect: () => "Fear debuff"
     },
-    "shadowmeld_stalk": {
-        id: "shadowmeld_stalk",
-        name: "Shadowmeld Stalk",
-        agentClass: "Voidwraith",
-        description: "Fade into the shadows, becoming harder to hit.",
+    "haze_mantle": {
+        id: "haze_mantle",
+        name: "Haze Mantle",
+        agentClass: "Fog Wanderer",
+        description: "Wrap in haze, becoming harder to perceive.",
         effect: () => "Buff Evasion"
     },
-    "soul_siphon": {
-        id: "soul_siphon",
-        name: "Soul Siphon",
-        agentClass: "Voidwraith",
-        description: "Drain life force from the enemy to heal yourself.",
+    "memory_siphon": {
+        id: "memory_siphon",
+        name: "Memory Siphon",
+        agentClass: "Fog Wanderer",
+        description: "Draw energy from fading memories to restore yourself.",
         magnitude: "1d8",
         effect: () => "Life Steal"
     },
-    // Twilight Weaver
-    "shadowstep_ambush": {
-        id: "shadowstep_ambush",
-        name: "Shadowstep Ambush",
-        agentClass: "Twilight Weaver",
-        description: "Teleport behind foe for a critical strike.",
+    // Dew Weaver
+    "silkstep": {
+        id: "silkstep",
+        name: "Silkstep",
+        agentClass: "Dew Weaver",
+        description: "Glide behind a foe for a precise strike.",
         magnitude: "3d6",
         effect: () => "High Crit"
     },
-    "dark_web_entanglement": {
-        id: "dark_web_entanglement",
-        name: "Dark Web Entanglement",
-        agentClass: "Twilight Weaver",
-        description: "Weave shadows to bind an enemy.",
+    "thread_binding": {
+        id: "thread_binding",
+        name: "Thread Binding",
+        agentClass: "Dew Weaver",
+        description: "Weave silk threads to bind an enemy in place.",
         magnitude: "1d4",
         effect: () => "Immobilize"
     },
-    "twilight_bolt": {
-        id: "twilight_bolt",
-        name: "Twilight Bolt",
-        agentClass: "Twilight Weaver",
-        description: "A bolt of twilight energy.",
+    "dewdrop_cloak": {
+        id: "dewdrop_cloak",
+        name: "Dewdrop Cloak",
+        agentClass: "Dew Weaver",
+        description: "A cloak of dewdrops that shimmers and deflects.",
         magnitude: "1d8",
         effect: () => "None"
     },
-    // Byssalspawn
-    "eldritch_devouring_gaze": {
-        id: "eldritch_devouring_gaze",
-        name: "Eldritch Devouring Gaze",
-        agentClass: "Byssalspawn",
-        description: "Consume life force with an alien gaze.",
+    // Tanglevine
+    "vine_reach": {
+        id: "vine_reach",
+        name: "Vine Reach",
+        agentClass: "Tanglevine",
+        description: "Extend vines to grasp and drain energy.",
         magnitude: "1d8",
         effect: () => "Drain/Debuff"
     },
-    "tendril_grapple_assault": {
-        id: "tendril_grapple_assault",
-        name: "Tendril Grapple Assault",
-        agentClass: "Byssalspawn",
-        description: "Extend shadowy tendrils to crush and bind.",
+    "root_grip": {
+        id: "root_grip",
+        name: "Root Grip",
+        agentClass: "Tanglevine",
+        description: "Extend roots to crush and bind targets.",
         magnitude: "2d6",
         effect: () => "Immobilize"
     },
-    "abysmal_torrent": {
-        id: "abysmal_torrent",
-        name: "Abysmal Torrent",
-        agentClass: "Byssalspawn",
-        description: "Unleash projectiles of dark abyssal energy.",
+    "pollen_cloud": {
+        id: "pollen_cloud",
+        name: "Pollen Cloud",
+        agentClass: "Tanglevine",
+        description: "Unleash a thick cloud of disorienting pollen.",
         magnitude: "2d6",
         effect: () => "AoE Ranged"
     },
-    "dimensional_phasing": {
-        id: "dimensional_phasing",
-        name: "Dimensional Phasing",
-        agentClass: "Byssalspawn",
-        description: "Phase into ethereal state to avoid harm.",
+    "regrowth": {
+        id: "regrowth",
+        name: "Regrowth",
+        agentClass: "Tanglevine",
+        description: "Phase into a rooted state to regenerate and avoid harm.",
         effect: () => "Buff Evasion"
     },
-    // Aksov Hexe-Spinne
-    "rocket_barrage": {
-        id: "rocket_barrage",
-        name: "Rocket Barrage",
-        agentClass: "Aksov Hexe-Spinne",
-        description: "Unleash a barrage of explosive hell rockets.",
+    // Silkspinner Scout
+    "silk_barrage": {
+        id: "silk_barrage",
+        name: "Silk Barrage",
+        agentClass: "Silkspinner Scout",
+        description: "Unleash a barrage of silk projectiles.",
         magnitude: "3d6",
-        effect: () => "AoE Fire"
+        effect: () => "AoE Nature"
     },
-    "chrome_volley": {
-        id: "chrome_volley",
-        name: "Chrome Volley",
-        agentClass: "Aksov Hexe-Spinne",
-        description: "Fire guided death missiles at a target.",
+    "thread_volley": {
+        id: "thread_volley",
+        name: "Thread Volley",
+        agentClass: "Silkspinner Scout",
+        description: "Fire guided silk threads at a target.",
         magnitude: "2d8",
         effect: () => "Homing/Precise"
     },
-    "jet_propulsion": {
-        id: "jet_propulsion",
-        name: "Jet Propulsion",
-        agentClass: "Aksov Hexe-Spinne",
-        description: "Activate anti-gravity for aerial advantage.",
+    "web_propulsion": {
+        id: "web_propulsion",
+        name: "Web Propulsion",
+        agentClass: "Silkspinner Scout",
+        description: "Activate web lines for aerial advantage.",
         effect: () => "Buff Evasion/Speed"
     },
-    "cluster_bomb_deployment": {
-        id: "cluster_bomb_deployment",
-        name: "Cluster Bomb Deployment",
-        agentClass: "Aksov Hexe-Spinne",
-        description: "Carpet bomb an area with biochemical explosives.",
+    "cluster_web": {
+        id: "cluster_web",
+        name: "Cluster Web",
+        agentClass: "Silkspinner Scout",
+        description: "Deploy a cluster of sticky webs across an area.",
         magnitude: "2d6",
-        effect: () => "AoE Poison"
+        effect: () => "AoE Slow"
     },
 };

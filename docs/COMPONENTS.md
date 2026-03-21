@@ -133,7 +133,7 @@ Those specifics should live in copy and data, not the component API.
 
 ## Current UI Debt
 
-- some visible labels and content still carry Quadar/grimdark language
+- some visible labels and content still carry legacy/old-aesthetic language
 - `Runes.tsx` and some related styling choices still encode the old aesthetic
 - the screen structure is solid, but the content pipeline is not yet Lanternbough-native
 

@@ -22,7 +22,7 @@ Engineering should stay lore-agnostic.
 
 - file names, folders, functions, state fields, and internal identifiers should describe mechanics
 - lore belongs in UI copy, content data, docs, art, and presentation
-- the current codebase still contains Quadar-era names in some places, but that is transition debt, not the target standard
+- the current codebase still contains legacy-era names in some places, but that is transition debt, not the target standard
 
 ## Top-Level `src/` Layout
 
@@ -134,5 +134,5 @@ As the rewrite continues:
 
 1. Fix `cortexService.ts` so the repo builds again.
 2. Remove duplicate SDK init and duplicate poll registration.
-3. Replace Quadar branding in `src/app/layout.tsx`.
+3. Replace legacy branding in `src/app/layout.tsx`.
 4. Keep the current reducer/thunk/system split while swapping in Lanternbough content.

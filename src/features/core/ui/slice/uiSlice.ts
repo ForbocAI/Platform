@@ -2,7 +2,7 @@ import type { StageOfScene, AgentClass } from '@/features/game/types';
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { type RootState } from '@/features/core/store';
 
-const DEFAULT_SELECTED_CLASS: AgentClass = 'Ashwalker';
+const DEFAULT_SELECTED_CLASS: AgentClass = 'Wayfinder';
 
 /** Payload for scheduling next autoplay tick (reducer-only scheduling). */
 export interface AutoplaySchedulePayload {

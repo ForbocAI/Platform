@@ -10,42 +10,42 @@ export interface AreaGenContext {
 type TransitionEntry = { biome: Biome; weight: number };
 
 export const BIOME_TRANSITIONS: Partial<Record<Biome, TransitionEntry[]>> = {
-    "Quadar Tower": [{ biome: "Quadar Tower", weight: 45 }, { biome: "Haunted Chapel", weight: 18 }, { biome: "Military Installation", weight: 18 }, { biome: "Eldritch Fortress", weight: 10 }, { biome: "Labyrinthine Dungeon", weight: 5 }, { biome: "Crumbling Ruins", weight: 4 }],
-    "Haunted Chapel": [{ biome: "Quadar Tower", weight: 28 }, { biome: "Eldritch Fortress", weight: 25 }, { biome: "Labyrinthine Dungeon", weight: 22 }, { biome: "Ethereal Marshlands", weight: 15 }, { biome: "Military Installation", weight: 10 }],
-    "Military Installation": [{ biome: "Quadar Tower", weight: 28 }, { biome: "Eldritch Fortress", weight: 25 }, { biome: "Labyrinthine Dungeon", weight: 22 }, { biome: "Crumbling Ruins", weight: 15 }, { biome: "Obsidian Spire", weight: 10 }],
-    "Eldritch Fortress": [{ biome: "Labyrinthine Dungeon", weight: 25 }, { biome: "Chthonic Depths", weight: 22 }, { biome: "Haunted Chapel", weight: 18 }, { biome: "Cavernous Abyss", weight: 15 }, { biome: "Rune Temples", weight: 12 }, { biome: "Military Installation", weight: 8 }],
-    "Labyrinthine Dungeon": [{ biome: "Chthonic Depths", weight: 28 }, { biome: "Eldritch Fortress", weight: 22 }, { biome: "Cavernous Abyss", weight: 20 }, { biome: "Rune Temples", weight: 15 }, { biome: "Quadar Tower", weight: 8 }, { biome: "The Sterile Chamber", weight: 7 }],
-    "Chthonic Depths": [{ biome: "Labyrinthine Dungeon", weight: 22 }, { biome: "Cavernous Abyss", weight: 22 }, { biome: "Abyss of Infernal Lore", weight: 18 }, { biome: "Rune Temples", weight: 15 }, { biome: "Dimensional Nexus", weight: 12 }, { biome: "The Sterile Chamber", weight: 11 }],
-    "Cavernous Abyss": [{ biome: "Chthonic Depths", weight: 25 }, { biome: "Labyrinthine Dungeon", weight: 22 }, { biome: "Abyss of Infernal Lore", weight: 18 }, { biome: "Rune Temples", weight: 15 }, { biome: "Dimensional Nexus", weight: 12 }, { biome: "Obsidian Spire", weight: 8 }],
-    "Ethereal Marshlands": [{ biome: "Haunted Chapel", weight: 25 }, { biome: "Crumbling Ruins", weight: 22 }, { biome: "Toxic Wastes", weight: 18 }, { biome: "Labyrinthine Dungeon", weight: 18 }, { biome: "Precipice of the Shadowlands", weight: 10 }, { biome: "Quadar Tower", weight: 7 }],
-    "Crumbling Ruins": [{ biome: "Military Installation", weight: 22 }, { biome: "Eldritch Fortress", weight: 20 }, { biome: "Labyrinthine Dungeon", weight: 18 }, { biome: "Quadar Tower", weight: 15 }, { biome: "Chthonic Depths", weight: 12 }, { biome: "Ethereal Marshlands", weight: 13 }],
-    "Obsidian Spire": [{ biome: "Eldritch Fortress", weight: 25 }, { biome: "Military Installation", weight: 22 }, { biome: "Chthonic Depths", weight: 18 }, { biome: "Labyrinthine Dungeon", weight: 15 }, { biome: "Dimensional Nexus", weight: 12 }, { biome: "Cavernous Abyss", weight: 8 }],
-    "Rune Temples": [{ biome: "Chthonic Depths", weight: 22 }, { biome: "Labyrinthine Dungeon", weight: 20 }, { biome: "Abyss of Infernal Lore", weight: 18 }, { biome: "Twilight Alchemy Haven", weight: 15 }, { biome: "Eldritch Fortress", weight: 12 }, { biome: "Dimensional Nexus", weight: 13 }],
-    "Toxic Wastes": [{ biome: "Ethereal Marshlands", weight: 25 }, { biome: "Chthonic Depths", weight: 20 }, { biome: "The Sterile Chamber", weight: 18 }, { biome: "Labyrinthine Dungeon", weight: 15 }, { biome: "Chromatic-Steel Fungi", weight: 12 }, { biome: "Crumbling Ruins", weight: 10 }],
-    "The Sterile Chamber": [{ biome: "Chthonic Depths", weight: 22 }, { biome: "Labyrinthine Dungeon", weight: 20 }, { biome: "Toxic Wastes", weight: 18 }, { biome: "Abyss of Infernal Lore", weight: 15 }, { biome: "Dimensional Nexus", weight: 13 }, { biome: "Rune Temples", weight: 12 }],
-    "Abyss of Infernal Lore": [{ biome: "Chthonic Depths", weight: 22 }, { biome: "Rune Temples", weight: 20 }, { biome: "Dimensional Nexus", weight: 18 }, { biome: "Twilight Alchemy Haven", weight: 15 }, { biome: "Static Sea of All Noise", weight: 12 }, { biome: "Precipice of the Shadowlands", weight: 13 }],
-    "Dimensional Nexus": [{ biome: "Rune Temples", weight: 22 }, { biome: "Twilight Alchemy Haven", weight: 20 }, { biome: "Abyss of Infernal Lore", weight: 18 }, { biome: "Static Sea of All Noise", weight: 15 }, { biome: "Chthonic Depths", weight: 12 }, { biome: "Precipice of the Shadowlands", weight: 13 }],
-    "Twilight Alchemy Haven": [{ biome: "Rune Temples", weight: 22 }, { biome: "Dimensional Nexus", weight: 20 }, { biome: "Abyss of Infernal Lore", weight: 18 }, { biome: "Static Sea of All Noise", weight: 15 }, { biome: "Precipice of the Shadowlands", weight: 13 }, { biome: "Chromatic-Steel Fungi", weight: 12 }],
-    "Static Sea of All Noise": [{ biome: "Dimensional Nexus", weight: 25 }, { biome: "Twilight Alchemy Haven", weight: 22 }, { biome: "Precipice of the Shadowlands", weight: 20 }, { biome: "Chromatic-Steel Fungi", weight: 15 }, { biome: "Abyss of Infernal Lore", weight: 10 }, { biome: "Chthonic Depths", weight: 8 }],
-    "Precipice of the Shadowlands": [{ biome: "Static Sea of All Noise", weight: 22 }, { biome: "Ethereal Marshlands", weight: 20 }, { biome: "Abyss of Infernal Lore", weight: 18 }, { biome: "Dimensional Nexus", weight: 15 }, { biome: "Haunted Chapel", weight: 12 }, { biome: "Twilight Alchemy Haven", weight: 13 }],
-    "Chromatic-Steel Fungi": [{ biome: "Static Sea of All Noise", weight: 22 }, { biome: "Toxic Wastes", weight: 20 }, { biome: "Dimensional Nexus", weight: 18 }, { biome: "Chthonic Depths", weight: 15 }, { biome: "Twilight Alchemy Haven", weight: 13 }, { biome: "The Sterile Chamber", weight: 12 }],
+    "Lanternbough": [{ biome: "Lanternbough", weight: 45 }, { biome: "Rune Stones", weight: 18 }, { biome: "Trading Posts", weight: 18 }, { biome: "Mushroom Chapel", weight: 10 }, { biome: "Root Warrens", weight: 5 }, { biome: "Troll Bridges", weight: 4 }],
+    "Rune Stones": [{ biome: "Lanternbough", weight: 28 }, { biome: "Mushroom Chapel", weight: 25 }, { biome: "Root Warrens", weight: 22 }, { biome: "Meadows", weight: 15 }, { biome: "Trading Posts", weight: 10 }],
+    "Trading Posts": [{ biome: "Lanternbough", weight: 28 }, { biome: "Mushroom Chapel", weight: 25 }, { biome: "Root Warrens", weight: 22 }, { biome: "Troll Bridges", weight: 15 }, { biome: "The Tree", weight: 10 }],
+    "Mushroom Chapel": [{ biome: "Root Warrens", weight: 25 }, { biome: "Underground Springs", weight: 22 }, { biome: "Rune Stones", weight: 18 }, { biome: "Root Drops", weight: 15 }, { biome: "Canopy Platforms", weight: 12 }, { biome: "Trading Posts", weight: 8 }],
+    "Root Warrens": [{ biome: "Underground Springs", weight: 28 }, { biome: "Mushroom Chapel", weight: 22 }, { biome: "Root Drops", weight: 20 }, { biome: "Canopy Platforms", weight: 15 }, { biome: "Lanternbough", weight: 8 }, { biome: "Seasonal Shifts", weight: 7 }],
+    "Underground Springs": [{ biome: "Root Warrens", weight: 22 }, { biome: "Root Drops", weight: 22 }, { biome: "Overgrown Ruins", weight: 18 }, { biome: "Canopy Platforms", weight: 15 }, { biome: "Otherwild Reaches", weight: 12 }, { biome: "Seasonal Shifts", weight: 11 }],
+    "Root Drops": [{ biome: "Underground Springs", weight: 25 }, { biome: "Root Warrens", weight: 22 }, { biome: "Overgrown Ruins", weight: 18 }, { biome: "Canopy Platforms", weight: 15 }, { biome: "Otherwild Reaches", weight: 12 }, { biome: "The Tree", weight: 8 }],
+    "Meadows": [{ biome: "Rune Stones", weight: 25 }, { biome: "Troll Bridges", weight: 22 }, { biome: "Mud Paths", weight: 18 }, { biome: "Root Warrens", weight: 18 }, { biome: "Narrow Paths", weight: 10 }, { biome: "Lanternbough", weight: 7 }],
+    "Troll Bridges": [{ biome: "Trading Posts", weight: 22 }, { biome: "Mushroom Chapel", weight: 20 }, { biome: "Root Warrens", weight: 18 }, { biome: "Lanternbough", weight: 15 }, { biome: "Underground Springs", weight: 12 }, { biome: "Meadows", weight: 13 }],
+    "The Tree": [{ biome: "Mushroom Chapel", weight: 25 }, { biome: "Trading Posts", weight: 22 }, { biome: "Underground Springs", weight: 18 }, { biome: "Root Warrens", weight: 15 }, { biome: "Otherwild Reaches", weight: 12 }, { biome: "Root Drops", weight: 8 }],
+    "Canopy Platforms": [{ biome: "Underground Springs", weight: 22 }, { biome: "Root Warrens", weight: 20 }, { biome: "Overgrown Ruins", weight: 18 }, { biome: "Herb Gardens", weight: 15 }, { biome: "Mushroom Chapel", weight: 12 }, { biome: "Otherwild Reaches", weight: 13 }],
+    "Mud Paths": [{ biome: "Meadows", weight: 25 }, { biome: "Underground Springs", weight: 20 }, { biome: "Seasonal Shifts", weight: 18 }, { biome: "Root Warrens", weight: 15 }, { biome: "Mushroom Rings", weight: 12 }, { biome: "Troll Bridges", weight: 10 }],
+    "Seasonal Shifts": [{ biome: "Underground Springs", weight: 22 }, { biome: "Root Warrens", weight: 20 }, { biome: "Mud Paths", weight: 18 }, { biome: "Overgrown Ruins", weight: 15 }, { biome: "Otherwild Reaches", weight: 13 }, { biome: "Canopy Platforms", weight: 12 }],
+    "Overgrown Ruins": [{ biome: "Underground Springs", weight: 22 }, { biome: "Canopy Platforms", weight: 20 }, { biome: "Otherwild Reaches", weight: 18 }, { biome: "Herb Gardens", weight: 15 }, { biome: "Creek Crossings", weight: 12 }, { biome: "Narrow Paths", weight: 13 }],
+    "Otherwild Reaches": [{ biome: "Canopy Platforms", weight: 22 }, { biome: "Herb Gardens", weight: 20 }, { biome: "Overgrown Ruins", weight: 18 }, { biome: "Creek Crossings", weight: 15 }, { biome: "Underground Springs", weight: 12 }, { biome: "Narrow Paths", weight: 13 }],
+    "Herb Gardens": [{ biome: "Canopy Platforms", weight: 22 }, { biome: "Otherwild Reaches", weight: 20 }, { biome: "Overgrown Ruins", weight: 18 }, { biome: "Creek Crossings", weight: 15 }, { biome: "Narrow Paths", weight: 13 }, { biome: "Mushroom Rings", weight: 12 }],
+    "Creek Crossings": [{ biome: "Otherwild Reaches", weight: 25 }, { biome: "Herb Gardens", weight: 22 }, { biome: "Narrow Paths", weight: 20 }, { biome: "Mushroom Rings", weight: 15 }, { biome: "Overgrown Ruins", weight: 10 }, { biome: "Underground Springs", weight: 8 }],
+    "Narrow Paths": [{ biome: "Creek Crossings", weight: 22 }, { biome: "Meadows", weight: 20 }, { biome: "Overgrown Ruins", weight: 18 }, { biome: "Otherwild Reaches", weight: 15 }, { biome: "Rune Stones", weight: 12 }, { biome: "Herb Gardens", weight: 13 }],
+    "Mushroom Rings": [{ biome: "Creek Crossings", weight: 22 }, { biome: "Mud Paths", weight: 20 }, { biome: "Otherwild Reaches", weight: 18 }, { biome: "Underground Springs", weight: 15 }, { biome: "Herb Gardens", weight: 13 }, { biome: "Seasonal Shifts", weight: 12 }],
 };
 
 export const BIOMES: Biome[] = [
-    "Ethereal Marshlands", "Toxic Wastes", "Haunted Chapel", "Obsidian Spire",
-    "Quadar Tower", "Military Installation", "Eldritch Fortress", "Labyrinthine Dungeon",
-    "Chromatic-Steel Fungi", "Chthonic Depths", "Static Sea of All Noise", "Twilight Alchemy Haven",
-    "Abyss of Infernal Lore", "Precipice of the Shadowlands", "Rune Temples", "Crumbling Ruins",
-    "Dimensional Nexus", "Cavernous Abyss", "The Sterile Chamber",
+    "Meadows", "Mud Paths", "Rune Stones", "The Tree",
+    "Lanternbough", "Trading Posts", "Mushroom Chapel", "Root Warrens",
+    "Mushroom Rings", "Underground Springs", "Creek Crossings", "Herb Gardens",
+    "Overgrown Ruins", "Narrow Paths", "Canopy Platforms", "Troll Bridges",
+    "Otherwild Reaches", "Root Drops", "Seasonal Shifts",
 ];
 
-const deeperBiomes: Biome[] = ["Chthonic Depths", "Cavernous Abyss", "Abyss of Infernal Lore", "Dimensional Nexus", "Static Sea of All Noise", "Twilight Alchemy Haven", "Precipice of the Shadowlands", "Chromatic-Steel Fungi", "The Sterile Chamber"];
-const shallowerBiomes: Biome[] = ["Quadar Tower", "Haunted Chapel", "Military Installation", "Ethereal Marshlands", "Crumbling Ruins"];
+const deeperBiomes: Biome[] = ["Underground Springs", "Root Drops", "Overgrown Ruins", "Otherwild Reaches", "Creek Crossings", "Herb Gardens", "Narrow Paths", "Mushroom Rings", "Seasonal Shifts"];
+const shallowerBiomes: Biome[] = ["Lanternbough", "Rune Stones", "Trading Posts", "Meadows", "Troll Bridges"];
 
 export function selectNextBiome(context?: AreaGenContext | null): Biome {
     const prevBiome = context?.previousArea?.biome;
     const transitions = prevBiome ? BIOME_TRANSITIONS[prevBiome] : null;
-    if (!transitions || transitions.length === 0) return "Quadar Tower";
+    if (!transitions || transitions.length === 0) return "Lanternbough";
 
     const direction = context?.direction ?? "";
     const areasExplored = context?.areasExplored ?? 0;

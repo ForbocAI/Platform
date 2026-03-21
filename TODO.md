@@ -38,12 +38,12 @@ This log tracks the engineering requirements for the flagship Forboc AI consumer
 - [ ] **Memory Persistence**: Configure SDK to persist LanceDB memories to IndexedDB.
 - [ ] **Replace SDK Placeholder**: Once SDK is stable, swap `src/lib/sdk-placeholder` with real `forbocai` calls (keep same interface shape).
 
-## Qua'dar System Implementation (The Law of the Spire) ᛒ
-*Objective: Instantiate the grimdark TTRPG rules within the digital engine.*
+## Lanternbough System Implementation (The Wonderloom) ᛒ
+*Objective: Instantiate the cozy TTRPG rules within the digital engine.*
 
-- [x] **Class & Spell Mechanics**: Port the attributes and unique spell architectures from `quadar.md`.
-- [x] **Starting Initiation**: Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `quadar_familiar.md`.
-- [x] **Loom of Fate Logic**: `Surge Count` and narrative modifier tables for world-event consequences.
+- [x] **Class & Spell Mechanics**: Port the attributes and unique spell architectures from `Lanternbough.md`.
+- [x] **Starting Initiation**: Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `Lanternbough.md`.
+- [x] **Wonderloom Logic**: `Surge Count` and narrative modifier tables for world-event consequences.
 - [x] **Narrative Momentum**: "Chipping vs. Cutting" questioning heuristics in directive synthesis.
 - [x] **Level Progression**: XP gain, level up thresholds, stat scaling (MaxHP).
 

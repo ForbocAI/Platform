@@ -13,83 +13,83 @@ interface NPCTemplate {
 }
 
 export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
-    "Obsidian Warden": {
-        type: "Obsidian Warden", // Will be made generic in Phase 2
-        description: "A tower of black glass and malice.",
+    "Bridgekeeper": {
+        type: "Bridgekeeper",
+        description: "A sturdy sentinel wrapped in mossy stone and warm granite.",
         baseStats: { maxHp: 60, defense: 15, damage: 10, speed: 0.5 },
-        capabilities: ["obsidian_surge", "death_shard_strike"]
+        capabilities: ["root_stone_sheltering", "granite_surge"]
     },
-    "Doomguard": {
-        type: "Doomguard",
-        description: "A shell of armor powered by sheer hate.",
+    "Thornwarden": {
+        type: "Thornwarden",
+        description: "A thorny guardian bristling with seed-pods and bark armor.",
         baseStats: { maxHp: 50, defense: 14, damage: 8, speed: 0.8 },
-        capabilities: ["hellfire_explosion", "dreadful_charge"]
+        capabilities: ["seedstorm", "briar_charge"]
     },
-    "Ashwalker Renegade": {
-        type: "Ashwalker",
-        description: "A fallen ranger turned to madness.",
+    "Wayfinder Scout": {
+        type: "Wayfinder",
+        description: "A wandering ranger with a lantern and craft tools.",
         baseStats: { maxHp: 40, defense: 13, damage: 7, speed: 1.0 },
-        capabilities: ["ember_dash", "relic_strike"]
+        capabilities: ["lantern_dash", "craft_strike"]
     },
-    "Iron Armored Guardian": {
-        type: "Iron Armored Guardian",
-        description: "Heavily armored medieval swordfest knight.",
+    "Ironbark Sentinel": {
+        type: "Ironbark Sentinel",
+        description: "A heavily armored sentinel with bark-plated shield.",
         baseStats: { maxHp: 55, defense: 16, damage: 9, speed: 0.6 },
-        capabilities: ["ironclad_charge", "steel_shield_block"]
+        capabilities: ["ironbark_charge", "root_shield_block"]
     },
-    "Aether Spirit": {
-        type: "Aether Spirit",
-        description: "A fleeting form of shimmering angles.",
+    "Mist Drifter": {
+        type: "Mist Drifter",
+        description: "A fleeting form of shimmering mist and gentle light.",
         baseStats: { maxHp: 35, defense: 12, damage: 12, speed: 1.2 },
-        capabilities: ["ethereal_phasing", "astral_bolt"]
+        capabilities: ["mistfade_drift", "wisp_grasp"]
     },
-    "Thunder Trooper": {
-        type: "Thunder Trooper",
-        description: "A raining commando with a love of carnage.",
+    "Windguard Scout": {
+        type: "Windguard Scout",
+        description: "A swift canopy scout who rides wind currents.",
         baseStats: { maxHp: 45, defense: 13, damage: 11, speed: 1.1 },
-        capabilities: ["shotgun_barrage", "grenade_assault"]
+        capabilities: ["rain_cape_shield", "thunder_clap"]
     },
-    "Storm Titan": {
-        type: "Storm Titan",
-        description: "A hulking creature with quantum electric attacks.",
+    "Thunderoak Elder": {
+        type: "Thunderoak Elder",
+        description: "A towering elder oak creature crackling with storm energy.",
         baseStats: { maxHp: 120, defense: 18, damage: 20, speed: 0.4 },
-        capabilities: ["electrical_charge", "thunderous_slam"]
+        capabilities: ["storm_harvest", "thunderous_stamp"]
     },
-    "Flame Corps Brute": {
-        type: "Flame Corps",
-        description: "A large, brutish phallic creature with a grenade launcher.",
+    "Hearthkeeper Tender": {
+        type: "Hearthkeeper",
+        description: "A warm-hearted keeper who tends cooking fires and forge pots.",
         baseStats: { maxHp: 65, defense: 14, damage: 15, speed: 0.7 },
-        capabilities: ["napalm_grenade", "inferno_overdrive"]
+        capabilities: ["ember_pot_toss", "kindling_charge"]
     },
-    "Gravewalker": {
-        type: "Gravewalker",
-        description: "A reanimated corpse, a dead wandering.",
+    "Rootwalker": {
+        type: "Rootwalker",
+        description: "A quiet figure who walks the old root tunnels with patient steps.",
         baseStats: { maxHp: 70, defense: 11, damage: 13, speed: 0.9 },
-        capabilities: ["necrotic_strike", "rotting_grasp", "bone_shatter"]
+        capabilities: ["root_strike", "tendril_grasp", "soil_shatter"]
     },
-    "Shadowhorn Juggernaut": {
-        type: "Shadowhorn Juggernaut",
-        description: "An agile, horned creature with powerful melee attacks.",
+    "Mosshorn Charger": {
+        type: "Mosshorn Charger",
+        description: "An agile, antlered creature with powerful charging attacks.",
         baseStats: { maxHp: 60, defense: 14, damage: 14, speed: 1.3 },
-        capabilities: ["horn_charge", "seismic_stomp", "shadow_rush"]
+        capabilities: ["antler_charge", "stomping_impact", "forest_sprint"]
     },
-    "Magma Leviathan": {
-        type: "Magma Leviathan",
-        description: "A huge, massive lava creature from the core.",
+    "Bramble Colossus": {
+        type: "Bramble Colossus",
+        description: "A massive vine-covered colossus from the deep root hollows.",
         baseStats: { maxHp: 200, defense: 20, damage: 25, speed: 0.3 },
-        capabilities: ["molten_breath", "lava_slam", "magma_eruption"]
+        capabilities: ["vine_surge_sweep", "root_slam_tremor", "tangle_pool_eruption"]
     },
-    "Abyssal Overfiend": {
-        type: "Abyssal Overfiend",
-        description: "The ultimate antagonist. A monstrous entity with tentacles and void power.",
+    "The Briarking": {
+        type: "The Briarking",
+        description: "The great protector of the deep vale. A towering entity of vine and thorn.",
         baseStats: { maxHp: 500, defense: 22, damage: 40, speed: 0.5 },
-        capabilities: ["void_tentacles", "chaos_gaze", "netherstorm"]
+        capabilities: ["vine_arms", "thorn_gaze", "tangle_storm_call"]
     },
-    "Aetherwing Herald": {
-        type: "Aetherwing Herald",
-        description: "A flying, otherworldly creature that shoots energy projectiles.",
+    "Petalwing Herald": {
+        type: "Petalwing Herald",
+        description: "A graceful flying herald that projects beams of petal-light.",
         baseStats: { maxHp: 120, defense: 15, damage: 18, speed: 1.4 },
-        capabilities: ["celestial_beam", "spectral_tempest", "dimensional_rift"]
+        capabilities: ["petal_projection", "petal_storm", "bloom_reckoning"]
     }
 };
 

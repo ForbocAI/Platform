@@ -1,128 +1,128 @@
 import type { Capability } from "../../types";
 
 export const ENEMY_CAPABILITIES: Record<string, Capability> = {
-    // Gravewalker
-    "necrotic_strike": {
-        id: "necrotic_strike",
-        name: "Necrotic Strike",
-        agentClass: "Gravewalker",
-        description: "A melee strike infused with necrotic energy.",
+    // Rootwalker
+    "root_strike": {
+        id: "root_strike",
+        name: "Root Strike",
+        agentClass: "Rootwalker",
+        description: "A melee strike channeled through deep roots.",
         magnitude: "1d8",
         effect: () => "Debuff"
     },
-    "rotting_grasp": {
-        id: "rotting_grasp",
-        name: "Rotting Grasp",
-        agentClass: "Gravewalker",
-        description: "Extend a decaying grasp that rots flesh over time.",
+    "tendril_grasp": {
+        id: "tendril_grasp",
+        name: "Tendril Grasp",
+        agentClass: "Rootwalker",
+        description: "Extend root tendrils that sap energy over time.",
         magnitude: "1d6",
         effect: () => "DoT Rot"
     },
-    "bone_shatter": {
-        id: "bone_shatter",
-        name: "Bone Shatter",
-        agentClass: "Gravewalker",
-        description: "Unleash a bone-shattering shockwave that staggers enemies.",
+    "soil_shatter": {
+        id: "soil_shatter",
+        name: "Soil Shatter",
+        agentClass: "Rootwalker",
+        description: "Unleash a ground-shaking tremor that staggers enemies.",
         magnitude: "2d6",
         effect: () => "AoE Stagger"
     },
-    // Shadowhorn Juggernaut
-    "horn_charge": {
-        id: "horn_charge",
-        name: "Horn Charge",
-        agentClass: "Shadowhorn Juggernaut",
-        description: "Charge with incredible speed, goring the target with shadow horns.",
+    // Mosshorn Charger
+    "antler_charge": {
+        id: "antler_charge",
+        name: "Antler Charge",
+        agentClass: "Mosshorn Charger",
+        description: "Charge with incredible speed, goring the target with moss-covered antlers.",
         magnitude: "2d8",
         effect: () => "Piercing"
     },
-    "seismic_stomp": {
-        id: "seismic_stomp",
-        name: "Seismic Stomp",
-        agentClass: "Shadowhorn Juggernaut",
-        description: "Crush the ground to create a fiery quake that burns nearby foes.",
+    "stomping_impact": {
+        id: "stomping_impact",
+        name: "Stomping Impact",
+        agentClass: "Mosshorn Charger",
+        description: "Crush the ground to create tremors that stagger nearby foes.",
         magnitude: "2d6",
         effect: () => "AoE Knockdown"
     },
-    "shadow_rush": {
-        id: "shadow_rush",
-        name: "Shadow Rush",
-        agentClass: "Shadowhorn Juggernaut",
-        description: "Rush through shadows with blinding speed.",
+    "forest_sprint": {
+        id: "forest_sprint",
+        name: "Forest Sprint",
+        agentClass: "Mosshorn Charger",
+        description: "Sprint through the forest with blinding speed.",
         magnitude: "1d10",
         effect: () => "Buff Speed"
     },
-    // Magma Leviathan
-    "molten_breath": {
-        id: "molten_breath",
-        name: "Molten Breath",
-        agentClass: "Magma Leviathan",
-        description: "Exhale a scorching stream of molten lava.",
+    // Bramble Colossus
+    "vine_surge_sweep": {
+        id: "vine_surge_sweep",
+        name: "Vine Surge Sweep",
+        agentClass: "Bramble Colossus",
+        description: "Sweep with massive vine arms in a wide arc.",
         magnitude: "3d6",
         effect: () => "Burn"
     },
-    "lava_slam": {
-        id: "lava_slam",
-        name: "Lava Slam",
-        agentClass: "Magma Leviathan",
-        description: "Slam the ground with immense force, generating lava waves.",
+    "root_slam_tremor": {
+        id: "root_slam_tremor",
+        name: "Root Slam Tremor",
+        agentClass: "Bramble Colossus",
+        description: "Slam roots into the ground, generating tremor waves.",
         magnitude: "2d8",
         effect: () => "AoE"
     },
-    "magma_eruption": {
-        id: "magma_eruption",
-        name: "Magma Eruption",
-        agentClass: "Magma Leviathan",
-        description: "Trigger a cataclysmic eruption of lava and sulfur.",
+    "tangle_pool_eruption": {
+        id: "tangle_pool_eruption",
+        name: "Tangle Pool Eruption",
+        agentClass: "Bramble Colossus",
+        description: "Trigger a cataclysmic eruption of tangling vines and thorns.",
         magnitude: "3d8",
         effect: () => "AoE Ultimate"
     },
-    // Abyssal Overfiend
-    "void_tentacles": {
-        id: "void_tentacles",
-        name: "Void Tentacles",
-        agentClass: "Abyssal Overfiend",
-        description: "Summon dark tentacles from the void to entangle and crush.",
+    // The Briarking
+    "vine_arms": {
+        id: "vine_arms",
+        name: "Vine Arms",
+        agentClass: "The Briarking",
+        description: "Summon massive vine arms to entangle and crush.",
         magnitude: "2d8",
         effect: () => "Immobilize"
     },
-    "chaos_gaze": {
-        id: "chaos_gaze",
-        name: "Chaos Gaze",
-        agentClass: "Abyssal Overfiend",
-        description: "Release a devastating gaze of chaos that pierces all defenses.",
+    "thorn_gaze": {
+        id: "thorn_gaze",
+        name: "Thorn Gaze",
+        agentClass: "The Briarking",
+        description: "Release a devastating gaze that pierces all defenses with thorns.",
         magnitude: "3d8",
         effect: () => "Pierce"
     },
-    "netherstorm": {
-        id: "netherstorm",
-        name: "Netherstorm",
-        agentClass: "Abyssal Overfiend",
-        description: "Conjure a storm of chaotic energies that rains destruction.",
+    "tangle_storm_call": {
+        id: "tangle_storm_call",
+        name: "Tangle Storm Call",
+        agentClass: "The Briarking",
+        description: "Conjure a storm of tangling vines and thorns that rains destruction.",
         magnitude: "4d6",
         effect: () => "AoE Ultimate"
     },
-    // Aetherwing Herald
-    "celestial_beam": {
-        id: "celestial_beam",
-        name: "Celestial Beam",
-        agentClass: "Aetherwing Herald",
-        description: "Release a beam of ethereal light that pierces through targets.",
+    // Petalwing Herald
+    "petal_projection": {
+        id: "petal_projection",
+        name: "Petal Projection",
+        agentClass: "Petalwing Herald",
+        description: "Release a beam of petal-light that pierces through targets.",
         magnitude: "2d6",
         effect: () => "Ranged Pierce"
     },
-    "spectral_tempest": {
-        id: "spectral_tempest",
-        name: "Spectral Tempest",
-        agentClass: "Aetherwing Herald",
-        description: "Summon a swirling spectral storm of glass shards.",
+    "petal_storm": {
+        id: "petal_storm",
+        name: "Petal Storm",
+        agentClass: "Petalwing Herald",
+        description: "Summon a swirling storm of razor petals.",
         magnitude: "2d8",
         effect: () => "AoE"
     },
-    "dimensional_rift": {
-        id: "dimensional_rift",
-        name: "Dimensional Rift",
-        agentClass: "Aetherwing Herald",
-        description: "Create evil rifts that damage and displace enemies.",
+    "bloom_reckoning": {
+        id: "bloom_reckoning",
+        name: "Bloom Reckoning",
+        agentClass: "Petalwing Herald",
+        description: "Create blooming rifts that damage and displace enemies.",
         magnitude: "2d6",
         effect: () => "Displacement"
     },

@@ -36,7 +36,7 @@ Built on **Next.js 16** and **Tailwind CSS**, designed for maximum visual impact
 
 - **Neural Grid Integration**: Native hook into the `forbocai` SDK via the [multi-round protocol](https://classified.forboc.ai/reference/api/scope-and-glossary.html) — API orchestrates directive, context, and verdict; SDK executes locally.
 - **Dynamic Simulation**: Real-time rendering of procedural environments and autonomous NPC behaviors.
-- **Vengeance UI**: A high-fidelity, grimdark aesthetic framework.
+- **Lantern UI**: A warm, cozy aesthetic framework.
 
 ### 🛠️ Boot Sequence
 To initialize the mainframe:
@@ -50,7 +50,7 @@ npm run dev
 Strict adherence to the [Style Guide](./style-guide.md) is expected.
 - **Paranoid Reality**: Guided by `Philip K. Dick`.
 - **High-Tech Low-Life**: Guided by `William Gibson`.
-- **Eldritch Infrastructure**: Guided by `H.P. Lovecraft`.
+- **Rootsong Infrastructure**: Guided by folk tale and storybook tradition.
 
 ---
 *SYS_LOAD_COMPLETE // VOID_STABLE*

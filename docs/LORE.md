@@ -18,25 +18,22 @@ This document is the current canon target for `/Users/seandinwiddie/GitHub/Forbo
 
 It is inspired by structural ideas found in:
 
-- `~/GitHub/Forboc/notes/quadar.md`
-- `~/GitHub/Forboc/notes/quadar_ familiar.md`
+- `~/GitHub/Forboc/notes/Lanternbough.md`
 - `~/Documents/GitHub/forboc.github.io`
 - `~/Documents/GitHub/qvht.github.io`
 
-But it is not Quadar canon. Platform now aims at a distinct cozy-fantasy identity.
+But it is not legacy canon. Platform now aims at a distinct cozy-fantasy identity.
 
 ## Canon Reset
 
-Platform is no longer a cyber-grimdark nightmare setting.
+Platform is no longer a dark horror setting.
 
 Retired for Platform canon:
 
-- Umbralyn
-- Qua'dar Tower
-- Goetéian Chthonica
-- abyssal punishment cosmology
-- blood-soaked revelation framing
-- noir metropolis / chrome-horror atmosphere
+- Lanternbough replaces all prior setting names
+- seasonal cycles cosmology replaces old cosmology
+- warm revelation framing replaces old framing
+- cozy fantasy vale replaces old atmosphere
 
 Those sources remain useful as structural inspiration only.
 
@@ -222,9 +219,9 @@ The tone should not be:
 
 - cruel
 - nihilistic
-- blood-soaked
+- grim or gory
 - prison-like
-- chrome-noir oppressive
+- oppressively dark
 
 ## Visual Guide
 
@@ -252,4 +249,4 @@ Preferred palette:
 
 ## Canon Rule Going Forward
 
-If a runtime string or design decision conflicts with this document, this Lanternbough brief wins. Quadar text that still exists in code should be treated as migration debt.
+If a runtime string or design decision conflicts with this document, this Lanternbough brief wins. Legacy text that still exists in code should be treated as migration debt.

@@ -195,25 +195,25 @@ export interface ExchangeHub {
 }
 
 export type EnvironmentType =
-    | "Ethereal Marshlands"
-    | "Toxic Wastes"
-    | "Haunted Chapel"
-    | "Obsidian Spire"
-    | "Quadar Tower"
-    | "Military Installation"
-    | "Eldritch Fortress"
-    | "Labyrinthine Dungeon"
-    | "Chromatic-Steel Fungi"
-    | "Chthonic Depths"
-    | "Static Sea of All Noise"
-    | "Twilight Alchemy Haven"
-    | "Abyss of Infernal Lore"
-    | "Precipice of the Shadowlands"
-    | "Rune Temples"
-    | "Crumbling Ruins"
-    | "Dimensional Nexus"
-    | "Cavernous Abyss"
-    | "The Sterile Chamber";
+    | "Meadows"
+    | "Mud Paths"
+    | "Rune Stones"
+    | "The Tree"
+    | "Lanternbough"
+    | "Trading Posts"
+    | "Mushroom Chapel"
+    | "Root Warrens"
+    | "Mushroom Rings"
+    | "Underground Springs"
+    | "Creek Crossings"
+    | "Herb Gardens"
+    | "Overgrown Ruins"
+    | "Narrow Paths"
+    | "Canopy Platforms"
+    | "Troll Bridges"
+    | "Otherwild Reaches"
+    | "Root Drops"
+    | "Seasonal Shifts";
 
 export interface Sector {
     id: string;

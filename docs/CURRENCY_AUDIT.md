@@ -11,11 +11,11 @@
 # Platform Resource and Trade Direction
 
 Last reviewed: 2026-03-17
-Scope: transition from Quadar economy to Lanternbough economy
+Scope: transition to Lanternbough economy
 
 ## Current Runtime State
 
-The live code still uses Quadar-era resource fields and actions:
+The live code still uses legacy resource fields and actions:
 
 - `player.inventory.spirit`
 - `player.inventory.blood`
@@ -54,9 +54,9 @@ Recommended mapping:
 
 | Current Runtime Field | Current Theme | Lanternbough UI Label | Role |
 | --- | --- | --- | --- |
-| `inventory.spirit` | grimdark primary currency | `Pollen` | common barter currency for food, tools, supplies, and favors |
-| `inventory.blood` | ritual secondary currency | `Glowstones` | rarer upgrade currency for charms, routes, and uncommon wares |
-| `sacrificeItem` | grimdark discard ritual | `Repurpose` | break down unused items into usable value |
+| `inventory.spirit` | legacy primary currency | `Pollen` | common barter currency for food, tools, supplies, and favors |
+| `inventory.blood` | legacy secondary currency | `Glowstones` | rarer upgrade currency for charms, routes, and uncommon wares |
+| `sacrificeItem` | legacy discard action | `Repurpose` | break down unused items into usable value |
 
 ## Tone Shift
 

@@ -2,8 +2,7 @@
  * Lanternbough-compatible lore exports.
  *
  * Compatibility note:
- * These export names are retained so existing imports keep working while
- * the Platform fiction migrates from Qua'dar to Lanternbough.
+ * These export names are retained so existing imports keep working.
  */
 
 /** Cozy-world central landmark. */
@@ -12,8 +11,8 @@ export const LORE_UMBRALYN = "Lanternbough";
 /** The warm, mysterious chorus guiding the vale. */
 export const LORE_GOETIAN_CHTHONICA = "Rootsong";
 
-/** Legacy tower slot now mapped to the living tree-city. */
-export const LORE_QUADAR_TOWER = "Lanternbough";
+/** Central tree-city landmark. */
+export const LORE_LANTERNBOUGH = "Lanternbough";
 export const LORE_MIGDAL_KUDAR = "Heartwood Spire";
 
 /** Starting hub and provisioning nook. */
@@ -116,8 +115,8 @@ export const LORE_REALMS = [
   "Wonderloom Gate",
 ] as const;
 
-/** Environment list keeping the old export name for compatibility. */
-export const LORE_QUADAR_ENVIRONMENTS = [
+/** Environment list for Lanternbough. */
+export const LORE_LANTERNBOUGH_ENVIRONMENTS = [
   "Lantern-lit market nooks",
   "Root bridges and puddle walks",
   "Mushroom terraces",

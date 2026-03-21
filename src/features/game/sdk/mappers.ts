@@ -3,7 +3,7 @@ import type { GameState } from '@/features/game/store/types';
 import type { CortexDirective, AgentActionType } from '@/features/game/mechanics/systems/ai/types';
 
 /**
- * Maps Qua'dar GameState to ForbocAI SDK Observation
+ * Maps Lanternbough GameState to ForbocAI SDK Observation
  */
 export function toObservation(gameState: GameState): { type: string; timestamp: number; agentId: string; content: string; data: Record<string, unknown> } {
     const { player, currentArea } = gameState;
@@ -40,7 +40,7 @@ export function toObservation(gameState: GameState): { type: string; timestamp: 
 }
 
 /**
- * Maps ForbocAI SDK AgentAction back to Qua'dar CortexDirective
+ * Maps ForbocAI SDK AgentAction back to Lanternbough CortexDirective
  */
 export function toCortexDirective(action: AgentAction): CortexDirective {
     const allowed: AgentActionType[] = [
