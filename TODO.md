@@ -41,8 +41,8 @@ This log tracks the engineering requirements for the flagship Forboc AI consumer
 ## Lanternbough System Implementation (The Wonderloom) ᛒ
 *Objective: Instantiate the cozy TTRPG rules within the digital engine.*
 
-- [x] **Class & Spell Mechanics**: Port the attributes and unique spell architectures from `Lanternbough.md`.
-- [x] **Starting Initiation**: Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `Lanternbough.md`.
+- [x] **Class & Spell Mechanics**: Port the attributes and unique spell architectures from `index.md`.
+- [x] **Starting Initiation**: Level 12 Rogue/Ranger starting state and "nexus spawn" logic from `index.md`.
 - [x] **Wonderloom Logic**: `Surge Count` and narrative modifier tables for world-event consequences.
 - [x] **Narrative Momentum**: "Chipping vs. Cutting" questioning heuristics in directive synthesis.
 - [x] **Level Progression**: XP gain, level up thresholds, stat scaling (MaxHP).

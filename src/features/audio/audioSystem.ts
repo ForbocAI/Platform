@@ -1,5 +1,5 @@
 /**
- * Simple 8-bit style sound effects and ritual ambient music using Web Audio API.
+ * Simple UI sound effects and Lanternbough Rootsong music using Web Audio API.
  * Volume and music playing state are managed in audioSlice.
  * Implementation is split into core (context), sfx, and music submodules.
  */
