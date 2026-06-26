@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
     resolveAlias: {
+      // Native modules — shimmed to empty stubs for browser bundles.
       'node-llama-cpp': './src/lib/sdk/empty.ts',
       '@lancedb/lancedb': './src/lib/sdk/empty.ts',
       'onnxruntime-node': './src/lib/sdk/empty.ts',
