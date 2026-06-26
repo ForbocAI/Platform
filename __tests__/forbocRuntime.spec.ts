@@ -72,6 +72,19 @@ describe('initializeOracleRuntime', () => {
         initializeOracleRuntime();
         expect(mockDispatch).toHaveBeenCalledTimes(1);
     });
+
+    it('does not dispatch when Oracle is disabled (production + no URL configured)', async () => {
+        vi.stubEnv('NODE_ENV', 'production');
+        vi.stubEnv('NEXT_PUBLIC_FORBOC_API_URL', '');
+
+        const { initializeOracleRuntime } = await freshRuntime();
+        initializeOracleRuntime();
+
+        expect(mockDispatch).not.toHaveBeenCalled();
+        expect(mockGenerateNPCId).not.toHaveBeenCalled();
+
+        vi.unstubAllEnvs();
+    });
 });
 
 // ── ensureApiAvailable ────────────────────────────────────────────────────────
@@ -133,6 +146,19 @@ describe('ensureApiAvailable', () => {
         const { ensureApiAvailable } = await freshRuntime();
         await ensureApiAvailable();
         expect(mockDispatch).toHaveBeenCalled();      // setNPCInfo was dispatched
+    });
+
+    it('returns false without a network call when Oracle is disabled', async () => {
+        vi.stubEnv('NODE_ENV', 'production');
+        vi.stubEnv('NEXT_PUBLIC_FORBOC_API_URL', '');
+
+        const { ensureApiAvailable } = await freshRuntime();
+        const result = await ensureApiAvailable();
+
+        expect(result).toBe(false);
+        expect(mockCheckApiConnectivity).not.toHaveBeenCalled();
+
+        vi.unstubAllEnvs();
     });
 });
 
@@ -208,7 +234,8 @@ describe('askOracle', () => {
         delete process.env.NEXT_PUBLIC_FORBOC_API_URL;
     });
 
-    it('falls back to localhost:8080 when env is unset', async () => {
+    it('falls back to localhost:8080 when env is unset (non-production)', async () => {
+        // NODE_ENV=test in Vitest → non-production → localhost fallback applies.
         const saved = process.env.NEXT_PUBLIC_FORBOC_API_URL;
         delete process.env.NEXT_PUBLIC_FORBOC_API_URL;
         const { askOracle } = await freshRuntime();
@@ -221,5 +248,15 @@ describe('askOracle', () => {
         expect(call[0]).toMatchObject({ apiUrl: 'http://localhost:8080' });
 
         if (saved !== undefined) process.env.NEXT_PUBLIC_FORBOC_API_URL = saved;
+    });
+
+    it('throws a descriptive error when Oracle is disabled (production + no URL)', async () => {
+        vi.stubEnv('NODE_ENV', 'production');
+        vi.stubEnv('NEXT_PUBLIC_FORBOC_API_URL', '');
+
+        const { askOracle } = await freshRuntime();
+        await expect(askOracle('hello')).rejects.toThrow('NEXT_PUBLIC_FORBOC_API_URL');
+
+        vi.unstubAllEnvs();
     });
 });
