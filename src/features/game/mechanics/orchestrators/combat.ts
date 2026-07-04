@@ -42,7 +42,6 @@ export const castCapability = createAsyncThunk(
 
     if (isSummon) {
       dispatch(addLog({ message: `You activate ${capability.name}. An echo forms to aid you.`, type: 'combat' }));
-      // TODO: Add companion logic if needed
     }
 
     // 2. Offensive Capabilities (AoE or Single Target)

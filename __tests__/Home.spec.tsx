@@ -16,11 +16,11 @@ vi.mock('next/navigation', () => ({
     }),
 }))
 
-// Mock next/image to a plain img
+// Mock next/image to a plain img for test rendering
 vi.mock('next/image', () => ({
-    default: (props: Record<string, unknown>) => {
-        const { unoptimized: _u, ...rest } = props
-        return <img {...rest} />
+    default: ({ unoptimized: _u, alt = '', ...rest }: Record<string, unknown>) => {
+        // eslint-disable-next-line @next/next/no-img-element
+        return <img alt={alt as string} {...rest} />
     },
 }))
 
