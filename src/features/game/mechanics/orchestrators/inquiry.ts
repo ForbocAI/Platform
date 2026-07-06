@@ -14,6 +14,8 @@ export const askInquiry = createAsyncThunk(
 
     const result = await sdkService.generateInquiryResponse(question, state.game.player.stats.stress); // Using stress as context
 
+    dispatch(addLog({ message: result.description, type: 'oracle' }));
+
     dispatch(
       addFact({
         sourceQuestion: question,

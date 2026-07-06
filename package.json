@@ -3,15 +3,18 @@
   "version": "0.1.0",
   "license": "UNLICENSED",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@forbocai/browser": "^0.6.2",
-    "@forbocai/core": "^0.6.2",
+    "@forbocai/core": "file:./vendor/forbocai-core-0.6.5.tgz",
     "@iconify-icons/pixelarticons": "^1.2.5",
     "@iconify-json/game-icons": "^1.2.3",
     "@iconify/react": "^6.0.2",
@@ -23,6 +26,11 @@
     "react-dom": "19.2.3",
     "react-redux": "^9.2.0",
     "tailwind-merge": "^3.4.0"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-darwin-arm64": "1.1.3",
+    "@rolldown/binding-linux-x64-gnu": "1.1.3",
+    "@rolldown/binding-linux-x64-musl": "1.1.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.0",
