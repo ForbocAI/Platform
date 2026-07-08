@@ -1,8 +1,15 @@
-// Unit tests for cortexService's local procedural move validation.
-// validateMove is pure over an Area — no mocks needed.
-import { describe, it, expect } from 'vitest';
-import { sdkService } from '../src/features/game/sdk/cortexService';
+// Unit tests for cortexService — local procedural move validation and
+// inquiry response generation.
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import type { Area } from '../src/features/game/types';
+
+const mockAskOracle = vi.fn();
+vi.mock('../src/features/game/sdk/forbocRuntime', () => ({
+    askOracle: mockAskOracle,
+    ensureApiAvailable: vi.fn(),
+}));
+
+const { sdkService } = await import('../src/features/game/sdk/cortexService');
 
 const makeArea = (exits: Record<string, string | null>): Area => ({
     id: 'area-1',
@@ -28,5 +35,81 @@ describe('cortexService.validateMove', () => {
     it('returns false for a direction that is not a key in exits at all', async () => {
         const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
         await expect(sdkService.validateMove(area, 'Up')).resolves.toBe(false);
+    });
+});
+
+describe('cortexService.generateInquiryResponse', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+        mockAskOracle.mockReset();
+    });
+
+    it('appends Oracle dialogue to the mechanical description instead of replacing it', async () => {
+        // d100 roll of 61, no stress: modifiedRoll=61 -> clean "Yes", no qualifier.
+        vi.spyOn(Math, 'random').mockReturnValue(0.6);
+        mockAskOracle.mockResolvedValue('The stars align in your favor.');
+
+        const result = await sdkService.generateInquiryResponse('Will I succeed?', 0);
+
+        expect(result.answer).toBe('Yes');
+        expect(result.description).toContain('The stars align in your favor.');
+        expect(result.description).toContain('confirms');
+    });
+
+    it('reports a real d100-range roll and a non-zero surge update, not the old hardcoded d20/0 stub', async () => {
+        vi.spyOn(Math, 'random').mockReturnValue(0.6);
+        mockAskOracle.mockResolvedValue('...');
+
+        const result = await sdkService.generateInquiryResponse('Will I succeed?', 0);
+
+        expect(result.roll).toBe(61);
+        expect(result.surgeUpdate).toBe(2); // clean answer, no qualifier -> +2 surge
+    });
+
+    it('applies a negative surge update when the roll produces a qualifier', async () => {
+        // d100 roll of 83, no stress: modifiedRoll=83 -> "Yes, and..." qualifier.
+        vi.spyOn(Math, 'random').mockReturnValue(0.82);
+        mockAskOracle.mockResolvedValue('...');
+
+        const result = await sdkService.generateInquiryResponse('Will I succeed?', 0);
+
+        expect(result.qualifier).toBe('and');
+        expect(result.surgeUpdate).toBe(-1);
+    });
+
+    it('surfaces an unexpected event and its d20 roll on an "unexpectedly" result', async () => {
+        // d100 roll of 98, no stress: modifiedRoll=98 -> "unexpectedly" qualifier.
+        vi.spyOn(Math, 'random').mockReturnValue(0.97);
+        mockAskOracle.mockResolvedValue('...');
+
+        const result = await sdkService.generateInquiryResponse('Will I succeed?', 0);
+
+        expect(result.qualifier).toBe('unexpectedly');
+        expect(result.unexpectedRoll).toBeGreaterThanOrEqual(1);
+        expect(result.unexpectedEvent).toBeTruthy();
+        expect(result.description).toContain('EVENT:');
+    });
+
+    it('still returns a coherent mechanical result when the Oracle is unavailable', async () => {
+        vi.spyOn(Math, 'random').mockReturnValue(0.6);
+        mockAskOracle.mockRejectedValue(new Error('API unavailable'));
+
+        const result = await sdkService.generateInquiryResponse('Will I succeed?', 0);
+
+        expect(result.answer).toBe('Yes');
+        expect(result.roll).toBe(61);
+        expect(result.surgeUpdate).toBe(2);
+        expect(result.description).toContain('confirms');
+    });
+
+    it('factors current system stress into the roll', async () => {
+        // d100 roll of 61 (r=0.6), stress=20 pushed onto a >50 roll -> modifiedRoll=81 -> "Yes, and...".
+        vi.spyOn(Math, 'random').mockReturnValue(0.6);
+        mockAskOracle.mockResolvedValue('...');
+
+        const result = await sdkService.generateInquiryResponse('Will I succeed?', 20);
+
+        expect(result.roll).toBe(81);
+        expect(result.qualifier).toBe('and');
     });
 });

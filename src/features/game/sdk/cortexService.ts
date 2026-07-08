@@ -62,22 +62,14 @@ export const createSDKService = () => {
         generateArea(regionalType, magnitude, context);
 
     const generateInquiryResponse = async (question: string, surgeCount: number, stage?: StageOfScene): Promise<InquiryResponse> => {
-        void surgeCount; void stage;
+        void stage;
+        const { simulateInquiryResponse } = await import('@/features/game/engine');
+        const mechanicalResult = simulateInquiryResponse(question, surgeCount);
         try {
             const dialogue = await askOracle(question);
-            return {
-                answer: Math.random() > 0.5 ? 'Yes' : 'No',
-                description: dialogue,
-                roll: Math.floor(Math.random() * 20) + 1,
-                surgeUpdate: 0,
-            };
+            return { ...mechanicalResult, description: `${mechanicalResult.description} ${dialogue}` };
         } catch (_e) {
-            return {
-                answer: 'No',
-                description: 'The Oracle remains silent.',
-                roll: 1,
-                surgeUpdate: 0,
-            };
+            return mechanicalResult;
         }
     };
 
