@@ -81,7 +81,8 @@ export const createSDKService = () => {
         }
     };
 
-    const validateMove = async (_area: Area, _direction: string): Promise<boolean> => false;
+    const validateMove = async (area: Area, direction: string): Promise<boolean> =>
+        Boolean(area.exits?.[direction]);
 
     return {
         init,
