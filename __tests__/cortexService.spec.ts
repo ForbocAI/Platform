@@ -36,6 +36,41 @@ describe('cortexService.validateMove', () => {
         const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
         await expect(sdkService.validateMove(area, 'Up')).resolves.toBe(false);
     });
+
+    it('rejects "constructor" even though every object inherits it from Object.prototype', async () => {
+        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
+        await expect(sdkService.validateMove(area, 'constructor')).resolves.toBe(false);
+    });
+
+    it('rejects "toString" even though every object inherits it from Object.prototype', async () => {
+        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
+        await expect(sdkService.validateMove(area, 'toString')).resolves.toBe(false);
+    });
+
+    it('rejects "__proto__"', async () => {
+        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
+        await expect(sdkService.validateMove(area, '__proto__')).resolves.toBe(false);
+    });
+
+    it('rejects "hasOwnProperty" (another Object.prototype member)', async () => {
+        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
+        await expect(sdkService.validateMove(area, 'hasOwnProperty')).resolves.toBe(false);
+    });
+
+    it('rejects a lowercase variant of a valid direction ("north")', async () => {
+        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
+        await expect(sdkService.validateMove(area, 'north')).resolves.toBe(false);
+    });
+
+    it('rejects a whitespace-padded variant of a valid direction (" North")', async () => {
+        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
+        await expect(sdkService.validateMove(area, ' North')).resolves.toBe(false);
+    });
+
+    it('rejects an empty string', async () => {
+        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
+        await expect(sdkService.validateMove(area, '')).resolves.toBe(false);
+    });
 });
 
 describe('cortexService.generateInquiryResponse', () => {

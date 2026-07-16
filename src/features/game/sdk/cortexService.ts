@@ -3,9 +3,17 @@
 // Oracle interactions route through askOracle() → processNPC thunk → ForbocAI API.
 // Worldgen and move-validation use local procedural generators (no remote cortex).
 
-import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
+import type { Area, Direction, InquiryResponse, StageOfScene } from '@/features/game/types';
 import type { GenerateStartAreaOptions } from '@/features/game/entities/area';
 import { askOracle, ensureApiAvailable } from './forbocRuntime';
+
+const CARDINAL_DIRECTIONS: readonly Direction[] = ['North', 'South', 'East', 'West'];
+
+export const isDirection = (value: string): value is Direction =>
+    (CARDINAL_DIRECTIONS as readonly string[]).includes(value);
+
+const isAreaReference = (value: string | null | undefined): value is string =>
+    typeof value === 'string' && value.length > 0;
 
 interface SDKAgent {
     process(signal: string, payload: Record<string, unknown>): Promise<{ dialogue: string }>;
@@ -74,7 +82,9 @@ export const createSDKService = () => {
     };
 
     const validateMove = async (area: Area, direction: string): Promise<boolean> =>
-        Boolean(area.exits?.[direction]);
+        isDirection(direction) &&
+        Object.hasOwn(area.exits, direction) &&
+        isAreaReference(area.exits[direction]);
 
     return {
         init,

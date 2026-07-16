@@ -1,6 +1,6 @@
 import { baseApi } from './baseApi';
 import { sdkService } from '@/features/game/sdk/cortexService';
-import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
+import type { Area, Direction, InquiryResponse, StageOfScene } from '@/features/game/types';
 
 export const gameApi = baseApi.injectEndpoints({
   overrideExisting: true,
@@ -28,7 +28,7 @@ export const gameApi = baseApi.injectEndpoints({
     }),
     navigate: build.mutation<
       { newRoom: Area },
-      { direction: string; currentRoom: Area; playerLevel?: number; areasExplored?: number }
+      { direction: Direction; currentRoom: Area; playerLevel?: number; areasExplored?: number }
     >({
       async queryFn({ direction, currentRoom, playerLevel = 1, areasExplored = 0 }) {
         const isValid = await sdkService.validateMove(currentRoom, direction);

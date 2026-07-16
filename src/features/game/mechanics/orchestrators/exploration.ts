@@ -3,10 +3,11 @@ import { sdkService } from '@/features/game/sdk/cortexService';
 import { getKeenSensesScanExtra } from '../utils/skills';
 import { addLog } from '../../store/gameSlice';
 import type { GameState } from '../../store/types';
+import type { Direction } from '@/features/game/types';
 
 export const movePlayer = createAsyncThunk(
   'game/movePlayer',
-  async (direction: string, { getState, dispatch }) => {
+  async (direction: Direction, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
     if (!state.game.currentArea) throw new Error('No area');
 
