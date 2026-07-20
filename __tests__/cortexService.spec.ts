@@ -79,7 +79,7 @@ describe('cortexService.generateInquiryResponse', () => {
         mockAskOracle.mockReset();
     });
 
-    it('appends Oracle dialogue to the mechanical description instead of replacing it', async () => {
+    it('uses the Oracle dialogue as the description on success (no mechanical prefix glued on)', async () => {
         // d100 roll of 61, no stress: modifiedRoll=61 -> clean "Yes", no qualifier.
         vi.spyOn(Math, 'random').mockReturnValue(0.6);
         mockAskOracle.mockResolvedValue('The stars align in your favor.');
@@ -87,8 +87,32 @@ describe('cortexService.generateInquiryResponse', () => {
         const result = await sdkService.generateInquiryResponse('Will I succeed?', 0);
 
         expect(result.answer).toBe('Yes');
-        expect(result.description).toContain('The stars align in your favor.');
-        expect(result.description).toContain('confirms');
+        expect(result.description).toBe('The stars align in your favor.');
+        expect(result.oracleAvailable).toBe(true);
+    });
+
+    it('sends a terse, non-prose verdict tag to the Oracle, not just the bare question', async () => {
+        vi.spyOn(Math, 'random').mockReturnValue(0.82); // d100 = 83 -> "Yes, and..."
+        mockAskOracle.mockResolvedValue('...');
+
+        await sdkService.generateInquiryResponse('Will I succeed?', 0);
+
+        expect(mockAskOracle).toHaveBeenCalledTimes(1);
+        const sentText = mockAskOracle.mock.calls[0][0] as string;
+        expect(sentText).toBe('<Yes-and> Will I succeed?');
+    });
+
+    it('includes the unexpected event and scene stage as compact tags in the prompt sent to the Oracle', async () => {
+        vi.spyOn(Math, 'random').mockReturnValue(0.97); // d100 = 98 -> "unexpectedly"
+        mockAskOracle.mockResolvedValue('...');
+
+        await sdkService.generateInquiryResponse('Will I succeed?', 0, 'To Conflict');
+
+        const sentText = mockAskOracle.mock.calls[0][0] as string;
+        expect(sentText).toContain('<Yes-unexpectedly');
+        expect(sentText).toContain('|twist:');
+        expect(sentText).toContain('|scene:To Conflict>');
+        expect(sentText).toContain('Will I succeed?');
     });
 
     it('reports a real d100-range roll and a non-zero surge update, not the old hardcoded d20/0 stub', async () => {
@@ -122,12 +146,12 @@ describe('cortexService.generateInquiryResponse', () => {
         expect(result.qualifier).toBe('unexpectedly');
         expect(result.unexpectedRoll).toBeGreaterThanOrEqual(1);
         expect(result.unexpectedEvent).toBeTruthy();
-        expect(result.description).toContain('EVENT:');
     });
 
-    it('still returns a coherent mechanical result when the Oracle is unavailable', async () => {
+    it('still returns a coherent mechanical result when the Oracle is unavailable, with the failure explicit and observable', async () => {
         vi.spyOn(Math, 'random').mockReturnValue(0.6);
         mockAskOracle.mockRejectedValue(new Error('API unavailable'));
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
         const result = await sdkService.generateInquiryResponse('Will I succeed?', 0);
 
@@ -135,6 +159,10 @@ describe('cortexService.generateInquiryResponse', () => {
         expect(result.roll).toBe(61);
         expect(result.surgeUpdate).toBe(2);
         expect(result.description).toContain('confirms');
+        expect(result.oracleAvailable).toBe(false);
+        expect(warnSpy).toHaveBeenCalled();
+
+        warnSpy.mockRestore();
     });
 
     it('factors current system stress into the roll', async () => {

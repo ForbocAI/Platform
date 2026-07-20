@@ -15,6 +15,17 @@ export const isDirection = (value: string): value is Direction =>
 const isAreaReference = (value: string | null | undefined): value is string =>
     typeof value === 'string' && value.length > 0;
 
+const buildOracleNarrationPrompt = (
+    question: string,
+    verdict: InquiryResponse,
+    stage?: StageOfScene
+): string => {
+    const qualifierWord = verdict.qualifier ? `-${verdict.qualifier}` : '';
+    const eventTag = verdict.unexpectedEvent ? `|twist:${verdict.unexpectedEvent}` : '';
+    const stageTag = stage ? `|scene:${stage}` : '';
+    return `<${verdict.answer}${qualifierWord}${eventTag}${stageTag}> ${question}`;
+};
+
 interface SDKAgent {
     process(signal: string, payload: Record<string, unknown>): Promise<{ dialogue: string }>;
 }
@@ -69,15 +80,15 @@ export const createSDKService = () => {
     const generateRoom = async (regionalType?: string, magnitude?: number, context?: Record<string, unknown>) =>
         generateArea(regionalType, magnitude, context);
 
-    const generateInquiryResponse = async (question: string, surgeCount: number, stage?: StageOfScene): Promise<InquiryResponse> => {
-        void stage;
+    const generateInquiryResponse = async (question: string, currentSystemStress: number, stage?: StageOfScene): Promise<InquiryResponse> => {
         const { simulateInquiryResponse } = await import('@/features/game/engine');
-        const mechanicalResult = simulateInquiryResponse(question, surgeCount);
+        const mechanicalResult = simulateInquiryResponse(question, currentSystemStress);
         try {
-            const dialogue = await askOracle(question);
-            return { ...mechanicalResult, description: `${mechanicalResult.description} ${dialogue}` };
-        } catch (_e) {
-            return mechanicalResult;
+            const dialogue = await askOracle(buildOracleNarrationPrompt(question, mechanicalResult, stage));
+            return { ...mechanicalResult, description: dialogue, oracleAvailable: true };
+        } catch (e) {
+            console.warn('ForbocAI: Oracle narration unavailable; returning mechanical result only.', e);
+            return { ...mechanicalResult, oracleAvailable: false };
         }
     };
 

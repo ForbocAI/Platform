@@ -14,12 +14,12 @@ export const gameApi = baseApi.injectEndpoints({
     }),
     performInquiry: build.mutation<
       InquiryResponse,
-      { question: string; surgeCount: number; stage: StageOfScene }
+      { question: string; currentSystemStress: number; stage: StageOfScene }
     >({
-      async queryFn({ question, surgeCount, stage }) {
+      async queryFn({ question, currentSystemStress, stage }) {
         const result = await sdkService.generateInquiryResponse(
           question,
-          surgeCount,
+          currentSystemStress,
           stage
         );
         return { data: result };
