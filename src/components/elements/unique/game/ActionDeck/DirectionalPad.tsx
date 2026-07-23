@@ -2,7 +2,7 @@
 
 import { Map as MapIcon } from "lucide-react";
 import { GameButton, NavButton } from "@/components/elements/generic";
-import type { Area } from "@/features/game/types";
+import type { Area, Direction } from "@/features/game/types";
 
 export function DirectionalPad({
   currentArea,
@@ -10,7 +10,7 @@ export function DirectionalPad({
   onMapClick,
 }: {
   currentArea: Area;
-  onMove: (direction: string) => void;
+  onMove: (direction: Direction) => void;
   onMapClick: () => void;
 }) {
   return (

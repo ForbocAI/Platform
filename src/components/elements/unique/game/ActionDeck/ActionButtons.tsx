@@ -2,7 +2,7 @@
 
 import { Crosshair, Play, Square, Swords, MessageCircle } from "lucide-react";
 import { GameButton } from "@/components/elements/generic";
-import type { Sector } from "@/features/game/types";
+import type { Sector, Direction } from "@/features/game/types";
 import { DirectionalPad } from "./DirectionalPad";
 
 export function ActionButtons({
@@ -16,7 +16,7 @@ export function ActionButtons({
   onToggleAutoPlay,
 }: {
   currentArea: Sector;
-  onMove: (direction: string) => void;
+  onMove: (direction: Direction) => void;
   onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;

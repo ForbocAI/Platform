@@ -314,6 +314,7 @@ export interface QueryResult {
     entropyUpdate?: number; // Optional for Legacy Migration
     mutationRoll?: number;
     mutationEvent?: string;
+    oracleAvailable?: boolean;
 }
 
 export type ProgressionPhase = "PhaseA" | "PhaseB" | "PhaseC";

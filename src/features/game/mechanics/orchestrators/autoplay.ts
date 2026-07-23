@@ -43,7 +43,7 @@ import { computeAwareness } from '@/features/game/mechanics/systems/ai/awareness
 import { runBehaviorTree, AUTOPLAY_CONFIG } from '@/features/game/mechanics/systems/ai/behaviorTree';
 import type { AgentAction, AgentActionType, CortexDirective } from '@/features/game/mechanics/systems/ai/types';
 import { getAutoplayConfig, getTickInterval, getNextAutoplayDelayMs } from '@/features/game/sdk/config';
-import { sdkService } from '@/features/game/sdk/cortexService';
+import { sdkService, isDirection } from '@/features/game/sdk/cortexService';
 import { toObservation, toCortexDirective } from '@/features/game/sdk/mappers';
 import { addLog, setAgentPondering, clearAgentPondering } from '@/features/game/store/gameSlice';
 import { getPortraitForAgent } from '@/features/game/sdk/portraits';
@@ -139,7 +139,7 @@ async function actuate(
     case 'flee':
     case 'move': {
       const dir = action.payload?.direction as string;
-      if (dir) {
+      if (isDirection(dir)) {
         await dispatch(movePlayer(dir));
         handleVignetteProgression(dispatch, getState);
       }

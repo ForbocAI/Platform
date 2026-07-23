@@ -3,16 +3,17 @@ import { sdkService } from '@/features/game/sdk/cortexService';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
 import type { GameState } from '../../store/types';
+import type { StageOfScene } from '@/features/game/types';
 
 export const askInquiry = createAsyncThunk(
   'game/askInquiry',
   async (question: string, { getState, dispatch }) => {
-    const state = getState() as { game: GameState };
+    const state = getState() as { game: GameState; ui: { stageOfScene: StageOfScene } };
     if (!state.game.player) throw new Error('No player');
 
     dispatch(addLog({ message: `Your Inquiry: "${question}"`, type: 'system' }));
 
-    const result = await sdkService.generateInquiryResponse(question, state.game.player.stats.stress); // Using stress as context
+    const result = await sdkService.generateInquiryResponse(question, state.game.player.stats.stress, state.ui.stageOfScene);
 
     dispatch(addLog({ message: result.description, type: 'oracle' }));
 
@@ -33,12 +34,12 @@ export const askInquiry = createAsyncThunk(
 export const performSystemInquiry = createAsyncThunk(
   'game/performSystemInquiry',
   async (_, { getState, dispatch }) => {
-    const state = getState() as { game: GameState };
+    const state = getState() as { game: GameState; ui: { stageOfScene: StageOfScene } };
     if (!state.game.player) return;
 
     dispatch(addLog({ message: 'Requesting system overview...', type: 'system' }));
 
-    const result = await sdkService.generateInquiryResponse('System Overview', state.game.player.stats.stress);
+    const result = await sdkService.generateInquiryResponse('System Overview', state.game.player.stats.stress, state.ui.stageOfScene);
 
     dispatch(addLog({ message: `Response: ${result.description}`, type: 'oracle' }));
     dispatch(

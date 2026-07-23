@@ -1,6 +1,6 @@
 "use client";
 
-import type { PlayerActor, Area } from "@/features/game/types";
+import type { PlayerActor, Area, Direction } from "@/features/game/types";
 import { ActionButtons } from "./ActionButtons";
 import { DeckToggles } from "./DeckToggles";
 
@@ -21,7 +21,7 @@ export function ActionDeck({
 }: {
   player: PlayerActor;
   currentArea: Area;
-  onMove: (direction: string) => void;
+  onMove: (direction: Direction) => void;
   onMapClick: () => void;
   onScan: () => void;
   onEngage: () => void;

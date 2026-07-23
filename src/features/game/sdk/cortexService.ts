@@ -3,9 +3,28 @@
 // Oracle interactions route through askOracle() → processNPC thunk → ForbocAI API.
 // Worldgen and move-validation use local procedural generators (no remote cortex).
 
-import type { Area, InquiryResponse, StageOfScene } from '@/features/game/types';
+import type { Area, Direction, InquiryResponse, StageOfScene } from '@/features/game/types';
 import type { GenerateStartAreaOptions } from '@/features/game/entities/area';
 import { askOracle, ensureApiAvailable } from './forbocRuntime';
+
+const CARDINAL_DIRECTIONS: readonly Direction[] = ['North', 'South', 'East', 'West'];
+
+export const isDirection = (value: string): value is Direction =>
+    (CARDINAL_DIRECTIONS as readonly string[]).includes(value);
+
+const isAreaReference = (value: string | null | undefined): value is string =>
+    typeof value === 'string' && value.length > 0;
+
+const buildOracleNarrationPrompt = (
+    question: string,
+    verdict: InquiryResponse,
+    stage?: StageOfScene
+): string => {
+    const qualifierWord = verdict.qualifier ? `-${verdict.qualifier}` : '';
+    const eventTag = verdict.unexpectedEvent ? `|twist:${verdict.unexpectedEvent}` : '';
+    const stageTag = stage ? `|scene:${stage}` : '';
+    return `<${verdict.answer}${qualifierWord}${eventTag}${stageTag}> ${question}`;
+};
 
 interface SDKAgent {
     process(signal: string, payload: Record<string, unknown>): Promise<{ dialogue: string }>;
@@ -61,27 +80,22 @@ export const createSDKService = () => {
     const generateRoom = async (regionalType?: string, magnitude?: number, context?: Record<string, unknown>) =>
         generateArea(regionalType, magnitude, context);
 
-    const generateInquiryResponse = async (question: string, surgeCount: number, stage?: StageOfScene): Promise<InquiryResponse> => {
-        void surgeCount; void stage;
+    const generateInquiryResponse = async (question: string, currentSystemStress: number, stage?: StageOfScene): Promise<InquiryResponse> => {
+        const { simulateInquiryResponse } = await import('@/features/game/engine');
+        const mechanicalResult = simulateInquiryResponse(question, currentSystemStress);
         try {
-            const dialogue = await askOracle(question);
-            return {
-                answer: Math.random() > 0.5 ? 'Yes' : 'No',
-                description: dialogue,
-                roll: Math.floor(Math.random() * 20) + 1,
-                surgeUpdate: 0,
-            };
-        } catch (_e) {
-            return {
-                answer: 'No',
-                description: 'The Oracle remains silent.',
-                roll: 1,
-                surgeUpdate: 0,
-            };
+            const dialogue = await askOracle(buildOracleNarrationPrompt(question, mechanicalResult, stage));
+            return { ...mechanicalResult, description: dialogue, oracleAvailable: true };
+        } catch (e) {
+            console.warn('ForbocAI: Oracle narration unavailable; returning mechanical result only.', e);
+            return { ...mechanicalResult, oracleAvailable: false };
         }
     };
 
-    const validateMove = async (_area: Area, _direction: string): Promise<boolean> => false;
+    const validateMove = async (area: Area, direction: string): Promise<boolean> =>
+        isDirection(direction) &&
+        Object.hasOwn(area.exits, direction) &&
+        isAreaReference(area.exits[direction]);
 
     return {
         init,
