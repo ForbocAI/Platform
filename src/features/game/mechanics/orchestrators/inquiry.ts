@@ -16,6 +16,9 @@ export const askInquiry = createAsyncThunk(
     const result = await sdkService.generateInquiryResponse(question, state.game.player.stats.stress, state.ui.stageOfScene);
 
     dispatch(addLog({ message: result.description, type: 'oracle' }));
+    if (result.oracleAvailable === false) {
+      dispatch(addLog({ message: 'Oracle narration unavailable — showing the mechanical verdict only.', type: 'system' }));
+    }
 
     dispatch(
       addFact({
@@ -42,6 +45,9 @@ export const performSystemInquiry = createAsyncThunk(
     const result = await sdkService.generateInquiryResponse('System Overview', state.game.player.stats.stress, state.ui.stageOfScene);
 
     dispatch(addLog({ message: `Response: ${result.description}`, type: 'oracle' }));
+    if (result.oracleAvailable === false) {
+      dispatch(addLog({ message: 'Oracle narration unavailable — showing the mechanical verdict only.', type: 'system' }));
+    }
     dispatch(
       addFact({
         text: `System Inquiry: ${result.description}`,

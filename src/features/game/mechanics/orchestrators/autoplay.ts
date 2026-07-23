@@ -138,10 +138,12 @@ async function actuate(
 
     case 'flee':
     case 'move': {
-      const dir = action.payload?.direction as string;
+      const dir = action.payload?.direction;
       if (isDirection(dir)) {
         await dispatch(movePlayer(dir));
         handleVignetteProgression(dispatch, getState);
+      } else {
+        dispatch(addLog({ message: `Autoplay: ignored ${action.type} with invalid direction "${String(dir)}".`, type: 'system' }));
       }
       break;
     }
