@@ -14,7 +14,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@forbocai/core": "file:./vendor/forbocai-core-0.6.5.tgz",
+    "@forbocai/browser": "^0.6.6",
+    "@forbocai/core": "^0.6.6",
     "@iconify-icons/pixelarticons": "^1.2.5",
     "@iconify-json/game-icons": "^1.2.3",
     "@iconify/react": "^6.0.2",

@@ -1,25 +1,37 @@
 // Unit tests for forbocRuntime — no running API required.
-// All @forbocai/core calls are replaced with Vitest mocks so tests
+// The runtime is built on the SDK's public browser surface
+// (`createBrowserCli` from @forbocai/browser), so that factory and the two
+// @forbocai/core helpers it still uses are replaced with Vitest mocks. Tests
 // are deterministic and execute in < 100 ms.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Shared mock state ─────────────────────────────────────────────────────────
-// Declared before vi.mock() so the factory can close over them.
+// Declared before vi.mock() so the factories can close over them.
+const mockRun = vi.fn();
 const mockDispatch = vi.fn();
+const mockCreateBrowserCli = vi.fn(() => ({ run: mockRun, store: { dispatch: mockDispatch } }));
 const mockSetNPCInfo = vi.fn((payload: unknown) => ({ type: 'npc/setNPCInfo', payload }));
 const mockGenerateNPCId = vi.fn(() => 'mock-oracle-npc-id');
-const mockProcessNPC = vi.fn((payload: unknown) => ({ type: 'npc/processNPC', payload }));
-const mockCheckApiConnectivity = vi.fn();
+
+vi.mock('@forbocai/browser', () => ({
+    createBrowserCli: mockCreateBrowserCli,
+}));
 
 vi.mock('@forbocai/core', () => ({
-    store: { dispatch: mockDispatch },
     setNPCInfo: mockSetNPCInfo,
     generateNPCId: mockGenerateNPCId,
-    processNPC: mockProcessNPC,
-    checkApiConnectivity: mockCheckApiConnectivity,
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+const okResult = (data: unknown = {}) => ({ status: 'ok', lines: [], data });
+
+/** Every command string passed to cli.run(), in order. */
+const runCommands = (): string[] => mockRun.mock.calls.map((call) => String(call[0]));
+
+/** The first command issued that starts with the given prefix. */
+const commandStartingWith = (prefix: string): string | undefined =>
+    runCommands().find((command) => command.startsWith(prefix));
 
 /**
  * Re-import forbocRuntime with a fresh module instance.
@@ -29,6 +41,8 @@ vi.mock('@forbocai/core', () => ({
 const freshRuntime = async () => {
     vi.resetModules();
     vi.clearAllMocks();
+    mockGenerateNPCId.mockReturnValue('mock-oracle-npc-id');
+    mockRun.mockResolvedValue(okResult());
     return import('../src/features/game/sdk/forbocRuntime');
 };
 
@@ -42,11 +56,33 @@ describe('initializeOracleRuntime', () => {
         expect(mockSetNPCInfo).toHaveBeenCalledOnce();
     });
 
+    it('registers the Oracle with the full six-field persona', async () => {
+        // The `npc create` command collapses a persona into a single traits
+        // entry, which is why registration goes through the store instead.
+        const { initializeOracleRuntime } = await freshRuntime();
+        initializeOracleRuntime();
+
+        const [call] = mockSetNPCInfo.mock.calls;
+        const persona = (call[0] as { structuredPersona: Record<string, string[]> }).structuredPersona;
+        expect(Object.keys(persona).sort()).toEqual(
+            ['constraints', 'goals', 'relationships', 'speakingStyle', 'traits', 'world'],
+        );
+        expect(persona.goals.length).toBeGreaterThan(0);
+        expect(persona.speakingStyle.length).toBeGreaterThan(0);
+    });
+
     it('is idempotent — second call does not dispatch again', async () => {
         const { initializeOracleRuntime } = await freshRuntime();
         initializeOracleRuntime();
         initializeOracleRuntime();
         expect(mockDispatch).toHaveBeenCalledOnce();
+    });
+
+    it('builds the browser CLI exactly once', async () => {
+        const { initializeOracleRuntime } = await freshRuntime();
+        initializeOracleRuntime();
+        initializeOracleRuntime();
+        expect(mockCreateBrowserCli).toHaveBeenCalledOnce();
     });
 
     it('generates an NPC id on first call', async () => {
@@ -82,8 +118,44 @@ describe('initializeOracleRuntime', () => {
 
         expect(mockDispatch).not.toHaveBeenCalled();
         expect(mockGenerateNPCId).not.toHaveBeenCalled();
+        expect(mockCreateBrowserCli).not.toHaveBeenCalled();
 
         vi.unstubAllEnvs();
+    });
+});
+
+// ── runtime configuration ─────────────────────────────────────────────────────
+
+describe('runtime configuration', () => {
+    it('configures the API URL through the runtime config surface', async () => {
+        // createBrowserCli() is zero-config by design, so the URL reaches the
+        // runtime via `config set` rather than a constructor option.
+        process.env.NEXT_PUBLIC_FORBOC_API_URL = 'http://test-api:9090';
+        const { initializeOracleRuntime } = await freshRuntime();
+        initializeOracleRuntime();
+
+        expect(commandStartingWith('config set _apiUrl')).toBe('config set _apiUrl http://test-api:9090');
+
+        delete process.env.NEXT_PUBLIC_FORBOC_API_URL;
+    });
+
+    it('configures the API key through the runtime config surface', async () => {
+        const { initializeOracleRuntime } = await freshRuntime();
+        initializeOracleRuntime();
+        expect(commandStartingWith('config set apiKey')).toBeDefined();
+    });
+
+    it('falls back to localhost:8080 when env is unset (non-production)', async () => {
+        // NODE_ENV=test in Vitest → non-production → localhost fallback applies.
+        const saved = process.env.NEXT_PUBLIC_FORBOC_API_URL;
+        delete process.env.NEXT_PUBLIC_FORBOC_API_URL;
+
+        const { initializeOracleRuntime } = await freshRuntime();
+        initializeOracleRuntime();
+
+        expect(commandStartingWith('config set _apiUrl')).toBe('config set _apiUrl http://localhost:8080');
+
+        if (saved !== undefined) process.env.NEXT_PUBLIC_FORBOC_API_URL = saved;
     });
 });
 
@@ -91,37 +163,36 @@ describe('initializeOracleRuntime', () => {
 
 describe('ensureApiAvailable', () => {
     beforeEach(() => {
-        mockCheckApiConnectivity.mockResolvedValue(true);
+        mockRun.mockResolvedValue(okResult());
     });
 
-    it('calls checkApiConnectivity on first invocation', async () => {
+    it('runs the status command on first invocation', async () => {
         const { ensureApiAvailable } = await freshRuntime();
         await ensureApiAvailable();
-        expect(mockCheckApiConnectivity).toHaveBeenCalledOnce();
+        expect(runCommands()).toContain('status');
     });
 
     it('returns true when API is reachable', async () => {
-        mockCheckApiConnectivity.mockResolvedValue(true);
         const { ensureApiAvailable } = await freshRuntime();
         const result = await ensureApiAvailable();
         expect(result).toBe(true);
     });
 
-    it('returns false when API is unreachable', async () => {
-        mockCheckApiConnectivity.mockResolvedValue(false);
+    it('returns false when the status command reports an error', async () => {
         const { ensureApiAvailable } = await freshRuntime();
+        mockRun.mockResolvedValue({ status: 'error', lines: ['unreachable'] });
         const result = await ensureApiAvailable();
         expect(result).toBe(false);
     });
 
-    it('returns false when connectivity check rejects', async () => {
-        mockCheckApiConnectivity.mockRejectedValue(new Error('network error'));
+    it('returns false when the status command rejects', async () => {
         const { ensureApiAvailable } = await freshRuntime();
+        mockRun.mockRejectedValue(new Error('network error'));
         const result = await ensureApiAvailable();
         expect(result).toBe(false);
     });
 
-    it('calls checkApiConnectivity only once across multiple calls', async () => {
+    it('runs the status command only once across multiple calls', async () => {
         // The async wrapper creates a new Promise each invocation, so object
         // identity cannot be asserted.  The meaningful invariant is that the
         // underlying connectivity check fires exactly once regardless of how
@@ -130,11 +201,10 @@ describe('ensureApiAvailable', () => {
         await ensureApiAvailable();
         await ensureApiAvailable();
         await ensureApiAvailable();
-        expect(mockCheckApiConnectivity).toHaveBeenCalledOnce();
+        expect(runCommands().filter((command) => command === 'status')).toHaveLength(1);
     });
 
     it('awaiting the cached Promise returns the same value', async () => {
-        mockCheckApiConnectivity.mockResolvedValue(true);
         const { ensureApiAvailable } = await freshRuntime();
         const r1 = await ensureApiAvailable();
         const r2 = await ensureApiAvailable();
@@ -156,7 +226,7 @@ describe('ensureApiAvailable', () => {
         const result = await ensureApiAvailable();
 
         expect(result).toBe(false);
-        expect(mockCheckApiConnectivity).not.toHaveBeenCalled();
+        expect(runCommands()).not.toContain('status');
 
         vi.unstubAllEnvs();
     });
@@ -165,89 +235,78 @@ describe('ensureApiAvailable', () => {
 // ── askOracle ────────────────────────────────────────────────────────────────
 
 describe('askOracle', () => {
-    it('dispatches processNPC and returns dialogue', async () => {
+    it('runs npc process and returns dialogue', async () => {
         const { askOracle } = await freshRuntime();
-        const mockUnwrap = vi.fn().mockResolvedValue({ dialogue: 'The stars align.' });
-        mockDispatch.mockReturnValue({ unwrap: mockUnwrap });
+        mockRun.mockResolvedValue(okResult({ dialogue: 'The stars align.' }));
 
         const result = await askOracle('What do the stars say?');
 
-        expect(mockProcessNPC).toHaveBeenCalledOnce();
+        expect(commandStartingWith('npc process')).toBeDefined();
         expect(result).toBe('The stars align.');
     });
 
-    it('passes the question text to processNPC', async () => {
+    it('passes the question text in the npc process command', async () => {
         const { askOracle } = await freshRuntime();
-        const mockUnwrap = vi.fn().mockResolvedValue({ dialogue: 'Answer.' });
-        mockDispatch.mockReturnValue({ unwrap: mockUnwrap });
+        mockRun.mockResolvedValue(okResult({ dialogue: 'Answer.' }));
 
         await askOracle('Who are you?');
 
-        const [call] = mockProcessNPC.mock.calls;
-        expect(call[0]).toMatchObject({ text: 'Who are you?' });
+        expect(commandStartingWith('npc process')).toContain('Who are you?');
     });
 
-    it('initializes the runtime automatically before the first dispatch', async () => {
+    it('collapses newlines so the message stays on one command line', async () => {
+        // The CLI parser splits on whitespace; a multi-line question would
+        // otherwise break the command.
         const { askOracle } = await freshRuntime();
-        const mockUnwrap = vi.fn().mockResolvedValue({ dialogue: '...' });
-        mockDispatch.mockReturnValue({ unwrap: mockUnwrap });
+        mockRun.mockResolvedValue(okResult({ dialogue: '...' }));
+
+        await askOracle('first line\nsecond line');
+
+        const command = commandStartingWith('npc process') ?? '';
+        expect(command).toContain('first line second line');
+        expect(command).not.toContain('\n');
+    });
+
+    it('initializes the runtime automatically before the first command', async () => {
+        const { askOracle } = await freshRuntime();
+        mockRun.mockResolvedValue(okResult({ dialogue: '...' }));
 
         await askOracle('hello');
 
-        // setNPCInfo (from initializeOracleRuntime) + processNPC both go through dispatch
-        expect(mockDispatch).toHaveBeenCalledTimes(2);
         expect(mockSetNPCInfo).toHaveBeenCalledOnce();
-        expect(mockProcessNPC).toHaveBeenCalledOnce();
+        expect(commandStartingWith('npc process')).toBeDefined();
     });
 
     it('uses the NPC id produced by initialization', async () => {
         mockGenerateNPCId.mockReturnValue('oracle-abc123');
         const { askOracle } = await freshRuntime();
-        const mockUnwrap = vi.fn().mockResolvedValue({ dialogue: '...' });
-        mockDispatch.mockReturnValue({ unwrap: mockUnwrap });
+        mockGenerateNPCId.mockReturnValue('oracle-abc123');
+        mockRun.mockResolvedValue(okResult({ dialogue: '...' }));
 
         await askOracle('hello');
 
-        const [call] = mockProcessNPC.mock.calls;
-        expect(call[0]).toMatchObject({ npcId: 'oracle-abc123' });
+        expect(commandStartingWith('npc process')).toContain('oracle-abc123');
     });
 
-    it('propagates thunk failures to the caller', async () => {
+    it('throws when the command reports an error status', async () => {
         const { askOracle } = await freshRuntime();
-        const mockUnwrap = vi.fn().mockRejectedValue(new Error('API timeout'));
-        mockDispatch.mockReturnValue({ unwrap: mockUnwrap });
+        mockRun.mockResolvedValue({ status: 'error', lines: ['API timeout'] });
 
         await expect(askOracle('hello')).rejects.toThrow('API timeout');
     });
 
-    it('includes the API URL from env in the processNPC call', async () => {
-        process.env.NEXT_PUBLIC_FORBOC_API_URL = 'http://test-api:9090';
+    it('throws when the command returns no dialogue', async () => {
         const { askOracle } = await freshRuntime();
-        const mockUnwrap = vi.fn().mockResolvedValue({ dialogue: '...' });
-        mockDispatch.mockReturnValue({ unwrap: mockUnwrap });
+        mockRun.mockResolvedValue(okResult({}));
 
-        await askOracle('hello');
-
-        const [call] = mockProcessNPC.mock.calls;
-        expect(call[0]).toMatchObject({ apiUrl: 'http://test-api:9090' });
-
-        delete process.env.NEXT_PUBLIC_FORBOC_API_URL;
+        await expect(askOracle('hello')).rejects.toThrow('no dialogue');
     });
 
-    it('falls back to localhost:8080 when env is unset (non-production)', async () => {
-        // NODE_ENV=test in Vitest → non-production → localhost fallback applies.
-        const saved = process.env.NEXT_PUBLIC_FORBOC_API_URL;
-        delete process.env.NEXT_PUBLIC_FORBOC_API_URL;
+    it('propagates runtime failures to the caller', async () => {
         const { askOracle } = await freshRuntime();
-        const mockUnwrap = vi.fn().mockResolvedValue({ dialogue: '...' });
-        mockDispatch.mockReturnValue({ unwrap: mockUnwrap });
+        mockRun.mockRejectedValue(new Error('network down'));
 
-        await askOracle('hello');
-
-        const [call] = mockProcessNPC.mock.calls;
-        expect(call[0]).toMatchObject({ apiUrl: 'http://localhost:8080' });
-
-        if (saved !== undefined) process.env.NEXT_PUBLIC_FORBOC_API_URL = saved;
+        await expect(askOracle('hello')).rejects.toThrow('network down');
     });
 
     it('throws a descriptive error when Oracle is disabled (production + no URL)', async () => {

@@ -1,14 +1,24 @@
 // Singleton ForbocAI runtime for the Platform.
-// Owns the Oracle NPC identity and dispatches processNPC thunks against the
-// SDK's internal Redux store. Fully browser-compatible — no SQLite, no native modules.
+//
+// Follows the architecture of the SDK's own browser consumer
+// (@forbocai/test-game-browser): the runtime is built from the *public*
+// zero-config surface `createBrowserCli()`, never the SDK-maintainer-only
+// `@forbocai/browser/dev` surface.
+//
+// `createBrowserCli()` returns `{ run, store }`. Both halves are used:
+//
+//   store — dispatch domain actions that need richer arguments than a command
+//           string can carry. The Oracle's structuredPersona has six fields,
+//           and the `npc create` command flattens a persona into a single
+//           `traits` entry, so the persona is registered through the store.
+//   run   — issue command-shaped operations. `npc process` is what supplies
+//           `memory` to processNPC internally (context.getMemory), which is why
+//           the Platform never constructs an IMemory of its own.
+//
+// Fully browser-compatible — no SQLite, no native modules.
 
-import {
-    store,
-    setNPCInfo,
-    generateNPCId,
-    processNPC,
-    checkApiConnectivity,
-} from '@forbocai/core';
+import { createBrowserCli } from '@forbocai/browser';
+import { generateNPCId, setNPCInfo } from '@forbocai/core';
 
 /**
  * Resolve the ForbocAI API URL from environment.
@@ -29,13 +39,39 @@ const resolveApiUrl = (): string | null => {
 const getApiKey = (): string =>
     process.env.NEXT_PUBLIC_FORBOC_API_KEY ?? 'sk_test_key';
 
+type BrowserCli = ReturnType<typeof createBrowserCli>;
+
 // ── Runtime state ─────────────────────────────────────────────────────────────
 // Mutable singletons — set only by initializeOracleRuntime().
 // _apiUrl=null and _oracleNpcId=null together mean "Oracle disabled".
 let _initialized = false;
+let _cli: BrowserCli | null = null;
 let _oracleNpcId: string | null = null;
 let _apiUrl: string | null = null;
 let _apiAvailablePromise: Promise<boolean> | null = null;
+
+const ORACLE_PERSONA = {
+    traits: [
+        'Mystical oracle',
+        'Ancient and wise',
+        'Answers questions with insight',
+    ],
+    goals: [
+        'Guide the player with truthful answers',
+        'Illuminate the path forward',
+    ],
+    relationships: ['Serves the realm and its seekers'],
+    world: ['The game world', 'Ancient halls of knowing'],
+    speakingStyle: [
+        'Cryptic but clear',
+        'Measured and deliberate',
+        'Uses metaphor when helpful',
+    ],
+    constraints: [
+        'Answers only what is asked',
+        'Never fabricates certainty it does not have',
+    ],
+};
 
 /**
  * Register the Oracle NPC and configure the runtime. Idempotent — safe to call
@@ -63,39 +99,30 @@ export const initializeOracleRuntime = (): void => {
         return;
     }
 
-    // Set _apiUrl and _oracleNpcId before marking initialized so that a failure
-    // in generateNPCId() does not leave _initialized=true with the fields null.
+    // Set the runtime fields before marking initialized so a failure below does
+    // not leave _initialized=true with the fields null.
+    const cli = createBrowserCli();
+
+    // The public factory is zero-config by design, so the API URL and key are
+    // supplied through the runtime's own config surface rather than constructor
+    // options. `npc process` reads them back via context.runtimeConfig().
+    void cli.run(`config set _apiUrl ${url}`);
+    void cli.run(`config set apiKey ${getApiKey()}`);
+
+    _cli = cli;
     _apiUrl = url;
     _oracleNpcId = generateNPCId();
     _initialized = true;
 
     console.log(`ForbocAI API configured: ${url}`);
 
-    store.dispatch(
+    // Registered through the store rather than `npc create` because the command
+    // collapses a persona into a single traits entry; the Oracle needs all six
+    // persona fields to survive.
+    cli.store.dispatch(
         setNPCInfo({
             id: _oracleNpcId,
-            structuredPersona: {
-                traits: [
-                    'Mystical oracle',
-                    'Ancient and wise',
-                    'Answers questions with insight',
-                ],
-                goals: [
-                    'Guide the player with truthful answers',
-                    'Illuminate the path forward',
-                ],
-                relationships: ['Serves the realm and its seekers'],
-                world: ['The game world', 'Ancient halls of knowing'],
-                speakingStyle: [
-                    'Cryptic but clear',
-                    'Measured and deliberate',
-                    'Uses metaphor when helpful',
-                ],
-                constraints: [
-                    'Answers only what is asked',
-                    'Never fabricates certainty it does not have',
-                ],
-            },
+            structuredPersona: ORACLE_PERSONA,
         })
     );
 };
@@ -106,9 +133,13 @@ export const initializeOracleRuntime = (): void => {
  */
 export const ensureApiAvailable = async (): Promise<boolean> => {
     initializeOracleRuntime();
-    if (!_apiUrl) return false;
+    if (!_cli || !_apiUrl) return false;
     if (_apiAvailablePromise) return _apiAvailablePromise;
-    _apiAvailablePromise = checkApiConnectivity(_apiUrl)
+
+    const cli = _cli;
+    _apiAvailablePromise = cli
+        .run('status')
+        .then((result) => result.status === 'ok')
         .then((ok) => {
             if (ok) {
                 console.log(`ForbocAI: API available at ${_apiUrl}`);
@@ -133,21 +164,28 @@ export const ensureApiAvailable = async (): Promise<boolean> => {
  */
 export const askOracle = async (text: string): Promise<string> => {
     initializeOracleRuntime();
-    if (!_oracleNpcId || !_apiUrl) {
+    if (!_cli || !_oracleNpcId || !_apiUrl) {
         throw new Error(
             'ForbocAI Oracle is not available: ' +
             'set NEXT_PUBLIC_FORBOC_API_URL in your environment to enable it.'
         );
     }
-    const result = await store
-        .dispatch(
-            processNPC({
-                npcId: _oracleNpcId,
-                text,
-                apiUrl: _apiUrl,
-                apiKey: getApiKey(),
-            })
-        )
-        .unwrap();
-    return result.dialogue;
+
+    // `npc process` is the surface that wires memory into processNPC. The
+    // command parser splits on whitespace and the handler rejoins everything
+    // after the id, so newlines are collapsed to keep the message on one line.
+    const message = text.replace(/\s+/g, ' ').trim();
+    const result = await _cli.run(`npc process ${_oracleNpcId} ${message}`);
+
+    if (result.status !== 'ok') {
+        throw new Error(
+            `ForbocAI Oracle failed: ${result.lines.join(' ') || 'unknown error'}`
+        );
+    }
+
+    const dialogue = (result.data as { dialogue?: string } | undefined)?.dialogue;
+    if (!dialogue) {
+        throw new Error('ForbocAI Oracle returned no dialogue.');
+    }
+    return dialogue;
 };
