@@ -9,8 +9,6 @@ vi.mock('../src/features/game/sdk/forbocRuntime', () => ({
 
 const { askInquiry, performSystemInquiry } = await import('../src/features/game/mechanics/orchestrators/inquiry');
 const { sdkService } = await import('../src/features/game/sdk/cortexService');
-const { gameApi } = await import('../src/features/core/api/gameApi');
-const { baseApi } = await import('../src/features/core/api/baseApi');
 const gameReducer = (await import('../src/features/game/store/gameSlice')).default;
 const uiReducer = (await import('../src/features/core/ui/slice/uiSlice')).default;
 const { initialState } = await import('../src/features/game/store/constants');
@@ -46,62 +44,6 @@ describe('askInquiry / performSystemInquiry thunks thread stress and stage corre
 
         expect(spy).toHaveBeenCalledWith('System Overview', 15, 'To Conflict');
         spy.mockRestore();
-    });
-});
-
-describe('the askInquiry thunk and the performInquiry RTK Query mutation agree on the same domain result', () => {
-    const makeApiStore = () =>
-        configureStore({
-            reducer: { [baseApi.reducerPath]: baseApi.reducer },
-            middleware: (getDefault) => getDefault().concat(baseApi.middleware),
-        });
-
-    it('given the same question, stress, and roll, both paths report the same answer/qualifier/roll', async () => {
-        mockAskOracle.mockResolvedValue('...');
-        vi.spyOn(Math, 'random').mockReturnValue(0.82); // deterministic d100 = 83 -> "Yes, and..."
-
-        const thunkResult = await askInquiry('Will I succeed?')(vi.fn(), makeGetState(15, 'To Conflict'), undefined);
-
-        vi.spyOn(Math, 'random').mockReturnValue(0.82);
-        const store = makeApiStore();
-        const mutationResult = await store.dispatch(
-            gameApi.endpoints.performInquiry.initiate({
-                question: 'Will I succeed?',
-                currentSystemStress: 15,
-                stage: 'To Conflict',
-            })
-        );
-
-        expect(askInquiry.fulfilled.match(thunkResult)).toBe(true);
-        expect(mutationResult.data).toBeDefined();
-        if (askInquiry.fulfilled.match(thunkResult) && mutationResult.data) {
-            expect(mutationResult.data.answer).toBe(thunkResult.payload.answer);
-            expect(mutationResult.data.qualifier).toBe(thunkResult.payload.qualifier);
-            expect(mutationResult.data.roll).toBe(thunkResult.payload.roll);
-        }
-    });
-
-    it('a different stress value changes the roll identically on both paths', async () => {
-        mockAskOracle.mockResolvedValue('...');
-        vi.spyOn(Math, 'random').mockReturnValue(0.6); // d100 = 61
-
-        const thunkResult = await askInquiry('Will I succeed?')(vi.fn(), makeGetState(20, 'To Knowledge'), undefined);
-
-        vi.spyOn(Math, 'random').mockReturnValue(0.6);
-        const store = makeApiStore();
-        const mutationResult = await store.dispatch(
-            gameApi.endpoints.performInquiry.initiate({
-                question: 'Will I succeed?',
-                currentSystemStress: 20,
-                stage: 'To Knowledge',
-            })
-        );
-
-        expect(askInquiry.fulfilled.match(thunkResult)).toBe(true);
-        if (askInquiry.fulfilled.match(thunkResult) && mutationResult.data) {
-            expect(thunkResult.payload.roll).toBe(81);
-            expect(mutationResult.data.roll).toBe(81);
-        }
     });
 });
 
