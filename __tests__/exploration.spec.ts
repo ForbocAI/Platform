@@ -1,10 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
 import gameReducer from '../src/features/game/store/gameSlice';
 import { movePlayer } from '../src/features/game/mechanics/orchestrators/exploration';
-import { sdkService } from '../src/features/game/sdk/cortexService';
-import { baseApi } from '../src/features/core/api/baseApi';
-import { gameApi } from '../src/features/core/api/gameApi';
 import { initialState } from '../src/features/game/store/constants';
 import type { GameState } from '../src/features/game/store/types';
 import type { Direction, Sector, PerformanceMetrics } from '../src/features/game/types';
@@ -32,8 +29,7 @@ const makeSessionScore = (): PerformanceMetrics => ({
 
 const makeRealStore = (area: Sector) =>
     configureStore({
-        reducer: { game: gameReducer, [baseApi.reducerPath]: baseApi.reducer },
-        middleware: (getDefault) => getDefault().concat(baseApi.middleware),
+        reducer: { game: gameReducer },
         preloadedState: {
             game: { ...initialState, currentArea: area, sessionScore: makeSessionScore() } as GameState,
         },
@@ -79,52 +75,5 @@ describe('movePlayer thunk against a real store — no mutation on rejection', (
             expect(state.exploredAreas).toEqual({});
             expect(state.logs.some((l) => l.message.includes('Moved'))).toBe(false);
         }
-    });
-});
-
-describe('movePlayer thunk and the navigate RTK Query mutation agree on the same decision', () => {
-    it('both reject "constructor" for the same area', async () => {
-        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
-        const store = makeRealStore(area);
-
-        const thunkResult = await store.dispatch(movePlayer('constructor' as Direction));
-        const mutationResult = await store.dispatch(
-            gameApi.endpoints.navigate.initiate({ direction: 'constructor' as Direction, currentRoom: area })
-        );
-
-        expect(thunkResult.meta.requestStatus).toBe('rejected');
-        expect('error' in mutationResult).toBe(true);
-        if ('error' in mutationResult) {
-            expect((mutationResult.error as { status: number }).status).toBe(400);
-        }
-    });
-
-    it('both accept "North" for the same area (mutation independently reaches room generation)', async () => {
-        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
-        const store = makeRealStore(area);
-        const generateRoomSpy = vi.spyOn(sdkService, 'generateRoom');
-
-        const mutationResult = await store.dispatch(
-            gameApi.endpoints.navigate.initiate({ direction: 'North', currentRoom: area })
-        );
-
-        expect('data' in mutationResult).toBe(true);
-        expect(generateRoomSpy).toHaveBeenCalled();
-
-        generateRoomSpy.mockRestore();
-    });
-
-    it('the mutation never reaches room generation for "constructor"', async () => {
-        const area = makeArea({ North: 'new-area', South: null, East: null, West: null });
-        const store = makeRealStore(area);
-        const generateRoomSpy = vi.spyOn(sdkService, 'generateRoom');
-
-        await store.dispatch(
-            gameApi.endpoints.navigate.initiate({ direction: 'constructor' as Direction, currentRoom: area })
-        );
-
-        expect(generateRoomSpy).not.toHaveBeenCalled();
-
-        generateRoomSpy.mockRestore();
     });
 });

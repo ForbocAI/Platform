@@ -1,14 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createListenerMiddleware, type TypedStartListening } from '@reduxjs/toolkit';
-import { setupListeners } from '@reduxjs/toolkit/query';
 import gameReducer from '@/features/game/store/gameSlice';
 import uiReducer, { clearVignetteThemeInput, toggleCraftingPanel } from '@/features/core/ui/slice/uiSlice';
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';
-import { baseApi } from '@/features/core/api/baseApi';
 import { registerAudioListeners, flushTtsQueue } from '@/features/audio/audioListeners';
 import { registerGameListeners } from '@/features/core/store/listeners';
-import '@/features/core/api/gameApi';
 
 export const appBootstrap = { type: 'app/bootstrap' as const };
 export { retryInitialize } from './listeners';
@@ -21,12 +18,10 @@ export const store = configureStore({
     ui: uiReducer,
     narrative: narrativeReducer,
     audio: audioReducer,
-    [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-      .prepend(listenerMiddleware.middleware)
-      .concat(baseApi.middleware),
+      .prepend(listenerMiddleware.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 
@@ -34,8 +29,6 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export { useAppDispatch, useAppSelector } from './hooks';
-
-setupListeners(store.dispatch);
 
 const startAppListening = listenerMiddleware.startListening as TypedStartListening<RootState, AppDispatch>;
 

@@ -6,7 +6,6 @@ import gameReducer from '../src/features/game/store/gameSlice'
 import uiReducer from '../src/features/core/ui/slice/uiSlice'
 import narrativeReducer from '../src/features/narrative/slice/narrativeSlice'
 import audioReducer from '../src/features/audio/slice/audioSlice'
-import { baseApi } from '../src/features/core/api/baseApi'
 import Home from '../src/app/page'
 
 // Mock Next.js navigation
@@ -31,10 +30,7 @@ function createTestStore() {
             ui: uiReducer,
             narrative: narrativeReducer,
             audio: audioReducer,
-            [baseApi.reducerPath]: baseApi.reducer,
         },
-        middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware().concat(baseApi.middleware),
     })
 }
 
