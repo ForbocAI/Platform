@@ -40,13 +40,11 @@ export function GameScreenFooter({
 }) {
   return (
     <>
-      <div className="shrink-0 border-t border-palette-border">
-        <InquiryForm
-          value={inquiryInput}
-          onChange={onInquiryChange}
-          onSubmit={onInquirySubmit}
-        />
-      </div>
+      <InquiryForm
+        value={inquiryInput}
+        onChange={onInquiryChange}
+        onSubmit={onInquirySubmit}
+      />
       <ActionDeck
         player={player}
         currentArea={currentArea}

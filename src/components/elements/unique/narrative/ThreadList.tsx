@@ -19,9 +19,9 @@ export function ThreadList({
   if (threads.length === 0) return null;
 
   return (
-    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5" data-testid="thread-list">
-      <span className="text-palette-muted-light uppercase tracking-[0.16em] text-xs block mb-1">Story Threads</span>
-      <div className="flex flex-wrap gap-1">
+    <div className="shrink-0 p-2 sm:p-2.5" data-testid="thread-list">
+      <span className="text-palette-muted-light uppercase tracking-[0.16em] text-xs font-bold block mb-1.5">Story Threads</span>
+      <div className="flex flex-wrap gap-1.5">
         {threads.map((t) => (
           <GameButton
             key={t.id}

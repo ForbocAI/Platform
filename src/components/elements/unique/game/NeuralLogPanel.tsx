@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/features/core/utils";
 import type { SignalEntry } from "@/features/game/types";
-import { RuneSigil } from "../shared/Runes";
 
 import { TypewriterText } from "../../shared/TypewriterText";
 
@@ -24,7 +23,6 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
       <div className="flex items-center gap-1.5 p-1.5 sm:p-2 border-b border-palette-border/60 bg-palette-bg-mid/20 shrink-0">
         <BookOpen className="app-icon text-palette-accent-mid shrink-0 animate-ambient-breathe" />
         <span className="font-display font-bold tracking-[0.18em] text-palette-accent-bright uppercase leading-tight">Lantern Chronicle</span>
-        <RuneSigil className="ml-auto" />
       </div>
       <div
         ref={scrollContainerRef}

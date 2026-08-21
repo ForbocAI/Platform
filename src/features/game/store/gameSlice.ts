@@ -107,6 +107,10 @@ export const selectIsLoading = createSelector(
   [selectGameState],
   (game) => game.isLoading
 );
+export const selectError = createSelector(
+  [selectGameState],
+  (game) => game.error
+);
 export const selectSelectedCapabilityId = createSelector(
   [selectGameState],
   (game) => game.selectedCapabilityId

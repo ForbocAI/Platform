@@ -8,6 +8,7 @@ import {
   selectAreaCoordinates,
   selectLogs,
   selectIsInitialized,
+  selectError,
   selectActiveQuests,
   selectSessionScore,
   selectSessionComplete,
@@ -66,7 +67,6 @@ import { retryInitialize } from "@/features/core/store";
 import { LoadingOverlay } from "@/components/elements/generic/LoadingOverlay";
 import { GameScreenHeader } from "./GameScreenHeader";
 import { GameScreenMain } from "./GameScreenMain";
-import { GameScreenFooter } from "./GameScreenFooter";
 import { GameScreenOverlays } from "./GameScreenOverlays";
 import { ClassSelectionScreen } from "../ClassSelectionScreen";
 import type { VignetteStage } from "@/features/game/types";
@@ -79,6 +79,7 @@ export function GameScreen() {
   const areaCoordinates = useAppSelector(selectAreaCoordinates);
   const logs = useAppSelector(selectLogs);
   const isInitialized = useAppSelector(selectIsInitialized);
+  const error = useAppSelector(selectError);
   const inquiryInput = useAppSelector(selectInquiryInput);
   const stageOfScene = useAppSelector(selectStageOfScene);
   const inventoryOpen = useAppSelector(selectInventoryOpen);
@@ -102,9 +103,12 @@ export function GameScreen() {
 
   if (!isInitialized) {
     if (isLoading) {
+      return <LoadingOverlay message="Lanterns are waking..." />;
+    }
+    if (error) {
       return (
         <LoadingOverlay
-          message="Lanterns are waking..."
+          message="The lantern link faltered."
           onRetry={() => dispatch(retryInitialize)}
         />
       );
@@ -131,12 +135,10 @@ export function GameScreen() {
 
   return (
     <div className="relative flex flex-col h-screen min-h-0 bg-palette-bg-dark text-palette-white">
-      <GameScreenHeader
-        player={player}
+      <GameScreenHeader player={player} />
+      <GameScreenMain
         stage={stageOfScene}
         onStageChange={(s) => dispatch(setStageOfScene(s))}
-      />
-      <GameScreenMain
         currentArea={currentArea}
         showMap={showMap}
         exploredAreas={exploredAreas}
@@ -162,13 +164,10 @@ export function GameScreen() {
         sessionComplete={sessionComplete}
         currentSceneId={currentSceneId}
         onFadeOutScene={() => dispatch(fadeOutScene({ sceneId: currentSceneId ?? undefined }))}
-      />
-      <GameScreenFooter
+        player={player}
         inquiryInput={inquiryInput}
         onInquiryChange={(v) => dispatch(setInquiryInput(v))}
         onInquirySubmit={handleInquirySubmit}
-        player={player}
-        currentArea={currentArea}
         onMove={(dir) => dispatch(movePlayer(dir))}
         onMapClick={() => dispatch(toggleShowMap())}
         onScan={() => dispatch(scanSector())}

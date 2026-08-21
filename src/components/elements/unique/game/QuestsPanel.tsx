@@ -1,6 +1,7 @@
 "use client";
 
 import type { ActiveQuest, SessionScore } from "@/features/game/types";
+import { cn } from "@/features/core/utils";
 
 interface QuestsPanelProps {
   activeQuests: ActiveQuest[];
@@ -17,26 +18,25 @@ export function QuestsPanel({
 
   return (
     <div
-      className="shrink-0 border-b border-palette-border p-2 space-y-1.5 bg-palette-bg-mid/10"
+      className="shrink-0 p-2 sm:p-2.5 space-y-1.5"
       data-testid="quests-panel"
     >
-      <div className="text-palette-muted-light uppercase tracking-[0.16em] text-xs">Workboard</div>
-      {activeQuests.map((q) => (
-        <div key={q.id} className="text-xs text-palette-muted-light">
-          <span
-            className={
-              q.complete ? "line-through text-palette-muted/70" : ""
-            }
-          >
-            {q.label}: {q.progress}/{q.target}
-          </span>
-          {q.complete && (
-            <span className="ml-1 text-palette-accent-mid">✓</span>
-          )}
-        </div>
-      ))}
+      <div className="text-palette-muted-light uppercase tracking-[0.16em] text-xs font-bold">Workboard</div>
+      <div className="space-y-1">
+        {activeQuests.map((q) => (
+          <div key={q.id} className="flex items-center justify-between gap-2 text-xs text-palette-muted-light">
+            <span className={cn("truncate", q.complete && "line-through text-palette-muted/70")}>
+              {q.label}
+            </span>
+            <span className="shrink-0 tabular-nums flex items-center gap-1">
+              {q.progress}/{q.target}
+              {q.complete && <span className="text-palette-accent-mid">✓</span>}
+            </span>
+          </div>
+        ))}
+      </div>
       {sessionComplete === "quests" && sessionScore && (
-        <div className="text-xs text-palette-accent-mid pt-1 border-t border-palette-border/50">
+        <div className="text-xs text-palette-accent-mid pt-1.5 border-t border-palette-border/50">
           Journey complete — Areas: {sessionScore.areasExplored} | Scouts:{" "}
           {sessionScore.areasScanned} | Troubles: {sessionScore.npcsDefeated} |
           Trades: {sessionScore.vendorTrades} | Quests:{" "}
@@ -44,7 +44,7 @@ export function QuestsPanel({
         </div>
       )}
       {sessionComplete === "death" && sessionScore && (
-        <div className="text-xs text-palette-accent-mid pt-1 border-t border-palette-border/50">
+        <div className="text-xs text-palette-accent-mid pt-1.5 border-t border-palette-border/50">
           Journey paused at dusk — Areas: {sessionScore.areasExplored} | Scouts:{" "}
           {sessionScore.areasScanned} | Troubles: {sessionScore.npcsDefeated} |
           Trades: {sessionScore.vendorTrades} | Quests:{" "}
