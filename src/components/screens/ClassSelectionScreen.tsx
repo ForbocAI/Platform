@@ -1,12 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { CLASS_PRESENTATION, CLASS_TEMPLATES, CHARACTER_CLASSES } from "@/features/game/mechanics";
 import { GameButton } from "@/components/elements/generic";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import { initializeGame } from "@/features/game/store/gameSlice";
 import { selectSelectedClassId, setSelectedClassId } from "@/features/core/ui/slice/uiSlice";
 import { selectIsLoading } from "@/features/game/store/gameSlice";
-import { Activity, Sparkles, User } from "lucide-react";
+import { getClassPortraitUrl } from "@/features/game/sdk/portraits";
+import { Activity, Sparkles } from "lucide-react";
 
 export function ClassSelectionScreen() {
   const dispatch = useAppDispatch();
@@ -19,32 +21,57 @@ export function ClassSelectionScreen() {
 
   const template = CLASS_TEMPLATES[selectedId];
   const presentation = CLASS_PRESENTATION[selectedId];
+  const selectedPortraitUrl = getClassPortraitUrl(selectedId);
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-palette-bg-dark text-palette-white p-4 py-8">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-3 gap-6 h-full lg:h-[80vh]">
         <div className="lg:col-span-1 bg-palette-bg-mid/20 border border-palette-border rounded p-4 overflow-y-auto space-y-2">
           <h2 className="text-palette-accent-bright uppercase font-bold text-sm mb-4">Choose your folk</h2>
-          {CHARACTER_CLASSES.map((id) => (
-            <button
-              key={id}
-              onClick={() => dispatch(setSelectedClassId(id))}
-              className={`w-full text-left p-3 rounded border transition-colors ${selectedId === id ? "bg-palette-accent-bright/20 border-palette-accent-bright text-palette-accent-bright" : "bg-palette-bg-dark border-palette-border hover:bg-palette-bg-mid/40 text-palette-muted"}`}
-            >
-              <span className="block text-xs uppercase tracking-[0.22em] text-palette-muted-light">
-                {CLASS_PRESENTATION[id].folk}
-              </span>
-              <span className="block text-sm font-semibold mt-1 text-palette-white">
-                {CLASS_PRESENTATION[id].name}
-              </span>
-            </button>
-          ))}
+          {CHARACTER_CLASSES.map((id) => {
+            const portraitUrl = getClassPortraitUrl(id);
+            return (
+              <button
+                key={id}
+                onClick={() => dispatch(setSelectedClassId(id))}
+                className={`w-full flex items-center gap-3 text-left p-3 rounded border transition-colors ${selectedId === id ? "bg-palette-accent-bright/20 border-palette-accent-bright text-palette-accent-bright" : "bg-palette-bg-dark border-palette-border hover:bg-palette-bg-mid/40 text-palette-muted"}`}
+              >
+                <div className="w-10 h-10 rounded border border-palette-border bg-palette-bg-dark shrink-0 overflow-hidden">
+                  {portraitUrl && (
+                    <Image
+                      src={portraitUrl}
+                      alt={CLASS_PRESENTATION[id].name}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                <span className="min-w-0">
+                  <span className="block text-xs uppercase tracking-[0.22em] text-palette-muted-light">
+                    {CLASS_PRESENTATION[id].folk}
+                  </span>
+                  <span className="block text-sm font-semibold mt-1 text-palette-white">
+                    {CLASS_PRESENTATION[id].name}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="lg:col-span-2 bg-palette-bg-mid/20 border border-palette-border rounded p-6 flex flex-col">
           <div className="flex items-center gap-4 mb-6 border-b border-palette-border pb-4">
-            <div className="p-3 bg-palette-bg-dark border border-palette-accent-bright rounded">
-              <User className="w-8 h-8 text-palette-accent-bright" />
+            <div className="w-16 h-16 rounded bg-palette-bg-dark border border-palette-accent-bright shrink-0 overflow-hidden">
+              {selectedPortraitUrl && (
+                <Image
+                  src={selectedPortraitUrl}
+                  alt={presentation.name}
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
             <div>
               <h1 className="text-2xl font-bold text-palette-white tracking-wide">{presentation.name}</h1>

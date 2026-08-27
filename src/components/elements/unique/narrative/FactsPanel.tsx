@@ -15,22 +15,22 @@ export function FactsPanel({ facts, maxDisplay = 8 }: { facts: Fact[]; maxDispla
   if (facts.length === 0) return null;
 
   return (
-    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0" data-testid="facts-panel">
+    <div className="shrink-0" data-testid="facts-panel">
       <GameButton
         icon={open ? <ChevronDown className="app-icon" /> : <ChevronRight className="app-icon" />}
         onClick={() => {
           dispatch(playButtonSound());
           dispatch(toggleFactsPanel());
         }}
-        className="w-full flex items-center gap-1 p-1.5 h-auto text-left justify-start border-transparent bg-transparent text-palette-muted-light hover:text-palette-muted uppercase tracking-wider hover:bg-transparent"
+        className="w-full flex items-center gap-1 p-2 sm:p-2.5 h-auto text-left justify-start border-transparent bg-transparent text-palette-muted-light hover:text-palette-muted uppercase tracking-wider hover:bg-transparent"
         data-testid="facts-toggle"
         aria-label={open ? "Close Field Notes" : "Open Field Notes"}
         title="Field notes gathered along the way."
       >
-        <span className="normal-case">Field Notes ({facts.length})</span>
+        <span className="normal-case font-bold">Field Notes ({facts.length})</span>
       </GameButton>
       {open && (
-        <ul className="max-h-32 overflow-y-auto p-1.5 space-y-1 text-sm animate-in fade-in duration-200" role="region" aria-label="Field notes list">
+        <ul className="max-h-32 overflow-y-auto px-2 sm:px-2.5 pb-2 sm:pb-2.5 pt-1 space-y-1 text-sm animate-in fade-in duration-200" role="region" aria-label="Field notes list">
           {display.map((f) => (
             <li
               key={f.id}

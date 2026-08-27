@@ -4,7 +4,6 @@ import type { StageOfScene } from "@/features/game/types";
 import { cn } from "@/features/core/utils";
 import { useAppDispatch } from "@/features/core/store";
 import { playButtonSound } from "@/features/audio";
-import { RuneSigil } from "../shared/Runes";
 import { GameButton } from "@/components/elements/generic";
 
 const STAGES: { value: StageOfScene; label: string }[] = [
@@ -22,8 +21,7 @@ export function StageSelector({
 }) {
   const dispatch = useAppDispatch();
   return (
-    <div className="flex items-center gap-1 p-1 sm:p-1.5 border-b border-palette-border bg-palette-bg-mid/10 shrink-0 overflow-x-auto min-w-0" data-testid="stage-selector">
-      <RuneSigil className="shrink-0" />
+    <div className="flex items-center gap-1 p-1.5 sm:p-2 rounded-2xl border border-palette-border/70 bg-palette-bg-mid/15 shrink-0 overflow-x-auto min-w-0" data-testid="stage-selector">
       <span className="font-runic text-palette-accent-mid shrink-0">ᚱᚢᚾ</span>
       <span className="text-palette-muted-light uppercase tracking-[0.16em] mr-0.5 shrink-0 leading-tight">Story Path:</span>
       {STAGES.map(({ value, label }) => (

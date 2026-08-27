@@ -25,9 +25,9 @@ export function VignetteControls({
   onEnd?: () => void;
 }) {
   return (
-    <div className="border-b border-palette-border bg-palette-bg-mid/10 shrink-0 p-1.5 space-y-1.5" data-testid="vignette-controls">
+    <div className="shrink-0 p-2 sm:p-2.5 space-y-1.5" data-testid="vignette-controls">
       <div className="flex items-center justify-between">
-        <span className="text-palette-muted-light uppercase tracking-[0.16em] text-xs block">Lantern Scene</span>
+        <span className="text-palette-muted-light uppercase tracking-[0.16em] text-xs font-bold block">Lantern Scene</span>
         {currentSceneId && onFadeOutScene && (
           <GameButton
             onClick={onFadeOutScene}

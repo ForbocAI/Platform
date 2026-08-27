@@ -1,56 +1,43 @@
 "use client";
 
+import { useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import {
   setMasterVolume,
   selectMasterVolume,
   playButtonSound,
 } from "@/features/audio";
-import { Minus, Plus } from "lucide-react";
-import { GameButton } from "@/components/elements/generic";
-
-const VOLUME_STEP = 0.15;
+import { Volume2, VolumeX } from "lucide-react";
 
 export function VolumeControls() {
   const dispatch = useAppDispatch();
   const masterVolume = useAppSelector(selectMasterVolume);
   const isMuted = masterVolume <= 0;
+  const preMuteVolume = useRef(1);
 
-  const handleVolumeUp = () => {
+  const handleToggleMute = () => {
     dispatch(playButtonSound());
-    dispatch(setMasterVolume(Math.min(1, masterVolume + VOLUME_STEP)));
-  };
-
-  const handleVolumeDown = () => {
-    dispatch(playButtonSound());
-    dispatch(setMasterVolume(Math.max(0, masterVolume - VOLUME_STEP)));
+    if (isMuted) {
+      dispatch(setMasterVolume(preMuteVolume.current));
+    } else {
+      preMuteVolume.current = masterVolume;
+      dispatch(setMasterVolume(0));
+    }
   };
 
   return (
-    <div className="flex items-center gap-0.5 sm:gap-1 border border-palette-border rounded bg-palette-bg-mid/80 p-0.5">
-      <div className="flex flex-col gap-px items-center">
-        <GameButton
-          icon={<Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />}
-          onClick={handleVolumeUp}
-          className="p-0.5 h-6 shrink-0 border-transparent hover:border-palette-muted hover:bg-palette-panel/80 text-palette-muted-light hover:text-palette-foreground"
-          title="Volume up"
-          aria-label="Volume up"
-          disabled={masterVolume >= 1}
-          data-testid="volume-up"
-        />
-        <span className="text-[10px] leading-tight text-palette-muted uppercase tracking-wider">
-          Vol
-        </span>
-        <GameButton
-          icon={<Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />}
-          onClick={handleVolumeDown}
-          className="p-0.5 h-6 shrink-0 border-transparent hover:border-palette-muted hover:bg-palette-panel/80 text-palette-muted-light hover:text-palette-foreground"
-          title="Volume down"
-          aria-label="Volume down"
-          disabled={isMuted}
-          data-testid="volume-down"
-        />
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={handleToggleMute}
+      className={isMuted
+        ? "p-1 sm:p-1.5 rounded-full border border-palette-border/60 hover:border-palette-accent-mid text-palette-muted hover:text-palette-accent-bright transition-colors"
+        : "p-1 sm:p-1.5 rounded-full border border-palette-accent-mid/55 bg-palette-accent-mid/18 text-palette-accent-bright hover:bg-palette-accent-mid/26 transition-colors"
+      }
+      data-testid="volume-toggle"
+      aria-label={isMuted ? "Unmute" : "Mute"}
+      title={isMuted ? "Unmute" : "Mute"}
+    >
+      {isMuted ? <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+    </button>
   );
 }

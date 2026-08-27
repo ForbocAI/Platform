@@ -35,7 +35,7 @@ export function InquiryForm({
   return (
     <div
       ref={formContainerRef}
-      className="p-1.5 sm:p-2 border-t border-palette-border bg-palette-bg-mid/30 shrink-0"
+      className="p-1.5 sm:p-2 rounded-2xl border border-palette-border/70 bg-palette-bg-mid/30 shrink-0"
     >
       <form ref={formRef} onSubmit={handleSubmit} className="flex gap-1.5">
         <input

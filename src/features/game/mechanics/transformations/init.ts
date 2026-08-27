@@ -34,6 +34,10 @@ export function addInitReducers(builder: ActionReducerMapBuilder<GameState>): vo
         // Removed non-deterministic log push from reducer.
         // This log is now dispatched from the initializeGame thunk.
     });
+    builder.addCase(thunks.initializeGame.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message ?? 'Failed to initialize game.';
+    });
 
     builder.addCase(thunks.askInquiry.fulfilled, (state, action) => {
         if (!state.player) return;

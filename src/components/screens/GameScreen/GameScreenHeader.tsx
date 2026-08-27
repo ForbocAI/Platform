@@ -1,22 +1,12 @@
 "use client";
 
-import { PlayerHeader, StageSelector } from "@/components/elements/unique";
+import { PlayerHeader } from "@/components/elements/unique";
 import type { PlayerActor } from "@/features/game/types";
-import type { StageOfScene } from "@/features/game/types";
 
-export function GameScreenHeader({
-  player,
-  stage,
-  onStageChange,
-}: {
-  player: PlayerActor;
-  stage: StageOfScene;
-  onStageChange: (s: StageOfScene) => void;
-}) {
+export function GameScreenHeader({ player }: { player: PlayerActor }) {
   return (
-    <>
+    <div className="p-1.5 sm:p-2">
       <PlayerHeader player={player} />
-      <StageSelector stage={stage} onStageChange={onStageChange} />
-    </>
+    </div>
   );
 }
