@@ -87,5 +87,44 @@ export const ITEMS: Item[] = [
             description: "A sturdy pathkeeper who keeps lantern routes safe.",
             maxHp: 80
         }
+    },
+    {
+        id: "contract_mystic",
+        name: "Wayfinder Writ: Glowmoth Herald",
+        description: "Invites a keeper of old songs to travel with you.",
+        type: "contract",
+        cost: { primary: 60, secondary: 5 },
+        contractDetails: {
+            targetName: "Glowmoth Herald",
+            role: "Mystic",
+            description: "A quiet keeper of old songs, drawn to light and half-remembered melodies.",
+            maxHp: 35
+        }
+    },
+    {
+        id: "contract_ranger",
+        name: "Wayfinder Writ: Thistlebound Ranger",
+        description: "Invites a sharp-eyed tracker to travel with you.",
+        type: "contract",
+        cost: { primary: 55 },
+        contractDetails: {
+            targetName: "Thistlebound Ranger",
+            role: "Scout",
+            description: "A sharp-eyed tracker who reads broken twigs and old footprints better than any map.",
+            maxHp: 45
+        }
+    },
+    {
+        id: "contract_guard",
+        name: "Wayfinder Writ: Ironroot Guard",
+        description: "Invites a slow-tempered stonewright to travel with you.",
+        type: "contract",
+        cost: { primary: 90, secondary: 15 },
+        contractDetails: {
+            targetName: "Ironroot Guard",
+            role: "Warrior",
+            description: "A slow-tempered stonewright who never leaves a companion's back undefended.",
+            maxHp: 95
+        }
     }
 ];

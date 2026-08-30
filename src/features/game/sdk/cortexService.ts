@@ -26,19 +26,12 @@ const buildOracleNarrationPrompt = (
     verdict: InquiryResponse,
     stage?: StageOfScene
 ): string => {
-    const qualifierWord = verdict.qualifier ? `-${verdict.qualifier}` : '';
-    const eventTag = verdict.unexpectedEvent ? `|twist:${verdict.unexpectedEvent}` : '';
-    const stageTag = stage ? `|scene:${stage}` : '';
-    return `<${verdict.answer}${qualifierWord}${eventTag}${stageTag}> ${stripVerdictDelimiters(question)}`;
+    const cleanQuestion = stripVerdictDelimiters(question);
+    const qualifierPhrase = verdict.qualifier ? `, ${verdict.qualifier}` : '';
+    const twistPhrase = verdict.unexpectedEvent ? ` Twist: ${verdict.unexpectedEvent}.` : '';
+    const scenePhrase = stage ? ` Scene: ${stage}.` : '';
+    return `${cleanQuestion} (Wonderloom verdict: ${verdict.answer}${qualifierPhrase}.${twistPhrase}${scenePhrase})`;
 };
-
-interface SDKAgent {
-    process(signal: string, payload: Record<string, unknown>): Promise<{ dialogue: string }>;
-}
-
-interface SDKBridge {
-    validate(action: Record<string, unknown>, ctx: Record<string, unknown>): Promise<{ valid: boolean }>;
-}
 
 export const createSDKService = () => {
     let initialized = false;
@@ -55,20 +48,6 @@ export const createSDKService = () => {
         } finally {
             initialized = true;
         }
-    };
-
-    const isCortexReady = (): boolean => false;
-
-    const getAgent = async (_id?: string, _persona?: string): Promise<SDKAgent> => {
-        throw new Error('getAgent: local cortex not available in this SDK version. Use processNPC thunk via forbocRuntime.');
-    };
-
-    const getBridge = (): SDKBridge => {
-        throw new Error('getBridge: bridge not available in this SDK version.');
-    };
-
-    const rehydrateAgent = async (_txId: string): Promise<SDKAgent> => {
-        throw new Error('rehydrateAgent: not available in this SDK version.');
     };
 
     const generateStartArea = async (options?: GenerateStartAreaOptions): Promise<Area> => {
@@ -104,10 +83,6 @@ export const createSDKService = () => {
 
     return {
         init,
-        isCortexReady,
-        getAgent,
-        getBridge,
-        rehydrateAgent,
         generateStartRoom,
         generateStartArea,
         generateRoom,

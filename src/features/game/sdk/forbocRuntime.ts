@@ -47,8 +47,15 @@ type BrowserCli = ReturnType<typeof createBrowserCli>;
 let _initialized = false;
 let _cli: BrowserCli | null = null;
 let _oracleNpcId: string | null = null;
+let _playerCortexNpcId: string | null = null;
 let _apiUrl: string | null = null;
 let _apiAvailablePromise: Promise<boolean> | null = null;
+
+const _agentCortexIds = new Map<string, string>();
+
+const _vendorCortexIds = new Map<string, string>();
+const _lastVendorSpokeAt = new Map<string, number>();
+const VENDOR_SPEAK_COOLDOWN_MS = 15000;
 
 const ORACLE_PERSONA = {
     traits: [
@@ -72,6 +79,87 @@ const ORACLE_PERSONA = {
         'Never fabricates certainty it does not have',
     ],
 };
+
+const PLAYER_CORTEX_PERSONA = {
+    traits: [
+        'A quiet observer walking beside the Wayfinder',
+        'Notices danger, opportunity, and mood before the Wayfinder does',
+    ],
+    goals: [
+        'Comment briefly on what the Wayfinder is facing right now',
+        'When a clear next step stands out, name it plainly',
+    ],
+    relationships: ['Travels with the Wayfinder through Lanternbough'],
+    world: ['The game world', 'Lanternbough, the vertical village in the ancient tree'],
+    speakingStyle: [
+        'Short, plain, present-tense observations',
+        'Never uses tags, brackets, or symbols — plain sentences only',
+    ],
+    constraints: [
+        'Answers only what the current situation shows',
+        'When suggesting a next step, names exactly one of: move, engage, flee, heal, scan, loot, buy, sell, harvest, craft, idle',
+        'Never invents a next step when nothing stands out — silence or a brief remark is fine',
+    ],
+};
+
+const buildAgentPersona = (displayName: string, agentType: 'npc' | 'companion') => ({
+    traits: [
+        agentType === 'companion'
+            ? `${displayName}, a companion traveling with the Wayfinder`
+            : `${displayName}, someone the Wayfinder has crossed paths with in Lanternbough`,
+    ],
+    goals: ['React briefly and in character to what is happening right now'],
+    relationships: [
+        agentType === 'companion'
+            ? 'Travels with the Wayfinder'
+            : 'Encountered in the village of Lanternbough',
+    ],
+    world: ['The game world', 'Lanternbough, the vertical village in the ancient tree'],
+    speakingStyle: [
+        'Short, plain, present-tense remarks',
+        'Never uses tags, brackets, or symbols — plain sentences only',
+    ],
+    constraints: [
+        'Answers only what the current situation shows',
+        'Never invents a name, title, or fact not already known',
+    ],
+});
+
+const buildCompanionPersona = (name: string, role: string, description: string) => ({
+    traits: [
+        `${name}, the ${role} traveling with the Wayfinder`,
+        description,
+    ],
+    goals: [`React briefly and in character to what is happening right now, in keeping with being a ${role}`],
+    relationships: ['Travels with the Wayfinder through Lanternbough, hired by contract'],
+    world: ['The game world', 'Lanternbough, the vertical village in the ancient tree'],
+    speakingStyle: [
+        'Short, plain, present-tense remarks, in keeping with the role and description above',
+        'Never uses tags, brackets, or symbols — plain sentences only',
+    ],
+    constraints: [
+        'Answers only what the current situation shows',
+        'Never invents a name, title, or fact not already known',
+    ],
+});
+
+const buildVendorPersona = (name: string, description: string, specialty?: string) => ({
+    traits: [
+        specialty ? `${name}, the ${specialty} at this stall` : `${name}, a trader at this stall`,
+        description,
+    ],
+    goals: ['React briefly and in character to what was just bought or sold at the stall'],
+    relationships: ['Runs a stall in Lanternbough, dealing with the Wayfinder and other travelers'],
+    world: ['The game world', 'Lanternbough, the vertical village in the ancient tree'],
+    speakingStyle: [
+        'Short, plain, present-tense remarks, in keeping with the stall\'s specialty',
+        'Never uses tags, brackets, or symbols — plain sentences only',
+    ],
+    constraints: [
+        'Answers only what the current transaction shows',
+        'Never invents a name, price, or fact not already known',
+    ],
+});
 
 /**
  * Register the Oracle NPC and configure the runtime. Idempotent — safe to call
@@ -112,6 +200,7 @@ export const initializeOracleRuntime = (): void => {
     _cli = cli;
     _apiUrl = url;
     _oracleNpcId = generateNPCId();
+    _playerCortexNpcId = generateNPCId();
     _initialized = true;
 
     console.log(`ForbocAI API configured: ${url}`);
@@ -123,6 +212,12 @@ export const initializeOracleRuntime = (): void => {
         setNPCInfo({
             id: _oracleNpcId,
             structuredPersona: ORACLE_PERSONA,
+        })
+    );
+    cli.store.dispatch(
+        setNPCInfo({
+            id: _playerCortexNpcId,
+            structuredPersona: PLAYER_CORTEX_PERSONA,
         })
     );
 };
@@ -188,4 +283,130 @@ export const askOracle = async (text: string): Promise<string> => {
         throw new Error('ForbocAI Oracle returned no dialogue.');
     }
     return dialogue;
+};
+
+export const askPlayerCortex = async (
+    observationText: string
+): Promise<{ dialogue: string; action?: { type: string; payload?: Record<string, unknown> } }> => {
+    initializeOracleRuntime();
+    if (!_cli || !_playerCortexNpcId || !_apiUrl) {
+        throw new Error(
+            'ForbocAI player cortex is not available: ' +
+            'set NEXT_PUBLIC_FORBOC_API_URL in your environment to enable it.'
+        );
+    }
+
+    const message = observationText.replace(/\s+/g, ' ').trim();
+    const result = await _cli.run(`npc process ${_playerCortexNpcId} ${message}`);
+
+    if (result.status !== 'ok') {
+        throw new Error(
+            `ForbocAI player cortex failed: ${result.lines.join(' ') || 'unknown error'}`
+        );
+    }
+
+    const data = result.data as
+        | { dialogue?: string; action?: { type: string; payload?: Record<string, unknown> } }
+        | undefined;
+    if (!data?.dialogue) {
+        throw new Error('ForbocAI player cortex returned no dialogue.');
+    }
+    return { dialogue: data.dialogue, action: data.action };
+};
+
+export const askAgentCortex = async (
+    agentId: string,
+    displayName: string,
+    agentType: 'npc' | 'companion',
+    observationText: string,
+    lore?: { role: string; description: string }
+): Promise<{ dialogue: string; action?: { type: string; payload?: Record<string, unknown> } }> => {
+    initializeOracleRuntime();
+    if (!_cli || !_apiUrl) {
+        throw new Error(
+            'ForbocAI agent cortex is not available: ' +
+            'set NEXT_PUBLIC_FORBOC_API_URL in your environment to enable it.'
+        );
+    }
+
+    let sdkNpcId = _agentCortexIds.get(agentId);
+    if (!sdkNpcId) {
+        sdkNpcId = generateNPCId();
+        _cli.store.dispatch(
+            setNPCInfo({
+                id: sdkNpcId,
+                structuredPersona: lore
+                    ? buildCompanionPersona(displayName, lore.role, lore.description)
+                    : buildAgentPersona(displayName, agentType),
+            })
+        );
+        _agentCortexIds.set(agentId, sdkNpcId);
+    }
+
+    const message = observationText.replace(/\s+/g, ' ').trim();
+    const result = await _cli.run(`npc process ${sdkNpcId} ${message}`);
+
+    if (result.status !== 'ok') {
+        throw new Error(
+            `ForbocAI agent cortex failed: ${result.lines.join(' ') || 'unknown error'}`
+        );
+    }
+
+    const data = result.data as
+        | { dialogue?: string; action?: { type: string; payload?: Record<string, unknown> } }
+        | undefined;
+    if (!data?.dialogue) {
+        throw new Error('ForbocAI agent cortex returned no dialogue.');
+    }
+    return { dialogue: data.dialogue, action: data.action };
+};
+
+export const askVendorCortex = async (
+    vendorId: string,
+    name: string,
+    description: string,
+    specialty: string | undefined,
+    observationText: string
+): Promise<{ dialogue: string } | null> => {
+    initializeOracleRuntime();
+    if (!_cli || !_apiUrl) {
+        throw new Error(
+            'ForbocAI vendor cortex is not available: ' +
+            'set NEXT_PUBLIC_FORBOC_API_URL in your environment to enable it.'
+        );
+    }
+
+    const lastSpokeAt = _lastVendorSpokeAt.get(vendorId);
+    if (lastSpokeAt && Date.now() - lastSpokeAt < VENDOR_SPEAK_COOLDOWN_MS) {
+        return null;
+    }
+
+    let sdkNpcId = _vendorCortexIds.get(vendorId);
+    if (!sdkNpcId) {
+        sdkNpcId = generateNPCId();
+        _cli.store.dispatch(
+            setNPCInfo({
+                id: sdkNpcId,
+                structuredPersona: buildVendorPersona(name, description, specialty),
+            })
+        );
+        _vendorCortexIds.set(vendorId, sdkNpcId);
+    }
+
+    const message = observationText.replace(/\s+/g, ' ').trim();
+    const result = await _cli.run(`npc process ${sdkNpcId} ${message}`);
+
+    if (result.status !== 'ok') {
+        throw new Error(
+            `ForbocAI vendor cortex failed: ${result.lines.join(' ') || 'unknown error'}`
+        );
+    }
+
+    const data = result.data as { dialogue?: string } | undefined;
+    if (!data?.dialogue) {
+        throw new Error('ForbocAI vendor cortex returned no dialogue.');
+    }
+
+    _lastVendorSpokeAt.set(vendorId, Date.now());
+    return { dialogue: data.dialogue };
 };

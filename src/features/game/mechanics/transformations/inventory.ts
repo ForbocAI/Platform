@@ -20,6 +20,7 @@ export function addInventoryReducers(builder: ActionReducerMapBuilder<GameState>
                     faction: "ally",
                     name: contractDetails.targetName,
                     role: contractDetails.role as "Warrior" | "Scout" | "Mystic",
+                    description: contractDetails.description,
                     stats: {
                         hp: contractDetails.maxHp,
                         maxHp: contractDetails.maxHp,

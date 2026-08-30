@@ -49,7 +49,7 @@ export function generateGroundLoot(biome: Biome): Item[] {
         const max = entry.maxQty ?? 1;
         const actualQty = min + Math.floor(Math.random() * (max - min + 1));
         for (let i = 0; i < actualQty; i++) {
-            loot.push({ ...mat, id: `${mat.id}_${Math.random().toString(36).substring(7)}` });
+            loot.push({ ...mat, id: `${mat.id}_${Date.now()}-${Math.random().toString(36).substr(2, 9)}` });
         }
     }
     return loot;
@@ -63,7 +63,7 @@ export function getNPCLoot(npcName: string): Item[] {
         const roll = Math.random();
         if (d.guaranteed || roll < d.chance) {
             const mat = MATERIALS.find((m) => m.id === d.materialId);
-            if (mat) loot.push({ ...mat, id: `${mat.id}_${Math.random().toString(36).substring(7)}` });
+            if (mat) loot.push({ ...mat, id: `${mat.id}_${Date.now()}-${Math.random().toString(36).substr(2, 9)}` });
         }
     }
     return loot;

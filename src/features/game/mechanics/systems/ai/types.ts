@@ -92,6 +92,7 @@ export interface AwarenessResult {
     // Quest awareness
     incompleteQuests: ActiveQuest[];  // Quests that are not yet complete
     questProgress: Record<string, number>;  // Quest ID -> progress ratio (0-1)
+    previousAreaId: string | null;
 }
 
 // ── Actions ──

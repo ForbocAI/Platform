@@ -7,7 +7,7 @@ import { BIOME_GROUND_LOOT } from '../mechanics/systems/generation';
 /** Create a unique instance of an item (pure). */
 const instanceOf = (item: Item): Item => ({
     ...item,
-    id: `${item.id}_${Math.random().toString(36).substring(7)}`
+    id: `${item.id}_${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 });
 
 /** Pick N random items from a pool (pure, returns new array). */
@@ -52,16 +52,10 @@ const generateWeaponsmithWares = (): Item[] => {
     return pickRandom(pool, Math.floor(Math.random() * 2) + 3).map(instanceOf);
 };
 
-const generateAlchemistWares = (biome?: Biome): Item[] => {
-    const matPool = biome && BIOME_GROUND_LOOT[biome]
-        ? BIOME_GROUND_LOOT[biome]!
-            .map(e => MATERIALS.find(m => m.id === e.materialId))
-            .filter((m): m is Item => !!m)
-        : [...MATERIALS];
-    const pool = matPool.length > 0 ? matPool : [...MATERIALS];
-    return pickRandom(pool, Math.floor(Math.random() * 3) + 3)
-        .filter((m): m is Item => !!m)
-        .map(instanceOf);
+const generateAlchemistWares = (): Item[] => {
+    const consumables = ITEMS.filter(i => i.type === "consumable");
+    const pool = consumables.length > 0 ? consumables : ITEMS.filter(i => i.type !== "contract");
+    return pickRandom(pool, Math.floor(Math.random() * 2) + 2).map(instanceOf);
 };
 
 const generateRelicHunterWares = (): Item[] => {
@@ -128,7 +122,7 @@ export const generateRandomVendor = (biome?: Biome, forcedType?: string): Vendor
     const description = SPECIALIST_DESCRIPTIONS[type] ?? "A friendly traveler with practical goods, bright gossip, and trail supplies to barter.";
     const specialty = (SPECIALIST_TYPES as readonly string[]).includes(type) ? displayType : undefined;
 
-    return { id: Math.random().toString(36).substring(7), name, description, specialty, wares };
+    return { id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, name, description, specialty, displayType, wares };
 };
 
 /** Generate a marketplace with 2 specialists + 1 generic vendor (pure). */

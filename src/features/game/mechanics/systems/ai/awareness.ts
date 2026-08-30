@@ -8,6 +8,7 @@
 import type { GameState } from '../../../store/types';
 import type { AwarenessResult, AgentActionType } from './types';
 import type { Item } from '../../../types';
+import { HEALING_EFFECTS, STRESS_RELIEF_EFFECTS } from '../../orchestrators/autoplayHelpers';
 
 const DIRECTIONS = ['North', 'South', 'East', 'West'] as const;
 const DANGEROUS_HAZARDS = ['Wayward Rootsong', 'Lantern Flare', 'Sporepuff Haze', 'Gloomblight', 'Rootsong Dissonance', 'Bitter Frost', 'Scorching Drought'];
@@ -23,7 +24,8 @@ const DANGEROUS_HAZARDS = ['Wayward Rootsong', 'Lantern Flare', 'Sporepuff Haze'
 export function computeAwareness(
     state: GameState,
     lastAction: AgentActionType | null = null,
-    hasActiveVignette: boolean = false
+    hasActiveVignette: boolean = false,
+    previousAreaId: string | null = null
 ): AwarenessResult {
     const { currentArea: area, player, logs, exploredAreas, activeQuests } = state;
 
@@ -65,6 +67,7 @@ export function computeAwareness(
             actionHistory: [],
             incompleteQuests: [],
             questProgress: {},
+            previousAreaId,
         };
     }
 
@@ -81,14 +84,12 @@ export function computeAwareness(
     const hpRatio = player.stats.maxHp > 0 ? player.stats.hp / player.stats.maxHp : 0;
     const stressRatio = player.stats.maxStress > 0 ? (player.stats.stress || 0) / player.stats.maxStress : 0;
 
-    const healingNames = ['Healing', 'Potion', 'Mushroom', 'Salve', 'Puffball', 'Cap', 'Morel', 'Truffle', 'Lichen'];
     const hasHealingItem = inventory.some(
-        i => i.type === 'consumable' && healingNames.some(n => i.name.includes(n))
+        i => i.type === 'consumable' && !!i.effect && HEALING_EFFECTS.includes(i.effect)
     );
 
-    const stressNames = ['Calm', 'Tonic', 'Serenity', 'Spore Clump'];
     const hasStressItem = inventory.some(
-        i => i.type === 'consumable' && stressNames.some(n => i.name.includes(n))
+        i => i.type === 'consumable' && !!i.effect && STRESS_RELIEF_EFFECTS.includes(i.effect)
     );
 
     // ── Equipment ──
@@ -291,5 +292,6 @@ export function computeAwareness(
         actionHistory: trimmedHistory,
         incompleteQuests,
         questProgress,
+        previousAreaId,
     };
 }

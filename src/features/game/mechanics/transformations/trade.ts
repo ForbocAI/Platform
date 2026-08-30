@@ -5,11 +5,17 @@ import type { GameState } from '../../store/types';
 export function addTradeReducers(builder: ActionReducerMapBuilder<GameState>): void {
     builder.addCase(thunks.tradeBuy.fulfilled, (state, action) => {
         if (!action.payload || !state.player) return;
-        const { item, primaryCost, secondaryCost } = action.payload;
+        const { item, primaryCost, secondaryCost, merchantId } = action.payload;
 
         state.player.inventory.spirit = (state.player.inventory.spirit || 0) - primaryCost;
         state.player.inventory.blood = (state.player.inventory.blood || 0) - secondaryCost;
         state.player.inventory.items.push({ ...item });
+
+        const vendor = state.currentArea?.vendors?.find((v) => v.id === merchantId);
+        if (vendor) {
+            const wareIndex = vendor.wares.findIndex((w) => w.id === item.id);
+            if (wareIndex !== -1) vendor.wares.splice(wareIndex, 1);
+        }
 
         if (state.sessionScore) {
             state.sessionScore.vendorTrades += 1;

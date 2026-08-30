@@ -43,7 +43,14 @@ export const createBotOrchestrator = () => {
         }
     };
 
-    const checkAndTickAgent = (state: RootState, agentId: string, type: 'npc' | 'companion', persona?: string, soulId?: string) => {
+    const checkAndTickAgent = (
+        state: RootState,
+        agentId: string,
+        type: 'npc' | 'companion',
+        persona?: string,
+        soulId?: string,
+        lore?: { role: string; description: string }
+    ) => {
         const nextTickAt = state.ui.agentTickSchedule[agentId];
 
         // If no schedule exists, initialize it with a small random offset to stagger starts
@@ -58,7 +65,7 @@ export const createBotOrchestrator = () => {
             dispatch!(setAgentSchedule({ agentId, nextTickAt: null }));
 
             // Step 2: Dispatch generic agent tick
-            dispatch!(runAgentTick({ agentId, type, persona, soulId }));
+            dispatch!(runAgentTick({ agentId, type, persona, soulId, lore }));
         }
     };
 
@@ -72,7 +79,10 @@ export const createBotOrchestrator = () => {
     const orchestrateCompanions = (state: RootState) => {
         const companions = state.game.player?.companions || [];
         for (const companion of companions) {
-            checkAndTickAgent(state, companion.id, 'companion', companion.name, companion.soulId);
+            const lore = companion.role && companion.description
+                ? { role: companion.role, description: companion.description }
+                : undefined;
+            checkAndTickAgent(state, companion.id, 'companion', companion.name, companion.soulId, lore);
         }
     };
 
@@ -86,13 +96,12 @@ export const createBotOrchestrator = () => {
         }
 
         // 1. Player Autoplay Orchestration
+        // 2. NPC / Companion Orchestration
         if (state.ui.autoPlay) {
             orchestratePlayer(state);
+            orchestrateNPCs(state);
+            orchestrateCompanions(state);
         }
-
-        // 2. NPC / Companion Orchestration
-        orchestrateNPCs(state);
-        orchestrateCompanions(state);
     };
 
     return {

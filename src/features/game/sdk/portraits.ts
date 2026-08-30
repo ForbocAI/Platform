@@ -8,6 +8,17 @@ export const PORTRAIT_MAP: Record<string, string> = {
     'Hostile Entity': 'https://api.dicebear.com/7.x/bottts/svg?seed=monster&backgroundColor=330000',
     'Loyal Servitor': 'https://api.dicebear.com/7.x/identicon/svg?seed=ghost&backgroundColor=003366',
     'Vale Wayfinder': 'https://api.dicebear.com/7.x/adventurer/svg?seed=hero&backgroundColor=0a0a0a',
+    'Kettle Smith': 'https://api.dicebear.com/7.x/personas/svg?seed=kettle-smith&backgroundColor=2b1a0a',
+    'Tea Alchemist': 'https://api.dicebear.com/7.x/personas/svg?seed=tea-alchemist&backgroundColor=1a2b16',
+    'Curio Forager': 'https://api.dicebear.com/7.x/personas/svg?seed=curio-forager&backgroundColor=1a1a2b',
+    'Bridge Marshal': 'https://api.dicebear.com/7.x/personas/svg?seed=bridge-marshal&backgroundColor=2b1a1a',
+    'Lantern Peddler': 'https://api.dicebear.com/7.x/personas/svg?seed=lantern-peddler&backgroundColor=2b2410',
+    'Moss Caravaner': 'https://api.dicebear.com/7.x/personas/svg?seed=moss-caravaner&backgroundColor=15241a',
+    'Tinker Trader': 'https://api.dicebear.com/7.x/personas/svg?seed=tinker-trader&backgroundColor=241a2b',
+    'Rootsong Reader': 'https://api.dicebear.com/7.x/personas/svg?seed=rootsong-reader&backgroundColor=1a241f',
+    'Warrior': 'https://api.dicebear.com/7.x/micah/svg?seed=companion-warrior&backgroundColor=2b1a1a',
+    'Scout': 'https://api.dicebear.com/7.x/micah/svg?seed=companion-scout&backgroundColor=15241a',
+    'Mystic': 'https://api.dicebear.com/7.x/micah/svg?seed=companion-mystic&backgroundColor=1a1a2b',
 };
 
 export function getPortraitForAgent(type: string, persona?: string): string {
@@ -62,3 +73,5 @@ export function getClassFullPortraitUrl(classId: string): string | undefined {
     const fileName = CLASS_FULL_PORTRAIT_OVERRIDES[classId] ?? CLASS_PORTRAIT_OVERRIDES[classId];
     return fileName ? CHARACTER_PROFILE_ASSET_PATH + fileName : undefined;
 }
+
+export const AUTOPLAY_WATCHER_PORTRAIT_URL = CHARACTER_PROFILE_ASSET_PATH + 'autoplay_full.png';
