@@ -45,6 +45,7 @@ type BrowserCli = ReturnType<typeof createBrowserCli>;
 // Mutable singletons — set only by initializeOracleRuntime().
 // _apiUrl=null and _oracleNpcId=null together mean "Oracle disabled".
 let _initialized = false;
+let _initPromise: Promise<void> | null = null;
 let _cli: BrowserCli | null = null;
 let _oracleNpcId: string | null = null;
 let _playerCortexNpcId: string | null = null;
@@ -171,9 +172,17 @@ const buildVendorPersona = (name: string, description: string, specialty?: strin
  * fallback is used in production — that would always fail silently with CORS
  * errors from the browser.
  */
-export const initializeOracleRuntime = (): void => {
-    if (_initialized) return;
+export const initializeOracleRuntime = (): Promise<void> => {
+    if (_initialized) return Promise.resolve();
+    if (_initPromise) return _initPromise;
+    _initPromise = performOracleRuntimeInit().catch((error) => {
+        _initPromise = null;
+        throw error;
+    });
+    return _initPromise;
+};
 
+const performOracleRuntimeInit = async (): Promise<void> => {
     const url = resolveApiUrl();
 
     if (!url) {
@@ -189,13 +198,7 @@ export const initializeOracleRuntime = (): void => {
 
     // Set the runtime fields before marking initialized so a failure below does
     // not leave _initialized=true with the fields null.
-    const cli = createBrowserCli();
-
-    // The public factory is zero-config by design, so the API URL and key are
-    // supplied through the runtime's own config surface rather than constructor
-    // options. `npc process` reads them back via context.runtimeConfig().
-    void cli.run(`config set _apiUrl ${url}`);
-    void cli.run(`config set apiKey ${getApiKey()}`);
+    const cli = createBrowserCli({ apiUrl: url, apiKey: getApiKey() });
 
     _cli = cli;
     _apiUrl = url;
@@ -227,7 +230,7 @@ export const initializeOracleRuntime = (): void => {
  * Returns false immediately (no network call) when the Oracle is disabled.
  */
 export const ensureApiAvailable = async (): Promise<boolean> => {
-    initializeOracleRuntime();
+    await initializeOracleRuntime();
     if (!_cli || !_apiUrl) return false;
     if (_apiAvailablePromise) return _apiAvailablePromise;
 
@@ -258,7 +261,7 @@ export const ensureApiAvailable = async (): Promise<boolean> => {
  * Throws a descriptive error when the Oracle is disabled (API URL not configured).
  */
 export const askOracle = async (text: string): Promise<string> => {
-    initializeOracleRuntime();
+    await initializeOracleRuntime();
     if (!_cli || !_oracleNpcId || !_apiUrl) {
         throw new Error(
             'ForbocAI Oracle is not available: ' +
@@ -288,7 +291,7 @@ export const askOracle = async (text: string): Promise<string> => {
 export const askPlayerCortex = async (
     observationText: string
 ): Promise<{ dialogue: string; action?: { type: string; payload?: Record<string, unknown> } }> => {
-    initializeOracleRuntime();
+    await initializeOracleRuntime();
     if (!_cli || !_playerCortexNpcId || !_apiUrl) {
         throw new Error(
             'ForbocAI player cortex is not available: ' +
@@ -321,7 +324,7 @@ export const askAgentCortex = async (
     observationText: string,
     lore?: { role: string; description: string }
 ): Promise<{ dialogue: string; action?: { type: string; payload?: Record<string, unknown> } }> => {
-    initializeOracleRuntime();
+    await initializeOracleRuntime();
     if (!_cli || !_apiUrl) {
         throw new Error(
             'ForbocAI agent cortex is not available: ' +
@@ -368,7 +371,7 @@ export const askVendorCortex = async (
     specialty: string | undefined,
     observationText: string
 ): Promise<{ dialogue: string } | null> => {
-    initializeOracleRuntime();
+    await initializeOracleRuntime();
     if (!_cli || !_apiUrl) {
         throw new Error(
             'ForbocAI vendor cortex is not available: ' +
