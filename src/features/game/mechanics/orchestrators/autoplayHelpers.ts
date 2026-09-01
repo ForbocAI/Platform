@@ -27,10 +27,11 @@ export function pickBestPurchase(
   resourceSecondary: number,
   playerInventory: Item[],
   preferContract = false,
+  excludeNames: ReadonlySet<string> = new Set(),
 ): Item | null {
   const affordable = wares.filter(w => {
     const cost = w.cost || { primary: 0 };
-    return (resourcePrimary >= (cost.primary || 0)) && (resourceSecondary >= (cost.secondary || 0));
+    return (resourcePrimary >= (cost.primary || 0)) && (resourceSecondary >= (cost.secondary || 0)) && !excludeNames.has(w.name);
   });
   if (affordable.length === 0) return null;
 
@@ -70,7 +71,11 @@ export function pickBestPurchase(
 }
 
 /** Determine worst item to sell (resources > consumables > others) */
-export function pickWorstItem(inventory: Item[], blueprints: CraftingFormula[] = []): Item | null {
+export function pickWorstItem(
+  inventory: Item[],
+  blueprints: CraftingFormula[] = [],
+  excludeNames: ReadonlySet<string> = new Set(),
+): Item | null {
   if (inventory.length === 0) return null;
   const sellPriority: Record<string, number> = {
     resource: 1, consumable: 2, contract: 3, relic: 4, armor: 5, weapon: 6,
@@ -94,7 +99,7 @@ export function pickWorstItem(inventory: Item[], blueprints: CraftingFormula[] =
       return held <= ingredient.quantity;
     });
 
-  const sellable = inventory.filter(i => !isLastCriticalReserve(i) && !isNeededRecipeIngredient(i));
+  const sellable = inventory.filter(i => !isLastCriticalReserve(i) && !isNeededRecipeIngredient(i) && !excludeNames.has(i.name));
   if (sellable.length === 0) return null;
 
   return [...sellable].sort((a, b) =>

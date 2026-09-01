@@ -8,21 +8,16 @@ export const PORTRAIT_MAP: Record<string, string> = {
     'Hostile Entity': 'https://api.dicebear.com/7.x/bottts/svg?seed=monster&backgroundColor=330000',
     'Loyal Servitor': 'https://api.dicebear.com/7.x/identicon/svg?seed=ghost&backgroundColor=003366',
     'Vale Wayfinder': 'https://api.dicebear.com/7.x/adventurer/svg?seed=hero&backgroundColor=0a0a0a',
-    'Kettle Smith': 'https://api.dicebear.com/7.x/personas/svg?seed=kettle-smith&backgroundColor=2b1a0a',
-    'Tea Alchemist': 'https://api.dicebear.com/7.x/personas/svg?seed=tea-alchemist&backgroundColor=1a2b16',
-    'Curio Forager': 'https://api.dicebear.com/7.x/personas/svg?seed=curio-forager&backgroundColor=1a1a2b',
-    'Bridge Marshal': 'https://api.dicebear.com/7.x/personas/svg?seed=bridge-marshal&backgroundColor=2b1a1a',
-    'Lantern Peddler': 'https://api.dicebear.com/7.x/personas/svg?seed=lantern-peddler&backgroundColor=2b2410',
-    'Moss Caravaner': 'https://api.dicebear.com/7.x/personas/svg?seed=moss-caravaner&backgroundColor=15241a',
-    'Tinker Trader': 'https://api.dicebear.com/7.x/personas/svg?seed=tinker-trader&backgroundColor=241a2b',
-    'Rootsong Reader': 'https://api.dicebear.com/7.x/personas/svg?seed=rootsong-reader&backgroundColor=1a241f',
-    'Warrior': 'https://api.dicebear.com/7.x/micah/svg?seed=companion-warrior&backgroundColor=2b1a1a',
-    'Scout': 'https://api.dicebear.com/7.x/micah/svg?seed=companion-scout&backgroundColor=15241a',
-    'Mystic': 'https://api.dicebear.com/7.x/micah/svg?seed=companion-mystic&backgroundColor=1a1a2b',
 };
 
 export function getPortraitForAgent(type: string, persona?: string): string {
-    if (persona && PORTRAIT_MAP[persona]) return PORTRAIT_MAP[persona];
+    if (persona) {
+        const classPortrait = getClassPortraitUrl(persona);
+        if (classPortrait) return classPortrait;
+        const vendorPortrait = getVendorPortraitUrl(persona);
+        if (vendorPortrait) return vendorPortrait;
+        if (PORTRAIT_MAP[persona]) return PORTRAIT_MAP[persona];
+    }
     return PORTRAIT_MAP[type] || PORTRAIT_MAP['npc'];
 }
 
@@ -43,6 +38,13 @@ const CLASS_PORTRAIT_OVERRIDES: Record<string, string> = {
     Tanglevine: 'rootsong_caller_thumbnail.png',
     'Silkspinner Scout': 'spindle_weaver_thumbnail.png',
     'Dew Weaver': 'lantern_dryad_thumbnail.png',
+    'Wayfinder Scout': 'courier_fairy_thumbnail.png',
+    'Hearthkeeper Tender': 'kettle_spark_thumbnail.png',
+    Rootwalker: 'rootwalker_thumbnail.png',
+    'Bramble Colossus': 'bramble_colossus_thumbnail.png',
+    'Mosshorn Charger': 'mosshorn_charger_thumbnail.png',
+    'Petalwing Herald': 'petalwing_herald_thumbnail.png',
+    'The Briarking': 'the_briarking_thumbnail.png',
 };
 
 /** Higher-resolution portrait filenames for classes with real character art, for larger display contexts (e.g. HUD identity badge). */
@@ -60,6 +62,8 @@ const CLASS_FULL_PORTRAIT_OVERRIDES: Record<string, string> = {
     Tanglevine: 'rootsong_caller_full.png',
     'Silkspinner Scout': 'spindle_weaver_full.png',
     'Dew Weaver': 'lantern_dryad_full.png',
+    'Wayfinder Scout': 'courier_fairy_full.png',
+    'Hearthkeeper Tender': 'kettle_spark_full.png',
 };
 
 /** Thumbnail portrait for a playable class, or undefined when no real art exists for it. */
@@ -74,4 +78,27 @@ export function getClassFullPortraitUrl(classId: string): string | undefined {
     return fileName ? CHARACTER_PROFILE_ASSET_PATH + fileName : undefined;
 }
 
-export const AUTOPLAY_WATCHER_PORTRAIT_URL = CHARACTER_PROFILE_ASSET_PATH + 'autoplay_full.png';
+export const AUTOPLAY_WATCHER_PORTRAIT_URL = CHARACTER_PROFILE_ASSET_PATH + 'watcher_thumbnail.png';
+
+const VENDOR_PROFILE_ASSET_PATH = '/assets/vendor_profile/';
+
+export const ORACLE_PORTRAIT_URL = VENDOR_PROFILE_ASSET_PATH + 'oracle_thumbnail.png';
+
+const VENDOR_PORTRAIT_OVERRIDES: Record<string, string> = {
+    'Kettle Smith': 'kettle_smith_thumbnail.png',
+    'Tea Alchemist': 'tea_alchemist_thumbnail.png',
+    'Curio Forager': 'curio_forager_thumbnail.png',
+    'Bridge Marshal': 'bridge_marshal_thumbnail.png',
+    'Lantern Peddler': 'lantern_peddler_thumbnail.png',
+    'Moss Caravaner': 'moss_caravaner_thumbnail.png',
+    'Tinker Trader': 'tinker_trader_thumbnail.png',
+    'Rootsong Reader': 'rootsong_reader_thumbnail.png',
+    'Warrior': 'warrior_thumbnail.png',
+    'Scout': 'scout_thumbnail.png',
+    'Mystic': 'mystic_thumbnail.png',
+};
+
+export function getVendorPortraitUrl(persona: string): string | undefined {
+    const fileName = VENDOR_PORTRAIT_OVERRIDES[persona];
+    return fileName ? VENDOR_PROFILE_ASSET_PATH + fileName : undefined;
+}

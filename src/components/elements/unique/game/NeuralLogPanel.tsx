@@ -30,7 +30,7 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
       >
         {logs.map((log, index) => (
           <div key={log.id} className="min-w-0 wrap-break-word shrink-0 flex gap-2">
-            {log.type === "dialogue" && log.portraitUrl && (
+            {(log.type === "dialogue" || log.type === "oracle") && log.portraitUrl && (
               <div className="shrink-0 mt-1">
                 <Image
                   src={log.portraitUrl}

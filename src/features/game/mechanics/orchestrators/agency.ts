@@ -46,7 +46,7 @@ export const runAgentTick = createAsyncThunk(
 
             if (response.dialogue) {
                 const portraitUrl = getPortraitForAgent(type, lore?.role ?? agentPersona);
-                dispatch(addLog({ message: `[${agentId}] ${response.dialogue}`, type: 'dialogue', portraitUrl }));
+                dispatch(addLog({ message: `[${agentPersona} · ${agentId}] ${response.dialogue}`, type: 'dialogue', portraitUrl }));
             }
 
             // 3. ACTUATE

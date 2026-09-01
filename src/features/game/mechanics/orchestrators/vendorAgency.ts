@@ -14,7 +14,7 @@ export const runVendorTick = createAsyncThunk(
             const response = await askVendorCortex(vendorId, name, description, specialty, actionSummary);
             if (response?.dialogue) {
                 const portraitUrl = getPortraitForAgent('npc', displayType);
-                dispatch(addLog({ message: `[${vendorId}] ${response.dialogue}`, type: 'dialogue', portraitUrl }));
+                dispatch(addLog({ message: `[${name} · ${vendorId}] ${response.dialogue}`, type: 'dialogue', portraitUrl }));
             }
         } catch (e) {
             console.warn(`VendorAgency: Tick failed for vendor [${vendorId}]:`, e);

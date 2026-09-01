@@ -62,6 +62,26 @@ let lastActionType: AgentActionType | null = null;
 let lastAreaId: string | null = null;
 let stuckCounter = 0;
 
+let tradeTickCounter = 0;
+const TRADE_CHURN_COOLDOWN_TICKS = 5;
+const recentlyBoughtItemNames = new Map<string, number>();
+const recentlySoldItemNames = new Map<string, number>();
+
+function pruneExpired(expiryByName: Map<string, number>): void {
+  for (const [name, expiresAtTick] of expiryByName) {
+    if (tradeTickCounter >= expiresAtTick) expiryByName.delete(name);
+  }
+}
+
+function activeNames(expiryByName: Map<string, number>): ReadonlySet<string> {
+  pruneExpired(expiryByName);
+  return new Set(expiryByName.keys());
+}
+
+function recordTrade(expiryByName: Map<string, number>, itemName: string): void {
+  expiryByName.set(itemName, tradeTickCounter + TRADE_CHURN_COOLDOWN_TICKS);
+}
+
 /**
  * Check for "Abstract Stuck" state:
  * - Bot tries to move/explore but Area ID stays same.
@@ -174,8 +194,12 @@ async function actuate(
       const sellTarget = pickWorstItem(
         player.inventory.items as import('../../types').Item[],
         player.blueprints,
+        activeNames(recentlyBoughtItemNames),
       );
-      if (sellTarget) await dispatch(tradeSell({ itemId: sellTarget.id }));
+      if (sellTarget) {
+        await dispatch(tradeSell({ itemId: sellTarget.id }));
+        recordTrade(recentlySoldItemNames, sellTarget.name);
+      }
       break;
     }
 
@@ -190,11 +214,20 @@ async function actuate(
         return bSpec - aSpec;
       });
       const preferContract = action.reason?.includes('companion contract') ?? false;
+      const excludeRecentlySold = activeNames(recentlySoldItemNames);
       for (const vendor of sorted) {
         if (spirit < 5) break;
-        const purchase = pickBestPurchase(vendor.wares, spirit, blood, player.inventory.items as import('../../types').Item[], preferContract);
+        const purchase = pickBestPurchase(
+          vendor.wares,
+          spirit,
+          blood,
+          player.inventory.items as import('../../types').Item[],
+          preferContract,
+          excludeRecentlySold,
+        );
         if (purchase) {
           await dispatch(tradeBuy({ merchantId: vendor.id, itemId: purchase.id }));
+          recordTrade(recentlyBoughtItemNames, purchase.name);
           return;
         }
       }
@@ -237,7 +270,6 @@ export const runAutoplayTick = createAsyncThunk(
     const rootState = getState() as { game: GameState; ui?: { autoplayDelayMs?: number } };
     const state = { game: rootState.game };
     const { currentArea: area, player } = state.game;
-    console.log(`runAutoplayTick: Starting. Area=[${area?.title}] Player=[${player?.name}]`);
 
     if (!area || !player) {
       console.warn('runAutoplayTick: Aborting — Missing area or player.');
@@ -247,7 +279,6 @@ export const runAutoplayTick = createAsyncThunk(
     // 1. Perceive — gather awareness of the environment (with last action for cooldown tracking)
     const hasActiveVignette = !!(rootState as { narrative?: { vignette?: unknown } }).narrative?.vignette;
     const awareness = computeAwareness(state.game, lastActionType, hasActiveVignette, lastAreaId);
-    console.log(`runAutoplayTick: Perceived. hasVignette=${awareness.hasActiveVignette}, health=${awareness.hpRatio.toFixed(2)}`);
 
     // 2. SDK Directive — Call real ForbocAI SDK (skip if cortex is unavailable)
     let cortexDirective: CortexDirective | null = null;
@@ -291,7 +322,6 @@ export const runAutoplayTick = createAsyncThunk(
 
     // 3. Decide — run the shared behavior tree with SDK directive as Node 0
     let action = runBehaviorTree(AUTOPLAY_CONFIG, state.game, awareness, cortexDirective);
-    console.log(`runAutoplayTick: Decided. Action=[${action.type}] Reason=[${action.reason}]`);
 
     // 3.5 Stuck Recovery Override
     const isStuck = checkStuckState(area.id, lastActionType); // Check result of PREVIOUS action
@@ -310,9 +340,8 @@ export const runAutoplayTick = createAsyncThunk(
     }
 
     // 4. Act — execute the chosen action via Redux dispatches
-    console.log(`runAutoplayTick: Actuating [${action.type}]...`);
+    tradeTickCounter++;
     await actuate(action, state, dispatch as import('@/features/core/store').AppDispatch, getState);
-    console.log(`runAutoplayTick: Actuated [${action.type}].`);
 
     // 5. Track last action for next tick's cooldown checks
     lastActionType = action.type;
