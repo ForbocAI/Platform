@@ -7,10 +7,12 @@ import { startVignette } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
 import { VIGNETTE_THEMES } from '@/features/narrative/helpers';
 import type { InitializeGameOptions } from '../../store/types';
+import { resetForbocSession } from '@/features/game/sdk/state/forbocSlice';
 
 export const initializeGame = createAsyncThunk(
   'game/initialize',
   async (options: InitializeGameOptions | undefined, { dispatch }) => {
+    dispatch(resetForbocSession());
     dispatch(addLog({ message: 'SYSTEM: Lighting the lantern link...', type: 'system' }));
     await new Promise((resolve) => setTimeout(resolve, 800));
 

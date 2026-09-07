@@ -6,47 +6,32 @@
 import type { Area, Direction, InquiryResponse, StageOfScene } from '@/features/game/types';
 import type { GenerateStartAreaOptions } from '@/features/game/entities/area';
 import { askOracle, ensureApiAvailable } from './forbocRuntime';
+import { choose } from '@/features/core/fp/choice';
 import { simulateInquiryResponse } from '@/features/game/mechanics/transformations/inquiry';
-
-const CARDINAL_DIRECTIONS: readonly Direction[] = ['North', 'South', 'East', 'West'];
+import {
+    buildOracleNarrationPrompt,
+    isOracleDirection,
+    oracleMessages,
+} from './oracleAdapters';
 
 export const isDirection = (value: unknown): value is Direction =>
-    typeof value === 'string' && (CARDINAL_DIRECTIONS as readonly string[]).includes(value);
+    isOracleDirection(value);
 
 const isAreaReference = (value: string | null | undefined): value is string =>
     typeof value === 'string' && value.length > 0;
 
-// The verdict is framed with <>| delimiters; strip them from the free-text
-// question so a player can't inject a second, contradictory verdict tag into
-// the Oracle prompt. Narration-only — the mechanical result is computed locally.
-const stripVerdictDelimiters = (text: string): string => text.replace(/[<>|]/g, ' ');
-
-const buildOracleNarrationPrompt = (
-    question: string,
-    verdict: InquiryResponse,
-    stage?: StageOfScene
-): string => {
-    const cleanQuestion = stripVerdictDelimiters(question);
-    const qualifierPhrase = verdict.qualifier ? `, ${verdict.qualifier}` : '';
-    const twistPhrase = verdict.unexpectedEvent ? ` Twist: ${verdict.unexpectedEvent}.` : '';
-    const scenePhrase = stage ? ` Scene: ${stage}.` : '';
-    return `${cleanQuestion} (Wonderloom verdict: ${verdict.answer}${qualifierPhrase}.${twistPhrase}${scenePhrase})`;
-};
-
 export const createSDKService = () => {
-    let initialized = false;
-
     const init = async () => {
-        if (initialized) return;
         if (typeof window === 'undefined') return;
         try {
-            console.log('SDKService: Initializing...');
-            await ensureApiAvailable();
-            console.log('SDKService: Ready.');
+            console.log(oracleMessages.initializing);
+            choose(
+                await ensureApiAvailable(),
+                () => console.log(oracleMessages.ready),
+                () => console.error(oracleMessages.initializationError),
+            );
         } catch (_error) {
-            console.error('SDKService: Initialization error:', _error);
-        } finally {
-            initialized = true;
+            console.error(oracleMessages.initializationError, _error);
         }
     };
 
@@ -71,7 +56,7 @@ export const createSDKService = () => {
             const dialogue = await askOracle(buildOracleNarrationPrompt(question, mechanicalResult, stage));
             return { ...mechanicalResult, description: dialogue, oracleAvailable: true };
         } catch (e) {
-            console.warn('ForbocAI: Oracle narration unavailable; returning mechanical result only.', e);
+            console.warn(oracleMessages.narrationUnavailable, e);
             return { ...mechanicalResult, oracleAvailable: false };
         }
     };

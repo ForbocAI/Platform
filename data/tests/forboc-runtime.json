@@ -1,0 +1,80 @@
+{
+  "suite": {
+    "construction": "ForbocAI runtime construction",
+    "status": "ForbocAI runtime status",
+    "oracle": "ForbocAI Oracle",
+    "actors": "ForbocAI actor registration",
+    "state": "ForbocAI root state ownership"
+  },
+  "cases": {
+    "zeroConfig": "delegates connection policy to the SDK",
+    "initialRegistration": "registers the stable Oracle and player identities",
+    "freshStatus": "checks current API availability on every request",
+    "failedStatus": "reports an unsuccessful API status",
+    "dialogue": "returns dialogue from an NPC process command",
+    "whitespace": "normalizes multiline observations before the CLI command",
+    "commandFailure": "surfaces CLI command failures",
+    "emptyDialogue": "rejects an empty dialogue result",
+    "agentPersona": "forwards a complete agent persona under a deterministic identity",
+    "vendorPersona": "forwards a complete vendor persona under a deterministic identity",
+    "malformedDialogue": "rejects malformed dialogue: $name",
+    "stateIsolation": "keeps observations and cooldowns isolated by actor and store",
+    "stateReset": "clears observations and cooldowns when the session resets"
+  },
+  "observations": {
+    "oracle": "What do the stars say?",
+    "multiline": "first line\nsecond line",
+    "normalizedMultiline": "first line second line",
+    "lineBreak": "\n",
+    "agent": "A bridge is blocked.",
+    "vendor": "The player bought a lantern."
+  },
+  "responses": {
+    "oracle": "The stars align.",
+    "agent": "The east path remains open.",
+    "vendor": "Carry it carefully."
+  },
+  "errors": {
+    "command": "API timeout",
+    "emptyFragment": "no dialogue"
+  },
+  "invalidResponses": [
+    { "name": "null envelope", "data": null },
+    { "name": "numeric dialogue", "data": { "dialogue": 7 } },
+    { "name": "whitespace dialogue", "data": { "dialogue": " \n\t " } },
+    { "name": "object dialogue", "data": { "dialogue": { "text": "not a string" } } }
+  ],
+  "state": {
+    "otherActorId": "unrelated actor",
+    "respondedAt": 123456,
+    "empty": {
+      "lastObservationByAgent": {},
+      "lastVendorResponseAtById": {}
+    }
+  },
+  "expectations": {
+    "statusCallCount": 2,
+    "firstCallNumber": 1
+  },
+  "agent": {
+    "id": "guide 7",
+    "displayName": "Aster",
+    "agentType": "companion",
+    "role": "Pathfinder",
+    "description": "A careful reader of old roads."
+  },
+  "vendor": {
+    "id": "stall 3",
+    "name": "Mara",
+    "description": "A patient lampwright.",
+    "specialty": "lantern keeper"
+  },
+  "personaFields": [
+    "constraints",
+    "goals",
+    "relationships",
+    "speakingStyle",
+    "traits",
+    "world"
+  ]
+}

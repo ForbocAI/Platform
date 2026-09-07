@@ -1,0 +1,35 @@
+{
+  "actorIds": {
+    "oracle": "platform-oracle",
+    "playerAutoplay": "platform-player-autoplay",
+    "agentPrefix": "platform-agent-",
+    "vendorPrefix": "platform-vendor-"
+  },
+  "commands": {
+    "status": "status",
+    "npcProcess": "npc process"
+  },
+  "result": {
+    "okStatus": "ok",
+    "errorStatus": "error",
+    "unknownError": "unknown error"
+  },
+  "roles": {
+    "oracle": "Oracle",
+    "player": "player cortex",
+    "agent": "agent cortex",
+    "vendor": "vendor cortex"
+  },
+  "errors": {
+    "failed": "ForbocAI {role} failed: {details}",
+    "empty": "ForbocAI {role} returned no dialogue."
+  },
+  "normalization": {
+    "whitespacePattern": "\\s+",
+    "flags": "g",
+    "replacement": " "
+  },
+  "vendor": {
+    "speakCooldownMilliseconds": 15000
+  }
+}

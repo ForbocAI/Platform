@@ -4,6 +4,7 @@ import gameReducer from '@/features/game/store/gameSlice';
 import uiReducer, { clearVignetteThemeInput, toggleCraftingPanel } from '@/features/core/ui/slice/uiSlice';
 import narrativeReducer, { endVignette } from '@/features/narrative/slice/narrativeSlice';
 import audioReducer from '@/features/audio/slice/audioSlice';
+import forbocReducer from '@/features/game/sdk/state/forbocSlice';
 import { registerAudioListeners, flushTtsQueue } from '@/features/audio/audioListeners';
 import { registerGameListeners } from '@/features/core/store/listeners';
 
@@ -18,6 +19,7 @@ export const store = configureStore({
     ui: uiReducer,
     narrative: narrativeReducer,
     audio: audioReducer,
+    forboc: forbocReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()

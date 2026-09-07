@@ -1,12 +1,14 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { GameState } from '../../store/types';
 import { askAgentCortex } from '@/features/game/sdk/forbocRuntime';
 import { computeAwareness } from '@/features/game/mechanics/systems/ai/awareness';
 import { getPortraitForAgent } from '@/features/game/sdk/portraits';
 import { setAgentPondering, clearAgentPondering, addLog } from '../../store/gameSlice';
 import { toObservation } from '../../sdk/mappers';
-
-const _lastObservedContent = new Map<string, string>();
+import type { RootState } from '@/features/core/store';
+import {
+    agentObservationCommitted,
+    selectLastAgentObservation,
+} from '@/features/game/sdk/state/forbocSlice';
 
 /**
  * Generic Agent Tick Thunk.
@@ -16,7 +18,7 @@ const _lastObservedContent = new Map<string, string>();
 export const runAgentTick = createAsyncThunk(
     'game/runAgentTick',
     async (arg: { agentId: string; type: 'npc' | 'companion' | 'player'; persona?: string; soulId?: string; lore?: { role: string; description: string } }, { getState, dispatch }): Promise<{ agentId: string; nextTickAt: number } | undefined> => {
-        const rootState = getState() as { game: GameState };
+        const rootState = getState() as RootState;
         const { agentId, type, persona, lore } = arg;
 
         // 1. OBSERVE
@@ -26,7 +28,7 @@ export const runAgentTick = createAsyncThunk(
         // Map state to agent-specific observation
         const observation = toObservation(rootState.game);
 
-        if (_lastObservedContent.get(agentId) === observation.content) {
+        if (selectLastAgentObservation(rootState, agentId) === observation.content) {
             const delay = 5000 + Math.random() * 5000;
             return { agentId, nextTickAt: Date.now() + delay };
         }
@@ -38,11 +40,14 @@ export const runAgentTick = createAsyncThunk(
 
             dispatch(setAgentPondering(agentId));
 
-            const response = await askAgentCortex(agentId, agentPersona, agentType, observation.content, lore);
+            const response = await askAgentCortex({
+                agentId,
+                displayName: agentPersona,
+                agentType,
+                lore,
+            }, observation.content);
 
-            _lastObservedContent.set(agentId, observation.content);
-
-            dispatch(clearAgentPondering(agentId));
+            dispatch(agentObservationCommitted({ agentId, observation: observation.content }));
 
             if (response.dialogue) {
                 const portraitUrl = getPortraitForAgent(type, lore?.role ?? agentPersona);
@@ -55,6 +60,7 @@ export const runAgentTick = createAsyncThunk(
             }
         } catch (e) {
             console.warn(`Agency: Tick failed for agent [${agentId}]:`, e);
+        } finally {
             dispatch(clearAgentPondering(agentId));
         }
 

@@ -1,81 +1,73 @@
-import { UNEXPECTEDLY_TABLE } from "../tables";
-import type { InquiryResponse } from "../../types";
+import { choose } from '@/features/core/fp/choice';
+import { UNEXPECTEDLY_TABLE } from '../tables';
+import inquiryData from '../data/inquiry.json';
+import type { InquiryResponse } from '../../types';
 
-export function simulateInquiryResponse(question: string, currentSystemStress: number): InquiryResponse {
-    const d100 = Math.floor(Math.random() * 100) + 1;
-    let modifiedRoll = d100;
+type InquiryQualifier = NonNullable<InquiryResponse['qualifier']>;
 
-    if (d100 > 50) {
-        modifiedRoll += currentSystemStress;
-    } else {
-        modifiedRoll -= currentSystemStress;
-    }
-
-    if (modifiedRoll < 1) modifiedRoll = 1;
-    if (modifiedRoll > 100) modifiedRoll = 100;
-
-    let resultString = "";
-    let answer: "Yes" | "No";
-    let qualifier: "and" | "but" | "unexpectedly" | undefined;
-    let surgeAdjustment = 0;
-
-    if (modifiedRoll >= 96) {
-        answer = "Yes";
-        qualifier = "unexpectedly";
-        resultString = "The system confirms, and unexpectedly...";
-    } else if (modifiedRoll >= 86) {
-        answer = "Yes";
-        qualifier = "but";
-        resultString = "The system tentatively confirms, but...";
-    } else if (modifiedRoll >= 81) {
-        answer = "Yes";
-        qualifier = "and";
-        resultString = "The system confirms, and...";
-    } else if (modifiedRoll >= 51) {
-        answer = "Yes";
-        resultString = "The system confirms.";
-    } else if (modifiedRoll >= 21) {
-        answer = "No";
-        resultString = "The system remains unresponsive.";
-    } else if (modifiedRoll >= 16) {
-        answer = "No";
-        qualifier = "and";
-        resultString = "The system denies the request, and...";
-    } else if (modifiedRoll >= 6) {
-        answer = "No";
-        qualifier = "but";
-        resultString = "The system is silent, but...";
-    } else {
-        answer = "No";
-        qualifier = "unexpectedly";
-        resultString = "The system errors, and unexpectedly...";
-    }
-
-    let description = resultString;
-
-    if (!qualifier) {
-        surgeAdjustment = 2;
-    } else {
-        surgeAdjustment = -1;
-    }
-
-    let unexpectedRoll: number | undefined;
-    let unexpectedEventName: string | undefined;
-
-    if (qualifier === "unexpectedly") {
-        const d20 = Math.floor(Math.random() * 20) + 1;
-        unexpectedRoll = d20;
-        unexpectedEventName = UNEXPECTEDLY_TABLE[d20 - 1] || "Re-roll";
-        description += ` [EVENT: ${unexpectedEventName}]`;
-    }
-
-    return {
-        answer,
-        qualifier,
-        description,
-        roll: modifiedRoll,
-        surgeUpdate: surgeAdjustment,
-        unexpectedRoll,
-        unexpectedEvent: unexpectedEventName
-    };
+interface InquiryOutcome {
+  readonly minimumRoll: number;
+  readonly answer: InquiryResponse['answer'];
+  readonly qualifier?: InquiryQualifier;
+  readonly description: string;
 }
+
+const outcomes = inquiryData.outcomes as readonly InquiryOutcome[];
+
+const rollDie = (sides: number): number =>
+  Math.floor(Math.random() * sides) + inquiryData.dice.minimumRoll;
+
+const renderUnexpectedDescription = (
+  description: string,
+  event: string,
+): string => inquiryData.unexpectedDescriptionTemplate
+  .replace(inquiryData.tokens.description, description)
+  .replace(inquiryData.tokens.event, event);
+
+const selectOutcome = (roll: number): InquiryOutcome =>
+  outcomes.find((outcome) => roll >= outcome.minimumRoll) ?? outcomes.at(-1)!;
+
+const unexpectedProjection = (outcome: InquiryOutcome) => choose(
+  outcome.qualifier === inquiryData.unexpectedQualifier,
+  () => {
+    const unexpectedRoll = rollDie(inquiryData.dice.unexpectedSides);
+    const unexpectedEvent = UNEXPECTEDLY_TABLE[
+      unexpectedRoll - inquiryData.dice.minimumRoll
+    ] ?? inquiryData.fallbackUnexpectedEvent;
+    return {
+      description: renderUnexpectedDescription(outcome.description, unexpectedEvent),
+      unexpectedRoll,
+      unexpectedEvent,
+    };
+  },
+  () => ({ description: outcome.description }),
+);
+
+export const simulateInquiryResponse = (
+  question: string,
+  currentSystemStress: number,
+): InquiryResponse => {
+  void question;
+  const rawRoll = rollDie(inquiryData.dice.primarySides);
+  const stressedRoll = choose(
+    rawRoll > inquiryData.dice.stressPivot,
+    () => rawRoll + currentSystemStress,
+    () => rawRoll - currentSystemStress,
+  );
+  const roll = Math.min(
+    inquiryData.dice.primarySides,
+    Math.max(inquiryData.dice.minimumRoll, stressedRoll),
+  );
+  const outcome = selectOutcome(roll);
+  return {
+    answer: outcome.answer,
+    qualifier: outcome.qualifier,
+    roll,
+    surgeUpdate: choose(
+      Boolean(outcome.qualifier),
+      () => inquiryData.surge.qualified,
+      () => inquiryData.surge.unqualified,
+    ),
+    ...unexpectedProjection(outcome),
+  };
+};

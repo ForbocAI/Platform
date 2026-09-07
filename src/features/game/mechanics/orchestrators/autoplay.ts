@@ -48,6 +48,8 @@ import { askPlayerCortex } from '@/features/game/sdk/forbocRuntime';
 import { toObservation, toCortexDirective } from '@/features/game/sdk/mappers';
 import { addLog, setAgentPondering, clearAgentPondering } from '@/features/game/store/gameSlice';
 import { AUTOPLAY_WATCHER_PORTRAIT_URL } from '@/features/game/sdk/portraits';
+import { forbocActorIds } from '@/features/game/sdk/runtimeAdapters';
+import type { RootState } from '@/features/core/store';
 import {
   pickBestPurchase,
   pickWorstItem,
@@ -262,12 +264,10 @@ async function actuate(
 
 // ── Main autoplay thunk ──
 
-let _playerCortexInFlight = false;
-
 export const runAutoplayTick = createAsyncThunk(
   'game/runAutoplayTick',
   async (_, { getState, dispatch }): Promise<{ nextTickAt: number; nextDelayMs: number } | undefined> => {
-    const rootState = getState() as { game: GameState; ui?: { autoplayDelayMs?: number } };
+    const rootState = getState() as RootState;
     const state = { game: rootState.game };
     const { currentArea: area, player } = state.game;
 
@@ -282,30 +282,11 @@ export const runAutoplayTick = createAsyncThunk(
 
     // 2. SDK Directive — Call real ForbocAI SDK (skip if cortex is unavailable)
     let cortexDirective: CortexDirective | null = null;
-    if (!_playerCortexInFlight) {
+    if (!rootState.game.ponderingAgentIds.includes(forbocActorIds.playerAutoplay)) {
       try {
-        const SDK_TIMEOUT_MS = 5000;
-        _playerCortexInFlight = true;
-        const sdkPromise = (async () => {
-          const observation = toObservation(state.game);
-
-          dispatch(setAgentPondering('player-autoplay'));
-          const response = await askPlayerCortex(observation.content);
-          dispatch(clearAgentPondering('player-autoplay'));
-
-          return response;
-        })();
-        sdkPromise
-          .finally(() => {
-            _playerCortexInFlight = false;
-          })
-          .catch(() => {});
-
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('SDK timeout')), SDK_TIMEOUT_MS)
-        );
-
-        const response = await Promise.race([sdkPromise, timeoutPromise]);
+        const observation = toObservation(state.game);
+        dispatch(setAgentPondering(forbocActorIds.playerAutoplay));
+        const response = await askPlayerCortex(observation.content);
 
         if (response.dialogue) {
           dispatch(addLog({ message: response.dialogue, type: 'dialogue', portraitUrl: AUTOPLAY_WATCHER_PORTRAIT_URL }));
@@ -316,7 +297,8 @@ export const runAutoplayTick = createAsyncThunk(
         }
       } catch (e) {
         console.warn('SDK Decision failed, falling back to pure Behavior Tree:', e);
-        dispatch(clearAgentPondering('player-autoplay'));
+      } finally {
+        dispatch(clearAgentPondering(forbocActorIds.playerAutoplay));
       }
     }
 

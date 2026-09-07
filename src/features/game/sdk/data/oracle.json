@@ -1,0 +1,30 @@
+{
+  "directions": ["North", "South", "East", "West"],
+  "prompt": {
+    "template": "{question} (Wonderloom verdict: {answer}{qualifier}.{twist}{scene})",
+    "qualifierTemplate": ", {qualifier}",
+    "twistTemplate": " Twist: {event}.",
+    "sceneTemplate": " Scene: {stage}.",
+    "emptySegment": "",
+    "sanitization": {
+      "pattern": "[<>|]",
+      "flags": "g",
+      "replacement": " "
+    },
+    "tokens": {
+      "question": "{question}",
+      "answer": "{answer}",
+      "qualifier": "{qualifier}",
+      "twist": "{twist}",
+      "scene": "{scene}",
+      "event": "{event}",
+      "stage": "{stage}"
+    }
+  },
+  "messages": {
+    "initializing": "SDKService: Initializing...",
+    "ready": "SDKService: Ready.",
+    "initializationError": "SDKService: Initialization error:",
+    "narrationUnavailable": "ForbocAI: Oracle narration unavailable; returning mechanical result only."
+  }
+}

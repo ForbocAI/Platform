@@ -1,0 +1,51 @@
+{
+  "dice": {
+    "primarySides": 100,
+    "unexpectedSides": 20,
+    "minimumRoll": 1,
+    "stressPivot": 50
+  },
+  "surge": {
+    "unqualified": 2,
+    "qualified": -1
+  },
+  "unexpectedQualifier": "unexpectedly",
+  "fallbackUnexpectedEvent": "Re-roll",
+  "outcomes": [
+    { "minimumRoll": 96, "answer": "Yes", "qualifier": "unexpectedly", "description": "The system confirms, and unexpectedly..." },
+    { "minimumRoll": 86, "answer": "Yes", "qualifier": "but", "description": "The system tentatively confirms, but..." },
+    { "minimumRoll": 81, "answer": "Yes", "qualifier": "and", "description": "The system confirms, and..." },
+    { "minimumRoll": 51, "answer": "Yes", "description": "The system confirms." },
+    { "minimumRoll": 21, "answer": "No", "description": "The system remains unresponsive." },
+    { "minimumRoll": 16, "answer": "No", "qualifier": "and", "description": "The system denies the request, and..." },
+    { "minimumRoll": 6, "answer": "No", "qualifier": "but", "description": "The system is silent, but..." },
+    { "minimumRoll": 1, "answer": "No", "qualifier": "unexpectedly", "description": "The system errors, and unexpectedly..." }
+  ],
+  "unexpectedEvents": [
+    "Foreshadowing: Set a thread to be the main thread for the next scene.",
+    "Tying Off: The main thread resolves or substantially moves forward.",
+    "To Conflict: The next scene centers on a conflict.",
+    "Costume Change: An NPC drastically changes their mind, motivations, or alliances.",
+    "Key Grip: Set the location or general elements for the next scene.",
+    "To Knowledge: The next scene centers on lore or investigation.",
+    "Framing: An NPC or object becomes critical to the main thread.",
+    "Set Change: Scene continues in another location.",
+    "Upstaged: An NPC makes a big move/goes into Overdrive.",
+    "Pattern Change: The main thread gets modified drastically (Hard Left).",
+    "Limelit: The rest of the scene goes great for the PCs.",
+    "Entering the Red: Threat of danger or combat arrives.",
+    "To Endings: The next scene resolves or substantially moves forward a thread.",
+    "Montage: Timeframe changes to a montage of actions.",
+    "Enter Stage Left: A PC or NPC arrives fresh in the scene.",
+    "Cross-stitch: Choose another thread to be the main thread.",
+    "Six Degrees: A meaningful connection forms between two PCs/NPCs.",
+    "Re-roll/Reserved",
+    "Re-roll/Reserved",
+    "Re-roll/Reserved"
+  ],
+  "unexpectedDescriptionTemplate": "{description} [EVENT: {event}]",
+  "tokens": {
+    "description": "{description}",
+    "event": "{event}"
+  }
+}
