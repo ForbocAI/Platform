@@ -5,11 +5,10 @@
  */
 
 import { CAPABILITIES } from '@/features/game/mechanics/capabilities';
-import type { Item, NonPlayerActor } from '@/features/game/types';
+import type { CraftingFormula, Item, NonPlayerActor } from '@/features/game/types';
 
-export const HEALING_ITEM_NAMES = [
-  'Healing', 'Potion', 'Mushroom', 'Salve', 'Puffball', 'Cap', 'Morel', 'Truffle', 'Lichen',
-];
+export const HEALING_EFFECTS = ['heal_hp_20', 'heal_20_stress_10', 'heal_50_stress_add_10'];
+export const STRESS_RELIEF_EFFECTS = ['heal_stress_10', 'heal_20_stress_10', 'stress_30'];
 
 export const INQUIRY_THEMES = [
   'What data anomalies exist in this regional sector?',
@@ -28,10 +27,11 @@ export function pickBestPurchase(
   resourceSecondary: number,
   playerInventory: Item[],
   preferContract = false,
+  excludeNames: ReadonlySet<string> = new Set(),
 ): Item | null {
   const affordable = wares.filter(w => {
     const cost = w.cost || { primary: 0 };
-    return (resourcePrimary >= (cost.primary || 0)) && (resourceSecondary >= (cost.secondary || 0));
+    return (resourcePrimary >= (cost.primary || 0)) && (resourceSecondary >= (cost.secondary || 0)) && !excludeNames.has(w.name);
   });
   if (affordable.length === 0) return null;
 
@@ -41,7 +41,7 @@ export function pickBestPurchase(
   }
 
   const hasAnyHealing = playerInventory.some(
-    i => i.type === 'consumable' && HEALING_ITEM_NAMES.some(n => i.name.includes(n)),
+    i => i.type === 'consumable' && !!i.effect && HEALING_EFFECTS.includes(i.effect),
   );
   const hasWeapon = playerInventory.some(i => i.type === 'weapon');
   const hasArmor = playerInventory.some(i => i.type === 'armor');
@@ -71,12 +71,38 @@ export function pickBestPurchase(
 }
 
 /** Determine worst item to sell (resources > consumables > others) */
-export function pickWorstItem(inventory: Item[]): Item | null {
+export function pickWorstItem(
+  inventory: Item[],
+  blueprints: CraftingFormula[] = [],
+  excludeNames: ReadonlySet<string> = new Set(),
+): Item | null {
   if (inventory.length === 0) return null;
   const sellPriority: Record<string, number> = {
     resource: 1, consumable: 2, contract: 3, relic: 4, armor: 5, weapon: 6,
   };
-  return [...inventory].sort((a, b) =>
+
+  const isLastCriticalReserve = (item: Item) =>
+    item.type === 'consumable' && !!item.effect &&
+    (HEALING_EFFECTS.includes(item.effect) || STRESS_RELIEF_EFFECTS.includes(item.effect)) &&
+    inventory.filter(i => i.effect === item.effect).length <= 1;
+
+  const healingRecipes = blueprints.filter(recipe =>
+    !!recipe.produces.effect &&
+    (HEALING_EFFECTS.includes(recipe.produces.effect) || STRESS_RELIEF_EFFECTS.includes(recipe.produces.effect))
+  );
+  const isNeededRecipeIngredient = (item: Item) =>
+    item.type === 'resource' &&
+    healingRecipes.some(recipe => {
+      const ingredient = recipe.ingredients.find(ing => ing.name === item.name);
+      if (!ingredient) return false;
+      const held = inventory.filter(i => i.name === item.name).length;
+      return held <= ingredient.quantity;
+    });
+
+  const sellable = inventory.filter(i => !isLastCriticalReserve(i) && !isNeededRecipeIngredient(i) && !excludeNames.has(i.name));
+  if (sellable.length === 0) return null;
+
+  return [...sellable].sort((a, b) =>
     (sellPriority[a.type] || 0) - (sellPriority[b.type] || 0),
   )[0] ?? null;
 }

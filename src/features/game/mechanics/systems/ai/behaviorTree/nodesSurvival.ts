@@ -96,7 +96,8 @@ export function nodeSurvival(
     }
 
     // Evacuate hazardous area
-    if (awareness.isDangerousArea && awareness.hpRatio < 0.5 && !awareness.hasNPCs) {
+    if (awareness.isDangerousArea && awareness.hpRatio < 0.5 && !awareness.hasNPCs
+            && !(awareness.hasVendors && awareness.canAffordTrade)) {
         if (awareness.availableExits.length > 0) {
             const exit = awareness.availableExits[Math.floor(Math.random() * awareness.availableExits.length)];
             return { type: 'move', payload: { direction: exit }, reason: `Evacuating hazardous area (${Math.round(awareness.hpRatio * 100)}% HP)` };
@@ -104,7 +105,8 @@ export function nodeSurvival(
     }
 
     // Return to base camp when no healing items and HP is critical
-    if (has('flee') && awareness.hpRatio < 0.35 && !awareness.hasHealingItem && !awareness.isBaseCamp) {
+    if (has('flee') && awareness.hpRatio < 0.35 && !awareness.hasHealingItem && !awareness.isBaseCamp
+            && !(awareness.hasVendors && awareness.canAffordTrade)) {
         if (awareness.availableExits.length > 0) {
             const exit = awareness.availableExits[Math.floor(Math.random() * awareness.availableExits.length)];
             return { type: 'move', payload: { direction: exit }, reason: `HP critical (${Math.round(awareness.hpRatio * 100)}%) — no healing items, moving toward safety` };

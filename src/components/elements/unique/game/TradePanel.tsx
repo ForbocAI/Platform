@@ -23,7 +23,7 @@ export function TradePanel({ player, vendor, onClose }: TradePanelProps) {
 
   const handleSell = (item: Item) => {
     dispatch(playButtonSound());
-    dispatch(tradeSell({ itemId: item.id }));
+    dispatch(tradeSell({ itemId: item.id, merchantId: vendor.id }));
   };
 
   const canAfford = (cost: { primary?: number; secondary?: number } = {}) => {

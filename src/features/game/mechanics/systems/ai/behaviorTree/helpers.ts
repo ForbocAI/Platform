@@ -1,5 +1,6 @@
 import type { GameState } from '../../../../store/types';
 import type { AwarenessResult } from '../types';
+import { CAPABILITIES } from '../../../capabilities';
 
 /**
  * Capability selection helper
@@ -11,7 +12,7 @@ export function pickBestCapability(
     const player = state.player;
     if (!player) return null;
 
-    const capabilityIds = player.capabilities.learned || [];
+    const capabilityIds = (player.capabilities.learned || []).filter((id) => id in CAPABILITIES);
     if (capabilityIds.length === 0) return null;
 
     // Simple heuristic: prefer higher-magnitude capabilities when NPCs are tough

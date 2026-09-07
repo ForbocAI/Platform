@@ -2,7 +2,22 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
 import { handleVignetteProgression } from '../../store/constants';
+import { runVendorTick } from './vendorAgency';
 import type { GameState } from '../../store/types';
+import type { Vendor } from '../../types';
+
+const speakAboutTrade = (dispatch: (action: unknown) => unknown, vendor: Vendor, actionSummary: string) => {
+  dispatch(
+    runVendorTick({
+      vendorId: vendor.id,
+      name: vendor.name,
+      description: vendor.description ?? 'A traveler running a stall in Lanternbough.',
+      specialty: vendor.specialty,
+      displayType: vendor.displayType,
+      actionSummary,
+    })
+  );
+};
 
 export const tradeBuy = createAsyncThunk(
   'game/tradeBuy',
@@ -26,17 +41,18 @@ export const tradeBuy = createAsyncThunk(
     }
     dispatch(addLog({ message: `Brought home ${item.name} from ${vendor.name}.`, type: 'system' }));
     dispatch(addFact({ text: `Brought home ${item.name} from ${vendor.name}.`, questionKind: 'trade', isFollowUp: false }));
+    speakAboutTrade(dispatch, vendor, `The Wayfinder just bought ${item.name} from your stall.`);
     const now = Date.now();
     handleVignetteProgression(dispatch, getState);
-    return { item, primaryCost, secondaryCost, now };
+    return { item, primaryCost, secondaryCost, now, merchantId };
   }
 );
 
 export const tradeSell = createAsyncThunk(
   'game/tradeSell',
-  async ({ itemId }: { itemId: string }, { getState, dispatch }) => {
+  async ({ itemId, merchantId }: { itemId: string; merchantId?: string }, { getState, dispatch }) => {
     const state = getState() as { game: GameState };
-    const { player } = state.game;
+    const { player, currentArea } = state.game;
     if (!player) return;
     const itemIndex = (player.inventory.items as import('../../types').Item[]).findIndex((i) => i.id === itemId);
     if (itemIndex === -1) return;
@@ -46,6 +62,10 @@ export const tradeSell = createAsyncThunk(
     const now = Date.now();
     dispatch(addLog({ message: `Bartered away ${item.name} for ${value} supplies.`, type: 'system' }));
     dispatch(addFact({ text: `Bartered away ${item.name}.`, questionKind: 'trade', isFollowUp: false }));
+    const vendor = merchantId ? currentArea?.vendors?.find((v) => v.id === merchantId) : undefined;
+    if (vendor) {
+      speakAboutTrade(dispatch, vendor, `The Wayfinder just sold ${item.name} for ${value} supplies at your stall.`);
+    }
     handleVignetteProgression(dispatch, getState);
     return { itemIndex, value, now };
   }

@@ -4,6 +4,7 @@ import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
 import type { GameState } from '../../store/types';
 import type { StageOfScene } from '@/features/game/types';
+import { ORACLE_PORTRAIT_URL } from '@/features/game/sdk/portraits';
 
 export const askInquiry = createAsyncThunk(
   'game/askInquiry',
@@ -15,7 +16,7 @@ export const askInquiry = createAsyncThunk(
 
     const result = await sdkService.generateInquiryResponse(question, state.game.player.stats.stress, state.ui.stageOfScene);
 
-    dispatch(addLog({ message: result.description, type: 'oracle' }));
+    dispatch(addLog({ message: result.description, type: 'oracle', portraitUrl: ORACLE_PORTRAIT_URL }));
     if (result.oracleAvailable === false) {
       dispatch(addLog({ message: 'Oracle narration unavailable — showing the mechanical verdict only.', type: 'system' }));
     }
@@ -44,7 +45,7 @@ export const performSystemInquiry = createAsyncThunk(
 
     const result = await sdkService.generateInquiryResponse('System Overview', state.game.player.stats.stress, state.ui.stageOfScene);
 
-    dispatch(addLog({ message: `Response: ${result.description}`, type: 'oracle' }));
+    dispatch(addLog({ message: `Response: ${result.description}`, type: 'oracle', portraitUrl: ORACLE_PORTRAIT_URL }));
     if (result.oracleAvailable === false) {
       dispatch(addLog({ message: 'Oracle narration unavailable — showing the mechanical verdict only.', type: 'system' }));
     }

@@ -44,15 +44,17 @@ export function toObservation(gameState: GameState): { type: string; timestamp: 
 /**
  * Maps ForbocAI SDK AgentAction back to Lanternbough CortexDirective
  */
-export function toCortexDirective(action: AgentAction): CortexDirective {
+export function toCortexDirective(action: AgentAction): CortexDirective | null {
     const allowed: AgentActionType[] = [
         'respawn', 'harvest', 'craft', 'heal', 'reduce_stress', 'equip_weapon', 'equip_armor',
         'flee', 'cast_capability', 'engage', 'loot', 'sell', 'buy', 'scan', 'perform_inquiry',
         'ask_inquiry', 'advance_vignette', 'move', 'idle'
     ];
-    const type = allowed.includes(action.type as AgentActionType) ? (action.type as AgentActionType) : 'idle';
+    if (!allowed.includes(action.type as AgentActionType)) {
+        return null;
+    }
     return {
-        type,
+        type: action.type as AgentActionType,
         payload: action.payload,
         priority: 1, // Default priority for SDK directives
         source: 'sdk'

@@ -7,3 +7,4 @@ export { pickUpGroundLoot, consumeItem, equipItem, unequipItem, sacrificeItem } 
 export { harvestCrop, craftItem } from './baseCamp';
 export { runAutoplayTick } from './autoplay';
 export { runAgentTick } from './agency';
+export { runVendorTick } from './vendorAgency';

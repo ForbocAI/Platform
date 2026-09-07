@@ -265,7 +265,13 @@ export function nodeExploration(
             reason = `Exploring unvisited area`;
         }
 
-        const direction = exits[Math.floor(Math.random() * exits.length)];
+        const nonBacktrackExits = exits.filter((dir) => {
+            const exitAreaId = area.exits[dir as 'North' | 'South' | 'East' | 'West'];
+            return exitAreaId !== awareness.previousAreaId;
+        });
+        const finalExits = nonBacktrackExits.length > 0 ? nonBacktrackExits : exits;
+
+        const direction = finalExits[Math.floor(Math.random() * finalExits.length)];
         return { type: 'move', payload: { direction }, reason };
     }
 

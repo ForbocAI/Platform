@@ -191,6 +191,7 @@ export interface ExchangeHub {
     name: string;
     description?: string;
     specialty?: string;
+    displayType?: string;
     wares: Asset[];
 }
 
