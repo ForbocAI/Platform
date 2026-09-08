@@ -1,6 +1,7 @@
 "use client";
 
 import { AreaViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel, QuestsPanel, StageSelector } from "@/components/elements/unique";
+import { PlayerHeaderIdentity, PlayerHeaderBars } from "@/components/elements/unique/game/PlayerHeader";
 import { GameScreenFooter } from "./GameScreenFooter";
 import type { Area, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore, VignetteStage, StageOfScene, PlayerActor, Direction } from "@/features/game/types";
 import type { AreaCoordinates } from "@/features/game/store/gameSlice";
@@ -88,24 +89,45 @@ export function GameScreenMain({
 }) {
   return (
     <main className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-y-auto overflow-x-hidden lg:overflow-hidden">
-      {/* Left half: Area / Map (primary) + Workboard (secondary, shrinks first) */}
-      <div className="flex-none lg:flex-1 lg:basis-0 min-w-0 flex flex-col min-h-[35vh] lg:min-h-0 order-1 p-1.5 sm:p-2 gap-1.5 sm:gap-2">
-        <div className="flex-1 min-h-[16rem] flex flex-col">
-          {showMap ? (
-            <div className="flex-1 min-h-0 min-w-0 overflow-auto">
-              <MapView
-                exploredAreas={exploredAreas}
-                areaCoordinates={areaCoordinates}
-                currentAreaId={currentArea.id}
-              />
-            </div>
-          ) : (
-            <AreaViewport area={currentArea} onTradeVendor={onTradeVendor} />
-          )}
+      <div className="flex flex-col w-full lg:w-72 xl:w-80 shrink-0 min-h-0 order-1 p-1.5 sm:p-2 gap-1.5 sm:gap-2 lg:overflow-y-auto">
+        <div className="cozy-panel bg-palette-bg-mid/10 flex flex-col overflow-hidden shrink-0 lg:flex-1 lg:min-h-0">
+          <div className="flex flex-col items-center gap-2.5 p-3 pb-2.5 lg:gap-2.5 lg:p-3 lg:pb-2.5 lg:flex-1 lg:min-h-0">
+            <PlayerHeaderIdentity player={player} />
+            <PlayerHeaderBars player={player} />
+          </div>
+          <div className="border-t border-palette-border/10">
+            <StageSelector stage={stage} onStageChange={onStageChange} />
+          </div>
+          <div className="border-t border-palette-border/10">
+            <VignetteControls
+              theme={vignette?.theme ?? ""}
+              stage={vignette?.stage ?? "Exposition"}
+              threadIds={vignette?.threadIds}
+              threads={threads.map(t => ({ id: t.id, name: t.name ?? "Unnamed Thread" }))}
+              onStart={onStartVignette}
+              onAdvance={onAdvanceVignette}
+              onEnd={onEndVignette}
+              currentSceneId={currentSceneId}
+              onFadeOutScene={onFadeOutScene}
+            />
+          </div>
         </div>
-        {/* One unified panel with internal dividers, instead of separate boxes — capped so the area view above keeps most of the height */}
-        <div className="cozy-panel bg-palette-bg-mid/15 divide-y divide-palette-border/50 overflow-y-auto min-h-0 shrink max-h-[28%]">
-          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-palette-border/50">
+      </div>
+
+      <div className="flex flex-col w-full lg:flex-1 lg:basis-0 min-w-0 min-h-[35vh] lg:min-h-0 order-2 border-t lg:border-t-0 border-palette-border/20 lg:border-l column-divider p-1.5 sm:p-2 gap-1.5 sm:gap-2">
+        {showMap ? (
+          <div className="flex-1 min-h-0 min-w-0 overflow-auto">
+            <MapView
+              exploredAreas={exploredAreas}
+              areaCoordinates={areaCoordinates}
+              currentAreaId={currentArea.id}
+            />
+          </div>
+        ) : (
+          <AreaViewport area={currentArea} onTradeVendor={onTradeVendor} />
+        )}
+        <div className="cozy-panel bg-palette-bg-mid/15 divide-y divide-palette-border/20 overflow-y-auto shrink-0 max-h-[28%]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-palette-border/20">
             <QuestsPanel
               activeQuests={activeQuests}
               sessionComplete={sessionComplete}
@@ -118,22 +140,10 @@ export function GameScreenMain({
             />
           </div>
           <FactsPanel facts={facts} />
-          <VignetteControls
-            theme={vignette?.theme ?? ""}
-            stage={vignette?.stage ?? "Exposition"}
-            threadIds={vignette?.threadIds}
-            threads={threads.map(t => ({ id: t.id, name: t.name ?? "Unnamed Thread" }))}
-            onStart={onStartVignette}
-            onAdvance={onAdvanceVignette}
-            onEnd={onEndVignette}
-            currentSceneId={currentSceneId}
-            onFadeOutScene={onFadeOutScene}
-          />
         </div>
       </div>
-      {/* Right half: Story path + Lantern Chronicle (primary) + inquiry input + action deck, pinned below it */}
-      <div className="flex flex-col w-full lg:flex-1 lg:basis-0 min-w-0 shrink-0 min-h-0 border-t lg:border-t-0 lg:border-l border-palette-border order-2 overflow-hidden p-1.5 sm:p-2 gap-1.5 sm:gap-2">
-        <StageSelector stage={stage} onStageChange={onStageChange} />
+
+      <div className="flex flex-col w-full lg:flex-1 lg:basis-0 min-w-0 shrink-0 min-h-0 border-t lg:border-t-0 border-palette-border/20 lg:border-l column-divider order-3 overflow-hidden p-1.5 sm:p-2 gap-1.5 sm:gap-2">
         <div className="flex-1 min-h-[10rem]">
           <NeuralLogPanel logs={logs} />
         </div>

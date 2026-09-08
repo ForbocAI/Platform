@@ -38,7 +38,7 @@ export function ActionButtons({
         />
       )}
       <DirectionalPad currentArea={currentArea} onMove={onMove} onMapClick={onMapClick} />
-      <div className="grid grid-cols-3 gap-1 min-w-0 shrink-0">
+      <div className="flex flex-wrap gap-1 min-w-0">
         <GameButton onClick={onScan} icon={<Crosshair className="app-icon" />} data-testid="action-scan">
           SCOUT
         </GameButton>

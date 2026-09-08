@@ -1,5 +1,4 @@
 export { StageSelector } from "./narrative/StageSelector";
-export { PlayerHeader } from "./game/PlayerHeader/index";
 export { AreaViewport } from "./game/AreaViewport";
 export { MapView } from "./game/MapView";
 export { NeuralLogPanel } from "./game/NeuralLogPanel";
@@ -10,7 +9,6 @@ export { ConcessionModal } from "./game/ConcessionModal";
 export { FactsPanel } from "./narrative/FactsPanel";
 export { ThreadList } from "./narrative/ThreadList";
 export { VignetteControls } from "./narrative/VignetteControls";
-export { VolumeControls } from "./shared/VolumeControls";
 export { TradePanel } from "./game/TradePanel";
 export { InventoryPanel } from "./game/InventoryPanel";
 export { CapabilitiesPanel } from "./game/CapabilitiesPanel";

@@ -134,39 +134,43 @@ export function AreaViewport({
 
           {/* Base Camp Features */}
           {area.isBaseCamp && area.features && (
-            <div className="mt-2 sm:mt-3 w-full border-t border-palette-border/60 pt-2">
-              <h3 className="text-palette-accent-mid font-bold uppercase tracking-widest text-xs mb-1.5">Thimble Market Workboard</h3>
-              <div className="flex flex-wrap gap-1.5 justify-center">
+            <div className="mt-2 sm:mt-3 w-full border-t border-palette-border/15 pt-2">
+              <h3 className="text-palette-accent-mid font-bold uppercase tracking-widest text-xs mb-1">{area.title} Workboard</h3>
+              <div className="divide-y divide-palette-border/15">
                 {area.features.map((feature: AreaFeature, idx: number) => {
                   if (feature.type === 'resource_plot') {
                     return (
-                      <div key={idx} className="p-2 border border-palette-accent-soft/30 bg-palette-accent-soft/8 rounded-2xl flex flex-col items-center min-w-[120px]">
-                        <span className="text-xs text-palette-muted uppercase">Moon Garden</span>
-                        <span className="font-bold text-palette-white capitalize">{feature.resourceId ?? 'Seasonal Crop'}</span>
-                        <div className="w-full h-1 bg-palette-bg-dark mt-1 mb-1 rounded-full overflow-hidden">
-                          <div className="h-full bg-palette-accent-soft transition-all duration-500" style={{ width: `${feature.progress}%` }} />
+                      <div key={idx} className="flex items-center justify-between gap-3 py-1.5 text-left">
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs text-palette-muted uppercase">Moon Garden</span>
+                          <div className="font-bold text-palette-white capitalize truncate">{feature.resourceId ?? 'Seasonal Crop'}</div>
+                          <div className="w-full max-w-[160px] h-1 bg-palette-bg-dark mt-1 rounded-full overflow-hidden">
+                            <div className="h-full bg-palette-accent-soft transition-all duration-500" style={{ width: `${feature.progress}%` }} />
+                          </div>
                         </div>
                         {feature.ready ? (
                           <GameButton
                             variant="magic"
-                            className="text-xs px-2 py-0.5 h-auto"
+                            className="text-xs px-2 py-0.5 h-auto shrink-0"
                             onClick={() => window.dispatchEvent(new CustomEvent('harvest_crop', { detail: { index: idx } }))}
                           >
                             Gather
                           </GameButton>
                         ) : (
-                          <span className="text-[10px] text-palette-muted-light">Growing quietly... ({feature.progress}%)</span>
+                          <span className="text-[10px] text-palette-muted-light shrink-0">Growing quietly... ({feature.progress}%)</span>
                         )}
                       </div>
                     );
                   }
                   if (feature.type === 'work_station') {
                     return (
-                      <div key={idx} className="p-2 border border-palette-accent-bright/30 bg-palette-accent-bright/5 rounded-2xl flex flex-col items-center min-w-[120px]">
-                        <span className="text-xs text-palette-muted uppercase">Workshop</span>
-                        <span className="font-bold text-palette-white capitalize">{feature.kind}</span>
+                      <div key={idx} className="flex items-center justify-between gap-3 py-1.5 text-left">
+                        <div className="min-w-0">
+                          <span className="text-xs text-palette-muted uppercase">Workshop</span>
+                          <div className="font-bold text-palette-white capitalize truncate">{feature.kind}</div>
+                        </div>
                         <GameButton
-                          className="mt-2 text-xs px-2 py-0.5 h-auto"
+                          className="text-xs px-2 py-0.5 h-auto shrink-0"
                           onClick={() => window.dispatchEvent(new CustomEvent('open_crafting', { detail: { kind: feature.kind } }))}
                         >
                           Step In

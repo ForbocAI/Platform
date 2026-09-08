@@ -21,7 +21,7 @@ export function QuestsPanel({
       className="shrink-0 p-2 sm:p-2.5 space-y-1.5"
       data-testid="quests-panel"
     >
-      <div className="text-palette-muted-light uppercase tracking-[0.16em] text-xs font-bold">Workboard</div>
+      <div className="text-palette-muted-light uppercase tracking-[0.16em] text-xs font-bold">Journey Board</div>
       <div className="space-y-1">
         {activeQuests.map((q) => (
           <div key={q.id} className="flex items-center justify-between gap-2 text-xs text-palette-muted-light">
