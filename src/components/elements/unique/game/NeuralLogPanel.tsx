@@ -35,9 +35,12 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
                 <Image
                   src={log.portraitUrl}
                   alt="Agent Portrait"
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 rounded-2xl border border-palette-border/60 object-cover opacity-90"
+                  width={44}
+                  height={44}
+                  className={cn(
+                    "w-11 h-11 rounded-2xl object-cover shadow-[0_4px_14px_rgba(0,0,0,0.4)]",
+                    log.type === "oracle" ? "border border-palette-oracle/70" : "border border-palette-accent-mid/70"
+                  )}
                   unoptimized
                 />
               </div>
@@ -47,7 +50,7 @@ export function NeuralLogPanel({ logs, children }: { logs: SignalEntry[]; childr
                 "leading-relaxed pl-1.5 border-l-2 wrap-break-word flex-1",
                 log.type === "combat" && "text-palette-accent-dim border-palette-accent-dim/50",
                 log.type === "system" && "text-palette-accent-mid border-palette-border-light/45",
-                log.type === "oracle" && "text-palette-accent-soft border-palette-accent-soft/50 bg-palette-accent-soft/10 p-1 italic rounded-r-2xl",
+                log.type === "oracle" && "text-palette-oracle-bright border-palette-oracle/60 bg-palette-oracle/14 p-1 italic rounded-r-2xl font-medium",
                 log.type === "exploration" && "text-palette-muted-light border-palette-border/60",
                 log.type === "dialogue" && "text-palette-accent-bright border-palette-accent-mid/55 bg-palette-accent-mid/7 p-1.5 rounded-r-2xl font-medium"
               )}

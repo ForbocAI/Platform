@@ -65,7 +65,7 @@ import {
 } from "@/features/narrative/slice/narrativeSlice";
 import { retryInitialize } from "@/features/core/store";
 import { LoadingOverlay } from "@/components/elements/generic/LoadingOverlay";
-import { GameScreenHeader } from "./GameScreenHeader";
+import { AppHeader } from "@/components/elements/generic";
 import { GameScreenMain } from "./GameScreenMain";
 import { GameScreenOverlays } from "./GameScreenOverlays";
 import { ClassSelectionScreen } from "../ClassSelectionScreen";
@@ -134,8 +134,8 @@ export function GameScreen() {
   };
 
   return (
-    <div className="relative flex flex-col h-screen min-h-0 bg-palette-bg-dark text-palette-white">
-      <GameScreenHeader player={player} />
+    <div className="relative flex flex-col min-h-0 bg-palette-bg-dark text-palette-white" style={{ zoom: 0.9, height: "calc(100vh / 0.9)" }}>
+      <AppHeader />
       <GameScreenMain
         stage={stageOfScene}
         onStageChange={(s) => dispatch(setStageOfScene(s))}
