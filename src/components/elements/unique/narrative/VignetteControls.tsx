@@ -1,6 +1,6 @@
 "use client";
 
-import type { VignetteStage } from "@/features/game/types";
+import type { VignetteStage } from "@/features/narrative/types";
 import { GameButton } from "@/components/elements/generic";
 
 export function VignetteControls({

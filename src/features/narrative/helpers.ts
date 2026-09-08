@@ -1,4 +1,4 @@
-import type { InquiryResponse, UnexpectedlyEffect } from "@/features/game/types";
+import type { InquiryResponse, UnexpectedlyEffect } from "@/features/narrative/types";
 import { LORE_VIGNETTE_THEMES } from "@/features/game/content";
 
 export const VIGNETTE_THEMES = [

@@ -6,7 +6,8 @@
  * once integrated (see system-todo.md §1.2, Priority Node 0).
  */
 
-import type { NonPlayerActor, ActiveQuest } from '@/features/game/types';
+import type { NonPlayerActor } from "@/features/game/types";
+import type { ActiveQuest } from "@/features/game/store/objectives";
 
 // ── Capabilities ──
 

@@ -1,4 +1,4 @@
-import type { InquiryResponse, StageOfScene } from '@/features/game/types';
+import type { InquiryResponse, StageOfScene } from "@/features/narrative/types";
 import { choose } from '@/features/core/fp/choice';
 import oracleData from './data/oracle.json';
 

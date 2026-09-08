@@ -3,7 +3,7 @@ import { sdkService } from '@/features/game/sdk/cortexService';
 import { addFact } from '@/features/narrative/slice/narrativeSlice';
 import { addLog } from '../../store/gameSlice';
 import type { GameState } from '../../store/types';
-import type { StageOfScene } from '@/features/game/types';
+import type { StageOfScene } from "@/features/narrative/types";
 import { ORACLE_PORTRAIT_URL } from '@/features/game/sdk/portraits';
 
 export const askInquiry = createAsyncThunk(

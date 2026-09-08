@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import fixture from '../../data/tests/cortex-service.json';
 import oracleData from '../../src/features/game/sdk/data/oracle.json';
-import type { Area, StageOfScene } from '../../src/features/game/types';
+import type { Area } from "../../src/features/game/types";
+import type { StageOfScene } from "@/features/narrative/types";
 
 const mocks = vi.hoisted(() => ({
   askOracle: vi.fn(),

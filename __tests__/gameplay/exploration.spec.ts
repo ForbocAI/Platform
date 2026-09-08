@@ -4,7 +4,8 @@ import gameReducer from '../../src/features/game/store/gameSlice';
 import { movePlayer } from '../../src/features/game/mechanics/orchestrators/exploration';
 import { initialState } from '../../src/features/game/store/constants';
 import type { GameState } from '../../src/features/game/store/types';
-import type { Direction, Sector, PerformanceMetrics } from '../../src/features/game/types';
+import type { Direction, Sector } from "../../src/features/game/types";
+import type { PerformanceMetrics } from "@/features/game/store/objectives";
 
 const makeArea = (exits: Record<string, string | null>): Sector => ({
     id: 'area-1',

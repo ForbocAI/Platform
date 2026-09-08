@@ -1,6 +1,6 @@
 "use client";
 
-import type { Thread } from "@/features/game/types";
+import type { Thread } from "@/features/narrative/types";
 import { cn } from "@/features/core/utils";
 import { useAppDispatch } from "@/features/core/store";
 import { playButtonSound } from "@/features/audio";

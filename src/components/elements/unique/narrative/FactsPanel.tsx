@@ -1,6 +1,6 @@
 "use client";
 
-import type { Fact } from "@/features/game/types";
+import type { Fact } from "@/features/narrative/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/features/core/store";
 import { selectFactsPanelOpen, toggleFactsPanel } from "@/features/core/ui/slice/uiSlice";

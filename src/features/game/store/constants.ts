@@ -1,4 +1,5 @@
-import type { SessionScore, ActiveQuest, VignetteStage } from '@/features/game/types';
+import type { SessionScore, ActiveQuest } from "@/features/game/store/objectives";
+import type { VignetteStage } from "@/features/narrative/types";
 import { advanceVignetteStage, endVignette } from '@/features/narrative/slice/narrativeSlice';
 import type { GameState } from './types';
 import { addLog } from './gameSlice';

@@ -34,7 +34,7 @@ export function initializePlayer(classId?: string): PlayerActor {
         faction: 'player',
         name: "Kamenal", // Lore preserved in metadata for now
         agentClass: selectedClass,
-        archetype: selectedClass as any,
+        archetype: selectedClass,
         entropyModifier: 0,
 
         // Core Components

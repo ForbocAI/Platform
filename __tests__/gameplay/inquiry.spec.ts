@@ -13,7 +13,7 @@ const gameReducer = (await import('../../src/features/game/store/gameSlice')).de
 const uiReducer = (await import('../../src/features/core/ui/slice/uiSlice')).default;
 const { initialState } = await import('../../src/features/game/store/constants');
 import type { GameState } from '../../src/features/game/store/types';
-import type { StageOfScene } from '../../src/features/game/types';
+import type { StageOfScene } from "@/features/narrative/types";
 
 const makeGetState = (stress: number, stage: StageOfScene) => () => ({
     game: { player: { stats: { stress } } } as unknown as GameState,

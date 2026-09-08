@@ -3,7 +3,8 @@
 // Oracle interactions route through askOracle() → processNPC thunk → ForbocAI API.
 // Worldgen and move-validation use local procedural generators (no remote cortex).
 
-import type { Area, Direction, InquiryResponse, StageOfScene } from '@/features/game/types';
+import type { Area, Direction } from "@/features/game/types";
+import type { InquiryResponse, StageOfScene } from "@/features/narrative/types";
 import type { GenerateStartAreaOptions } from '@/features/game/entities/area';
 import { askOracle, ensureApiAvailable } from './forbocRuntime';
 import { choose } from '@/features/core/fp/choice';

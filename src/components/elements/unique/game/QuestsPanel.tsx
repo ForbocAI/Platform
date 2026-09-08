@@ -1,6 +1,6 @@
 "use client";
 
-import type { ActiveQuest, SessionScore } from "@/features/game/types";
+import type { ActiveQuest, SessionScore } from "@/features/game/store/objectives";
 import { cn } from "@/features/core/utils";
 
 interface QuestsPanelProps {

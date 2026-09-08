@@ -51,9 +51,9 @@ export interface InventoryComponent {
     secondaryResource?: number;  // Special currency
 
     // Legacy Migration Fields
-    weapons: any[];
+    weapons: string[];
     currentWeaponIndex: number;
-    items: any[];
+    items: Asset[];
     spirit: number;
     blood: number;
 }
@@ -271,128 +271,6 @@ export interface DialogueSession {
     isPondering: boolean;
 }
 
-/** Objective categories from playtest scope. */
-export type ObjectiveCategory = "reconnaissance" | "rescue" | "hostiles" | "vendor";
-
-export interface OperationalObjective {
-    id: string;
-    kind: ObjectiveCategory;
-    /** Short label for UI. */
-    label: string;
-    /** Target value to complete. */
-    target: number;
-    /** Current progress. */
-    progress: number;
-    /** When target is met, objective is complete. */
-    complete: boolean;
-}
-
-export interface PerformanceMetrics {
-    [key: string]: any; // Legacy Migration
-    sectorsExplored?: number;
-    sectorsScanned?: number;
-    actorsDefeated?: number;
-    hubTrades?: number;
-    objectivesCompleted?: number;
-    resourcesEarned: number;
-    startTime: number;
-    endTime: number | null;
-
-    // Legacy Migration Fields
-    areasExplored: number;
-    areasScanned: number;
-    npcsDefeated: number;
-    vendorTrades: number;
-    questsCompleted: number;
-}
-
-export interface QueryResult {
-    [key: string]: any; // Legacy Migration
-    answer: "Yes" | "No";
-    qualifier?: "and" | "but" | "unexpectedly";
-    description: string;
-    roll: number;
-    entropyUpdate?: number; // Optional for Legacy Migration
-    mutationRoll?: number;
-    mutationEvent?: string;
-    oracleAvailable?: boolean;
-}
-
-export type ProgressionPhase = "PhaseA" | "PhaseB" | "PhaseC";
-export type EpisodePhase = "Exposition" | "Rising Action" | "Climax" | "Epilogue";
-
-export type MutationType =
-    | "foreshadowing"
-    | "tying_off"
-    | "to_conflict"
-    | "costume_change"
-    | "key_grip"
-    | "to_knowledge"
-    | "framing"
-    | "set_change"
-    | "upstaged"
-    | "pattern_change"
-    | "limelit"
-    | "entering_the_red"
-    | "to_endings"
-    | "montage"
-    | "enter_stage_left"
-    | "cross_stitch"
-    | "six_degrees"
-    | "reroll_reserved";
-
-export interface MutationModifier {
-    [key: string]: any; // Legacy Migration
-    type: MutationType;
-    label: string;
-    applySetChange?: boolean;
-    applyEnteringRed?: boolean;
-    applyEnterStageLeft?: boolean;
-    suggestNextPhase?: ProgressionPhase;
-}
-
-export interface DataPoint {
-    id: string;
-    sourceQuestion?: string;
-    sourceAnswer?: string;
-    text: string;
-    isFollowUp: boolean;
-    questionKind?: string;
-    timestamp: number;
-}
-
-export interface NarrativeStream {
-    [key: string]: any; // Legacy Migration
-    id: string;
-    name?: string;
-    phase?: ProgressionPhase;
-    visitedSegmentIds?: string[];
-    relatedActorIds?: string[];
-    dataPoints?: string[];
-    createdAt?: number;
-}
-
-export interface SegmentRecord {
-    [key: string]: any; // Legacy Migration
-    id: string;
-    locationSectorId?: string;
-    mainStreamId?: string;
-    progressionPhase?: ProgressionPhase;
-    participantIds?: string[];
-    status?: "active" | "faded";
-    openedAt?: number;
-    closedAt?: number;
-}
-
-export interface NarrativeNode {
-    [key: string]: any; // Legacy Migration
-    id: string;
-    theme?: string;
-    phase?: EpisodePhase;
-    streamIds?: string[];
-    createdAt?: number;
-}
-
 // --- LEGACY TYPE MIGRATION ALIASES ---
 export type Area = Sector;
 export type Biome = string;
@@ -401,15 +279,5 @@ export type Item = Asset;
 export type AreaFeature = SiteFeature;
 export type EquipmentSlot = AssetSlot;
 export type AgentClass = string;
-export type ActiveQuest = OperationalObjective;
-export type SessionScore = PerformanceMetrics;
-export type Fact = DataPoint;
 export type GameLogEntry = SignalEntry;
-export type InquiryResponse = QueryResult;
-export type SceneRecord = SegmentRecord;
-export type StageOfScene = "To Knowledge" | "To Conflict" | "To Endings";
-export type Thread = NarrativeStream;
-export type UnexpectedlyEffect = MutationModifier;
-export type Vignette = NarrativeNode;
-export type VignetteStage = EpisodePhase;
 export type AreaCoordinates = { x: number, y: number };

@@ -3,7 +3,9 @@
 import { AreaViewport, MapView, ThreadList, FactsPanel, VignetteControls, NeuralLogPanel, QuestsPanel, StageSelector } from "@/components/elements/unique";
 import { PlayerHeaderIdentity, PlayerHeaderBars } from "@/components/elements/unique/game/PlayerHeader";
 import { GameScreenFooter } from "./GameScreenFooter";
-import type { Area, Fact, GameLogEntry, Thread, ActiveQuest, SessionScore, VignetteStage, StageOfScene, PlayerActor, Direction } from "@/features/game/types";
+import type { Area, GameLogEntry, PlayerActor, Direction } from "@/features/game/types";
+import type { Fact, Thread, VignetteStage, StageOfScene } from "@/features/narrative/types";
+import type { ActiveQuest, SessionScore } from "@/features/game/store/objectives";
 import type { AreaCoordinates } from "@/features/game/store/gameSlice";
 
 interface VignetteState {

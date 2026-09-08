@@ -1,7 +1,7 @@
 import { choose } from '@/features/core/fp/choice';
 import { UNEXPECTEDLY_TABLE } from '../tables';
 import inquiryData from '../data/inquiry.json';
-import type { InquiryResponse } from '../../types';
+import type { InquiryResponse } from "@/features/narrative/types";
 
 type InquiryQualifier = NonNullable<InquiryResponse['qualifier']>;
 

@@ -69,7 +69,7 @@ import { AppHeader } from "@/components/elements/generic";
 import { GameScreenMain } from "./GameScreenMain";
 import { GameScreenOverlays } from "./GameScreenOverlays";
 import { ClassSelectionScreen } from "../ClassSelectionScreen";
-import type { VignetteStage } from "@/features/game/types";
+import type { VignetteStage } from "@/features/narrative/types";
 
 export function GameScreen() {
   const dispatch = useAppDispatch();

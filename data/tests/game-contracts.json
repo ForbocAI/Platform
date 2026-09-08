@@ -1,0 +1,6 @@
+{
+  "suite": "Game state contracts",
+  "inventory": "Inventory entries retain their declared asset shapes",
+  "closedRecords": "Narrative and session records reject undeclared fields",
+  "narrative": "Narrative projections match the fields owned by reducers"
+}

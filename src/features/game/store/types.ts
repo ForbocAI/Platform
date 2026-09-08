@@ -1,4 +1,5 @@
-import type { PlayerActor, Sector, SignalEntry, OperationalObjective, PerformanceMetrics } from '@/features/game/types';
+import type { PlayerActor, Sector, SignalEntry } from "@/features/game/types";
+import type { OperationalObjective, PerformanceMetrics } from "@/features/game/store/objectives";
 
 export interface SectorLocation {
   x: number;

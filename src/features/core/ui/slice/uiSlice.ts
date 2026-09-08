@@ -1,4 +1,5 @@
-import type { StageOfScene, AgentClass } from '@/features/game/types';
+import type { StageOfScene } from "@/features/narrative/types";
+import type { AgentClass } from "@/features/game/types";
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { type RootState } from '@/features/core/store';
 import settings from '../../../../../data/presentation/settings.json';

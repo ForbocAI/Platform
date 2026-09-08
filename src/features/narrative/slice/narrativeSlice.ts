@@ -3,14 +3,7 @@ import {
   createSelector,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import type {
-  Thread,
-  SceneRecord,
-  Fact,
-  Vignette,
-  StageOfScene,
-  VignetteStage,
-} from "@/features/game/types";
+import type { Thread, SceneRecord, Fact, Vignette, StageOfScene, VignetteStage } from "@/features/narrative/types";
 
 function nanoid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
