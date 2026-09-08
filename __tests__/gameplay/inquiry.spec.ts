@@ -2,18 +2,18 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
 
 const mockAskOracle = vi.fn();
-vi.mock('../src/features/game/sdk/forbocRuntime', () => ({
+vi.mock('../../src/features/game/sdk/forbocRuntime', () => ({
     askOracle: mockAskOracle,
     ensureApiAvailable: vi.fn(),
 }));
 
-const { askInquiry, performSystemInquiry } = await import('../src/features/game/mechanics/orchestrators/inquiry');
-const { sdkService } = await import('../src/features/game/sdk/cortexService');
-const gameReducer = (await import('../src/features/game/store/gameSlice')).default;
-const uiReducer = (await import('../src/features/core/ui/slice/uiSlice')).default;
-const { initialState } = await import('../src/features/game/store/constants');
-import type { GameState } from '../src/features/game/store/types';
-import type { StageOfScene } from '../src/features/game/types';
+const { askInquiry, performSystemInquiry } = await import('../../src/features/game/mechanics/orchestrators/inquiry');
+const { sdkService } = await import('../../src/features/game/sdk/cortexService');
+const gameReducer = (await import('../../src/features/game/store/gameSlice')).default;
+const uiReducer = (await import('../../src/features/core/ui/slice/uiSlice')).default;
+const { initialState } = await import('../../src/features/game/store/constants');
+import type { GameState } from '../../src/features/game/store/types';
+import type { StageOfScene } from '../../src/features/game/types';
 
 const makeGetState = (stress: number, stage: StageOfScene) => () => ({
     game: { player: { stats: { stress } } } as unknown as GameState,

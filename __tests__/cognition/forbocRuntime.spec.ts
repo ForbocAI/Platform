@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import fixture from '../data/tests/forboc-runtime.json';
-import personaData from '../src/features/game/sdk/data/personas.json';
-import runtimeData from '../src/features/game/sdk/data/runtime.json';
+import fixture from '../../data/tests/forboc-runtime.json';
+import personaData from '../../src/features/game/sdk/data/personas.json';
+import runtimeData from '../../src/features/game/sdk/data/runtime.json';
 
 const mocks = vi.hoisted(() => ({
   configureNpc: vi.fn(),
@@ -27,7 +27,7 @@ const freshRuntime = async () => {
     configureNpc: mocks.configureNpc,
     run: mocks.run,
   });
-  return import('../src/features/game/sdk/forbocRuntime');
+  return import('../../src/features/game/sdk/forbocRuntime');
 };
 
 const configuredNpc = (id: string) => mocks.configureNpc.mock.calls

@@ -1,0 +1,21 @@
+{
+  "suite": "Shared presentation controls",
+  "cases": {
+    "hydration": "keeps server markup independent of the browser theme preference",
+    "storedTheme": "loads the stored theme through the root listener",
+    "deniedRead": "keeps controls usable when reading storage is denied",
+    "deniedWrite": "keeps a selected theme when writing storage is denied",
+    "remount": "retains theme across class selection and game header mounts",
+    "dismiss": "restores trigger focus after Escape and closes on focus exit",
+    "audio": "exposes and updates narration music and mute states",
+    "history": "does not reload or replace browser history on popstate",
+    "start": "starts the selected class without adding a synthetic history entry"
+  },
+  "browser": {
+    "bootstrap": "app/bootstrap",
+    "deniedMessage": "Preference storage unavailable",
+    "outsideLabel": "Outside controls",
+    "popstate": "popstate"
+  },
+  "counts": { "single": 1 }
+}

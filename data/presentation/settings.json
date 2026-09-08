@@ -1,0 +1,23 @@
+{
+  "theme": {
+    "storageKey": "forboc-theme",
+    "attribute": "data-theme",
+    "initial": "dark",
+    "next": { "dark": "light", "light": "dark" },
+    "labels": { "dark": "Light theme", "light": "Dark theme" }
+  },
+  "labels": {
+    "settings": "Settings",
+    "narration": "Narration",
+    "music": "Music",
+    "mute": "Mute",
+    "unmute": "Unmute"
+  },
+  "testIds": {
+    "theme": "settings-theme-toggle",
+    "narration": "settings-tts-toggle",
+    "music": "settings-music-toggle",
+    "volume": "settings-volume-toggle"
+  },
+  "dismissKey": "Escape"
+}

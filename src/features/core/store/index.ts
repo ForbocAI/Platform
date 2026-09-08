@@ -7,6 +7,7 @@ import audioReducer from '@/features/audio/slice/audioSlice';
 import forbocReducer from '@/features/game/sdk/state/forbocSlice';
 import { registerAudioListeners, flushTtsQueue } from '@/features/audio/audioListeners';
 import { registerGameListeners } from '@/features/core/store/listeners';
+import { registerThemeListeners } from '@/features/core/ui/themeListeners';
 
 export const appBootstrap = { type: 'app/bootstrap' as const };
 export { retryInitialize } from './listeners';
@@ -35,6 +36,7 @@ export { useAppDispatch, useAppSelector } from './hooks';
 const startAppListening = listenerMiddleware.startListening as TypedStartListening<RootState, AppDispatch>;
 
 registerAudioListeners(startAppListening);
+registerThemeListeners(startAppListening);
 registerGameListeners(startAppListening);
 
 // Flush TTS queue on user click so speechSynthesis.speak() runs with a user gesture (Chrome requirement).

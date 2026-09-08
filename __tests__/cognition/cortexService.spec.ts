@@ -1,19 +1,19 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import fixture from '../data/tests/cortex-service.json';
-import oracleData from '../src/features/game/sdk/data/oracle.json';
-import type { Area, StageOfScene } from '../src/features/game/types';
+import fixture from '../../data/tests/cortex-service.json';
+import oracleData from '../../src/features/game/sdk/data/oracle.json';
+import type { Area, StageOfScene } from '../../src/features/game/types';
 
 const mocks = vi.hoisted(() => ({
   askOracle: vi.fn(),
   ensureApiAvailable: vi.fn(),
 }));
 
-vi.mock('../src/features/game/sdk/forbocRuntime', () => ({
+vi.mock('../../src/features/game/sdk/forbocRuntime', () => ({
   askOracle: mocks.askOracle,
   ensureApiAvailable: mocks.ensureApiAvailable,
 }));
 
-const { sdkService } = await import('../src/features/game/sdk/cortexService');
+const { sdkService } = await import('../../src/features/game/sdk/cortexService');
 const area = fixture.area as Area;
 
 describe(fixture.suites.initialization, () => {

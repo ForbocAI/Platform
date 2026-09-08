@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
-import gameReducer from '../src/features/game/store/gameSlice';
-import { movePlayer } from '../src/features/game/mechanics/orchestrators/exploration';
-import { initialState } from '../src/features/game/store/constants';
-import type { GameState } from '../src/features/game/store/types';
-import type { Direction, Sector, PerformanceMetrics } from '../src/features/game/types';
+import gameReducer from '../../src/features/game/store/gameSlice';
+import { movePlayer } from '../../src/features/game/mechanics/orchestrators/exploration';
+import { initialState } from '../../src/features/game/store/constants';
+import type { GameState } from '../../src/features/game/store/types';
+import type { Direction, Sector, PerformanceMetrics } from '../../src/features/game/types';
 
 const makeArea = (exits: Record<string, string | null>): Sector => ({
     id: 'area-1',

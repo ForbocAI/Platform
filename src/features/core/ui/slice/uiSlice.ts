@@ -1,6 +1,8 @@
 import type { StageOfScene, AgentClass } from '@/features/game/types';
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { type RootState } from '@/features/core/store';
+import settings from '../../../../../data/presentation/settings.json';
+import { nextTheme, themeOf, type Theme } from '../theme';
 
 const DEFAULT_SELECTED_CLASS: AgentClass = 'Wayfinder';
 
@@ -11,6 +13,7 @@ export interface AutoplaySchedulePayload {
 }
 
 interface UIState {
+  theme: Theme;
   inquiryInput: string;
   showMap: boolean;
   stageOfScene: StageOfScene;
@@ -37,6 +40,7 @@ interface UIState {
 }
 
 const initialState: UIState = {
+  theme: themeOf(settings.theme.initial),
   inquiryInput: "",
   showMap: false,
   stageOfScene: "To Knowledge",
@@ -61,6 +65,12 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
+    themeLoaded: (state, action: PayloadAction<Theme>) => {
+      state.theme = action.payload;
+    },
+    themeToggled: (state) => {
+      state.theme = nextTheme(state.theme);
+    },
     setInquiryInput: (state, action: PayloadAction<string>) => {
       state.inquiryInput = action.payload;
     },
@@ -168,6 +178,9 @@ export const uiSlice = createSlice({
 export const { setInquiryInput, clearInquiryInput, toggleShowMap, setStageOfScene, toggleAutoPlay, setAutoplaySchedule, setAgentSchedule, toggleTextToSpeech, toggleFactsPanel, setVignetteThemeInput, clearVignetteThemeInput, toggleInventory, toggleCapabilitiesPanel, toggleSkillsPanel, toggleCompanionPanel, openTrade, closeTrade, toggleCraftingPanel, setSelectedClassId } = uiSlice.actions;
 
 // Selectors (memoized for stable references)
+export const { themeLoaded, themeToggled } = uiSlice.actions;
+export const selectTheme = (state: RootState): Theme => state.ui.theme;
+
 const selectUIState = (state: RootState) => state.ui;
 
 export const selectInquiryInput = createSelector(

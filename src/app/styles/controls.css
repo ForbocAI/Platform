@@ -1,0 +1,149 @@
+.font-runic {
+  font-family: var(--font-runic);
+  letter-spacing: 0.14em;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.status-led {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  min-height: 6px;
+  background: var(--accent-bright);
+  border-radius: 999px;
+  box-shadow: 0 0 6px rgba(255, 207, 112, 0.7), 0 0 10px rgba(255, 207, 112, 0.42);
+  margin-left: 0.5rem;
+  position: relative;
+  animation: ambient-breathe 2.4s ease-in-out infinite;
+}
+
+.lantern-glyph {
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 0 12px rgba(252, 163, 17, 0.16);
+}
+
+.lantern-glyph::before,
+.lantern-glyph::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+}
+
+.lantern-glyph::before {
+  color: var(--palette-accent-soft);
+  transform: translate(0.05em, -0.03em);
+}
+
+.lantern-glyph::after {
+  color: var(--palette-accent-bright);
+  transform: translate(-0.04em, 0.04em);
+}
+
+[data-macro-scramble] {
+  font-family: var(--font-display);
+  color: var(--foreground);
+  display: inline-block;
+  letter-spacing: 0.12em;
+}
+
+[data-macro-scramble]::after {
+  content: " ᚭ";
+  color: var(--color-rune-ink);
+  animation: rune-glow 3s ease-in-out infinite;
+}
+
+.encrypted-text {
+  display: inline-block;
+}
+
+.cozy-panel {
+  border: none;
+  border-radius: 24px;
+  background: linear-gradient(180deg, var(--panel-fill-1), var(--panel-fill-2));
+  box-shadow:
+    0 0 0 1px rgba(var(--ambient-warm-rgb), 0.14),
+    0 18px 40px var(--panel-shadow),
+    inset 0 1px 0 var(--panel-inset-highlight),
+    inset 0 0 0 1px rgba(var(--ambient-warm-rgb), 0.04);
+  backdrop-filter: blur(14px);
+}
+
+.portrait-frame {
+  border: 1px solid rgba(var(--ambient-warm-rgb), 0.42);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 20px var(--panel-shadow-soft),
+    inset 0 1px 0 var(--panel-inset-highlight),
+    inset 0 0 0 1px rgba(var(--ambient-warm-rgb), 0.06);
+}
+
+.portrait-arch {
+  border: none;
+  border-radius: 50% 50% 14px 14px / 30% 30% 14px 14px;
+  box-shadow:
+    0 0 0 1px rgba(var(--ambient-warm-rgb), 0.4),
+    0 10px 26px var(--panel-shadow-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.portrait-halo {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--ambient-warm-rgb), 0.32), transparent 68%);
+  filter: blur(18px);
+}
+
+.cozy-button {
+  @apply transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  background: linear-gradient(180deg, rgba(20, 33, 61, 0.7), rgba(10, 18, 32, 0.9));
+  border: 1px solid rgba(252, 163, 17, 0.4);
+  border-radius: 999px;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.cozy-button:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(28, 47, 82, 0.78), rgba(5, 10, 20, 0.95));
+  box-shadow: 0 0 18px rgba(252, 163, 17, 0.18);
+  color: var(--accent-mid);
+}
+
+.text-mid {
+  color: var(--accent-mid);
+  text-shadow: 0 0 10px rgba(253, 184, 64, 0.22);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(252, 163, 17, 0.65) var(--scrollbar-surface);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-surface);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(252, 163, 17, 0.85), rgba(74, 100, 148, 0.72));
+  border: 1px solid rgba(252, 163, 17, 0.45);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  box-shadow: 0 0 10px rgba(252, 163, 17, 0.24);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-surface);
+}

@@ -1,0 +1,103 @@
+@keyframes ambient-breathe {
+  0%, 100% { opacity: 0.72; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes lantern-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes lantern-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.25%); }
+}
+
+@keyframes lantern-float {
+  0%, 100% { transform: translateY(0); opacity: 0.88; }
+  50% { transform: translateY(-2px); opacity: 1; }
+}
+
+@keyframes particle-drift-up {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(var(--particle-drift-x, 6px), -120%) scale(1); opacity: 0; }
+}
+
+@keyframes particle-drift-side {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(var(--particle-drift-x, 90%), -18%) scale(1); opacity: 0; }
+}
+
+@keyframes rune-glow {
+  0%, 100% { opacity: 0.75; text-shadow: 0 0 8px rgba(252, 163, 17, 0.15); }
+  50% { opacity: 1; text-shadow: 0 0 14px rgba(252, 163, 17, 0.35); }
+}
+
+@keyframes enemy-flash-attack {
+  0%, 100% { filter: brightness(1) sepia(0); }
+  50% { filter: brightness(1.2); box-shadow: 0 0 18px rgba(252, 163, 17, 0.28); transform: scale(1.01); }
+}
+
+@keyframes enemy-flash-damage {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  25% { opacity: 0.72; filter: brightness(1.22); }
+  50% { opacity: 1; filter: brightness(1); }
+  75% { opacity: 0.72; filter: brightness(1.22); }
+}
+
+.animate-enemy-attack {
+  animation: enemy-flash-attack 0.35s ease-out forwards;
+}
+
+.animate-enemy-damage {
+  animation: enemy-flash-damage 0.5s ease-out forwards;
+}
+
+.animate-holo-flicker {
+  animation: lantern-float 5s ease-in-out infinite;
+}
+
+.animate-ambient-breathe {
+  animation: ambient-breathe 2.5s ease-in-out infinite;
+}
+
+.animate-lantern-spin {
+  animation: lantern-spin 3s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.logo-theme {
+  filter: hue-rotate(10deg) saturate(1.1) brightness(0.98)
+          drop-shadow(0 0 10px rgba(252, 163, 17, 0.28));
+  transition: all 0.3s ease;
+  animation: logo-pulse 4.5s ease-in-out infinite;
+}
+
+.logo-theme:hover {
+  filter: hue-rotate(10deg) saturate(1.2) brightness(1.04)
+          drop-shadow(0 0 16px rgba(252, 163, 17, 0.34));
+  transform: scale(1.04);
+}
+
+@keyframes logo-pulse {
+  0%, 100% {
+    filter: hue-rotate(10deg) saturate(1.1) brightness(0.98)
+            drop-shadow(0 0 10px rgba(252, 163, 17, 0.28));
+  }
+  50% {
+    filter: hue-rotate(10deg) saturate(1.16) brightness(1.02)
+            drop-shadow(0 0 14px rgba(252, 163, 17, 0.34));
+  }
+}

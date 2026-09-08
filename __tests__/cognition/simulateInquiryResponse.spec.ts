@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { simulateInquiryResponse } from '../src/features/game/mechanics/transformations/inquiry';
-import { UNEXPECTEDLY_TABLE } from '../src/features/game/mechanics/tables';
+import { simulateInquiryResponse } from '../../src/features/game/mechanics/transformations/inquiry';
+import { UNEXPECTEDLY_TABLE } from '../../src/features/game/mechanics/tables';
 
 afterEach(() => {
     vi.restoreAllMocks();

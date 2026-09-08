@@ -1,0 +1,157 @@
+@theme {
+  --font-sans: "Macondo", serif;
+  --font-mono: "SF Mono", "Fira Code", Menlo, monospace;
+  --font-display: "Eagle Lake", serif;
+  --font-runic: "Noto Sans Runic", "Eagle Lake", serif;
+
+  --color-palette-bg: #000000;
+  --color-palette-bg-dark: #000000;
+  --color-palette-bg-mid: #0a1220;
+  --color-palette-bg-light: #14213D;
+  --color-palette-bg-panel: #1c2f52;
+  --color-palette-panel: #1c2f52;
+
+  --color-palette-border: #2a3f66;
+  --color-palette-border-dim: #14213D;
+  --color-palette-border-light: #FCA311;
+
+  --color-palette-accent: #FCA311;
+  --color-palette-accent-mid: #fdb840;
+  --color-palette-accent-soft: #4a6494;
+  --color-palette-accent-dim: #b87c0d;
+  --color-palette-accent-bright: #ffcf70;
+  --color-palette-accent-green: #4a6494;
+  --color-palette-accent-lime: #7a94c0;
+  --color-palette-highlight: #FFFFFF;
+
+  --color-palette-oracle: #4caf7d;
+  --color-palette-oracle-bright: #8de8b0;
+
+  --color-palette-muted: #6b7690;
+  --color-palette-muted-light: #E5E5E5;
+  --color-palette-text-muted: #9aa3b8;
+  --color-palette-foreground: #FFFFFF;
+  --color-palette-white: #FFFFFF;
+}
+
+:root {
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --accent: #FCA311;
+  --accent-mid: #fdb840;
+  --accent-soft: #4a6494;
+  --accent-dim: #b87c0d;
+  --accent-bright: #ffcf70;
+  --accent-green: #4a6494;
+  --accent-lime: #7a94c0;
+  --highlight: #FFFFFF;
+  --border-dim: #14213D;
+  --palette-bg-dark: #000000;
+  --palette-bg-mid: #0a1220;
+  --palette-bg-light: #14213D;
+  --palette-bg-panel: #1c2f52;
+  --palette-muted: #6b7690;
+  --palette-muted-light: #E5E5E5;
+  --palette-text-muted: #9aa3b8;
+  --palette-border: #2a3f66;
+  --palette-border-light: #FCA311;
+  --palette-accent: #FCA311;
+  --palette-accent-soft: #4a6494;
+  --palette-accent-dim: #b87c0d;
+  --palette-accent-bright: #ffcf70;
+  --palette-accent-green: #4a6494;
+  --palette-accent-lime: #7a94c0;
+  --palette-highlight: #FFFFFF;
+  --palette-white: #FFFFFF;
+  --color-rune-ink: #FCA311;
+  --font-size-base: 0.68rem;
+  --icon-size: 1.35em;
+
+  --body-gradient-1: #0a1220;
+  --body-gradient-2: #050a14;
+  --body-gradient-3: #000000;
+  --ambient-warm-rgb: 252, 163, 17;
+  --ambient-warm-bright-rgb: 255, 207, 112;
+  --ambient-cool-rgb: 74, 100, 148;
+  --panel-fill-1: rgba(20, 33, 61, 0.38);
+  --panel-fill-2: rgba(0, 0, 0, 0.62);
+  --panel-shadow: rgba(0, 0, 0, 0.26);
+  --panel-shadow-soft: rgba(0, 0, 0, 0.3);
+  --panel-inset-highlight: rgba(255, 255, 255, 0.08);
+  --scrollbar-surface: rgba(0, 0, 0, 0.68);
+}
+
+[data-theme="light"] {
+  --color-palette-bg: #FEFAE0;
+  --color-palette-bg-dark: #FEFAE0;
+  --color-palette-bg-mid: #FFFDF3;
+  --color-palette-bg-light: #FFFFFA;
+  --color-palette-bg-panel: #FFFFFF;
+  --color-palette-panel: #FFFFFF;
+
+  --color-palette-border: #a1926a;
+  --color-palette-border-dim: #e0d7bb;
+  --color-palette-border-light: #3d2611;
+
+  --color-palette-accent: #BC6C25;
+  --color-palette-accent-mid: #8f5119;
+  --color-palette-accent-soft: #606C38;
+  --color-palette-accent-dim: #6e3d13;
+  --color-palette-accent-bright: #3d2611;
+  --color-palette-accent-green: #606C38;
+  --color-palette-accent-lime: #6d7a48;
+  --color-palette-highlight: #3d2611;
+
+  --color-palette-oracle: #2f8f5b;
+  --color-palette-oracle-bright: #1f6e44;
+
+  --color-palette-muted: #7d7256;
+  --color-palette-muted-light: #5c5340;
+  --color-palette-text-muted: #675e46;
+  --color-palette-foreground: #3d2611;
+  --color-palette-white: #3d2611;
+
+  --background: #FEFAE0;
+  --foreground: #3d2611;
+  --accent: #BC6C25;
+  --accent-mid: #8f5119;
+  --accent-soft: #606C38;
+  --accent-dim: #6e3d13;
+  --accent-bright: #3d2611;
+  --accent-green: #606C38;
+  --accent-lime: #6d7a48;
+  --highlight: #3d2611;
+  --border-dim: #FEFAE0;
+  --palette-bg-dark: #FEFAE0;
+  --palette-bg-mid: #FFFDF3;
+  --palette-bg-light: #FFFFFA;
+  --palette-bg-panel: #FFFFFF;
+  --palette-muted: #7d7256;
+  --palette-muted-light: #5c5340;
+  --palette-text-muted: #675e46;
+  --palette-border: #a1926a;
+  --palette-border-light: #3d2611;
+  --palette-accent: #BC6C25;
+  --palette-accent-soft: #606C38;
+  --palette-accent-dim: #6e3d13;
+  --palette-accent-bright: #3d2611;
+  --palette-accent-green: #606C38;
+  --palette-accent-lime: #6d7a48;
+  --palette-highlight: #3d2611;
+  --palette-white: #3d2611;
+  --color-rune-ink: #8f5119;
+
+  --ambient-warm-rgb: 188, 108, 37;
+  --ambient-warm-bright-rgb: 221, 161, 94;
+  --ambient-cool-rgb: 96, 108, 56;
+
+  --body-gradient-1: #FFFFFA;
+  --body-gradient-2: #FFFDF3;
+  --body-gradient-3: #FEFAE0;
+  --panel-fill-1: rgba(255, 255, 255, 0.96);
+  --panel-fill-2: rgba(254, 250, 224, 0.55);
+  --panel-shadow: rgba(61, 38, 17, 0.16);
+  --panel-shadow-soft: rgba(61, 38, 17, 0.2);
+  --panel-inset-highlight: rgba(255, 255, 255, 0.7);
+  --scrollbar-surface: rgba(254, 250, 224, 0.68);
+}

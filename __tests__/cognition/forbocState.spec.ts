@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { describe, expect, it } from 'vitest';
-import fixture from '../data/tests/forboc-runtime.json';
+import fixture from '../../data/tests/forboc-runtime.json';
 import forbocReducer, {
   agentObservationCommitted,
   resetForbocSession,
   vendorResponseCommitted,
-} from '../src/features/game/sdk/state/forbocSlice';
+} from '../../src/features/game/sdk/state/forbocSlice';
 
 const createStore = () => configureStore({ reducer: { forboc: forbocReducer } });
 

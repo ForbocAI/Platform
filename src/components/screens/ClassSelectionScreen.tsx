@@ -11,6 +11,7 @@ import { selectIsLoading } from "@/features/game/store/gameSlice";
 import { getClassPortraitUrl, getClassFullPortraitUrl } from "@/features/game/sdk/portraits";
 import { Activity, Sparkles, Swords, Wind, Wand2, Heart, Gauge, Gift } from "lucide-react";
 import type { AgentClass } from "@/features/game/types";
+import presentationData from '../../../data/presentation/class-selection.json';
 
 const PARTICLE_THEME: Record<AgentClass, { color: string; drift: "up" | "side" }> = {
   "Wayfinder": { color: "var(--accent-bright)", drift: "up" },
@@ -84,21 +85,20 @@ export function ClassSelectionScreen() {
   const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
-    if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
+    clearTimeout(previewTimeoutRef.current ?? undefined);
   }, []);
 
   const startPreview = (id: AgentClass) => {
-    if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
+    clearTimeout(previewTimeoutRef.current ?? undefined);
     previewTimeoutRef.current = setTimeout(() => setPreviewedId(id), 200);
   };
 
   const cancelPreview = () => {
-    if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
+    clearTimeout(previewTimeoutRef.current ?? undefined);
     setPreviewedId(null);
   };
 
   const handleStart = () => {
-    window.history.pushState({ forbocGame: true }, "", window.location.href);
     dispatch(initializeGame({ classId: selectedId }));
   };
 
@@ -107,16 +107,16 @@ export function ClassSelectionScreen() {
   const selectedPortraitUrl = getClassFullPortraitUrl(displayId);
 
   const statMaxes = useMemo(() => {
-    const maxes = { Str: 1, Agi: 1, Arcane: 1, maxHp: 1, maxStress: 1 };
-    for (const id of CHARACTER_CLASSES) {
+    return CHARACTER_CLASSES.reduce((maxes, id) => {
       const stats = CLASS_TEMPLATES[id].baseStats;
-      maxes.Str = Math.max(maxes.Str, stats.Str);
-      maxes.Agi = Math.max(maxes.Agi, stats.Agi);
-      maxes.Arcane = Math.max(maxes.Arcane, stats.Arcane);
-      maxes.maxHp = Math.max(maxes.maxHp, stats.maxHp);
-      maxes.maxStress = Math.max(maxes.maxStress, stats.maxStress);
-    }
-    return maxes;
+      return {
+        Str: Math.max(maxes.Str, stats.Str),
+        Agi: Math.max(maxes.Agi, stats.Agi),
+        Arcane: Math.max(maxes.Arcane, stats.Arcane),
+        maxHp: Math.max(maxes.maxHp, stats.maxHp),
+        maxStress: Math.max(maxes.maxStress, stats.maxStress),
+      };
+    }, CLASS_TEMPLATES[CHARACTER_CLASSES[0]].baseStats);
   }, []);
 
   const statBarPct = (value: number, max: number) => Math.round(Math.min(100, Math.max(4, (value / max) * 100)));
@@ -267,7 +267,7 @@ export function ClassSelectionScreen() {
               className="w-full py-5 text-xl tracking-[0.3em] border-2 shadow-[0_0_36px_-6px] shadow-palette-accent-bright/60"
               showLabel={true}
             >
-              {isLoading ? "Preparing..." : "Set out"}
+              {isLoading ? presentationData.loadingLabel : presentationData.startLabel}
             </GameButton>
           </div>
         </div>
